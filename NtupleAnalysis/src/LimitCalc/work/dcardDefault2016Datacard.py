@@ -2,7 +2,7 @@ import HiggsAnalysis.NtupleAnalysis.tools.systematics as systematics
 
 DataCardName ='Default_13TeV'
 LightAnalysis = not True # FIXME set to True for light H+
-
+MVA_analysis = not True #Set true if MVA is on to produce plots
 
 # Set mass points
 LightMassPoints=[]
@@ -992,17 +992,18 @@ ControlPlots.append(ControlPlotInput(
     flowPlotCaption  = "^{}R_{bb}^{min}", # Leave blank if you don't want to include the item to the selection flow plot
 ))
 
-ControlPlots.append(ControlPlotInput(
-    title	     = "MVA",
-    histoName	     = "MVA",
-    details	     = { "xlabel": "MVA",
-        		 "ylabel": "Events",
-        		 "divideByBinWidth": False,
-        		 "unit": " ",
-        		 "log": False,
-        		 "opts": {"ymin": 0.0} },
-    flowPlotCaption  = "MVA Cut",
-))
+if MVA_analysis:
+	ControlPlots.append(ControlPlotInput(
+	    title	     = "MVA",
+	    histoName	     = "MVA",
+	    details	     = { "xlabel": "MVA",
+	        		 "ylabel": "Events",
+	        		 "divideByBinWidth": False,
+	        		 "unit": " ",
+	        		 "log": False,
+	        		 "opts": {"ymin": 0.0} },
+	    flowPlotCaption  = "MVA Cut",
+	))
 
 if OptionMassShape =="TransverseMass":
     ControlPlots.append(ControlPlotInput(title="TransverseMass",

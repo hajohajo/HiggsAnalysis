@@ -45,10 +45,10 @@ public:
 
     friend class MVASelection;
 
+
   private:
     float fMVAOutputValue;
     bool bPassedSelection;
-
   };
 
   explicit MVASelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& prefix, const std::string& postfix);
@@ -79,6 +79,7 @@ public:
 
 
 private:
+  const float fMvaCutValue;
   void initialize(const ParameterSet& config, const std::string& postfix);
 
   Data privateAnalyze(const Event& iEvent);

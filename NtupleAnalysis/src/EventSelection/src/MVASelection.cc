@@ -29,7 +29,9 @@ MVASelection::Data::~Data(){ }
 MVASelection::MVASelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& prefix, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, prefix+postfix),
   cPassedMVASelection(fEventCounter.addCounter("passed MVA selection "+prefix+" ("+postfix+")")),
-  cSubAll(fEventCounter.addSubCounter("MVA selection "+prefix+" ("+postfix+")", "All events"))
+  cSubAll(fEventCounter.addSubCounter("MVA selection "+prefix+" ("+postfix+")", "All events")),
+  fMvaCutValue(config.getParameter<float>("MVACut"))
+
 {
   initialize(config, postfix);
 }
@@ -38,7 +40,8 @@ MVASelection::MVASelection(const ParameterSet& config, EventCounter& eventCounte
 MVASelection::MVASelection(const ParameterSet& config, const std::string& postfix)
 : BaseSelection(),
   cPassedMVASelection(fEventCounter.addCounter("passed MVA selection ("+postfix+")")),
-  cSubAll(fEventCounter.addSubCounter("MVA selection ("+postfix+")", "All events"))
+  cSubAll(fEventCounter.addSubCounter("MVA selection ("+postfix+")", "All events")),
+  fMvaCutValue(config.getParameter<float>("MVACut"))
 {
   initialize(config, postfix);
   bookHistograms(new TDirectory());
@@ -51,17 +54,7 @@ MVASelection::~MVASelection() {
 
 void MVASelection::initialize(const ParameterSet& config, const std::string& postfix) {
   reader = new TMVA::Reader( "!Color:Silent" );
-/*
-  Float_t R_bb, MET, TransMass, TransMass_jj, TransMass_muEt;
-  Float_t tjDist, jjDist, mujDist, ejDist;
-  Float_t SelectedTau_pt, SelectedTau_eta, SelectedTau_phi;
-  Float_t Muon_pt, Muon_eta, Muon_phi;
-  Float_t Electron_pt, Electron_eta, Electron_phi;
-  Float_t Jet1_pt, Jet1_phi, Jet1_eta, Jet1_IncSecVer_Btag, Jet1_MVA_Btag;
-  Float_t Jet2_pt, Jet2_phi, Jet2_eta, Jet2_IncSecVer_Btag, Jet2_MVA_Btag;
-  Float_t Jet3_pt, Jet3_phi, Jet3_eta, Jet3_IncSecVer_Btag, Jet3_MVA_Btag;
-  Float_t nTaus, nJets, nMuons, nElectrons;
-*/
+
   reader->AddVariable("R_bb",&R_bb);
   reader->AddVariable("MET",&MET);
   reader->AddVariable("TransMass",&TransMass);
@@ -252,10 +245,10 @@ MVASelection::Data MVASelection::privateAnalyze(const Event& event) {
     ej3Dist=0;
   }
 
-//  output.setValue(reader->EvaluateMVA("BDTG method"));
-  output.setValue(reader->EvaluateMVA("DNN method"));
+  output.setValue(reader->EvaluateMVA("BDTG method"));
+//  output.setValue(reader->EvaluateMVA("DNN method"));
   hMVAValueAll->Fill(output.mvaValue());
-  passedMVA=(output.mvaValue()>0.5);
+  passedMVA=(output.mvaValue()>fMvaCutValue);
   if(passedMVA){
     output.setTrue();
     cPassedMVASelection.increment();

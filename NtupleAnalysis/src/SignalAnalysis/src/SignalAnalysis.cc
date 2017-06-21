@@ -7,7 +7,6 @@
 #include "EventSelection/interface/TransverseMass.h"
 
 #include "TDirectory.h"
-#include <iostream>
 
 class SignalAnalysis: public BaseSelector {
 public:
@@ -261,10 +260,10 @@ void SignalAnalysis::process(Long64_t entry) {
     //    hTransverseMass_WRegion_bbcuts->Fill(myTransverseMass);
   }
 
+//MVA selection
   const MVASelection::Data mvaData = fMVASelection.analyze(fEvent, *fMVASelection.reader);
   if(!mvaData.passedSelection())
-//    std::cout<<mvaData.mvaValue()<<std::endl;
-    return;
+      	return;
 
 //====== All cuts passed
   cSelected.increment();

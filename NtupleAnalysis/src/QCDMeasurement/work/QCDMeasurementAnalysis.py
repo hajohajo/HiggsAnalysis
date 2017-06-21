@@ -15,7 +15,7 @@ if len(sys.argv) < 2:
 from HiggsAnalysis.NtupleAnalysis.main import Process, PSet, Analyzer
 from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import obtainAnalysisSuffix
 process = Process("QCDMeasurement"+obtainAnalysisSuffix(sys.argv))
-process.addDatasetsFromMulticrab(sys.argv[1], blacklist=["ChargedHiggs","2016C","2016E","2016F","2016G","2016H"])
+process.addDatasetsFromMulticrab(sys.argv[1], blacklist=["ChargedHiggs"])
 
 # Add config
 from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import allSelections,applyAnalysisCommandLineOptions,setAngularCutsWorkingPoint

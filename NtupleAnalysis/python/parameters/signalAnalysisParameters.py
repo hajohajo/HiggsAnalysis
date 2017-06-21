@@ -156,7 +156,7 @@ jetCorrelations = PSet (
 )
 
 mvaSelection = PSet (
-	MVACut=-0.23,
+	MVACut=0.23,
 )
 
 def setAngularCutsWorkingPoint(pset, workingPoint):
@@ -233,7 +233,6 @@ allSelections = PSet(
  AngularCutsBackToBack = angularCutsBackToBack,
        JetCorrelations = jetCorrelations,
            CommonPlots = commonPlotsOptions,
-#test
 	  MVASelection = mvaSelection,
 )
 
