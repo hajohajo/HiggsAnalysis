@@ -15,7 +15,9 @@ if len(sys.argv) < 2:
 from HiggsAnalysis.NtupleAnalysis.main import Process, PSet, Analyzer
 from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import obtainAnalysisSuffix 
 process = Process("SignalAnalysis"+obtainAnalysisSuffix(sys.argv))
-blacklist = ["ChargedHiggs_TTToHplusBWB"]
+blacklist = ["ChargedHiggs_TTToHplusBWB",
+	"ChargedHiggs_HplusTB_HplusToTauNu_M_180","ChargedHiggs_HplusTB_HplusToTauNu_M_250","ChargedHiggs_HplusTB_HplusToTauNu_M_300","ChargedHiggs_HplusTB_HplusToTauNu_M_350","ChargedHiggs_HplusTB_HplusToTauNu_M_400","ChargedHiggs_HplusTB_HplusToTauNu_M_500","ChargedHiggs_HplusTB_HplusToTauNu_M_750","ChargedHiggs_HplusTB_HplusToTauNu_M_800","ChargedHiggs_HplusTB_HplusToTauNu_M_1000","ChargedHiggs_HplusTB_HplusToTauNu_M_2000","ChargedHiggs_HplusTB_HplusToTauNu_M_3000","ChargedHiggs_HplusTB_HplusToTauNu_M_200",
+	"2016C","2016E","2016F","2016G","2016H"]
 if lightAnalysis:
     blacklist = ["ChargedHiggs_HplusTB"]
 process.addDatasetsFromMulticrab(sys.argv[1],blacklist=blacklist)
@@ -56,7 +58,7 @@ builder = AnalysisBuilder("SignalAnalysis",
                           searchModes,
                           #### Options ####
                           usePUreweighting=True,
-                          doSystematicVariations=True
+                          doSystematicVariations=False
                           )
 #builder.addVariation("METSelection.METCutValue", [100,120,140])
 #builder.addVariation("AngularCutsBackToBack.workingPoint", ["Loose","Medium","Tight"])

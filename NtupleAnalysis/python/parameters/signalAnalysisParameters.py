@@ -145,6 +145,9 @@ jetCorrelations = PSet (
 
 )
 
+mvaSelection = PSet (
+	MVACut=-0.23,
+)
 
 def setAngularCutsWorkingPoint(pset, workingPoint):
     if workingPoint == "NoCut":
@@ -199,6 +202,7 @@ commonPlotsOptions = PSet(
            WMassBins = PSet(nBins=60, axisMin=0., axisMax=300.),
               mtBins = PSet(nBins=1000, axisMin=0., axisMax=5000.), # 5 GeV bin width for tail fitter
          invmassBins = PSet(nBins=500, axisMin=0., axisMax=5000.),
+	     mvaBins = PSet(nBins=100, axisMin=-1.0, axisMax=1.0),
   # Enable/Disable some debug-level plots
        enablePUDependencyPlots = True,
 )
@@ -218,6 +222,8 @@ allSelections = PSet(
  AngularCutsBackToBack = angularCutsBackToBack,
        JetCorrelations = jetCorrelations,
            CommonPlots = commonPlotsOptions,
+#test
+	  MVASelection = mvaSelection,
 )
 
 

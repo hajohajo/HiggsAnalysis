@@ -30,12 +30,12 @@ analysis = "QCDMeasurement"
 # Histograms are generated with 1 GeV bin width, i.e. putting 10 here means 
 # that the fit is done on 10 GeV bins
 _rebinFactor = 10 
-#_rebinFactor = 20 # changing to this can solve fitting problems by smoothing fluctuations
+#_rebinFactor = 30 # changing to this can solve fitting problems by smoothing fluctuations
 
 print "Analysis name:", analysis
 
-selectOnlyBins = []#["Inclusive"] #["1"]
-
+selectOnlyBins = ["Inclusive"] #["1"]
+#[]
 def usage():
     print "\n"
     print "### Usage:   QCDMeasurementNormalization.py <multicrab dir>\n"
