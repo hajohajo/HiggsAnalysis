@@ -73,13 +73,21 @@ muVeto = PSet(
          muonIsolation = "veto", # loosest possible for vetoing ("veto"), "tight" for selecting
 )
 
+#====== Muon selection (for embedding)
+muForEmbedding = PSet(
+             muonPtCut = 40.0,
+            muonEtaCut = 2.5,
+                muonID = "muIDTight", # options: muIDLoose, muIDMedium, muIDTight
+         muonIsolation = "tight", # for selecting, not vetoing
+)
+
 #====== Jet selection
 jetSelection = PSet(
-               jetType = "Jets", # options: Jets (AK4PFCHS), JetsPuppi (AK4Puppi)
-              jetPtCut = 30.0,
-             jetEtaCut = 4.7,
-     tauMatchingDeltaR = 0.4,
-  numberOfJetsCutValue = 3,
+               jetType  = "Jets", # options: Jets (AK4PFCHS), JetsPuppi (AK4Puppi)
+              jetPtCuts = [30.0],
+             jetEtaCuts = [4.7],
+     tauMatchingDeltaR  = 0.4,
+  numberOfJetsCutValue  = 3,
   numberOfJetsCutDirection = ">=", # options: ==, !=, <, <=, >, >=
             jetIDDiscr = "IDloose", # options: IDloose, IDtight, IDtightLeptonVeto
           jetPUIDDiscr = "", # does not work at the moment 
@@ -103,12 +111,14 @@ enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
  
 #====== B-jet selection
 bjetSelection = PSet(
-              jetPtCut = 30.0,
-             jetEtaCut = 2.5,
+    triggerMatchingApply= False,
+    triggerMatchingCone = 0.1,  # DeltaR for matching offline bjet with trigger::TriggerBjet 
+              jetPtCuts = [30.0],
+             jetEtaCuts = [2.5],
              #bjetDiscr = "combinedInclusiveSecondaryVertexV2BJetTags",
-             bjetDiscr = "pfCombinedInclusiveSecondaryVertexV2BJetTags",
- bjetDiscrWorkingPoint = "Loose",
- numberOfBJetsCutValue = 1,
+             bjetDiscr  = "pfCombinedInclusiveSecondaryVertexV2BJetTags",
+ bjetDiscrWorkingPoint  = "Loose",
+ numberOfBJetsCutValue  = 1,
  numberOfBJetsCutDirection = ">=", # options: ==, !=, <, <=, >, >=
 )
 
@@ -215,6 +225,7 @@ allSelections = PSet(
           TauSelection = tauSelection,
      ElectronSelection = eVeto,
          MuonSelection = muVeto,
+      MuonForEmbedding = muForEmbedding,
           JetSelection = jetSelection,
   AngularCutsCollinear = angularCutsCollinear,
          BJetSelection = bjetSelection,

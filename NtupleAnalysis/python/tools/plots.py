@@ -62,23 +62,61 @@ _heavyHplusToTBbarMasses = [180, 200, 220, 240, 250, 260, 280, 300, 350, 400, 50
 ## statistics. The mapping is used in the
 ## mergeRenameReorderForDataMC() function.
 _physicalMcAdd = {
-    #"TT"    : "TT",
-    "TT_ext": "TT", # covered by "TT"
+    "TT"    : "TT",
+    "TT_ext": "TT",
 
-    #"TTTT"      : "TTTT", # covered by "TT"
-    "TTTT_ext1" : "TTTT", # covered by "TT"
+    "TTTT"      : "TTTT", 
+    "TTTT_ext1" : "TTTT", 
 
     "WZ"     : "WZ",
+    "WZ_ext" : "WZ",
     "WZ_ext1": "WZ",
 
     "ST_tW_antitop_5f_inclusiveDecays"     : "ST_tW_antitop_5f_inclusiveDecays",
+    "ST_tW_antitop_5f_inclusiveDecays_ext" : "ST_tW_antitop_5f_inclusiveDecays",
     "ST_tW_antitop_5f_inclusiveDecays_ext1": "ST_tW_antitop_5f_inclusiveDecays",
 
-    "ST_tW_top_5f_inclusiveDecays"     : "ST_tW_top_5f_inclusiveDecays",
-    "ST_tW_top_5f_inclusiveDecays_ext1": "ST_tW_top_5f_inclusiveDecays",
+    "ST_tW_top_5f_inclusiveDecays"      : "ST_tW_top_5f_inclusiveDecays",
+    "ST_tW_top_5f_inclusiveDecays_ext"  : "ST_tW_top_5f_inclusiveDecays",
+    "ST_tW_top_5f_inclusiveDecays_ext1" : "ST_tW_top_5f_inclusiveDecays",
 
-    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8"     : "TTBB",
-    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8_ext1": "TTBB",
+    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8"      : "TTBB",
+    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8_ext1" : "TTBB",
+
+    "WJetsToLNu"     : "WJetsToLNu",
+    "WJetsToLNu_ext" : "WJetsToLNu",
+    "WJetsToLNu_ext1": "WJetsToLNu",
+    "WJetsToLNu_ext2": "WJetsToLNu",
+
+    "WJetsToLNu_HT_0To70"          : "WJetsToLNu_HT_0To70",
+    "WJetsToLNu_HT_0To70_ext2"     : "WJetsToLNu_HT_0To70",
+    "WJetsToLNu_HT_100To200"       : "WJetsToLNu_HT_100To200",
+    "WJetsToLNu_HT_100To200_ext1"  : "WJetsToLNu_HT_100To200",
+    "WJetsToLNu_HT_100To200_ext2"  : "WJetsToLNu_HT_100To200",
+    "WJetsToLNu_HT_200To400"       : "WJetsToLNu_HT_200To400",
+    "WJetsToLNu_HT_200To400_ext1"  : "WJetsToLNu_HT_200To400",
+    "WJetsToLNu_HT_200To400_ext2"  : "WJetsToLNu_HT_200To400",
+    "WJetsToLNu_HT_400To600"       : "WJetsToLNu_HT_400To600",
+    "WJetsToLNu_HT_400To600_ext1"  : "WJetsToLNu_HT_400To600",
+    "WJetsToLNu_HT_600To800"       : "WJetsToLNu_HT_600To800",
+    "WJetsToLNu_HT_600To800_ext1"  : "WJetsToLNu_HT_600To800",
+    "WJetsToLNu_HT_800To1200"      : "WJetsToLNu_HT_800To1200",
+    "WJetsToLNu_HT_800To1200_ext1" : "WJetsToLNu_HT_800To1200",
+    "WJetsToLNu_HT_1200To2500"     : "WJetsToLNu_HT_1200To2500",
+    "WJetsToLNu_HT_1200To2500_ext1": "WJetsToLNu_HT_1200To2500",
+    "WJetsToLNu_HT_2500ToInf"      : "WJetsToLNu_HT_2500ToInf",
+    "WJetsToLNu_HT_2500ToInf_ext1" : "WJetsToLNu_HT_2500ToInf",
+
+    "DYJetsToLL_M_50"            : "DYJetsToLL_M_50",
+    "DYJetsToLL_M_50_ext"        : "DYJetsToLL_M_50",
+    "DYJetsToLL_M_50_ext1"       : "DYJetsToLL_M_50",
+
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_500_ext1" : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_750_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_750",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_800_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_800",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_1000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_1000",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_2000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_2000",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_3000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_3000",
 }
 
 #for mass in _lightHplusMasses:
@@ -133,6 +171,8 @@ _physicalToLogical.update({
         # "W2Jets"    : "W2Jets",
         # "W3Jets"    : "W3Jets",
         # "W4Jets"    : "W4Jets",
+        "WJetsToLNu_HT_0To70"  : "WJetsToLNu_HT_0To70",
+        "WJetsToLNu_HT_70To100"  : "WJetsToLNu_HT_70To100",
         "WJetsToLNu_HT_100To200"  : "WJetsToLNu_HT_100To200",
         "WJetsToLNu_HT_200To400"  : "WJetsToLNu_HT_200To400",
         "WJetsToLNu_HT_400To600"  : "WJetsToLNu_HT_400To600",
@@ -191,11 +231,10 @@ _physicalToLogical.update({
         "QCD_Pt_170to300_MuEnrichedPt5": "QCD_Pt_170to300_MuEnrichedPt5",
         "QCD_Pt_300to470_MuEnrichedPt5": "QCD_Pt_300to470_MuEnrichedPt5",
         
-        "ST_schannel_4f_leptonDecays"          : "ST_schannel_4f_leptonDecays",
-        "ST_tW_antitop_5f_inclusiveDecays"     : "ST_tW_antitop_5f_inclusiveDecays",
-        "ST_tW_top_5f_inclusiveDecays"         : "ST_tW_top_5f_inclusiveDecays",
-        "ST_tchannel_antitop_4f_leptonDecays"  : "ST_tchannel_antitop_4f_leptonDecays",
-        "ST_tchannel_top_4f_leptonDecays"      : "ST_tchannel_top_4f_leptonDecays",
+        "ST_tW_top_5f_inclusiveDecays"             : "ST_tW_top_5f_inclusiveDecays",
+        "ST_tW_antitop_5f_inclusiveDecays"         : "ST_tW_antitop_5f_inclusiveDecays",
+        "ST_t_channel_antitop_4f_inclusiveDecays"  : "ST_t_channel_antitop_4f_inclusiveDecays",
+        "ST_t_channel_top_4f_inclusiveDecays"         : "ST_t_channel_top_4f_inclusiveDecays",
 
         "WW": "WW",
         "WZ": "WZ",
@@ -261,8 +300,6 @@ _datasetMerge = {
     "ST_t_channel_top_4f_inclusiveDecays"    : "SingleTop",
 
     # "TT"      : "TT",
-    "TT_ext"  : "TT",
-    "TT_ext3" : "TT",
     "TTJets"  : "TTJets",    
     # "TTTT"    : "TTTT",
     #"TTJets_FullLept": "TTJets",
@@ -274,6 +311,8 @@ _datasetMerge = {
     # "W2Jets"    : "WJets",
     # "W3Jets"    : "WJets",
     # "W4Jets"    : "WJets",
+    "WJetsToLNu_HT_0To70"   : "WJetsHT",
+    "WJetsToLNu_HT_70To100"   : "WJetsHT",
     "WJetsToLNu_HT_100To200"  : "WJetsHT",
     "WJetsToLNu_HT_200To400"  : "WJetsHT",
     "WJetsToLNu_HT_400To600"  : "WJetsHT",
@@ -457,7 +496,7 @@ _legendLabels = {
     "TToBLNu_t-channel" : "Single t (t channel)",
     "TToBLNu_tW-channel": "Single t (tW channel)",
     "T_t-channel"       : "Single t (t channel)",
-    "Tbar_t-channel"    : "Single #bar{t} (t channel)",
+    "Tbar_t-channel"    : "Single #ba_physicalMcAddr{t} (t channel)",
     "T_tW-channel"      : "Single t (tW channel)",
     "Tbar_tW-channel"   : "Single #bar{t} (tW channel)",
     "T_s-channel"       : "Single t (s channel)",
@@ -678,10 +717,25 @@ def UpdatePlotStyleFill(styleMap, namesToFilled):
 # datasets not in the plots._datasetOrder list are left at the end in
 # the same order they were originally.
 def mergeRenameReorderForDataMC(datasetMgr, keepSourcesMC=False):
+    # merge data
     datasetMgr.mergeData(allowMissingDatasets=True)
+    # check that _ext* datasets are defined to be added in _physicalMcAdd
+    for datasetName in datasetMgr.getAllDatasetNames():
+        if "_ext" in datasetName and datasetName not in _physicalMcAdd.keys():
+            print """\033[91mWARNING: %s is not defined to be merged into anything \
+in _physicalMcAdd (see python/tools/plots.py). This may lead to incorrect \
+normalization of background! \033[00m"""%datasetName
+            raw_input("Press Enter to continue...")
+    # merge XX_ext* datasets into XX datasets according to (_physicalMcAdd)
+#    print "DEBUG: Datasets before _physicalMcAdd:"
+#    print datasetMgr.getAllDatasetNames()
+#    print "\n"
     datasetMgr.mergeMany(_physicalMcAdd, addition=True)
+#    print "DEBUG: Datasets after _physicalMcAdd:"
+#    print datasetMgr.getAllDatasetNames()
+#    print "\n"
+    # rename the datasets (according to _physicalToLogical and _physicalToLogical)
     datasetMgr.renameMany(_physicalToLogical, silent=True)
-
     datasetMgr.mergeMany(_datasetMerge, keepSources=keepSourcesMC)
 
     mcNames = datasetMgr.getAllDatasetNames()

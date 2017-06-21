@@ -123,9 +123,11 @@ def main():
         Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=opts.excludeTasks)
     else:
+        myBlackList = ["QCD_b"]
         Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
         Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
-        process.addDatasetsFromMulticrab(opts.mcrab)
+        regex =  "|".join(myBlackList)
+        process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=regex)
 
 
     # ================================================================================================
@@ -200,12 +202,10 @@ def main():
     # Pick events
     # ================================================================================================
     #process.addOptions(EventSaver = PSet(enabled = True,pickEvents = True))
-
-
     # ================================================================================================
     # Run the analysis
     # ================================================================================================
-    # Run the analysis with PROOF? By default it uses all cores, but you can give proofWorkers=<N> as a parameter
+    # Run the analysis with PROOF? You can give proofWorkers=<N> as a parameter
     if opts.jCores:
         Print("Running process with PROOF (proofWorkes=%s)" % ( str(opts.jCores) ) )
         process.run(proof=True, proofWorkers=opts.jCores)
@@ -219,13 +219,13 @@ def PrintOptions(opts):
     '''
     '''
     table    = []
-    msgAlign = "{:<30} {:<30} {:<30}"
-    title    =  msgAlign.format("Option", "Current Value", "Default Value")
+    msgAlign = "{:<20} {:<10} {:<10}"
+    title    =  msgAlign.format("Option", "Value", "Default")
     hLine    = "="*len(title)
     table.append(hLine)
     table.append(title)
     table.append(hLine)
-    table.append( msgAlign.format("mcrab" , opts.mcrab , "") )
+    #table.append( msgAlign.format("mcrab" , opts.mcrab , "") )
     table.append( msgAlign.format("jCores", opts.jCores, "") )
     table.append( msgAlign.format("includeOnlyTasks", opts.includeOnlyTasks, "") )
     table.append( msgAlign.format("excludeTasks", opts.excludeTasks, "") )
@@ -236,7 +236,8 @@ def PrintOptions(opts):
     table.append( msgAlign.format("useTopPtReweighting", opts.useTopPtReweighting, TOPPTREWEIGHT) )
     table.append( msgAlign.format("doSystematics", opts.doSystematics, DOSYSTEMATICS) ) 
     table.append( hLine )
-    
+
+    # Print("Will run on multicrab directory %s" % (opts.mcrab), True)     
     for i, line in enumerate(table):
         Print(line, i==0)
     return
@@ -261,10 +262,10 @@ if __name__ == "__main__":
     '''
 
     # Default Values
-    VERBOSE = False
-    NEVTS = -1
-    HISTOLEVEL = "Debug"
-    PUREWEIGHT = True
+    VERBOSE       = False
+    NEVTS         = -1
+    HISTOLEVEL    = "Debug"
+    PUREWEIGHT    = True
     TOPPTREWEIGHT = True
     DOSYSTEMATICS = False
 
@@ -303,4 +304,9 @@ if __name__ == "__main__":
 
     if opts.mcrab == None:
         raise Exception("Please provide input multicrab directory with -m")
+
+    allowedLevels = ['Never', 'Systematics', 'Vital', 'Informative', 'Debug']
+    if opts.histoLevel not in allowedLevels:
+        raise Exception("Invalid ambient histogram level \"%s\"! Valid options are: %s" % (opts.histoLevel, ", ".join(allowedLevels)))
+
     main()

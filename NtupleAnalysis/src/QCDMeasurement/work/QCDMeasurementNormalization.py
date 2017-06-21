@@ -23,19 +23,29 @@ import HiggsAnalysis.QCDMeasurement.QCDNormalization as QCDNormalization
 import HiggsAnalysis.NtupleAnalysis.tools.analysisModuleSelector as analysisModuleSelector
 import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 
+### OPTIONS ###
+
 #==== Set analysis, data era, and search mode
 analysis = "QCDMeasurement"
 
 #==== Set rebin factor for normalization plots 
-# Histograms are generated with 1 GeV bin width, i.e. putting 10 here means 
-# that the fit is done on 10 GeV bins
-_rebinFactor = 10 
-#_rebinFactor = 30 # changing to this can solve fitting problems by smoothing fluctuations
+#     Histograms are generated with 1 GeV bin width, so 
+#     10 here means that the fit is done on 10 GeV bins
+_rebinFactor = 5
+
+#=== Set to true if you want to use HT binned WJets samples instead of inclusive
+useWJetsHT = True
+
+#=== Set tau pT bins to be used
+selectOnlyBins = [] #["1"] # use all bins
+#selectOnlyBins = ["Inclusive"] # use only the inclusive bin
+
+
+#=== Set verbosity
+verbose = False
 
 print "Analysis name:", analysis
 
-selectOnlyBins = ["Inclusive"] #["1"]
-#[]
 def usage():
     print "\n"
     print "### Usage:   QCDMeasurementNormalization.py <multicrab dir>\n"
@@ -46,8 +56,9 @@ def treatNegativeBins(h, label):
     # Convert negative bins to zero but leave errors intact
     for k in range(0, h.GetNbinsX()+2):
         if h.GetBinContent(k) < 0.0:
-            print "histogram '%s': converted in bin %d a negative value (%f) to zero."%(label, k, h.GetBinContent(k))
             h.SetBinContent(k, 0.0)
+#            if verbose:
+#                print "histogram '%s': converted in bin %d a negative value (%f) to zero."%(label, k, h.GetBinContent(k))
 
 def main(argv, dsetMgr, moduleInfoString):
     COMBINEDHISTODIR = "ForQCDNormalization"
@@ -59,7 +70,7 @@ def main(argv, dsetMgr, moduleInfoString):
     dirs.append(sys.argv[1])
     
     # Check multicrab consistency
-    consistencyCheck.checkConsistencyStandalone(dirs[0],dsetMgr,name="QCD inverted")
+    # consistencyCheck.checkConsistencyStandalone(dirs[0],dsetMgr,name="QCD inverted") #FIXME needs to be updated
    
     # As we use weighted counters for MC normalisation, we have to
     # update the all event count to a separately defined value because
@@ -69,9 +80,9 @@ def main(argv, dsetMgr, moduleInfoString):
     # Read integrated luminosities of data dsetMgr from lumi.json
     dsetMgr.loadLuminosities()
     
-    print "\Datasets list (initial):\n"
-    print dsetMgr.getMCDatasetNames()
-    print "\n"
+    if verbose:
+        print "Datasets list (initial):"
+        print dsetMgr.getMCDatasetNames()
 
     # Include only 120 mass bin of HW and HH dsetMgr
     dsetMgr.remove(filter(lambda name: "TTToHplus" in name and not "M120" in name, dsetMgr.getAllDatasetNames()))
@@ -79,11 +90,12 @@ def main(argv, dsetMgr, moduleInfoString):
     dsetMgr.remove(filter(lambda name: "DY2JetsToLL" in name, dsetMgr.getAllDatasetNames()))
     dsetMgr.remove(filter(lambda name: "DY3JetsToLL" in name, dsetMgr.getAllDatasetNames()))
     dsetMgr.remove(filter(lambda name: "DY4JetsToLL" in name, dsetMgr.getAllDatasetNames()))
-    dsetMgr.remove(filter(lambda name: "WJetsToLNu_HT" in name, dsetMgr.getAllDatasetNames()))
+    # Ignore DY dataset with HERWIG hadronization (it's only for testing)
+    dsetMgr.remove(filter(lambda name: "DYJetsToLL_M_50_HERWIGPP" in name, dsetMgr.getAllDatasetNames()), close=False)
 
-    print "\Datasets after filter removals:\n"
-    print dsetMgr.getMCDatasetNames()
-    print "\n"
+    if verbose:
+        print "Datasets after filter removals:"
+        print dsetMgr.getMCDatasetNames()
           
         # Default merging nad ordering of data and MC dsetMgr
     # All data dsetMgr to "Data"
@@ -92,46 +104,69 @@ def main(argv, dsetMgr, moduleInfoString):
     # WW, WZ, ZZ to "Diboson"
     plots.mergeRenameReorderForDataMC(dsetMgr)
 
-    print "\Datasets after mergeRenameReorderForDataMC:\n"
+    if verbose:
+        print "Datasets after mergeRenameReorderForDataMC:"
+        print dsetMgr.getMCDatasetNames()
+
+    # Only WJets/WJetsToLNu or WJetsToLNu_HT_* should be used (not both)
+    if useWJetsHT:
+        dsetMgr.remove(filter(lambda name: "WJets"==name, dsetMgr.getAllDatasetNames()), close=False)    
+    else:
+        dsetMgr.remove(filter(lambda name: "WJetsHT" in name, dsetMgr.getAllDatasetNames()), close=False)
+
+    print "Datasets used for EWK (after choosing between WJets or WJetsHT sample):"
     print dsetMgr.getMCDatasetNames()
-    print "\n"
 
     # Set BR(t->H) to 0.05, keep BR(H->tau) in 1
     xsect.setHplusCrossSectionsToBR(dsetMgr, br_tH=0.05, br_Htaunu=1)
 
     # Merge WH and HH dsetMgr to one (for each mass bin)
     plots.mergeWHandHH(dsetMgr)
+
     # Merge MC EWK samples as one EWK sample
     myMergeList = []
+
+    # Always use TT (or TTJets) as a part of the EWK background
     if "TT" in dsetMgr.getMCDatasetNames():
         myMergeList.append("TT") # Powheg, no neg. weights -> large stats.
     else:
         myMergeList.append("TTJets") # Madgraph with negative weights
         print "Warning: using TTJets as input, but this is suboptimal. Please switch to the TT sample (much more stats.)."
 
-    #myMergeList.append("WJetsHT")
-    myMergeList.append("WJets")
-    myMergeList.append("DYJetsToLL")
+    # Always use WJets as a part of the EWK background
+    if useWJetsHT:    
+        myMergeList.append("WJetsHT")
+    else:
+        myMergeList.append("WJets")
+
+    # For SY, single top and diboson, use only if available:
+    if "DYJetsToQQHT" in dsetMgr.getMCDatasetNames():
+        myMergeList.append("DYJetsToQQHT")
+
+    if "DYJetsToLL" in dsetMgr.getMCDatasetNames():
+        myMergeList.append("DYJetsToLL")
+    else:
+        print "Warning: ignoring DYJetsToLL sample (since merged sample does not exist) ..."
 
     if "SingleTop" in dsetMgr.getMCDatasetNames():
         myMergeList.append("SingleTop")
     else:
-        print "Warning: ignoring single top sample (since merged diboson sample does not exist) ..."
+        print "Warning: ignoring single top sample (since merged sample does not exist) ..."
 
 
     if "Diboson" in dsetMgr.getMCDatasetNames():
         myMergeList.append("Diboson")
     else:
-        print "Warning: ignoring diboson sample (since merged diboson sample does not exist) ..."
+        print "Warning: ignoring diboson sample (since merged sample does not exist) ..."
 
     for item in myMergeList:
         if not item in dsetMgr.getMCDatasetNames():
             raise Exception("Error: tried to use dataset '%s' as part of the merged EWK dataset, but the dataset '%s' does not exist!"%(item,item))
     dsetMgr.merge("EWK", myMergeList)
 
-    print "\nFinal dataset list:\n"
-    print dsetMgr.getMCDatasetNames()
-    print "\n"
+    if verbose:
+        print "\nFinal merged dataset list:\n"
+        print dsetMgr.getMCDatasetNames()
 
     # Apply TDR style
     style = tdrstyle.TDRStyle()
@@ -159,7 +194,7 @@ def main(argv, dsetMgr, moduleInfoString):
         else:
             for hname in histonames:
                 binIndex = hname.replace("NormalizationMETBaselineTau"+HISTONAME,"")
-                print "DEBUG: We are looking for hisrogram "+COMBINEDHISTODIR+"/"+BASELINETAUHISTONAME+binIndex
+#                print "DEBUG: We are looking for hisrogram "+COMBINEDHISTODIR+"/"+BASELINETAUHISTONAME+binIndex
                 hDummy = dsetMgr.getDataset("Data").getDatasetRootHisto(COMBINEDHISTODIR+"/"+BASELINETAUHISTONAME+binIndex).getHistogram()
                 title = hDummy.GetTitle()
                 title = title.replace("METBaseline"+HISTONAME,"")
@@ -234,12 +269,29 @@ def main(argv, dsetMgr, moduleInfoString):
         template_EWKInclusive_Baseline.setDefaultFitParam(defaultLowerLimit=[0.5,  90, 30, 0.0001],
                                                           defaultUpperLimit=[ 20, 150, 60,    1.0])
 
-        # Note that the same function is used for QCD only and QCD+EWK fakes
-        template_QCD_Inverted.setFitter(QCDNormalization.FitFunction("QCDFunction", norm=1), FITMIN, FITMAX)
+        # Fake tau and QCD
+        # Note that the same function is used for QCD only and QCD+EWK fakes (=Fake Tau)
+
+        # Old function, used until May 2017    
+#        template_QCD_Inverted.setFitter(QCDNormalization.FitFunction("QCDFunction", norm=1), FITMIN, FITMAX)
 #        template_QCD_Inverted.setDefaultFitParam(defaultLowerLimit=[0.0001, 0.001, 0.1, 0.0,  10, 0.0001, 0.001],
 #                                                 defaultUpperLimit=[   200,    10,  10, 150, 100,      1, 0.05])
-        template_QCD_Inverted.setDefaultFitParam(defaultLowerLimit=[ 30, 0.1, 0.1,  10,  10, 0.00001, 0.001], # new default limits to make fits more stable,
-                                                 defaultUpperLimit=[ 130, 20,  20, 200, 200,    0.01,   0.1]) # corresponding to the 7 free param. of the fit function        
+#        template_QCD_Inverted.setDefaultFitParam(defaultLowerLimit=[ 30, 0.1, 0.1,    0,  10,     0.0, 0.0001], # new default limits to make fits more stable,
+#                                                 defaultUpperLimit=[ 130, 20,  20,  200, 200,     1.0,    1.0]) # corresponding to the 7 free param. of the fit function        
+
+        # New dunction with one more d.o.f in Rayleigh distribution WARNING!!! UNSTABLE!!!
+#        template_QCD_Inverted.setFitter(QCDNormalization.FitFunction("QCDFunctionWithPeakShift", norm=1), FITMIN, FITMAX)
+#        template_QCD_Inverted.setDefaultFitParam(defaultLowerLimit=[ 30, 0.1, -10,   0,  -20,  10,   0.0001, 0.0001], 
+#                                                 defaultUpperLimit=[ 130, 20,  10,  20,  200, 100,     1.0,   0.05]) 
+
+
+        # As the factor multiplicative for exponential function (p6 in QCDFunctionWithPeakShift tends to 0 in fitting, 
+        # we drop that term and use only this:
+        template_QCD_Inverted.setFitter(QCDNormalization.FitFunction("RayleighShiftedPlusGaussian", norm=1), FITMIN, FITMAX)
+        template_QCD_Inverted.setDefaultFitParam(defaultLowerLimit=[ 30, 0.1, -10,   0,  -20,  10], 
+                                                 defaultUpperLimit=[ 130, 20,  10,  20,  200, 100])      
+
+
         #===== Loop over tau pT bins
         for i,binStr in enumerate(bins):
             print "\n********************************"
@@ -268,16 +320,17 @@ def main(argv, dsetMgr, moduleInfoString):
             histoName = FAKEHISTODIR+"/"+INVERTEDTAUHISTONAME+binStr
             hmetInverted_EWK_FakeTaus = plots.DataMCPlot(dsetMgr, histoName).histoMgr.getHisto("EWK").getRootHisto().Clone(histoName)
 
-            # Finalize histograms by rebinning
-            for histogram in [hmetBase_data, hmetInverted_data, hmetBase_EWK_GenuineTaus, hmetInverted_EWK_GenuineTaus, hmetBase_EWK_FakeTaus, hmetInverted_EWK_FakeTaus]:
-                 histogram.Rebin(_rebinFactor)
-
             #===== Obtain inclusive EWK histograms
             hmetBase_EWKinclusive = hmetBase_EWK_GenuineTaus.Clone("EWKinclusiveBase")
             hmetBase_EWKinclusive.Add(hmetBase_EWK_FakeTaus, 1.0)
             
             hmetInverted_EWKinclusive = hmetInverted_EWK_GenuineTaus.Clone("EWKinclusiveInv")
             hmetInverted_EWKinclusive.Add(hmetInverted_EWK_FakeTaus, 1.0)
+
+            # Finalize histograms by rebinning
+            for histogram in [hmetBase_data, hmetInverted_data, hmetBase_EWK_GenuineTaus, hmetInverted_EWK_GenuineTaus, hmetBase_EWKinclusive, hmetBase_EWK_FakeTaus, hmetInverted_EWK_FakeTaus, hmetInverted_EWKinclusive]:
+                 histogram.Rebin(_rebinFactor)
+
             
             #===== Obtain histograms for QCD (subtract MC EWK events from data)
             # QCD from baseline is usable only as a cross check
@@ -302,7 +355,7 @@ def main(argv, dsetMgr, moduleInfoString):
             manager.plotTemplates()
             
             #===== Fit individual templates to data
-            fitOptions = "R BLW" # RBLW
+            fitOptions = "R B L W M" # RBLWM
 
             manager.calculateNormalizationCoefficients(hmetBase_data, fitOptions, FITMIN, FITMAX)
             
@@ -326,7 +379,6 @@ def main(argv, dsetMgr, moduleInfoString):
 
         #===== Save normalization
         outFileName = "QCDNormalizationFactors_%s_%s.py"%(HISTONAME, moduleInfoString)
-        print argv[1],outFileName
         outFileFullName = os.path.join(argv[1],outFileName)
         manager.writeScaleFactorFile(outFileFullName, moduleInfoString)
 

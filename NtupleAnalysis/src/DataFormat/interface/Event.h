@@ -8,7 +8,11 @@
 #include "DataFormat/interface/EventID.h"
 #include "DataFormat/interface/VertexInfo.h"
 #include "DataFormat/interface/METFilter.h"
+#include "DataFormat/interface/L1Tau.h"
+#include "DataFormat/interface/L1IsoTau.h"
+#include "DataFormat/interface/L1Jet.h"
 #include "DataFormat/interface/HLTTau.h"
+#include "DataFormat/interface/HLTBJet.h"
 #include "DataFormat/interface/Tau.h"
 #include "DataFormat/interface/Jet.h"
 #include "DataFormat/interface/GenJet.h"
@@ -64,7 +68,11 @@ public:
   const EventID& eventID() const { return fEventID; }
   const VertexInfo& vertexInfo() const { return fVertexInfo; }
   const METFilter& metFilter() const { return fMETFilter; }
+  const L1TauCollection& l1Taus() const { return fL1TauCollection; }
+  const L1IsoTauCollection& l1IsoTaus() const { return fL1IsoTauCollection; }
+  const L1JetCollection& l1Jets() const { return fL1JetCollection; }
   const HLTTauCollection& triggerTaus() const { return fTriggerTauCollection; }
+  const HLTBJetCollection& triggerBJets() const { return fTriggerBJetCollection; }
   const TauCollection& taus() const { return fTauCollection; }
   const JetCollection& jets() const { return fJetCollection; }
   const GenJetCollection& genjets() const { return fGenJetCollection; }
@@ -95,7 +103,11 @@ private:
   BooleanOr fTriggerOr;
   BooleanOr fTriggerOr2;
 
+  L1TauCollection fL1TauCollection;
+  L1IsoTauCollection fL1IsoTauCollection;
+  L1JetCollection fL1JetCollection;
   HLTTauCollection fTriggerTauCollection;
+  HLTBJetCollection fTriggerBJetCollection;
   TauCollection fTauCollection;
   JetCollection fJetCollection;
   GenJetCollection fGenJetCollection;

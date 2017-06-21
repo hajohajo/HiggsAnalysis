@@ -36,7 +36,8 @@ open two terminals
 for both terminals, ssh to the same machine (e.g. ssh -YK aattikis@cmslpc37.fnal.gov)
 setup CMSSW and CRAB environments
 terminal 1: (ssh tunneling session)
-ssh -N -L 10121:itrac50012-v.cern.ch:10121 attikis@lxplus.cern.ch
+ssh -N -L 10121:itrac5212-v.cern.ch:10121 <username>@lxplus.cern.ch
+ssh -N -L 10121:itrac50012-v.cern.ch:10121 <username>@lxplus.cern.ch #invalid after recent cern oracle server migration
 
 terminal 2 (while terminal 1 is open):
 cd multicrab_AnalysisType_vXYZ_TimeStamp
@@ -347,6 +348,8 @@ def Print(msg, printHeader=False):
 def GetRegularExpression(arg):
     Verbose("GetRegularExpression()", True)
     if isinstance(arg, basestring):
+        if arg[len(arg)-1:] == '/':
+            arg = arg[:len(arg)-1]
         arg = [arg]
     return [re.compile(a) for a in arg]
 
@@ -411,6 +414,8 @@ def isEmpty(taskdir, opts):
     If task directory is empty return True
     '''    
     Verbose("isEmpty()", True)
+    if opts.ignoreLogs:
+        return False
     if opts.transferToEOS:
         return False
     path  = os.path.join(taskdir, "results")
@@ -646,7 +651,8 @@ def IsSSHReady(opts):
 
     if not opts.offsite:
         return
-    cmd_ssh   = "ssh -N -L 10121:itrac50012-v.cern.ch:10121 <username>@lxplus.cern.ch\n\tPress "
+    #cmd_ssh   = "ssh -N -L 10121:itrac50012-v.cern.ch:10121 <username>@lxplus.cern.ch\n\tPress "
+    cmd_ssh   = "ssh -N -L 10121:itrac5212-v.cern.ch:10121 <username>@lxplus.cern.ch\n\tPress "
     ssh_ready = AskUser("Script executed outside LXPLUS (--offsite enabled). Is the ssh tunneling session ready?\n\t%s" % (cmd_ssh), True)
     if not ssh_ready:
         sys.exit()
@@ -745,9 +751,10 @@ def main(opts, args):
 
     if not opts.truncate and os.path.exists(opts.output):
         Verbose("Opening OUTPUT file %s in \"r\"(read) mode" % (opts.output) )
-        f = open(opts.output, "r")
-        data = json.load(f)
-        f.close()
+	if os.path.exists(opts.output):
+            f = open(opts.output, "r")
+            data = json.load(f)
+            f.close()
     
     files = []
     # only if no explicit files, or some directories explicitly given
@@ -795,6 +802,13 @@ def main(opts, args):
     puFiles  = {}
     index    = -1
     lumiUnit = ""
+
+    # if lumi.joson already exists, load
+    if os.path.exists(opts.output):
+        f = open(opts.output, "r")
+        data = json.load(f)
+        f.close()
+
     # For-loop: All json files
     for task, jsonfile in files:
         index += 1
@@ -987,6 +1001,9 @@ if __name__ == "__main__":
 
     parser.add_option("--transferToEOS", dest="transferToEOS", default=TRANSFERTOEOS, action="store_true",
                       help="The output ROOT files will be transfered to appropriate EOS paths [default: '%s']" % (TRANSFERTOEOS) )
+    parser.add_option("--ignore-logs", dest="ignoreLogs",default=False, action="store_true",
+                      help="Does not check the existence of log files. [default: False]")
+
 
     (opts, args) = parser.parse_args()
     opts.dirs.extend(args)

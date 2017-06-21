@@ -107,7 +107,11 @@ void Event::setupBranches(BranchManager& mgr) {
   fTriggerOr.setupBranchesAutoScanVersion(mgr);
   fTriggerOr2.setupBranchesAutoScanVersion(mgr);
 
+  fL1TauCollection.setupBranches(mgr);
+  fL1IsoTauCollection.setupBranches(mgr);
+  fL1JetCollection.setupBranches(mgr);
   fTriggerTauCollection.setupBranches(mgr);
+  fTriggerBJetCollection.setupBranches(mgr);
   fTauCollection.setupBranches(mgr);
   fJetCollection.setupBranches(mgr);
   fGenJetCollection.setupBranches(mgr);

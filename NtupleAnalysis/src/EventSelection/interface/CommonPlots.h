@@ -20,8 +20,11 @@ public:
   enum AnalysisType {
     kSignalAnalysis = 0,
     kHplus2tbAnalysis= 0,
-    kEmbedding,
+    kBTagEfficiencyAnalysis= 0,
+    kTauAnalysis,
+    kMuAnalysis,
     kQCDMeasurement,
+    kFakeBMeasurement,
     kQCDNormalizationSystematicsSignalRegion, // Needed for obtaining normalization systematics to data-driven control plots
     kQCDNormalizationSystematicsControlRegion // Needed for obtaining normalization systematics to data-driven control plots
   };
@@ -44,12 +47,18 @@ public:
   HistoSplitter& getHistoSplitter() { return fHistoSplitter; }
   /// Returns the histogram settings for pt histograms (usecase: QCD measurement)
   const HistogramSettings& getPtBinSettings() const { return fPtBinSettings; }
+  /// Returns the histogram settings for eta histograms (usecase: QCD measurement)
+  const HistogramSettings& getEtaBinSettings() const { return fEtaBinSettings; }
   /// Returns the histogram settings for MET bins (usecase: QCD measurement)
   const HistogramSettings& getMetBinSettings() const { return fMetBinSettings; }
   /// Returns the histogram settings for HT bins (usecase: Htb analysis)
   const HistogramSettings& getHtBinSettings() const { return fHtBinSettings; }
   /// Returns the histogram settings for Mt bins (usecase: QCD measurement)
   const HistogramSettings& getMtBinSettings() const { return fMtBinSettings; }
+  /// Returns the histogram settings for Mt bins (usecase: QCD measurement)
+  const HistogramSettings& getBJetDiscBinSettings() const { return fBJetDiscriminatorBinSettings;}
+  /// Returns the histogram settings for Njets bins (usecase: FakeB measurement)
+  const HistogramSettings& getNjetsBinSettings() const { return fNjetsBinSettings;}
 
   /** Special method for setting genuine tau status 
     * (it is usually set through TauSelection via CommonPlots::fillControlPlotsAfterTauSelection)
@@ -77,8 +86,9 @@ public:
   void fillControlPlotsAfterMETFilter(const Event& event);
   void fillControlPlotsAfterTauSelection(const Event& event, const TauSelection::Data& data);
   void fillControlPlotsAfterAntiIsolatedTauSelection(const Event& event, const TauSelection::Data& data);
+  //void fillControlPlotsAfterMuonSelection(const Event& event);
   void fillControlPlotsAfterMETTriggerScaleFactor(const Event& event);
-  void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false);
+  void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
   void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false);
   void fillControlPlotsAfterAllSelectionsWithProbabilisticBtag(const Event& event, const METSelection::Data& metData, double btagWeight);
   //void fillControlPlotsAfterAllSelectionsWithFullMass(const Event& event, FullHiggsMassCalculator::Data& data);
@@ -176,12 +186,22 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauNProngsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauRtauAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauSourceAfterStdSelections;
+
+  HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPtAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonEtaAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPhiAfterStdSelections;
+  HistoSplitter::SplittedTripletTH2s hCtrlSelectedMuonEtaPhiAfterStdSelections;
   
   HistoSplitter::SplittedTripletTH1s hCtrlNJetsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlJetPtAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlJetEtaAfterStdSelections;
   HistoSplitter::SplittedTripletTH2s hCtrlJetEtaPhiAfterStdSelections;
   
+  HistoSplitter::SplittedTripletTH1s hCtrlMETAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlMETPhiAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiTauMetAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuMetAfterStdSelections;
+
   // MET
   HistoSplitter::SplittedTripletTH1s hCtrlMET;
   HistoSplitter::SplittedTripletTH1s hCtrlMETPhi;

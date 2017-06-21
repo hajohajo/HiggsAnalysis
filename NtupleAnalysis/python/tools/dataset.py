@@ -33,8 +33,9 @@ from sys import platform as _platform
 #================================================================================================
 # Global Definitions
 #================================================================================================
-_debugNAllEvents = False
 DEBUG = False
+_debugNAllEvents = False
+_debugCounters = False
 
 # era name -> list of era parts in data dataset names
 _dataEras = {
@@ -2167,7 +2168,6 @@ class DatasetRootHistoCompoundBase(DatasetRootHistoBase):
                                 if hsum.getRootHisto().GetXaxis().GetBinLabel(i) == histo.getRootHisto().GetXaxis().GetBinLabel(j):
                                     nSuccess += 1
                                     hsum.getRootHisto().SetBinContent(i, hsum.getRootHisto().GetBinContent(i) + histo.getRootHisto().GetBinContent(j));
-                                    hsum.getRootHisto().SetBinError(i, math.sqrt(hsum.getRootHisto().GetBinError(i)**2 + histo.getRootHisto().GetBinError(j)**2));
                                     # Ignore uncertainties
                 if nSuccess == 0:
                     raise Exception("Histogram '%s' from datasets '%s' and '%s' have different binnings: %d vs. %d" % (hsum.GetName(), self.histoWrappers[i].getDataset().getName(), h.getDataset().getName(), hsum.GetNbinsX(), histo.GetNbinsX()))
@@ -2715,6 +2715,10 @@ class Dataset:
             if (((self.isMC() or self.isPseudo()) or (self.isData() and enableSystematicVariationForData)) and
                 self._systematicVariation is not None):
                 self._analysisDirectoryName += "_"+self._systematicVariation
+
+        # Convert to string (otherwise causes problems in certain PYTHON/ROOT envs)
+        self._analysisDirectoryName = str(self._analysisDirectoryName)
+        
         # Check that analysis directory exists
         for f in self.files:
             if aux.Get(f, self._analysisDirectoryName) == None:
@@ -2946,7 +2950,8 @@ class Dataset:
             raise Exception("Trying to read object %s from dataset %s, but the file is already closed!" % (name, self.name))
 
         for f in self.files:
-            o = aux.Get(f, realName)
+            # Convert to string (otherwise causes problems in certain PYTHON/ROOT envs)
+            o = aux.Get(f, str(realName))
             # below it is important to use '==' instead of 'is',
             # because null TObject == None, but is not None
             if o == None:
@@ -2958,52 +2963,69 @@ class Dataset:
     ## Read counters
     def _readCounters(self):
         self.counterDir = self._unweightedCounterDir
+        self.nAllEventsWeighted = None # value to be read from counters (if possible)
+        self.nAllEventsUnweighted = None  # value to be read from counters (if possible)
 
-        # Read unweighted counters
-        # The unweighted counters are allowed to not exist unless
-        # weightedCounters are also enabled
+        # Initialize for normalization check based on weighted counters
         normalizationCheckStatus = True
         nAllEvts  = 0
         nPUReEvts = 0
+
+        # Try to read unweighted counters
         try:
-            (counter, realName) = self.getRootHisto(self.counterDir+"/counter")
+            (counter, realName) = self.getRootHisto(self.counterDir+"/counter") #unweighted
             ctr = _histoToCounter(counter)
-            self.nAllEventsUnweighted = ctr[0][1].value() # first counter, second element of the tuple
-            # Check normalization from weighted counters
-            (counter, realName) = self.getRootHisto(self.counterDir+"/weighted/counter")
+            self.nAllEventsUnweighted = ctr[0][1].value() # first counter, second element of the tuple, corresponds to ttree: skimCounterAll
+            if _debugCounters: # Debug print
+                print "DEBUG: Unweighted counters, Dataset name: "+self.getName()
+                for i in range(counter.GetNbinsX()+1):
+                    if counter.GetXaxis().GetBinLabel(i) == "Base::AllEvents":
+                        allEventsBin = i
+                    print "bin %d, label: %s, content: = %s"%(i, counter.GetXaxis().GetBinLabel(i), counter.GetBinContent(i))
+                print "\n\n"
+            # Normalization check (to spot e.g. PROOF problems), based on weighted counters
+            (counter, realName) = self.getRootHisto(self.counterDir+"/weighted/counter") # weighted
             allEventsBin = None
-            for i in range(counter.GetNbinsX()):
-                if counter.GetXaxis().GetBinLabel(i+1) == "Base::AllEvents":
+            for i in range(counter.GetNbinsX()+1):
+                if counter.GetXaxis().GetBinLabel(i) == "Base::AllEvents":
                     allEventsBin = i
             if allEventsBin != None and allEventsBin > 0:
                 if counter.GetBinContent(allEventsBin) < counter.GetBinContent(allEventsBin+1):
                     nAllEvts  = counter.GetBinContent(allEventsBin)
                     nPUReEvts = counter.GetBinContent(allEventsBin+1)
                     normalizationCheckStatus = False
+            if _debugNAllEvents: # Debug print
+                print "DEBUG: self.nAllEventsUnweighted = "+str(self.nAllEventsUnweighted)
+        # If reading unweighted counters fail
         except HistogramNotFoundException, e:
             if not self._weightedCounters:
                 raise Exception("Could not find counter histogram, message: %s" % str(e))
             self.nAllEventsUnweighted = -1
+        # If normalization problem is spotted
         if not normalizationCheckStatus:
             msg  = "Error in dset=%s: Base::AllEvents counter (=%s) is smaller than the Base::PUReweighting counter (=%s)" % (self.name, nAllEvts, nPUReEvts)
-            msg += "\n\tPlease check this (Know to happen when running PROOF on samples with negative generator weights)."
-            #raise Exception(msg)
             Print(msg)
             raw_input("\tPress any key to continue: ")
-
-        self.nAllEventsWeighted = None
-        self.nAllEvents = self.nAllEventsUnweighted
-
-        # Read weighted counters
+            # raise Exception(msg)
+ 
+        # Try to read weighted counters
         if self._weightedCounters:
             self.counterDir = self._weightedCounterDir
             try:
-                (counter, realName) = self.getRootHisto(self.counterDir+"/counter")
+                (counter, realName) = self.getRootHisto(self.counterDir+"/counter") # weighted
                 ctr = _histoToCounter(counter)
-                self.nAllEventsWeighted = ctr[0][1].value() # first counter, second element of the tuple
-                self.nAllEvents = self.nAllEventsWeighted
+                self.nAllEventsWeighted = ctr[0][1].value() # first counter, second element of the tuple, corresponds to ttree: skimCounterAll
             except HistogramNotFoundException, e:
                 raise Exception("Could not find counter histogram, message: %s" % str(e))
+            if _debugNAllEvents: # Debug print
+                print "DEBUG: self.nAllEventsWeighted = "+str(self.nAllEventsWeighted)
+
+
+        # Set nAllEvents to unweighted value (corresponding to ttree: skimCounterAll)  
+        # The corresponding value in the weighted counter is 0, so we don't want to use that
+        self.nAllEvents = self.nAllEventsUnweighted
+        if _debugNAllEvents: # Debug print
+            print "DEBUG: self.nAllEvents = "+str(self.nAllEvents)
 
     def getName(self):
         return self.name
@@ -3138,26 +3160,35 @@ class Dataset:
             raise Exception("Number of all events is not set for dataset %s! The counter directory was not given, and setNallEvents() was not called." % self.name)
         return self.nAllEvents
 
-    ## Get the cross section normalization factor.
-    #
-    # The normalization factor is defined as crossSection/N(all
-    # events), so by multiplying the number of MC events with the
-    # factor one gets the corresponding cross section.
+    def getNAllUnweightedEvents(self):
+        if not hasattr(self, "nAllEventsUnweighted"):
+            raise Exception("Number of all unweighted events is not set for dataset %s! The counter directory was not given, and setNallEvents() was not called." % self.name)
+        return self.nAllEventsUnweighted
+
     def getNormFactor(self):
-        nAllEvents = self.getNAllEvents()
+        '''
+        Get the cross section normalization factor.
+       
+        The normalization factor is defined as:
+        crossSection/N(all events)
+        so by multiplying the number of MC events with the 
+        factor one gets the corresponding cross section.
+        '''
+        nAllEvents = self.getNAllUnweightedEvents()
         if nAllEvents == 0:
-#            raise Exception("%s: Number of all events is 0.\nProbable cause is that the counters are weighted, the analysis job input was a skim, and the updateNAllEventsToPUWeighted() has not been called." % self.name)
-             print "Warning: all events == 0"
-             return 0
+            Print("WARNING! nAllEvents = %s" % (nAllEvents), True)
+            return 0
         return self.getCrossSection() / nAllEvents
 
-    ## Check if a ROOT histogram exists in this dataset
-    #
-    # \param name  Name (path) of the ROOT histogram
-    #
-    # If dataset.TreeDraw object is given, it is considered to always
-    # exist.
     def hasRootHisto(self, name, **kwargs):
+        '''
+        Check if a ROOT histogram exists in this dataset
+        
+        \param name  Name (path) of the ROOT histogram
+        
+        If dataset.TreeDraw object is given, it is considered to always
+        exist.
+        '''
         realName = self._translateName(name, **kwargs)
         if hasattr(realName, "draw"):
             return True
@@ -3174,24 +3205,26 @@ class Dataset:
                 return status
         return False
 
-    ## Get the dataset.DatasetRootHisto object for a named histogram.
-    # 
-    # \param name   Path of the histogram in the ROOT file
-    # \param modify Function to modify the histogram (use case is e.g. obtaining a slice of TH2 as TH1)
-    # \param kwargs Keyword arguments, forwarded to getRootHisto()
-    #
-    # \return dataset.DatasetRootHisto object containing the (unnormalized) TH1 and this Dataset
-    # 
-    # If dataset.TreeDraw object is given (or actually anything with
-    # draw() method), the draw() method is called by giving the
-    # Dataset object as parameters. The draw() method is expected to
-    # return a TH1 which is then returned.
-    #
-    # If dataset.SystematicsHelper object is given (or actually
-    # anything with addUncertainties() method), the addUncertainties()
-    # method of it is called with the Dataset and
-    # RootHistoWithUncertainties objects, and the modify function.
     def getDatasetRootHisto(self, name, modify=None, **kwargs):
+        '''
+        Get the dataset.DatasetRootHisto object for a named histogram.
+        
+        \param name   Path of the histogram in the ROOT file
+        \param modify Function to modify the histogram (use case is e.g. obtaining a slice of TH2 as TH1)
+        \param kwargs Keyword arguments, forwarded to getRootHisto()
+        
+        \return dataset.DatasetRootHisto object containing the (unnormalized) TH1 and this Dataset
+        
+        If dataset.TreeDraw object is given (or actually anything with
+        draw() method), the draw() method is called by giving the
+        Dataset object as parameters. The draw() method is expected to
+        return a TH1 which is then returned.
+        
+        If dataset.SystematicsHelper object is given (or actually
+        anything with addUncertainties() method), the addUncertainties()
+        method of it is called with the Dataset and
+        RootHistoWithUncertainties objects, and the modify function.
+         '''
         #h = None
         # if hasattr(name, "draw"):
         #     if len(kwargs) > 0:
@@ -3210,19 +3243,22 @@ class Dataset:
             name.addUncertainties(self, wrapper, modify)
         return DatasetRootHisto(wrapper, self) 
 
-    ## Get the directory content of a given directory in the ROOT file.
-    # 
-    # \param directory   Path of the directory in the ROOT file
-    # \param predicate   Append the directory name to the return list only if
-    #                    predicate returns true for the name. Predicate
-    #                    should be a function taking an object in the directory as an
-    #                    argument and returning a boolean.
-    # 
-    # \return List of names in the directory.
-    #
-    # If the dataset consists of multiple files, the listing of the
-    # first file is given.
     def getDirectoryContent(self, directory, predicate=None):
+        '''
+        Get the directory content of a given directory in the ROOT file.
+        
+        \param directory   Path of the directory in the ROOT file
+
+        \param predicate   Append the directory name to the return list only if
+        predicate returns true for the name. Predicate
+        should be a function taking an object in the directory as an
+        argument and returning a boolean.
+    
+        \return List of names in the directory.
+        
+        If the dataset consists of multiple files, the listing of the
+        first file is given.
+        '''
         (dirs, realDir) = self.getRootObjects(directory)
 
         # wrap the predicate
@@ -3234,9 +3270,11 @@ class Dataset:
 
     def _setBaseDirectory(self,base):
         self.basedir = base
-
-    ## Get the path of the multicrab directory where this dataset originates
+        
     def getBaseDirectory(self):
+        '''
+        Get the path of the multicrab directory where this dataset originates
+        '''
         return self.basedir
 
     def formatDatasetTree(self, indent):
@@ -3558,7 +3596,7 @@ class DatasetAddedMC(DatasetMerged):
     #
     # Implementation is close to dataset.Dataset.getNormFactor()
     def getNormFactor(self):
-        nAllEvents = sum([d.getNAllEvents() for d in self.datasets])
+        nAllEvents = sum([d.getNAllUnweightedEvents() for d in self.datasets])
         if nAllEvents == 0:
             raise Exception("%s: Number of all events is 0.\nProbable cause is that the counters are weighted, the analysis job input was a skim, and the updateAllEventsToPUWeighted() has not been called." % self.name)
 
@@ -4327,25 +4365,32 @@ class DatasetPrecursor:
                 raise Exception("Unable to open ROOT file '%s' for dataset '%s'" % (name, self._name))
             self._rootFiles.append(rf)
 
+            # Get the data version (e.g. 80Xdata or 80Xmc)
             dv = aux.Get(rf, "configInfo/dataVersion")
             if dv == None:
                 print "Unable to find 'configInfo/dataVersion' from ROOT file '%s', I have no idea if this file is data, MC, or pseudo" % name
-                continue
-                
+                continue                
             if self._dataVersion is None:
                 self._dataVersion = dv.GetTitle()
             else:
                 if self._dataVersion != dv.GetTitle():
                     raise Exception("Mismatch in dataVersion when creating multi-file DatasetPrecursor, got %s from file %s, and %s from %s" % (dataVersion, self._filenames[0], dv.GetTitle(), name))
 
+            # Get the TTree
             isTree = aux.Get(rf, "Events") != None
             if isTree:
-                # pileup (nominal)
-#                pileup = aux.Get(rf, "pileup")
-#                if pileup == None:
-                pileup = aux.Get(rf, "configInfo/pileup")
+
+                # Get the "pileup" histogram under folder "configInfo"
+                puName = "configInfo/pileup"
+                pileup = aux.Get(rf, puName)
+
+                # Sanity checks
                 if pileup == None:
-                    print "Unable to find 'configInfo/pileup' from ROOT file '%s'" % name
+                    Print("Unable to find 'configInfo/pileup' from ROOT file '%s'" % name, True)
+                    sys.exit()
+                if (pileup.Integral() == 0):
+                    raise Exception("Empty pileup histogram \"%s\" in ROOT file \"%s\". Entries = \"%s\"." % (puName, rf.GetName(), pileup.GetEntries()) )
+
                 if self._pileup is None:
                     if pileup != None:
                         self._pileup = pileup
@@ -4651,7 +4696,7 @@ class DatasetManagerCreator:
         for precursor in precursors:
             if "optimizationMode" in _args.keys() and _args["optimizationMode"] == "":
                 del _args["optimizationMode"]
-            
+
             try:
                 if precursor.isData():
                     dset = Dataset(precursor.getName(), precursor.getFiles(), **_args)

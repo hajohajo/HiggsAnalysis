@@ -32,7 +32,10 @@ private:
   const double fJetPtCutMax;
   const double fJetEtaCutMin;
   const double fJetEtaCutMax;
+  const std::string fAnalysisType;
 
+  /// Common plots
+  CommonPlots fCommonPlots;
   // Event selection classes and event counters (in same order like they are applied)
   Count cAllEvents;
   Count cTrigger;
@@ -45,7 +48,7 @@ private:
   ElectronSelection fElectronSelection;
   MuonSelection fMuonSelection;
   JetSelection fJetSelection;
-  AngularCutsCollinear fAngularCutsCollinear;
+  // AngularCutsCollinear fAngularCutsCollinear;
   BJetSelection fBJetSelection;
   METSelection fMETSelection;
   Count cSelected;
@@ -70,38 +73,42 @@ BTagEfficiencyAnalysis::BTagEfficiencyAnalysis(const ParameterSet& config, const
   fJetPtCutMax(config.getParameter<double>("jetPtCutMax")),
   fJetEtaCutMin(config.getParameter<double>("jetEtaCutMin")),
   fJetEtaCutMax(config.getParameter<double>("jetEtaCutMax")),
+  fAnalysisType(config.getParameter<std::string>("AnalysisType")),
+  fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kBTagEfficiencyAnalysis, fHistoWrapper),
   cAllEvents(fEventCounter.addCounter("All events")),
   cTrigger(fEventCounter.addCounter("Passed trigger")),
   fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"),
-                fEventCounter, fHistoWrapper, nullptr, ""),
+                fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   cVertexSelection(fEventCounter.addCounter("Primary vertex selection")),
   fTauSelection(config.getParameter<ParameterSet>("TauSelection"),
-                fEventCounter, fHistoWrapper, nullptr, ""),
+                fEventCounter, fHistoWrapper, &fCommonPlots, ""), // fixme: alex "Veto"
   cFakeTauSFCounter(fEventCounter.addCounter("Fake tau SF")),
   cTauTriggerSFCounter(fEventCounter.addCounter("Tau trigger SF")),
   cMetTriggerSFCounter(fEventCounter.addCounter("Met trigger SF")),
   fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"),
-                fEventCounter, fHistoWrapper, nullptr, "Veto"),
+                fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
   fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"),
-                fEventCounter, fHistoWrapper, nullptr, "Veto"),
+                fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
   fJetSelection(config.getParameter<ParameterSet>("JetSelection"),
-                fEventCounter, fHistoWrapper, nullptr, ""),
-  fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear"),
-                fEventCounter, fHistoWrapper, nullptr, ""),
+                fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+  // fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear"),
+  // fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"),
-                fEventCounter, fHistoWrapper, nullptr, ""),
+                fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fMETSelection(config.getParameter<ParameterSet>("METSelection"),
-                fEventCounter, fHistoWrapper, nullptr, ""),
+                fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   cSelected(fEventCounter.addCounter("Selected events"))
 { }
 
 void BTagEfficiencyAnalysis::book(TDirectory *dir) {
+  // Book common plots histograms
+  fCommonPlots.book(dir, isData());
   // Book histograms in event selection classes
   fTauSelection.bookHistograms(dir);
   fElectronSelection.bookHistograms(dir);
   fMuonSelection.bookHistograms(dir);
   fJetSelection.bookHistograms(dir);
-  fAngularCutsCollinear.bookHistograms(dir);
+  // fAngularCutsCollinear.bookHistograms(dir);
   fBJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
   // Book non-common histograms
@@ -123,6 +130,8 @@ void BTagEfficiencyAnalysis::process(Long64_t entry) {
 
 //====== Initialize
   cAllEvents.increment();
+  fCommonPlots.initialize();
+  fCommonPlots.setFactorisationBinForEvent(std::vector<float> {});
 
 //====== Apply trigger
   if (!(fEvent.passTriggerDecision()))
@@ -142,39 +151,47 @@ void BTagEfficiencyAnalysis::process(Long64_t entry) {
   if (nVertices < 1)
     return;
   cVertexSelection.increment();
-  
-//====== Tau selection
+
+  //====== Tau selection or Tau veto
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
-  if (!tauData.hasIdentifiedTaus())
-    return;
-  if (fEvent.isMC() && !tauData.isGenuineTau()) //if not genuine tau, reject the events (fake tau events are taken into account in QCDandFakeTau measurement)
-    return;
-
-//====== Tau ID SF
-  if (fEvent.isMC()) {
-    fEventWeight.multiplyWeight(tauData.getTauIDSF());
-//    cTauIDSFCounter.increment();
-  }
-
-//====== Fake tau SF
-  if (fEvent.isMC()) {
-    fEventWeight.multiplyWeight(tauData.getTauMisIDSF());
-    cFakeTauSFCounter.increment();
-  }
-
-//====== Tau trigger SF
-  if (fEvent.isMC()) {
-    fEventWeight.multiplyWeight(tauData.getTauTriggerSF());
-    cTauTriggerSFCounter.increment();
-  }
-
-//====== MET trigger SF
-  const METSelection::Data silentMETData = fMETSelection.silentAnalyze(fEvent, nVertices);
-  if (fEvent.isMC()) {
-    fEventWeight.multiplyWeight(silentMETData.getMETTriggerSF());
-  }
-  cMetTriggerSFCounter.increment();
-
+  if (fAnalysisType.compare("HToTauNu") == 0 )  
+    {
+      if (!tauData.hasIdentifiedTaus())
+	return;
+      if (fEvent.isMC() && !tauData.isGenuineTau()) //if not genuine tau, reject the events
+	return;
+      fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, tauData);
+      
+      //====== Tau ID SF
+      if (fEvent.isMC()) {
+	fEventWeight.multiplyWeight(tauData.getTauIDSF());
+	//    cTauIDSFCounter.increment();
+      }
+      
+      //====== Fake tau SF
+      if (fEvent.isMC()) {
+	fEventWeight.multiplyWeight(tauData.getTauMisIDSF());
+	cFakeTauSFCounter.increment();
+      }
+      
+      //====== Tau trigger SF
+      if (fEvent.isMC()) {
+	fEventWeight.multiplyWeight(tauData.getTauTriggerSF());
+	cTauTriggerSFCounter.increment();
+      }
+    
+      //====== MET trigger SF
+      const METSelection::Data silentMETData = fMETSelection.silentAnalyze(fEvent, nVertices);
+      if (fEvent.isMC()) {
+	fEventWeight.multiplyWeight(silentMETData.getMETTriggerSF());
+      }
+      cMetTriggerSFCounter.increment();
+    }
+  else // "HToTB"
+    {
+      if (tauData.hasIdentifiedTaus()) return;
+    }
+  
 //====== Electron veto
   const ElectronSelection::Data eData = fElectronSelection.analyze(fEvent);
   if (eData.hasIdentifiedElectrons())
@@ -186,9 +203,21 @@ void BTagEfficiencyAnalysis::process(Long64_t entry) {
     return;
 
 //====== Jet selection
-  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
-  if (!jetData.passedSelection())
-    return;
+  JetSelection::Data jetData;
+  if (fAnalysisType.compare("HToTauNu") == 0 )  
+    {
+      // const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
+      jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
+      if (!jetData.passedSelection())
+	return;
+    }
+  else // "tb"
+   {
+     // const JetSelection::Data jetData = fJetSelection.analyzeWithoutTau(fEvent);
+     jetData = fJetSelection.analyzeWithoutTau(fEvent);
+     if (!jetData.passedSelection())
+       return;
+   }
 
 //====== Collinear angular cuts
   /*
@@ -241,7 +270,6 @@ void BTagEfficiencyAnalysis::process(Long64_t entry) {
 //====== All cuts passed
   cSelected.increment();
   // Fill final plots
-  
 
 //====== Experimental selection code
   // if necessary
