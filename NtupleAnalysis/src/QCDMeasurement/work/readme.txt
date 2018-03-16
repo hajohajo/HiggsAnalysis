@@ -57,7 +57,10 @@ Instructions for running the QCD measurement:
 
 6) From QCD measurement to control plots and limits
    - To check the closure of the QCD measurement, produce the plots with:
-     TODO: add instructions
+       python plotClosure_2018.py --mdir=<path_to_the_QCDMeasurementFolder>
+     The script creates a "QCD_Closure..." folder to the QCDMeasurementFolder, which contains the closure plot.
+     NOTE: you need to create the normalizations first.
+
    - For limit calculation and control plots, copy the pseudoMulticrab_QCDMeasurement directory
      under a collective directory, where also the signal analysis (and embedding) result directories
      reside. Then run limit calculation on that directory (see src/LimitCalc/work/readme.txt).
