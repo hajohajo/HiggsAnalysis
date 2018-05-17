@@ -69,15 +69,19 @@ def doSinglePlot(hbase, hinv, myDir, histoName, luminosity):
     myPlotName = "%s/QCD_ClosureTest_%s"%(myDir, histoName)
     myParams = {}
     myParams["ylabel"] = "Events/#Deltam_{T}, normalized to 1"
+    myParams["xlabel"] = "m_{T} (GeV)"
     myParams["log"] = False
-    myParams["opts2"] = {"ymin": 0.0, "ymax":2.0}
+    myParams["opts2"] = {"ymin": 0.6, "ymax":1.4}
     myParams["opts"] = {"ymin": 0.0}
     myParams["ratio"] = True
-    myParams["ratioType"] = "errorScale"
-    myParams["ratioYlabel"] = "Var./Nom."
+    myParams["ratioType"] = "errorPropagation" #"errorScale"
+    myParams["ratioYlabel"] = "Isol./Anti-isol."
     myParams["addLuminosityText"] = True
     myParams["divideByBinWidth"] = True
+    myParams["errorBarsX"] = False
+    myParams["errorBarsY"] = False
     myParams["ylabelsize"] = 16
+#    myParams["ratioErrorOptions"] = {"errorBarsY": False}#{"numeratorStat": False}
     plots.drawPlot(plot, myPlotName, **myParams)
 
 def doClosureTestPlots(opts, dsetMgr, moduleInfoString, myDir, luminosity, normFactors):
