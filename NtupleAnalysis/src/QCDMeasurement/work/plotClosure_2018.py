@@ -56,7 +56,6 @@ def doSinglePlot(hbase, hinv, myDir, histoName, luminosity):
     hbase = rebin(hbase, histoName)
     hinv = rebin(hinv, histoName)
     # Normalize
-    # Should work, but sceptical if the result plot actually is normalized to 1
     print "baseline: %.1f events, inverted %.1f events"%(hbase.Integral(), hinv.Integral())
     hbase.Scale(1.0 / hbase.Integral())
     hinv.Scale(1.0 / hinv.Integral())
@@ -81,7 +80,6 @@ def doSinglePlot(hbase, hinv, myDir, histoName, luminosity):
     myParams["errorBarsX"] = False
     myParams["errorBarsY"] = False
     myParams["ylabelsize"] = 16
-#    myParams["ratioErrorOptions"] = {"errorBarsY": False}#{"numeratorStat": False}
     plots.drawPlot(plot, myPlotName, **myParams)
 
 def doClosureTestPlots(opts, dsetMgr, moduleInfoString, myDir, luminosity, normFactors):
