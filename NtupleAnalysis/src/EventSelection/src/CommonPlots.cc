@@ -781,12 +781,12 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
   //==========================================
   // MVA
   //==========================================
-  if (!hplus2tb)
+  if (!hplus2tb){
 
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlMVA,
                                                        "MVA", ";MVA;N_{events}",
                                                        fMvaBinSettings.bins(), fMvaBinSettings.min(), fMvaBinSettings.max());
-    }// if (!hplus2tb)
+  }// if (!hplus2tb)
 
 
   //==========================================
