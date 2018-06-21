@@ -88,9 +88,15 @@ MVASelection::Data MVASelection::privateAnalyze(const Event& event, const BJetSe
   Tau_lChTrkPt=event.taus()[0].lChTrkPt();
 
   auto& bJets = bJetData.getSelectedBJets();
-  Bjet_pt=bJets[0].pt();
-  Bjet_eta=bJets[0].eta();
-  Bjet_phi=bJets[0].phi();
+  if (bJets.size()>0){
+	  Bjet_pt=bJets[0].pt();
+	  Bjet_eta=bJets[0].eta();
+	  Bjet_phi=bJets[0].phi();
+  } else {
+          Bjet_pt=event.jets()[0].pt();
+          Bjet_eta=event.jets()[0].eta();
+          Bjet_phi=event.jets()[0].phi();
+  }
 
   Float_t met_x,met_y;
   met_x=event.met().x();
