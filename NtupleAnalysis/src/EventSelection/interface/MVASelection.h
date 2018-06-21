@@ -4,6 +4,8 @@
 
 #include "EventSelection/interface/BaseSelection.h"
 #include "EventSelection/interface/TauSelection.h"
+#include "EventSelection/interface/BJetSelection.h"
+
 
 #include <string>
 #include <vector>
@@ -57,32 +59,21 @@ public:
 
   virtual void bookHistograms(TDirectory* dir);
 
-  Data analyze(const Event& event, TMVA::Reader& reader);
-  Data silentAnalyze(const Event& event, TMVA::Reader& reader);
+  Data analyze(const Event& event, TMVA::Reader& reader, const BJetSelection::Data& bJetData);
+  Data silentAnalyze(const Event& event, TMVA::Reader& reader, const BJetSelection::Data& bJetData);
 
   TMVA::Reader *reader;
-  Float_t R_bb,R_coll, MET, TransMass, TransMass_jj, TransMass_muEt;
-  Float_t pv_x, pv_y, pv_z;
-  Float_t tj1Dist,tj2Dist,tj3Dist;
-  Float_t j1j2Dist,j1j3Dist,j2j3Dist;
-  Float_t muj1Dist,muj2Dist,muj3Dist;
-  Float_t ej1Dist,ej2Dist,ej3Dist;
-  Float_t tetaj1eta,tetaj2eta,tetaj3eta;
-  Float_t j1etaj2eta,j1etaj3eta,j2etaj3eta;
-  Float_t Tau_pt, Tau_eta, Tau_phi;
-  Float_t Muon_pt, Muon_eta, Muon_phi;
-  Float_t Electron_pt, Electron_eta, Electron_phi;
-  Float_t Jet1_pt, Jet1_phi, Jet1_eta, Jet1_IncSecVer_Btag, Jet1_MVA_Btag;
-  Float_t Jet2_pt, Jet2_phi, Jet2_eta, Jet2_IncSecVer_Btag, Jet2_MVA_Btag;
-  Float_t Jet3_pt, Jet3_phi, Jet3_eta, Jet3_IncSecVer_Btag, Jet3_MVA_Btag;
-  Float_t nTaus, nJets, nMuons, nElectrons;
-
+  Float_t MET, TransMass, met_x, met_y;
+  Float_t Tau_pt, Tau_eta, Tau_phi, Tau_lChTrkPt;
+  Float_t Bjet_pt, Bjet_eta, Bjet_phi;
+  Float_t DPhi_tau_miss, DPhi_bjet_miss, Dist_tau_bjet;
+  Float_t Transmass, Upsilon;
 
 
 private:
   void initialize(const ParameterSet& config, const std::string& postfix);
 
-  Data privateAnalyze(const Event& iEvent);
+  Data privateAnalyze(const Event& iEvent, const BJetSelection::Data& bJetData);
 
   Count cPassedMVASelection;
   Count cSubAll;

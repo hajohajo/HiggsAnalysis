@@ -526,7 +526,7 @@ void QCDMeasurement::doBaselineAnalysis(const Event& event, const Tau& tau, cons
   double myTransverseMass = TransverseMass::reconstruct(tau, silentMETData.getMET());
   const BJetSelection::Data silentBjetData = fBaselineTauBJetSelection.silentAnalyze(fEvent, jetData);
   const AngularCutsBackToBack::Data silentBackToBackData = fBaselineTauAngularCutsBackToBack.silentAnalyze(fEvent, tau, jetData, silentMETData);
-  const MVASelection::Data silentMVAData = fBaselineTauMVASelection.silentAnalyze(fEvent, *fBaselineTauMVASelection.reader);
+  const MVASelection::Data silentMVAData = fBaselineTauMVASelection.silentAnalyze(fEvent, *fBaselineTauMVASelection.reader, silentBjetData);
   fNormalizationSystematicsSignalRegion.setGenuineTauStatus(isGenuineTau);
   fNormalizationSystematicsSignalRegion.fillControlPlotsForQCDShapeUncertainty(fEvent, collinearData, silentBjetData, silentMETData, silentBackToBackData, silentMVAData);
   fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hNormalizationBaselineTauAfterStdSelections, isGenuineTau, METvalue);
@@ -586,7 +586,7 @@ void QCDMeasurement::doBaselineAnalysis(const Event& event, const Tau& tau, cons
     return;
   }
 
-  const MVASelection::Data MVAData = fBaselineTauMVASelection.analyze(fEvent,*fBaselineTauMVASelection.reader);
+  const MVASelection::Data MVAData = fBaselineTauMVASelection.analyze(fEvent,*fBaselineTauMVASelection.reader,bjetData);
   if(!MVAData.passedSelection()){
     return;
   }
@@ -675,7 +675,7 @@ void QCDMeasurement::doInvertedAnalysis(const Event& event, const Tau& tau, cons
   fCommonPlots.fillControlPlotsAfterTopologicalSelections(fEvent);
   const BJetSelection::Data silentBjetData = fInvertedTauBJetSelection.silentAnalyze(fEvent, jetData);
   const AngularCutsBackToBack::Data silentBackToBackData = fInvertedTauAngularCutsBackToBack.silentAnalyze(fEvent, tau, jetData, silentMETData);
-  const MVASelection::Data silentMVAData = fInvertedTauMVASelection.silentAnalyze(fEvent, *fInvertedTauMVASelection.reader);
+  const MVASelection::Data silentMVAData = fInvertedTauMVASelection.silentAnalyze(fEvent, *fInvertedTauMVASelection.reader, silentBjetData);
   fNormalizationSystematicsControlRegion.setGenuineTauStatus(isGenuineTau);
   fNormalizationSystematicsControlRegion.fillControlPlotsForQCDShapeUncertainty(fEvent, collinearData, silentBjetData, silentMETData, silentBackToBackData, silentMVAData);
   fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hNormalizationInvertedTauAfterStdSelections, isGenuineTau, METvalue);
@@ -749,7 +749,7 @@ void QCDMeasurement::doInvertedAnalysis(const Event& event, const Tau& tau, cons
   }
 
 //====== MVA selection
-  const MVASelection::Data MVAData = fInvertedTauMVASelection.analyze(fEvent, *fInvertedTauMVASelection.reader);
+  const MVASelection::Data MVAData = fInvertedTauMVASelection.analyze(fEvent, *fInvertedTauMVASelection.reader,bjetData);
   if(!MVAData.passedSelection())
     return;
 
