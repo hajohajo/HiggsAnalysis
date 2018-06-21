@@ -265,7 +265,6 @@ void SignalAnalysis::process(Long64_t entry) {
   const MVASelection::Data mvaData = fMVASelection.analyze(fEvent, *fMVASelection.reader, bjetData);
   if(!mvaData.passedSelection())
     return;
-  std::cout<<mvaData.mvaValue()<<std::endl;
 //====== All cuts passed
   cSelected.increment();
   // Fill final plots
