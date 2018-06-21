@@ -186,8 +186,13 @@ def main(argv, dsetMgr, moduleInfoString):
     for HISTONAME in comparisonList:
         BASELINETAUHISTONAME = "NormalizationMETBaselineTau"+HISTONAME+"/NormalizationMETBaselineTau"+HISTONAME
         INVERTEDTAUHISTONAME = "NormalizationMETInvertedTau"+HISTONAME+"/NormalizationMETInvertedTau"+HISTONAME
-        FITMIN = None
-        FITMAX = None
+<<<<<<< HEAD
+        FITMIN = None #0 #None
+        FITMAX = None #400 #None
+=======
+        FITMIN = 0 #None
+        FITMAX = 400 #None
+>>>>>>> master
       
         #===== Infer binning information and labels
         histonames = dsetMgr.getDataset("Data").getDirectoryContent(COMBINEDHISTODIR+"/NormalizationMETBaselineTau"+HISTONAME)

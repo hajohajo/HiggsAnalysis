@@ -101,6 +101,7 @@ public:
   void fillControlPlotsAtAngularCutsBackToBack(const Event& event, const AngularCutsBackToBack::Data& data);
   //void fillControlPlotsAtTopSelection(const Event& event, const TopSelectionManager::Data& data);
   //void fillControlPlotsAtEvtTopology(const Event& event, const EvtTopology::Data& data);
+  void fillControlPlotsAtMVASelection(const Event& event, const MVASelection::Data& data);
   
   //===== unique filling methods (to be called AFTER return statement from analysis routine)
   void setNvertices(int vtx) { iVertices = vtx; fPUDependencyPlots->setNvtx(vtx); }
@@ -130,7 +131,8 @@ public:
                                               const AngularCutsBackToBack::Data& collinearAngularCutsData,
                                               const BJetSelection::Data& bJetData,
                                               const METSelection::Data& metData,
-                                              const AngularCutsCollinear::Data& backToBackAngularCutsData);
+                                              const AngularCutsCollinear::Data& backToBackAngularCutsData,
+					      const MVASelection::Data& mvaData);
   
   /// Getter for all vertices
   int nVertices() const { return iVertices; }
@@ -167,6 +169,7 @@ private:
   const HistogramSettings fHtBinSettings;
   const HistogramSettings fBJetDiscriminatorBinSettings;
   const HistogramSettings fAngularCuts1DSettings;
+  const HistogramSettings fMvaBinSettings;
   const HistogramSettings fWMassBinSettings;
   const HistogramSettings fTopMassBinSettings;
   const HistogramSettings fInvmassBinSettings;
@@ -286,6 +289,8 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlBackToBackAngularCutsJet3;
   HistoSplitter::SplittedTripletTH1s hCtrlBackToBackAngularCutsJet4;
 
+  HistoSplitter::SplittedTripletTH1s hCtrlMVA;
+
   // control plots after all selections
   HistoSplitter::SplittedTripletTH1s hCtrlNVerticesAfterAllSelections;  
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauPtAfterAllSelections;
@@ -310,7 +315,8 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlMinDeltaRReversedJetMHTAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlCollinearAngularCutsMinimumAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlMETAfterAllSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlMETPhiAfterAllSelections;  
+  HistoSplitter::SplittedTripletTH1s hCtrlMETPhiAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlMVASelectionAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNBJetsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlBJetPtAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlBJetEtaAfterAllSelections;
@@ -399,6 +405,7 @@ private:
   AngularCutsCollinear::Data fBackToBackAngularCutsData;
   // FatJetSelection::Data fFatJetData;
   // FatJetSoftDropSelection::Data fFatJetSoftDropData;
+  MVASelection::Data fMVAData;
 
   /// Helper
   CommonPlotsHelper fHelper;

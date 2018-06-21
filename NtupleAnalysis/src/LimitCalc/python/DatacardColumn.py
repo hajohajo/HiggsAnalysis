@@ -789,6 +789,7 @@ class DatacardColumn():
                                         if e.getId() == n.getId():
                                             if e.isQCDNuisance():
                                                 myResult = n.getResult().Clone()
+						#myAveragePurity=0.7
                                                 myResult.scale((1.0-myAverageCtrlPlotPurity) / (1.0 - myAveragePurity))
                                                 #print n._exId, n.getResult().getUncertaintyUp(), myAverageCtrlPlotPurity, myResult.getUncertaintyUp()
                                 if not isinstance(h.getRootHisto(),ROOT.TH2):

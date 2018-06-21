@@ -33,6 +33,7 @@ IntermediateMassPoints=[165,170,175]
 IntermediateMassPointsAll=[145,150,155,160,165,170,175,180,190,200]
 HeavyMassPoints=[180,200,220,250,300,400,500,750,800,1000,2000,2500,3000] #, 5000, 7000, 10000]
 
+
 # Set mass points
 MassPoints = []
 if LightAnalysis:
@@ -71,7 +72,8 @@ ToleranceForLuminosityDifference=0.05 # Tolerance for throwing error on luminosi
 # Control plots and blinding policy
 OptionDoControlPlots= False #FIXME: If you want control plots, switch this to true!
 OptionCtrlPlotsAfterAllSelections=True # Produce control plots after all selections (all selections for transverse mass)
-OptionBlindThreshold=None # If signal exceeds this fraction of expected events, data is blinded; set to None to disable
+BlindAnalysis=True
+OptionBlindThreshold=0.01 # If signal exceeds this fraction of expected events, data is blinded; set to None to disable
 
 # Systematic uncertainties
 OptionIncludeSystematics=True # Include shape systematics (multicrabs must beproduced with doSystematics=True)
@@ -184,7 +186,8 @@ def PrintNuisancesTable(Nuisances, DataGroups):
 # Groups of nuisances (each nuisance to be defined later)
 #================================================================================================  
 
-myTrgSystematics=["CMS_eff_t_trg_data","CMS_eff_t_trg_MC", # Trigger tau part
+# Define systematics lists commmon to datasets
+myTrgSystematics=["CMS_eff_MVA","CMS_eff_t_trg_data","CMS_eff_t_trg_MC", # Trigger tau part
                   "CMS_eff_met_trg_data","CMS_eff_met_trg_MC"] # Trigger MET part
 myTauIDSystematics=["CMS_eff_t"] #tau ID
 if not LightAnalysis and OptionIncludeSystematics:
@@ -362,7 +365,6 @@ DataGroups.append(DataGroup(label="res.", landsProcess=2,datasetType="None", val
 #================================================================================================  
 # Nuisance Parameters (aka systematic uncertainties, repredented by rows in the final datacard) 
 #================================================================================================ 
-
 # Note: Remember to include 'stat.' into the label of nuistances of statistical nature
 
 from HiggsAnalysis.LimitCalc.InputClasses import Nuisance
@@ -376,6 +378,10 @@ Nuisances.append(Nuisance(id="CMS_Hptn_int_neutral", label="effect of WithNeutra
     distr="lnN", function="Constant", value=0.1, upperValue=0.0))
 
 #=====tau ID and mis-ID
+#MVA guesstimate of error
+Nuisances.append(Nuisance(id="CMS_eff_MVA",label="MVA uncertainty",
+    distr="lnN", function="Constant", value=0.20))
+
 # tau ID
 Nuisances.append(Nuisance(id="CMS_eff_t", label="tau-jet ID (no Rtau) uncertainty for genuine taus",
     distr="lnN", function="Constant", value=0.04))
@@ -391,19 +397,19 @@ if "CMS_eff_t_trg_data" in myShapeSystematics:
         distr="shapeQ", function="ShapeVariation", systVariation="TauTrgEffData"))
 else:
     Nuisances.append(Nuisance(id="CMS_eff_t_trg_data", label="APPROXIMATION for tau+MET trg tau part data eff.",
-        distr="lnN", function="Constant", value=0.03))
+        distr="lnN", function="Constant", value=0.015))
 if "CMS_eff_t_trg_MC" in myShapeSystematics:
     Nuisances.append(Nuisance(id="CMS_eff_t_trg_MC", label="tau+MET trg tau part MC eff.",
         distr="shapeQ", function="ShapeVariation", systVariation="TauTrgEffMC"))
 else:
     Nuisances.append(Nuisance(id="CMS_eff_t_trg_MC", label="APPROXIMATION for tau+MET trg tau part MC eff.",
-        distr="lnN", function="Constant", value=0.04))
+        distr="lnN", function="Constant", value=0.010))
 if "CMS_eff_met_trg_data" in myShapeSystematics:
     Nuisances.append(Nuisance(id="CMS_eff_met_trg_data", label="tau+MET trg MET data eff.",
         distr="shapeQ", function="ShapeVariation", systVariation="METTrgEffData"))
 else:
     Nuisances.append(Nuisance(id="CMS_eff_met_trg_data", label="APPROXIMATION for tau+MET trg MET data eff.",
-        distr="lnN", function="Constant", value=0.2))
+        distr="lnN", function="Constant", value=0.15))
 if "CMS_eff_met_trg_MC" in myShapeSystematics:
     Nuisances.append(Nuisance(id="CMS_eff_met_trg_MC", label="tau+MET trg MET MC eff.",
         distr="shapeQ", function="ShapeVariation", systVariation="METTrgEffMC"))
@@ -436,7 +442,7 @@ if "CMS_fake_b" in myShapeSystematics:
         distr="shapeQ", function="ShapeVariation", systVariation="BMistagSF"))
 else:
     Nuisances.append(Nuisance(id="CMS_fake_b", label="APPROXIMATION for b mistagging",
-        distr="lnN", function="Constant",value=0.02))
+        distr="lnN", function="Constant",value=0.05))
 
 #=====  e->tau mis-ID
 if "CMS_fake_e_to_t" in myShapeSystematics:
@@ -469,7 +475,7 @@ if "CMS_scale_t" in myShapeSystematics:
         distr="shapeQ", function="ShapeVariation", systVariation="TauES"))
 else:
     Nuisances.append(Nuisance(id="CMS_scale_t", label="APPROXIMATION for tau ES",
-        distr="lnN", function="Constant", value=0.06))
+        distr="lnN", function="Constant", value=0.03))
 # jet ES
 if "CMS_scale_j" in myShapeSystematics:
     Nuisances.append(Nuisance(id="CMS_scale_j", label="Jet energy scale",
@@ -490,7 +496,7 @@ if "CMS_res_j" in myShapeSystematics:
         distr="shapeQ", function="ShapeVariation", systVariation="JER"))
 else:
     Nuisances.append(Nuisance(id="CMS_res_j", label="APPROXIMATION for CMS_res_j",
-        distr="lnN", function="Constant",value=0.04))
+        distr="lnN", function="Constant",value=0.03))
 
 #===== Top pt SF
 if "CMS_topPtReweight" in myShapeSystematics:
@@ -958,6 +964,19 @@ ControlPlots.append(ControlPlotInput(
     flowPlotCaption  = "^{}R_{bb}^{min}", # Leave blank if you don't want to include the item to the selection flow plot
 ))
 
+ControlPlots.append(ControlPlotInput(
+    title	     = "MVA",
+    histoName	     = "MVA",
+    details	     = { "xlabel": "MVA discr.",
+        		 "ylabel": "Events",
+        		 "divideByBinWidth": False,
+        		 "unit": "",
+        		 "log": True,
+			 "legendPosition": "NW",
+        		 "opts": {"ymin": 0.09,"ymax":150000,"xmin": -1.0,"xmax":1.0} },
+    flowPlotCaption  = "MVA Cut",
+))
+
 if OptionMassShape =="TransverseMass":
     ControlPlots.append(ControlPlotInput(title="TransverseMass",
         histoName="shapeTransverseMass",
@@ -1217,6 +1236,8 @@ if OptionCtrlPlotsAfterAllSelections:
         "log": True,
         "legendPosition": "SW",
         "opts": {"ymin": 0.009} }))
+
+
     #for i in range(1,5):    
         #ControlPlots.append(ControlPlotInput(title="AngularCuts2DJet%d_AfterAllSelections"%i,
             #histoName="ImprovedDeltaPhiCuts2DJet%dBackToBack"%i,
