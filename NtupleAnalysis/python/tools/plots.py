@@ -623,10 +623,12 @@ _legendLabels = {
     "FakeB"    : "Fake b (data)",
     "GenuineB" : "Genuine b (MC)",
     "QCD-b"    : "QCD (b enr.)",
-    "QCDdata"  : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
+#    "QCDdata"  : "Jets#rightarrow#tau_{h}", #"QCD (data driven)"
+    "QCDdata"  : "Jets mis-id. as #tau_{h}", #"QCD (data driven)"
 
-    "TTJets"        : "t#bar{t}+jets",
+    "TTJets"        : "t#bar{t}",
     "TT"            : "t#bar{t}",
+    "TT_Mtt"        : "t#bar{t}",
     "TTTT"          : "t#bar{t}t#bar{t}",
     "Rares"         : "Rares",
     "TTWJetsToQQ"   : "t#bar{t}+W", # (W#rightarrowq#bar{q'})

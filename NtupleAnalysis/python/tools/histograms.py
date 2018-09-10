@@ -29,7 +29,7 @@ class CMSMode:
 
 
 ## Global variable to hold CMS text mode
-cmsTextMode = CMSMode.PRELIMINARY
+cmsTextMode = CMSMode.PAPER
 ## Global dictionary to hold the CMS text labels
 cmsText = {
     CMSMode.NONE: None,
