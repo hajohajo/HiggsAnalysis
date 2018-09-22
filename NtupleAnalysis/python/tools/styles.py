@@ -216,6 +216,7 @@ errorStyle2 = StyleCompound([StyleError(ROOT.kGray+2, 3354)])
 errorStyle3 = StyleCompound([StyleError(ROOT.kRed-10, 1001, linecolor=ROOT.kRed-10)])
 errorRatioStatStyle = StyleCompound([StyleError(ROOT.kGray, 1001, linecolor=ROOT.kGray)])
 errorRatioSystStyle = StyleCompound([StyleError(ROOT.kGray+1, 1001, linecolor=ROOT.kGray+1)])
+postFitErrorStyle = StyleCompound([StyleError(ROOT.kGray, 1001, linecolor=ROOT.kGray)])
 
 ratioStyle = dataStyle.clone()
 ratioLineStyle = StyleCompound([StyleLine(lineColor=ROOT.kRed, lineWidth=2, lineStyle=3)])
@@ -256,7 +257,9 @@ signal170Style = signalStyle.clone()
 signal175Style = signalStyle.clone()
 signal180Style = signalStyle.clone()
 signal190Style = signalStyle.clone()
-signal200Style = signalStyle.clone()
+signal200Style = StyleCompound([Style(34, ROOT.kBlue),
+                             StyleLine(lineStyle=2, lineWidth=2)
+                             ])
 
 """
 # Problem with StyleCompound: solid signal histo in control plots. 13122016/SL
@@ -285,7 +288,7 @@ signal500Style = StyleCompound([
         StyleLine(lineStyle=ROOT.kDashed, lineWidth=3, lineColor=ROOT.kBlue+3) ])
 """
 signal180Style  = signalStyle.clone()
-signal200Style  = signalStyle.clone()
+#signal200Style  = signalStyle.clone()
 signal220Style  = signalStyle.clone()
 signal250Style  = signalStyle.clone()
 signal300Style  = signalStyle.clone()   

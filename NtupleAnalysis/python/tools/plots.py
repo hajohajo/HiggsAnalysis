@@ -618,7 +618,7 @@ _legendLabels = {
     "Diboson"  : "Diboson",
     "ttX"      : "t#bar{t} + X",
     "noTop"    : "No t",
-    "SingleTop": "Single t",
+    "SingleTop": "Single top",
     "QCD"      : "QCD",#"Mis-ID. #tau_{h} (data)",
     "FakeB"    : "Fake b (data)",
     "GenuineB" : "Genuine b (MC)",
@@ -722,14 +722,14 @@ _legendLabels = {
     "QCD_Pt_800to1000_MuEnrichedPt5" : "QCD (#mu enr.), 800 < #hat{p}_{T} < 1000",
     "QCD_Pt_1000toInf_MuEnrichedPt5" : "QCD (#mu enr.), 1000 < #hat{p}_{T} < Inf",
     
-    "TToBLNu_s-channel" : "Single t (s channel)",
-    "TToBLNu_t-channel" : "Single t (t channel)",
-    "TToBLNu_tW-channel": "Single t (tW channel)",
-    "T_t-channel"       : "Single t (t channel)",
+    "TToBLNu_s-channel" : "Single top (s channel)",
+    "TToBLNu_t-channel" : "Single top (t channel)",
+    "TToBLNu_tW-channel": "Single top (tW channel)",
+    "T_t-channel"       : "Single top (t channel)",
     "Tbar_t-channel"    : "Single #ba_physicalMcAddr{t} (t channel)",
-    "T_tW-channel"      : "Single t (tW channel)",
+    "T_tW-channel"      : "Single top (tW channel)",
     "Tbar_tW-channel"   : "Single #bar{t} (tW channel)",
-    "T_s-channel"       : "Single t (s channel)",
+    "T_s-channel"       : "Single top (s channel)",
     "Tbar_s-channel"    : "Single #bar{t} (s channel)",
 
     # Ratio uncertainties
@@ -755,10 +755,11 @@ for mass in _lightHplusMasses:
     _legendLabels["TTOrTToHplus_M%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
 
 for mass in _intermediateHplusMasses:
-    _legendLabels["TTToHplus_M%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
+    _legendLabels["TTToHplus_M%d"%mass] = "H^{#pm} (%d GeV)" % mass
 
 for mass in _heavyHplusMasses:
-    _legendLabels["HplusTB_M%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
+#    _legendLabels["HplusTB_M%d"%mass] = "H^{#pm} (%d GeV, #sigma = 50 pb)" % mass # for plots in HIG-18-014
+    _legendLabels["HplusTB_M%d"%mass] = "H^{#pm} (%d GeV)" % mass
     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
 
 for mass in _heavyHplusToTBbarMasses:
@@ -856,6 +857,7 @@ _plotStyles = {
     "BackgroundStatError"    : styles.errorRatioStatStyle,
     "BackgroundSystError"    : styles.errorRatioSystStyle,
     "BackgroundStatSystError": styles.errorRatioSystStyle,
+    "PostFitError"           : styles.postFitErrorStyle,
     "RatioLine"              : styles.ratioLineStyle,
     }
 
@@ -1145,7 +1147,7 @@ def _createRatioHistos(histo1, histo2, ytitle, ratioType=None, ratioErrorOptions
     elif ratioType == "errorScale":
         ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions))
     else:
-        raise Exception("Invalid value for argument ratioType '%s', valid are 'errorPropagation', 'binomial', 'errorScale'")
+        raise Exception("Invalid value for argument ratioType '%s', valid are 'errorPropagation', 'binomial' and 'errorScale'")
     return ret        
 
 ## Creates a ratio histogram by propagating the uncertainties to the ratio
@@ -1333,9 +1335,8 @@ def _createRatioBinomial(histo1, histo2, ytitle):
 # Scales the histo1 values+uncertainties, and histo2 uncertainties by
 # histo2 values. Creates separate entries for histo2 statistical and
 # stat+syst uncertainties, if systematic uncertainties exist.
-def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True, denominatorStatSyst=True, numeratorOriginatesFromTH1=False):
+def _createRatioHistosErrorScale(histo1, histo2, ytitle, postFit=False, numeratorStatSyst=True, denominatorStatSyst=True, numeratorOriginatesFromTH1=False):
     addAlsoHatchedUncertaintyHisto = False
-    #addAlsoHatchedUncertaintyHisto = True
 
     ret = []
 
@@ -1383,7 +1384,10 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
                 self._gr = gr
                 self._ratio = False
             def ratioDrawStyle(self):
-                return "PZ"
+                if postFit:
+                    return "E0PZ"
+                else:
+                    return "PZ"
             def begin(self):
                 return 0
             def end(self):
@@ -1486,10 +1490,35 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         ratio.GetYaxis().SetTitle(ytitle)
         ratioErr.GetYaxis().SetTitle(ytitle)
         ratioErr.SetName("BackgroundStatError")
+        if postFit:
+            ratioErr.SetName("PostFitError")
         _plotStyles["Ratio"].apply(ratio)
         _plotStyles[ratioErr.GetName()].apply(ratioErr)
 
+        # Hack to make empty data bins in post-fit plots show up in the ratio pad in a nice way 
+        if postFit:
+            for iBin in range(0,ratio.GetN()):
+                pointX = ratio.GetX()[iBin]
+                binContent = ratio.GetY()[iBin]
+                # If is empty (ratio +), fill the ratio plot with error bar from up (ratio=10) to down
+                if binContent < 0.001:            
+                    ratio.SetPoint(iBin,pointX,10.0)
+                    ratio.SetPointEYlow(iBin, 50.0)
+                    ratio.SetPointEYhigh(iBin, -50.0)
+                # TODO: Otherwise re-calculate errors as Garwood likelihoods everywhere, by hand
+                # Recipy is here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/PoissonErrorBars
+                # The lines below give the error, but it is not correctly scaled yet (?) as the errors are huge
+#                else:
+#                    #Error (binContent) 1/sqrt(N), so the original data value N is 1/binContent^2
+#                    N = 1.0/(binContent*binContent)
+#                    print N
+#                    poissonErrorLow = (N - ROOT.Math.gamma_quantile((1 - 0.6827)/2.0,N,1))/N
+#                    poissonErrorHigh = (ROOT.Math.gamma_quantile_c((1 - 0.6827)/2.0,N+1,1) - N)/N
+#                    ratio.SetPointEYlow(iBin, poissonErrorLow)
+#                    ratio.SetPointEYhigh(iBin, poissonErrorHigh)                
+
         ret.append(_createHisto(ratio, drawStyle=ratioWrapped.ratioDrawStyle(), legendLabel=None))
+
         if histograms.uncertaintyMode.showStatOnly():
             ret.append(_createHisto(ratioErr, drawStyle="E2", legendLabel=_legendLabels[ratioErr.GetName()], legendStyle="F"))
             if addAlsoHatchedUncertaintyHisto:
@@ -1507,9 +1536,8 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         gr2 = histo2.getSystematicUncertaintyGraph(addStatistical=True, addSystematic=False)
 
         # Add scaled stat uncertainty
-        #ret.extend(_createRatioHistosErrorScale(h1, h2, ytitle))
-        ret.extend(_createRatioHistosErrorScale(gr1, gr2, ytitle, numeratorOriginatesFromTH1 = isinstance(histo1.getRootHisto(), ROOT.TH1)))
-        if histograms.uncertaintyMode.equal(histograms.Uncertainty.StatOnly):
+        ret.extend(_createRatioHistosErrorScale(gr1, gr2, ytitle, postFit, numeratorOriginatesFromTH1 = isinstance(histo1.getRootHisto(), ROOT.TH1)))
+        if histograms.uncertaintyMode.equal(histograms.Uncertainty.StatOnly) or postFit:
             return ret
 
         # Then add scaled stat+syst uncertainty
@@ -1919,11 +1947,13 @@ class PlotBase:
     ## Add MC uncertainty histogram
     def addMCUncertainty(self, postfit=False):
         systKey = "MCSystError"
+#        # Post-fit plots
+#        if postfit:
+#            legendLabel=_legendLabels["PostFitError"]
+#            uncertaintyLegendLabel=_legendLabels["PostFitError"]
+        # Pre-fit plots
         if histograms.uncertaintyMode.addStatToSyst():
             systKey = "MCStatSystError"
-        if postfit:
-            legendLabel=_legendLabels["PostFitError"]
-            uncertaintyLegendLabel=_legendLabels["PostFitError"]
         else:
             legendLabel=_legendLabels["MCStatError"]
             uncertaintyLegendLabel=_legendLabels[systKey]

@@ -1536,6 +1536,11 @@ class Histo:
                 unc.Draw(self._uncertaintyDrawStyle+" "+opt)
         if self.drawStyle is not None:
             drawStyle = self.drawStyle+" "+opt
+            # Hack to make plots with kPoisson error bars (e.g. post-fit plots) to plot correctly 
+            # (need to overrade the default "EP" style in favor of "E0")
+            # More info: https://twiki.cern.ch/twiki/bin/viewauth/CMS/PoissonErrorBars
+            if "data"in  h.GetTitle().lower() or h.GetName()=="Data": # or ("E2" in drawStyle):
+                drawStyle = "E0 same"
             h.Draw(drawStyle)
             tmp = drawStyle.lower()
             if "e" in tmp and "p" in tmp:

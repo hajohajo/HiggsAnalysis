@@ -586,7 +586,7 @@ class DatacardColumn():
                 elif limitOnSigmaBr or not limitOnBrBr:
                     if self._landsProcess <= 0:
                         # Set cross section of sample to 1 pb in order to obtain limit on sigma x Br
-                        dsetMgr.getDataset(self.getDatasetMgrColumn()).setCrossSection(1)
+                        dsetMgr.getDataset(self.getDatasetMgrColumn()).setCrossSection(1) # set to 50 for HIG-18-014 control plots
                         myDatasetRootHisto = dsetMgr.getDataset(self.getDatasetMgrColumn()).getDatasetRootHisto(mySystematics.histogram(self.getFullShapeHistoName()))
                         print ShellStyles.WarningLabel()+"Forcing heavy H+ signal sample %s to normalization of 1 pb xsect in DatacardColumn.py"%self._label
 
