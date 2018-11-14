@@ -343,10 +343,10 @@ hadrMoveLegend = {"dx": -0.172, "dy": -0.015, "dh": 0.14}
 taunuHadr_1.setMoveLegend(hadrMoveLegend)
 hadrRatioMoveLegend = {"dx": -0.51, "dy": -0.02, "dh": -0.14}
 taunuHadr_1.setRatioMoveLegend(hadrRatioMoveLegend)
-taunuHadr_1.addHisto("qcdfaketau","Jets mis-id. as #tau_{h}",color=ROOT.kOrange-2)
+taunuHadr_1.addHisto("qcdfaketau","Jets misid. as #tau_{h}",color=ROOT.kOrange-2)
 taunuHadr_1.addHisto("ttbar","t#bar{t}",color=ROOT.kMagenta-2)
 taunuHadr_1.addHisto("wjets","W+jets",color=ROOT.kOrange+9)
-taunuHadr_1.addHisto("singletop","Single top",color=ROOT.kSpring+4)
+taunuHadr_1.addHisto("singletop","Single t",color=ROOT.kSpring+4)
 taunuHadr_1.addHisto("dy","Z/#gamma^{_{*}}",color=ROOT.kTeal-9)
 taunuHadr_1.addHisto("vv","Diboson",color=ROOT.kBlue-4)
 taunuHadr_1.setXmax(460.0)
@@ -364,22 +364,24 @@ taunuLept_1.addHisto("ttbar","t#bar{t}",color=ROOT.kMagenta-2)
 #taunuLept_1.addHisto("ttb","ttb",color=ROOT.kRed-5)
 #taunuLept_1.addHisto("ttbb","ttbb",color=ROOT.kRed+3)
 taunuLept_1.addHisto("wjets","W+jets",color=ROOT.kOrange+9)
-taunuLept_1.addHisto("singletop","Single top",color=ROOT.kSpring+4)
+taunuLept_1.addHisto("singletop","Single t",color=ROOT.kSpring+4)
 taunuLept_1.addHisto("vv","Diboson",color=ROOT.kBlue-4)
 taunuLept_1.addHisto("dy","Z/#gamma^{_{*}}",color=ROOT.kTeal-9)
 taunuLept_1.setYmax(5*1e7)
 taunuLept_1.setXmax(460.0)
-taunuLept_1.setOpts2({"ymin": 0.600001, "ymax": 1.4})
+taunuLept_1.setOpts2({"ymin": 0.70001, "ymax": 1.3})
 leptMoveLegend = {"dx": -0.23, "dy": -0.015, "dh": 0.11}
 leptMoveLegendLong = {"dx": -0.30, "dy": -0.015, "dh": 0.11}
 leptRatioMoveLegend = {"dx": -0.51, "dy": -0.02, "dh": -0.14}
 taunuLept_1.setMoveLegend(leptMoveLegendLong)
 taunuLept_1.setRatioMoveLegend(leptRatioMoveLegend)
-taunuLept_2  = taunuLept_1.clone("ch2_ch1_R0_0_1Mu_tauh")
+taunuLept_1.setOpts2({"ymin": 0.65001, "ymax": 1.35})
+taunuLept_2  = taunuLept_1.clone("ch2_ch1_R0_0_1Mu_tauh") # 1.35 or larger needed
 taunuLept_1.setMoveLegend(leptMoveLegend)
 taunuLept_3  = taunuLept_1.clone("ch2_ch1_R0_1_1El_tauh")
 taunuLept_1.setMoveLegend(leptMoveLegendLong)
 taunuLept_4  = taunuLept_3.clone("ch2_ch1_R0_1_1Mu_tauh")
+#taunuLept_1.setOpts2({"ymin": 0.850001, "ymax": 1.15})
 taunuLept_5  = taunuLept_3.clone("ch2_ch1_R0_2_1El_tauh")
 taunuLept_6  = taunuLept_3.clone("ch2_ch1_R0_2_1Mu_tauh")
 # R1, tauh
@@ -398,12 +400,12 @@ taunuLept_17 = taunuLept_3.clone("ch2_ch1_R2_2_1El_tauh")
 taunuLept_18 = taunuLept_3.clone("ch2_ch1_R2_2_1Mu_tauh")
 # R1, notauh
 taunuLept_19 = taunuLept_3.clone("ch1_ch1_R1_0_1El_notauh")
-taunuLept_20 = taunuLept_3.clone("ch1_ch1_R1_0_1Mu_notauh")
+taunuLept_20 = taunuLept_3.clone("ch1_ch1_R1_0_1Mu_notauh") #1.15 or smaller needed
 taunuLept_21 = taunuLept_3.clone("ch1_ch1_R1_1_1El_notauh")
 taunuLept_22 = taunuLept_3.clone("ch1_ch1_R1_1_1Mu_notauh")
 # R2, notauh
-taunuLept_23 = taunuLept_3.clone("ch1_ch1_R2_0_1El_notauh")
-taunuLept_24 = taunuLept_3.clone("ch1_ch1_R2_0_1Mu_notauh")
+taunuLept_23 = taunuLept_3.clone("ch1_ch1_R2_0_1El_notauh") #1.15 or smaller needed
+taunuLept_24 = taunuLept_3.clone("ch1_ch1_R2_0_1Mu_notauh") #1.15 or smaller needed
 taunuLept_25 = taunuLept_3.clone("ch1_ch1_R2_1_1El_notauh")
 taunuLept_26 = taunuLept_3.clone("ch1_ch1_R2_1_1Mu_notauh")
 # R3, notauh

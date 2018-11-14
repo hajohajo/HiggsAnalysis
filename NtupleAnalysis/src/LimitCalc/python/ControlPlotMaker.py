@@ -276,7 +276,7 @@ class ControlPlotMaker:
                         if not "opts2" in myParams.keys():
                             myParams["opts2"] = {"ymin": 0.3, "ymax": 1.7}
 #                        myStackPlot.setLegendHeader("#tau_{h}+jets, R_{#tau} > 0.75")
-#                        myStackPlot.setLegendHeader("#tau_{h}+jets")
+#                        myStackPlot.setLegendHeader("#tau_{h}+jets, R_{#tau} inclusive")
                         # Do plotting
                         if m > 0:
 #                             histograms.cmsTextMode = histograms.CMSMode.PAPER

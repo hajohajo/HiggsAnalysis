@@ -618,13 +618,13 @@ _legendLabels = {
     "Diboson"  : "Diboson",
     "ttX"      : "t#bar{t} + X",
     "noTop"    : "No t",
-    "SingleTop": "Single top",
+    "SingleTop": "Single t", # "Single top quark" or "Single t" are OK for papers, "Single top" is not
     "QCD"      : "QCD",#"Mis-ID. #tau_{h} (data)",
     "FakeB"    : "Fake b (data)",
     "GenuineB" : "Genuine b (MC)",
     "QCD-b"    : "QCD (b enr.)",
 #    "QCDdata"  : "Jets#rightarrow#tau_{h}", #"QCD (data driven)"
-    "QCDdata"  : "Jets mis-id. as #tau_{h}", #"QCD (data driven)"
+    "QCDdata"  : "Jets misid. as #tau_{h}", #"QCD (data driven)"
 
     "TTJets"        : "t#bar{t}",
     "TT"            : "t#bar{t}",
@@ -758,7 +758,7 @@ for mass in _intermediateHplusMasses:
     _legendLabels["TTToHplus_M%d"%mass] = "H^{#pm} (%d GeV)" % mass
 
 for mass in _heavyHplusMasses:
-#    _legendLabels["HplusTB_M%d"%mass] = "H^{#pm} (%d GeV, #sigma = 50 pb)" % mass # for plots in HIG-18-014
+#    _legendLabels["HplusTB_M%d"%mass] = "H^{#pm} (%d GeV, #sigma = 50 pb)" % mass # for plots in HIG-18-014 paper
     _legendLabels["HplusTB_M%d"%mass] = "H^{#pm} (%d GeV)" % mass
     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
 
