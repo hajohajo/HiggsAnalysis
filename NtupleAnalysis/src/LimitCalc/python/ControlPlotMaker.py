@@ -275,10 +275,16 @@ class ControlPlotMaker:
                         # Ratio axis
                         if not "opts2" in myParams.keys():
                             myParams["opts2"] = {"ymin": 0.3, "ymax": 1.7}
+#                        myStackPlot.setLegendHeader("#tau_{h}+jets, R_{#tau} > 0.75")
+#                        myStackPlot.setLegendHeader("#tau_{h}+jets, R_{#tau} inclusive")
                         # Do plotting
                         if m > 0:
-                            drawPlot(myStackPlot, "%s/DataDrivenCtrlPlot_M%d_%02d_%s"%(self._dirname,m,i,myCtrlPlot.title), **myParams)
+#                             histograms.cmsTextMode = histograms.CMSMode.PAPER
+                             drawPlot(myStackPlot, "%s/DataDrivenCtrlPlot_M%d_%02d_%s"%(self._dirname,m,i,myCtrlPlot.title), **myParams)
+#                            histograms.cmsTextMode = histograms.CMSMode.PRELIMINARY
+#                            drawPlot(myStackPlot, "%s/DataDrivenCtrlPlot_M%d_%02d_%s_preliminary"%(self._dirname,m,i,myCtrlPlot.title), **myParams)
                         else:
+#                            histograms.cmsTextMode = histograms.CMSMode.PAPER
                             drawPlot(myStackPlot, "%s/DataDrivenCtrlPlot_%02d_%s"%(self._dirname,i,myCtrlPlot.title), **myParams)
 
             # Do selection flow plot
