@@ -174,6 +174,8 @@ _physicalMcAdd = {
     "ChargedHiggs_HplusTB_HplusToTauNu_M_2000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_2000",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_3000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_3000",
 
+    "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta" : "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta",
+
     "ChargedHiggs_HplusTB_HplusToTB_M_180_ext1" : "ChargedHiggs_HplusTB_HplusToTB_M_180",
     "ChargedHiggs_HplusTB_HplusToTB_M_200_ext1" : "ChargedHiggs_HplusTB_HplusToTB_M_200",
     "ChargedHiggs_HplusTB_HplusToTB_M_220_ext1" : "ChargedHiggs_HplusTB_HplusToTB_M_220", 
@@ -766,6 +768,8 @@ for mass in _heavyHplusToTBbarMasses:
     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} (%d GeV, #sigma = %.1f pb)" % (mass, xsect.getSignalCrossSection())
     _legendLabels["HplusToTBbar_M%d"%mass] = "H^{+}#rightarrowtb m_{H^{+}}=%d GeV" % mass
 
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"] = "H^{+} (m_{H^{+}} = 300 GeV, m_{H^{0}} = 200 GeV)"
+
 ## Map the logical dataset names to plot styles
 _plotStyles = {
     "ChargedHiggs_HplusTB_HplusToTB_M_180"  : styles.signalStyleHToTB,
@@ -786,6 +790,8 @@ _plotStyles = {
     "ChargedHiggs_HplusTB_HplusToTB_M_5000" : styles.signalStyleHToTB,
     "ChargedHiggs_HplusTB_HplusToTB_M_7000" : styles.signalStyleHToTB,
     "ChargedHiggs_HplusTB_HplusToTB_M_10000": styles.signalStyleHToTB,
+
+    "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta": styles.ttXStyle, #styles.signalStyleHToTB,
 
     "HplusTBintermediate_M145": styles.mcStyle,
     "HplusTBintermediate_withNeutral_M145": styles.mcStyle2,
