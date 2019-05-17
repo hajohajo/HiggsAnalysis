@@ -14,13 +14,12 @@ EXAMPLES:
 
 
 LAST USED:
-./dcardGenerator_v2.py -x dcardDefault_h2tb_2016.py -d limits2016/ --h2tb
-OR
-./dcardGenerator_v2.py -x dcardDefault_h2tb_2016_new.py -d limits2016/ --h2tb
+./dcardGenerator_v2.py -x dcardDefault_h2tb_2016_paper.py -d limits2016/ --h2tb
 
--
+
 HN Threads:
 https://hypernews.cern.ch/HyperNews/CMS/get/HIG-18-015/11.html
+
 '''
 #================================================================================================  
 # Imports
@@ -844,9 +843,7 @@ hLdgHiggsMass = ControlPlotInput(
                          "log"                : True,
                          "legendPosition"     : "NE",
                          "ratioLegendPosition": "right",
-                         #"opts"               : {"ymin": 1e-2, "ymaxfactor": 10}
-                         "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10} # paper
-                         #"opts"               : {"xmin":150.0, "ymin": 0.5e-2, "ymaxfactor": 10} # paper
+                         "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
                          },
     blindedRange=[0.0, 2500.0], # specify range min,max if blinding applies to this control plot
     flowPlotCaption  = "", # Leave blank if you don't want to include the item to the selection flow plot    
@@ -1369,8 +1366,8 @@ if OptionTest:
     ControlPlots.append(hLdgHiggsMass)
     #ControlPlots.append(hTetrajetBjetPt)
     #ControlPlots.append(hTetrajetBjetEta)
-    ControlPlots.append(hLdgTopPt)
+    #ControlPlots.append(hLdgTopPt)
     #ControlPlots.append(hLdgTopMass)
     #ControlPlots.append(hMET)
     #ControlPlots.append(hHT)
-    MassPoints = [500, 650, 800]
+    MassPoints = [800]
