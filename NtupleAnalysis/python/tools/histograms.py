@@ -1492,7 +1492,7 @@ class Histo:
             if 3345 in fillStyles and 3354 in fillStyles:
                 h.SetFillStyle(3344)
             elif 3345 in fillStyles:
-                h.SetFillStyle(3345):
+                h.SetFillStyle(3345)
             else:
                 info = inspect.getframeinfo(inspect.currentframe())
                 print >>sys.stderr, 'WARNING: encountered fill styles %d and %d for stat and syst uncertainties, and there is no support yet for "combining" them for stat. Consider adding your case to %s near line %d' % (fillStyles[0], fillStyles[1], info.filename, info.lineno)

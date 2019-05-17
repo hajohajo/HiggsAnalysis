@@ -28,20 +28,26 @@ import ROOT
 _legendLabelQCDMC = "QCD (MC)" 
 _legendLabelEWKMC = "EWK (MC)" 
 _legendLabelFakeB = "Fake-b (data)" 
-if self._config.OptionPaper:
-    rType = "errorScale"
-else:
-    rType = "errorScalePaper"
-            
+
 drawPlot = plots.PlotDrawer(ratio             = True, 
-                            ratioYlabel       = "Data/Bkg ",
+                            ratioYlabel       = "Data / Bkg  ",
                             ratioCreateLegend = True,
-                            ratioType         = rType,
+                            ratioType         = "errorScale",
                             ratioErrorOptions = {"numeratorStatSyst": False},
                             stackMCHistograms = True, 
                             addMCUncertainty  = True, 
                             addLuminosityText = True,
                             cmsTextPosition   = "outframe")
+
+drawPlotPaper = plots.PlotDrawer(ratio             = True, 
+                                 ratioYlabel       = "Data / Bkg  ",
+                                 ratioCreateLegend = True,
+                                 ratioType         = "errorScalePaper",
+                                 ratioErrorOptions = {"numeratorStatSyst": False},
+                                 stackMCHistograms = True, 
+                                 addMCUncertainty  = True, 
+                                 addLuminosityText = True,
+                                 cmsTextPosition   = "outframe")
 
 drawPlot2D = plots.PlotDrawer(opts2={"ymin": 0.5, "ymax": 1.5},
                               ratio=False, 
@@ -240,7 +246,11 @@ class ControlPlotMakerHToTB:
                             })
 
                 # Do plotting
-                drawPlot(myStackPlot, saveName, **myParams)
+                if self._config.OptionPaper:
+                    drawPlotPaper(myStackPlot, saveName, **myParams)
+                else:
+                    drawPlot(myStackPlot, saveName, **myParams)
+                    
                 
             # Do selection flow plot
             selectionFlow.makePlot(self._dirname, m, len(self._config.ControlPlots), self._luminosity)
@@ -317,13 +327,18 @@ class ControlPlotMakerHToTB:
 
     def _setRatioLegendPosition(self, myParams):
         if "ratioLegendPosition" in myParams.keys():
+            dy = 0.03
+            if self._config.OptionPaper:
+                dh = -0.1
+            else:
+                dh = 0.0
             self.Verbose("Setting the legend (ratio) position to \"%s\"" % ( myParams["ratioLegendPosition"] ) )
             if myParams["ratioLegendPosition"] == "left":
-                myParams["ratioMoveLegend"] = {"dx": -0.51, "dy": 0.03}
+                myParams["ratioMoveLegend"] = {"dx": -0.51, "dy": dy, "dh": dh}
             elif myParams["ratioLegendPosition"] == "right":
-                myParams["ratioMoveLegend"] = {"dx": -0.08, "dy": 0.03}
+                myParams["ratioMoveLegend"] = {"dx": -0.01, "dy": dy, "dh": dh}
             elif myParams["ratioLegendPosition"] == "SE":
-                myParams["ratioMoveLegend"] = {"dx": -0.08, "dy": -0.33}
+                myParams["ratioMoveLegend"] = {"dx": -0.08, "dy": -0.33, "dh": dh}
             else:
                 raise Exception("Unknown value for option ratioLegendPosition: %s!", myParams["ratioLegendPosition"])
             del myParams["ratioLegendPosition"]
@@ -335,18 +350,22 @@ class ControlPlotMakerHToTB:
     def _setLegendPosition(self, myParams):
         if "legendPosition" in myParams.keys():
             self.Verbose("Setting the legend position to \"%s\"" % ( myParams["legendPosition"] ) )
+            dh = 0.14
             if self._config.OptionBr == 1.0:
                 dx = -0.10
             else:
                 dx = -0.12
+            if self._config.OptionPaper:
+                dx = -0.20
+                dh = +0.05
             if myParams["legendPosition"] == "NE":
-                myParams["moveLegend"] = {"dx": dx, "dy": -0.02, "dh": 0.14}
+                myParams["moveLegend"] = {"dx": dx, "dy": -0.02, "dh": dh}
             elif myParams["legendPosition"] == "SE":
-                myParams["moveLegend"] = {"dx": dx, "dy": -0.40, "dh": 0.14}
+                myParams["moveLegend"] = {"dx": dx, "dy": -0.40, "dh": dh}
             elif myParams["legendPosition"] == "SW":
-                myParams["moveLegend"] = {"dx": -0.53, "dy": -0.40, "dh": 0.14}
+                myParams["moveLegend"] = {"dx": -0.53, "dy": -0.40, "dh": dh}
             elif myParams["legendPosition"] == "NW":
-                myParams["moveLegend"] = {"dx": -0.53, "dy": -0.02, "dh": 0.14}
+                myParams["moveLegend"] = {"dx": -0.53, "dy": -0.02, "dh": dh}
             elif myParams["legendPosition"] == "RM":
                 myParams["moveLegend"] = {"dx": +10.0, "dy": +10.0, "dh": -100.0}
             else:

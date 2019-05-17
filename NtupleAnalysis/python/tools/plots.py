@@ -617,9 +617,9 @@ _datasetOrder.extend([
 # Map the logical dataset names to legend labels
 _legendLabels = {
     "Data"     : "Data",
-    "EWK"      : "EWK",
+    "EWK"      : "Electroweak",
     "Diboson"  : "Diboson",
-    "ttX"      : "t,tW,t#bar{t}+X",
+    "ttX"      : "t, tW, t#bar{t} + X",
     "noTop"    : "No t",
     "SingleTop": "Single t",
     "QCD"      : "QCD",#"Mis-ID. #tau_{h} (data)",
@@ -741,6 +741,7 @@ _legendLabels = {
     "MCStatError"            : "Sim. stat. unc.",
     "MCSystError"            : "Sim. syst. unc.",
     "MCStatSystError"        : "Sim. stat.#oplussyst. unc.",
+    "StatSystError"          : "Stat #oplus syst unc",
     "PostFitError"           : "Post-fit unc."
     }
 
@@ -764,9 +765,9 @@ for mass in _heavyHplusMasses:
     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
 
 for mass in _heavyHplusToTBbarMasses:
-    # _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
-    _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} (%d GeV, #sigma = %.1f pb)" % (mass, xsect.getSignalCrossSection())
-    _legendLabels["HplusToTBbar_M%d"%mass] = "H^{+}#rightarrowtb m_{H^{+}}=%d GeV" % mass
+    #_legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} (%d GeV, #sigma = %.1f pb)" % (mass, xsect.getSignalCrossSection())
+     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{#pm} (%d GeV, #sigma#it{#Beta} = %.1f pb)" % (mass, xsect.getSignalCrossSection())
+     _legendLabels["HplusToTBbar_M%d"%mass] = "H^{+}#rightarrowtb m_{H^{+}}=%d GeV" % mass
 
 _legendLabels["ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"] = "H^{+} (m_{H^{+}} = 300 GeV, m_{H^{0}} = 200 GeV)"
 
@@ -863,6 +864,7 @@ _plotStyles = {
     "BackgroundStatError"    : styles.errorRatioStatStyle,
     "BackgroundSystError"    : styles.errorRatioSystStyle,
     "BackgroundStatSystError": styles.errorRatioSystStyle,
+    "StatSystError"          : styles.errorRatioStatStyle,
     "RatioLine"              : styles.ratioLineStyle,
     }
 
@@ -1151,8 +1153,11 @@ def _createRatioHistos(histo1, histo2, ytitle, ratioType=None, ratioErrorOptions
         ret.append(h)
     elif ratioType == "errorScale":
         ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions))
+    elif ratioType == "errorScalePaper": #iro
+        ratioErrorOptions["paperStyle"] = True
+        ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions) )
     else:
-        raise Exception("Invalid value for argument ratioType '%s', valid are 'errorPropagation', 'binomial', 'errorScale'")
+        raise Exception("Invalid value for argument ratioType '%s', valid are 'errorPropagation', 'binomial', 'errorScale', 'errorScalePaper'")
     return ret        
 
 ## Creates a ratio histogram by propagating the uncertainties to the ratio
@@ -1340,7 +1345,7 @@ def _createRatioBinomial(histo1, histo2, ytitle):
 # Scales the histo1 values+uncertainties, and histo2 uncertainties by
 # histo2 values. Creates separate entries for histo2 statistical and
 # stat+syst uncertainties, if systematic uncertainties exist.
-def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True, denominatorStatSyst=True, numeratorOriginatesFromTH1=False):
+def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True, denominatorStatSyst=True, numeratorOriginatesFromTH1=False, paperStyle=False):
     addAlsoHatchedUncertaintyHisto = False
     #addAlsoHatchedUncertaintyHisto = True
 
@@ -1515,7 +1520,7 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
 
         # Add scaled stat uncertainty
         #ret.extend(_createRatioHistosErrorScale(h1, h2, ytitle))
-        ret.extend(_createRatioHistosErrorScale(gr1, gr2, ytitle, numeratorOriginatesFromTH1 = isinstance(histo1.getRootHisto(), ROOT.TH1)))
+        ret.extend( _createRatioHistosErrorScale(gr1, gr2, ytitle, numeratorOriginatesFromTH1 = isinstance(histo1.getRootHisto(), ROOT.TH1)) )
         if histograms.uncertaintyMode.equal(histograms.Uncertainty.StatOnly):
             return ret
 
@@ -1547,6 +1552,8 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         ratioSyst1.SetName(histo1.GetName()+"_syst")
         ratioSyst2.GetYaxis().SetTitle(ytitle)
         name = "BackgroundStatSystError"
+        if paperStyle:
+            name = "StatSystError" #iro
         ratioSyst2.SetName(name)
         if not histograms.uncertaintyMode.addStatToSyst():
             name = "BackgroundSystError"
@@ -1555,7 +1562,11 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         if numeratorStatSyst:
             ret.append(_createHisto(ratioSyst1, drawStyle="[]", legendLabel=None))
         if denominatorStatSyst:
-            ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=_legendLabels[name], legendStyle="F"))
+            if paperStyle:
+                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=None, legendStyle="F"))  #iro
+            else:
+                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=_legendLabels[name], legendStyle="F"))  #iro
+
         if addAlsoHatchedUncertaintyHisto:
             ratioSyst2_2 = ratioSyst.Clone("BackgroundStatSystError2")
             styles.errorStyle.apply(ratioSyst2_2)
@@ -1834,6 +1845,7 @@ class PlotBase:
         self.histoMgr.forEachHisto(SetPlotStyle(_plotStyles))
         if self.histoMgr.hasHisto("Data"):
             self.histoMgr.setHistoDrawStyle("Data", "EP")
+
 
     ## Set default legend labels and styles, and plot styles
     def setDefaultStyles(self):
@@ -2504,7 +2516,7 @@ class PlotSameBase(PlotBase):
         if self.histoMgr.hasHisto("MCuncertainty"):
             dataset._normalizeToFactor(self.histoMgr.getHisto("MCuncertainty").getRootHisto(), 1.0/sumInt)
             handled.append("MCuncertainty")
-        
+
         # Normalize the rest
         for h in self.histoMgr.getHistos():
             if not h.getName() in handled:
@@ -2671,7 +2683,7 @@ class DataMCPlot(PlotSameBase, PlotRatioBase):
             self._createFrameRatio(filename,
                                    self.histoMgr.getHisto("Data").getRootHistoWithUncertainties(),
                                    self.histoMgr.getHisto("StackedMC").getSumRootHistoWithUncertainties(),
-                                   "Data/MC", **kwargs)
+                                   "Data/MC", **kwargs)        
 
     ## Create TCanvas and frames for the histogram and a data/MC ratio
     #
@@ -2712,10 +2724,11 @@ class DataMCPlot2(PlotBase, PlotRatioBase):
         self.normalizeToOne = normalizeToOne
         self.dataDatasetNames = ["Data"]
 
-    def setDefaultStyles(self):
+    def setDefaultStyles(self, paperStyle=False):
         self._setLegendStyles()
         self._setLegendLabels()
         self._setPlotStyles()
+        self._paperStyle=paperStyle
 
     ## Set the names of data histograms
     #
@@ -2756,7 +2769,10 @@ class DataMCPlot2(PlotBase, PlotRatioBase):
         elif histograms.uncertaintyMode.equal(histograms.Uncertainty.SystOnly):
             self.histoMgr.addMCUncertainty(styles.getErrorStyle(), nameList=["StackedMC"], legendLabel=_legendLabels[systKey])
         else:
-            self.histoMgr.addMCUncertainty(styles.getErrorStyle(), nameList=["StackedMC"], legendLabel=_legendLabels["MCStatError"], uncertaintyLegendLabel=_legendLabels[systKey])
+            if self._paperStyle:
+                self.histoMgr.addMCUncertainty(styles.getErrorStylePaper(), nameList=["StackedMC"], legendLabel=_legendLabels["StatSystError"], uncertaintyLegendLabel=None)
+            else:
+                self.histoMgr.addMCUncertainty(styles.getErrorStyle(), nameList=["StackedMC"], legendLabel=_legendLabels["MCStatError"], uncertaintyLegendLabel=_legendLabels[systKey])
 
     ## Create TCanvas and frames for the histogram and a data/MC ratio
     #
@@ -2789,7 +2805,7 @@ class DataMCPlot2(PlotBase, PlotRatioBase):
         PlotBase.draw(self)
         PlotRatioBase._draw(self)
 
-    ## Helper function to do the work for "normalization to one"
+    ## sHelper function to do the work for "normalization to one"
     def _normalizeToOne(self):
         # First check that the normalizeToOne is enabled
         if not self.normalizeToOne:
