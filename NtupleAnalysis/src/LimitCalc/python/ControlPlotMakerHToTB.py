@@ -28,16 +28,20 @@ import ROOT
 _legendLabelQCDMC = "QCD (MC)" 
 _legendLabelEWKMC = "EWK (MC)" 
 _legendLabelFakeB = "Fake-b (data)" 
-
+if self._config.OptionPaper:
+    rType = "errorScale"
+else:
+    rType = "errorScalePaper"
+            
 drawPlot = plots.PlotDrawer(ratio             = True, 
-                            ratioYlabel       = "Data/Bkg. ",
+                            ratioYlabel       = "Data/Bkg ",
                             ratioCreateLegend = True,
-                            ratioType         = "errorScale",
+                            ratioType         = rType,
                             ratioErrorOptions = {"numeratorStatSyst": False},
                             stackMCHistograms = True, 
                             addMCUncertainty  = True, 
                             addLuminosityText = True,
-                            cmsTextPosition="outframe")
+                            cmsTextPosition   = "outframe")
 
 drawPlot2D = plots.PlotDrawer(opts2={"ymin": 0.5, "ymax": 1.5},
                               ratio=False, 
@@ -67,11 +71,17 @@ class ControlPlotMakerHToTB:
         # Define label options
         myStyle = tdrstyle.TDRStyle()
         myStyle.setOptStat(False)
-        plots._legendLabels["MCStatError"] = "Bkg. stat."
-        plots._legendLabels["MCStatSystError"] = "Bkg. stat.#oplussyst."
-        plots._legendLabels["BackgroundStatError"] = "Bkg. stat. unc"
-        plots._legendLabels["BackgroundStatSystError"] = "Bkg. stat.#oplussyst. unc."
-
+        if self._config.OptionPaper:
+            plots._legendLabels["MCStatError"] = "Stat unc"
+            plots._legendLabels["MCStatSystError"] = "Stat #oplus syst unc"
+            plots._legendLabels["BackgroundStatError"] = "Stat #oplus syst unc"
+            plots._legendLabels["BackgroundStatSystError"] = "Stat #oplus syst unc"
+        else:
+            plots._legendLabels["MCStatError"] = "Bkg. stat."
+            plots._legendLabels["MCStatSystError"] = "Bkg. stat.#oplussyst."
+            plots._legendLabels["BackgroundStatError"] = "Bkg. stat. unc"
+            plots._legendLabels["BackgroundStatSystError"] = "Bkg. stat.#oplussyst. unc."
+            
         # Make control plots
         self.Verbose(ShellStyles.HighlightStyle() + "Generating control plots" + ShellStyles.NormalStyle(), True)
 
@@ -190,7 +200,7 @@ class ControlPlotMakerHToTB:
                     myHisto = histograms.Histo(hSignal, mySignalLabel)
                     myHisto.setIsDataMC(isData=False, isMC=True)
                     myStackList.insert(1, myHisto)
-                    
+            
                 # Add data to selection flow plot
                 selectionFlow.addColumn(myCtrlPlot.flowPlotCaption, hDataUnblinded, myStackList[1:])
 
@@ -200,8 +210,8 @@ class ControlPlotMakerHToTB:
                 myStackPlot = plots.DataMCPlot2(myStackList)
                 myStackPlot.setLuminosity(self._luminosity)
                 myStackPlot.setEnergy("%d" % self._config.OptionSqrtS)
-                myStackPlot.setDefaultStyles()
-                
+                myStackPlot.setDefaultStyles(paperStyle=self._config.OptionPaper)
+    
                 # Tweak paramaters
                 if not "unit" in myParams.keys():
                     myParams["unit"] = ""
@@ -645,6 +655,7 @@ class SelectionFlowPlotMaker:
         myStackPlot.setLuminosity(luminosity)
         myStackPlot.setEnergy("%d"%self._config.OptionSqrtS)
         myStackPlot.setDefaultStyles()
+
         myParams = {}
         myParams["ylabel"] = "Events"
         myParams["log"] = True
