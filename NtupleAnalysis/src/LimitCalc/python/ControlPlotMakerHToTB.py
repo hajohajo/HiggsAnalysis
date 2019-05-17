@@ -217,7 +217,9 @@ class ControlPlotMakerHToTB:
                 myStackPlot.setLuminosity(self._luminosity)
                 myStackPlot.setEnergy("%d" % self._config.OptionSqrtS)
                 myStackPlot.setDefaultStyles(paperStyle=self._config.OptionPaper)
-    
+                if self._config.OptionPaper:
+                    myStackPlot.setLegendHeader("Associated production")
+            
                 # Tweak paramaters
                 if not "unit" in myParams.keys():
                     myParams["unit"] = ""
