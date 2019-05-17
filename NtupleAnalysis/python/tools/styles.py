@@ -213,7 +213,7 @@ dataStyle = StyleCompound([Style(ROOT.kFullCircle, ROOT.kBlack)])
 dataMcStyle = dataStyle.clone()
 errorStyle = StyleCompound([StyleError(ROOT.kBlack, 3345, styleSyst=3354)])
 errorStyle2 = StyleCompound([StyleError(ROOT.kGray+2, 3354)])
-errorStylePaper = StyleCompound([StyleError(ROOT.kBlack, 3345, styleSyst=3345)]) # stat #oplus syst (not individually) => same style
+#errorStylePaper = StyleCompound([StyleError(ROOT.kBlack, 3345, styleSyst=3345)]) # stat #oplus syst (not individually) => same style
 errorStyle3 = StyleCompound([StyleError(ROOT.kRed-10, 1001, linecolor=ROOT.kRed-10)])
 errorRatioStatStyle = StyleCompound([StyleError(ROOT.kGray, 1001, linecolor=ROOT.kGray)])
 errorRatioSystStyle = StyleCompound([StyleError(ROOT.kGray+1, 1001, linecolor=ROOT.kGray+1)])
@@ -338,6 +338,10 @@ raresStyle        = Style(ROOT.kOpenSquare, ROOT.kViolet+10)  # ROOT.kAzure+8)
 #StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue-3, markerSizes=None, markerStyle=4),
 #                                   StyleLine(lineColor=ROOT.kBlue-3, lineStyle=ROOT.kSolid, lineWidth=4), 
 #                                   StyleFill(fillColor=ROOT.kBlue-3, fillStyle=3001)])
+
+# stat #oplus syst (not individually) => same style
+errorStylePaper = StyleCompound([StyleError(ROOT.kBlack, 3345, styleSyst=3345), 
+                                 StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3)])
 
 baselineStyle     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=3), 

@@ -329,7 +329,7 @@ class ControlPlotMakerHToTB:
         if "ratioLegendPosition" in myParams.keys():
             dy = 0.03
             if self._config.OptionPaper:
-                dh = -0.1
+                dh = -0.12
             else:
                 dh = 0.0
             self.Verbose("Setting the legend (ratio) position to \"%s\"" % ( myParams["ratioLegendPosition"] ) )
