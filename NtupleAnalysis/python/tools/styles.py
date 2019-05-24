@@ -412,7 +412,7 @@ signalStyleHToTB400 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROO
                                    StyleLine(lineColor=ROOT.kOrange-2, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kOrange-2, fillStyle=0)])
 signalStyleHToTB500 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                   StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kRed, fillStyle=0)])
 signalStyleHToTB650 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kAzure-6, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                                    StyleLine(lineColor=ROOT.kAzure-6, lineStyle=ROOT.kDashed, lineWidth=3), 
@@ -423,9 +423,9 @@ signalStyleHToTB800 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROO
 signalStyleHToTB1000 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kGreen, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kGreen, lineStyle=ROOT.kDotted, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kGreen, fillStyle=0)])
-signalStyleHToTB1500 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kMagenta+1, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                   StyleLine(lineColor=ROOT.kMagenta+1, lineStyle=ROOT.kDashed, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kMagenta+1, fillStyle=0)])
+signalStyleHToTB1500 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kCyan+1, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                   StyleLine(lineColor=ROOT.kCyan+1, lineStyle=ROOT.kDashed, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kCyan+1, fillStyle=0)])
 signalStyleHToTB2000 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kViolet-9, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kViolet-9, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kViolet-9, fillStyle=0)])

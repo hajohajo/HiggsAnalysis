@@ -174,7 +174,12 @@ _physicalMcAdd = {
     "ChargedHiggs_HplusTB_HplusToTauNu_M_2000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_2000",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_3000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_3000",
 
-    "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta" : "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta",
+    "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"     : "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta",
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO": "ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO",
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO": "ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO",
+    "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO": "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
+    "ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO" : "ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO",
+    "ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO" : "ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO",
 
     "ChargedHiggs_HplusTB_HplusToTB_M_180_ext1" : "ChargedHiggs_HplusTB_HplusToTB_M_180",
     "ChargedHiggs_HplusTB_HplusToTB_M_200_ext1" : "ChargedHiggs_HplusTB_HplusToTB_M_200",
@@ -770,6 +775,14 @@ for mass in _heavyHplusToTBbarMasses:
      _legendLabels["HplusToTBbar_M%d"%mass] = "H^{+}#rightarrowtb m_{H^{+}}=%d GeV" % mass
 
 _legendLabels["ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"] = "H^{+} (m_{H^{+}} = 300 GeV, m_{H^{0}} = 200 GeV)"
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO"] = "H^{+} (1500 GeV, m_{h^{0}} = 125 GeV)"
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"     ] = "H^{+} (1500 GeV, m_{h^{0}} = 125 GeV)"
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO"] = "H^{+} (1500 GeV, m_{H^{0}} = 150 GeV)"
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO"] = "H^{+} (1500 GeV, m_{h^{0}} = 125 GeV)"
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO"] = "H^{+} (300 GeV, m_{H^{0}} = 200 GeV)"
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO" ] = "H^{+} (350 GeV, m_{H^{0}} = 150 GeV)"
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO" ] = "H^{+} (350 GeV, m_{h^{0}} = 125 GeV)"
+
 
 ## Map the logical dataset names to plot styles
 _plotStyles = {
@@ -793,6 +806,13 @@ _plotStyles = {
     "ChargedHiggs_HplusTB_HplusToTB_M_10000": styles.signalStyleHToTB,
 
     "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta": styles.ttXStyle, #styles.signalStyleHToTB,
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO": styles.signalStyleHToTB1500,
+    "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"     : styles.signalStyleHToTB300,
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO": styles.signalStyleHToTB2000,
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO": styles.signalStyleHToTB1500,
+    "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO": styles.signalStyleHToTB300,
+    "ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO" : styles.signalStyleHToTB500,
+    "ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO" : styles.signalStyleHToTB400,
 
     "HplusTBintermediate_M145": styles.mcStyle,
     "HplusTBintermediate_withNeutral_M145": styles.mcStyle2,
