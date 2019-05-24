@@ -722,7 +722,7 @@ def PlotHistograms(datasetsMgr, histoList, binLabels, opts):
         # Get the histogram customisations (keyword arguments)
         p.appendPlotObject(histograms.PlotText(0.20, 0.88, GetBinText(bin), bold=True, size=22))
         plots.drawPlot(p, saveName, **GetHistoKwargs(saveName))
-        SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode), saveFormats = [".png"])#, ".pdf"])
+        SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode), saveFormats = [".png", ".C", ".pdf"])#, ".pdf"])
     return
 
 if __name__ == "__main__":

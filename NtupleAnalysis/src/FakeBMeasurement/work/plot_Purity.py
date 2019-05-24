@@ -380,7 +380,7 @@ def PlotHistoGraphs(hGraphList, _kwargs):
     plots.drawPlot(p, histoName, **_kwargs)
 
     # Save the plot
-    SavePlot(p, histoName, os.path.join(opts.saveDir, opts.optMode), saveFormats = [".png", ".pdf"] )
+    SavePlot(p, histoName, os.path.join(opts.saveDir, opts.optMode), saveFormats = [".C", ".png", ".pdf"] )
     return
 
 def GetHistoKwargs(histoName, opts):
