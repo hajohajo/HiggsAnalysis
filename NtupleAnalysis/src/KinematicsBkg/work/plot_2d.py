@@ -277,6 +277,13 @@ def GetHistoKwargs(h, opts):
         ROOT.gStyle.SetNdivisions(10, "Y")
         ROOT.gStyle.SetNdivisions(10, "Z")
 
+    if "dPhi" in h.split("_Vs_")[0]:
+        _kwargs["opts"]    = {"xmin": 0.0, "xmax": 3.2}
+
+        if "dPhi" in h.split("_Vs_")[1]:
+            _kwargs["opts"]    = {"xmin": 0.0, "xmax": 3.2, "ymin": 0.0, "ymax": 3.2}
+
+
     if "Pt_Vs_Pt" in h:
         _kwargs["rebinX"]  =  1
         _kwargs["rebinY"]  =  1

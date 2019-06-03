@@ -265,7 +265,7 @@ def GetHistoKwargs(histo, opts):
         units            = "GeV"
         format           = "%0.0f " + units
         kwargs["ylabel"] = yLabel + "/ %s " % format
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": 2000.0}
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": 1000.0}
         kwargs["log"]    = False
         kwargs["rebinX"] = 5
         ROOT.gStyle.SetNdivisions(6, "X")

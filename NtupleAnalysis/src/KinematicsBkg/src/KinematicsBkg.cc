@@ -387,6 +387,7 @@ void KinematicsBkg::book(TDirectory *dir) {
   h_GenJet4_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet4_Eta", ";#eta", nBinsEta, minEta, maxEta);
   h_GenJet5_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet5_Eta", ";#eta", nBinsEta, minEta, maxEta);
   h_GenJet6_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet6_Eta", ";#eta", nBinsEta, minEta, maxEta);
+
   h_MaxDiJetMass_Pt    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "MaxDiJetMass_Pt"   , ";p_{T} (GeV)"      , nBinsPt , minPt , maxPt);
   h_MaxDiJetMass_Eta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "MaxDiJetMass_Eta"  , ";#eta"             , nBinsEta, minEta, maxEta);
   h_MaxDiJetMass_Rap   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "MaxDiJetMass_Rap"  , ";#omega"           , nBinsRap, minRap, maxRap);
@@ -398,52 +399,52 @@ void KinematicsBkg::book(TDirectory *dir) {
   h_MaxDiJetMass_dRrap = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "MaxDiJetMass_dRrap", ";#DeltaR_{#omega}" , nBinsdR, mindR, maxdR);  
 
   // Taujets
-  h_TauJet1_TauJet2_dEt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dEt" , ";#DeltaE_{T} (GeV) "  ,2*nBinsPt , minPt  , maxPt);
-  h_TauJet1_TauJet2_dEta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dEta", ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta);
-  h_TauJet1_TauJet2_dPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dPhi", ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);
-  h_TauJet1_TauJet2_dR   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dR"  , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_TauJet1_TauJet2_dQ   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dQ"  , ";#DeltaQ (e)"         ,       3  ,    0.0 , 3.0);
-  h_TauJet1_MET_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_MET_dPhi"    , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_TauJet2_MET_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_MET_dPhi"    , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_TauJets_MET_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJets_MET_dPhi"    , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_TauJet1_BJet1_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_BJet1_dR"    , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_TauJet1_BJet1_dEta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_BJet1_dEta"  , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta);
-  h_TauJet1_BJet1_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_BJet1_dPhi"  , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_TauJet2_BJet1_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_BJet1_dR"    , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_TauJet2_BJet1_dEta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_BJet1_dEta"  , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_TauJet2_BJet1_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_BJet1_dPhi"  , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_TauJet1_Jet1_dR      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Jet1_dR"     , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_TauJet1_Jet1_dEta    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Jet1_dEta"   , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_TauJet1_Jet1_dPhi    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Jet1_dPhi"   , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_TauJet2_Jet1_dR      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Jet1_dR"     , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_TauJet2_Jet1_dEta    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Jet1_dEta"   , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_TauJet2_Jet1_dPhi    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Jet1_dPhi"   , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_TauJet1_Muon1_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Muon1_dR"    , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_TauJet1_Muon1_dEta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Muon1_dEta"  , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_TauJet1_Muon1_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Muon1_dPhi"  , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_TauJet2_Muon1_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Muon1_dR"    , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_TauJet2_Muon1_dEta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Muon1_dEta"  , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_TauJet2_Muon1_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Muon1_dPhi"  , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);
-  h_Muon1_MET_dPhi       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_MET_dPhi"    , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);
-  h_Muon1_BJet1_dR       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_BJet1_dR"    , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_Muon1_BJet1_dEta     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_BJet1_dEta"  , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_Muon1_BJet1_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_BJet1_dPhi"  , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_Muon1_Jet1_dR        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet1_dR"     , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_Muon1_Jet1_dEta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet1_dEta"   , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_Muon1_Jet1_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet1_dPhi"   , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_Muon1_Jet2_dR        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet2_dR"     , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_Muon1_Jet2_dEta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet2_dEta"   , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_Muon1_Jet2_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet2_dPhi"   , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_BJet1_MET_dPhi       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_MET_dPhi"    , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);
-  h_BJet1_Jet1_dR        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet1_dR"     , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_BJet1_Jet1_dEta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet1_dEta"   , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_BJet1_Jet1_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet1_dPhi"   , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_BJet1_Jet2_dR        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet2_dR"     , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_BJet1_Jet2_dEta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet2_dEta"   , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_BJet1_Jet2_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet2_dPhi"   , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
-  h_Jet1_Jet2_dR         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Jet1_Jet2_dR"      , ";#DeltaR"             , nBinsdR  , mindR  , maxdR);
-  h_Jet1_Jet2_dEta       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Jet1_Jet2_dEta"    , ";#Delta#eta"          , nBinsdEta, mindEta, maxdEta); 
-  h_Jet1_Jet2_dPhi       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Jet1_Jet2_dPhi"    , ";#Delta#phi (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJet1_TauJet2_dEt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dEt" , ";#DeltaE_{T}(#tau_{h,1}, #tau_{h,2}) (GeV) "  ,2*nBinsPt , minPt  , maxPt);
+  h_TauJet1_TauJet2_dEta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dEta", ";#Delta#eta(#tau_{h,1}, #tau_{h,2})"          , nBinsdEta, mindEta, maxdEta);
+  h_TauJet1_TauJet2_dPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dPhi", ";#Delta#phi(#tau_{h,1}, #tau_{h,2}) (rads)"   , nBinsdPhi, mindPhi, maxdPhi);
+  h_TauJet1_TauJet2_dR   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dR"  , ";#DeltaR(#tau_{h,1}, #tau_{h,2})"             , nBinsdR  , mindR  , maxdR);
+  h_TauJet1_TauJet2_dQ   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_TauJet2_dQ"  , ";#DeltaQ(#tau_{h,1}, #tau_{h,2}) (e)"         ,       3  ,    0.0 , 3.0);
+  h_TauJet1_MET_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_MET_dPhi"    , ";#Delta#phi(#tau_{h,1}, E_{T}^{miss}) (rads)" , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJet2_MET_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_MET_dPhi"    , ";#Delta#phi(#tau_{h,2}, E_{T}^{miss}) (rads)" , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJets_MET_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJets_MET_dPhi"    , ";#Delta#phi(#tau_{h}'s, E_{T}^{miss}) (rads)" , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJet1_BJet1_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_BJet1_dR"    , ";#DeltaR(#tau_{h,1},b_{1})"             , nBinsdR  , mindR , maxdR);
+  h_TauJet1_BJet1_dEta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_BJet1_dEta"  , ";#Delta#eta(#tau_{h,1},b_{1})"          , nBinsdEta, mindEta, maxdEta);
+  h_TauJet1_BJet1_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_BJet1_dPhi"  , ";#Delta#phi(#tau_{h,1},b_{1}) (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJet2_BJet1_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_BJet1_dR"    , ";#DeltaR(#tau_{h,2},b_{1})"             , nBinsdR  , mindR  , maxdR);
+  h_TauJet2_BJet1_dEta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_BJet1_dEta"  , ";#Delta#eta(#tau_{h,2},b_{1})"          , nBinsdEta, mindEta, maxdEta); 
+  h_TauJet2_BJet1_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_BJet1_dPhi"  , ";#Delta#phi(#tau_{h,2},b_{1}) (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJet1_Jet1_dR      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Jet1_dR"     , ";#DeltaR(#tau_{h,1},j_{1})"             , nBinsdR  , mindR  , maxdR);
+  h_TauJet1_Jet1_dEta    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Jet1_dEta"   , ";#Delta#eta(#tau_{h,1},j_{1})"          , nBinsdEta, mindEta, maxdEta); 
+  h_TauJet1_Jet1_dPhi    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Jet1_dPhi"   , ";#Delta#phi(#tau_{h,1},j_{1}) (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJet2_Jet1_dR      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Jet1_dR"     , ";#DeltaR(#tau_{h,2},j_{1})"             , nBinsdR  , mindR  , maxdR);
+  h_TauJet2_Jet1_dEta    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Jet1_dEta"   , ";#Delta#eta(#tau_{h,2},j_{1})"          , nBinsdEta, mindEta, maxdEta); 
+  h_TauJet2_Jet1_dPhi    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Jet1_dPhi"   , ";#Delta#phi(#tau_{h,2},j_{1}) (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJet1_Muon1_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Muon1_dR"    , ";#DeltaR(#tau_{h,1},#mu_{1})"           , nBinsdR  , mindR  , maxdR);
+  h_TauJet1_Muon1_dEta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Muon1_dEta"  , ";#Delta#eta(#tau_{h,1},#mu_{1})"        , nBinsdEta, mindEta, maxdEta); 
+  h_TauJet1_Muon1_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet1_Muon1_dPhi"  , ";#Delta#phi(#tau_{h,1},#mu_{1}) (rads)" , nBinsdPhi, mindPhi, maxdPhi);  
+  h_TauJet2_Muon1_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Muon1_dR"    , ";#DeltaR(#tau_{h,2},#mu_{1})"           , nBinsdR  , mindR  , maxdR);
+  h_TauJet2_Muon1_dEta   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Muon1_dEta"  , ";#Delta#eta(#tau_{h,2},#mu_{1})"        , nBinsdEta, mindEta, maxdEta); 
+  h_TauJet2_Muon1_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "TauJet2_Muon1_dPhi"  , ";#Delta#phi(#tau_{h,2},#mu_{1}) (rads)" , nBinsdPhi, mindPhi, maxdPhi);
+  h_Muon1_MET_dPhi       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_MET_dPhi"      , ";#Delta#phi(#mu_{1}, E_{T}^{miss}) (rads)", nBinsdPhi, mindPhi, maxdPhi);
+  h_Muon1_BJet1_dR       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_BJet1_dR"      , ";#DeltaR(#mu_{1}, b_{1})"            , nBinsdR  , mindR  , maxdR);
+  h_Muon1_BJet1_dEta     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_BJet1_dEta"    , ";#Delta#eta(#mu_{1}, b_{1})"         , nBinsdEta, mindEta, maxdEta); 
+  h_Muon1_BJet1_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_BJet1_dPhi"    , ";#Delta#phi(#mu_{1}, b_{1}) (rads)"  , nBinsdPhi, mindPhi, maxdPhi);  
+  h_Muon1_Jet1_dR        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet1_dR"       , ";#DeltaR(#mu_{1}, j_{1})"            , nBinsdR  , mindR  , maxdR);
+  h_Muon1_Jet1_dEta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet1_dEta"     , ";#Delta#eta(#mu_{1}, j_{1})"         , nBinsdEta, mindEta, maxdEta); 
+  h_Muon1_Jet1_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet1_dPhi"     , ";#Delta#phi(#mu_{1}, j_{1}) (rads)"  , nBinsdPhi, mindPhi, maxdPhi);  
+  h_Muon1_Jet2_dR        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet2_dR"       , ";#DeltaR(#mu_{1}, j_{2})"            , nBinsdR  , mindR  , maxdR);
+  h_Muon1_Jet2_dEta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet2_dEta"     , ";#Delta#eta(#mu_{1}, j_{2})"         , nBinsdEta, mindEta, maxdEta); 
+  h_Muon1_Jet2_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Muon1_Jet2_dPhi"     , ";#Delta#phi(#mu_{1}, j_{2}) (rads)"  , nBinsdPhi, mindPhi, maxdPhi);  
+  h_BJet1_MET_dPhi       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_MET_dPhi"      , ";#Delta#phi(#b_{1}, E_{T}^{miss}) (rads)" , nBinsdPhi, mindPhi, maxdPhi);
+  h_BJet1_Jet1_dR        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet1_dR"       , ";#DeltaR(#b_{1}, j_{1})"             , nBinsdR  , mindR  , maxdR);
+  h_BJet1_Jet1_dEta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet1_dEta"     , ";#Delta#eta(#b_{1}, j_{1})"          , nBinsdEta, mindEta, maxdEta); 
+  h_BJet1_Jet1_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet1_dPhi"     , ";#Delta#phi(#b_{1}, j_{1}) (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
+  h_BJet1_Jet2_dR        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet2_dR"       , ";#DeltaR(#b_{1}, j_{2})"             , nBinsdR  , mindR  , maxdR);
+  h_BJet1_Jet2_dEta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet2_dEta"     , ";#Delta#eta(#b_{1}, j_{2})"          , nBinsdEta, mindEta, maxdEta); 
+  h_BJet1_Jet2_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "BJet1_Jet2_dPhi"     , ";#Delta#phi(#b_{1}, j_{2}) (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
+  h_Jet1_Jet2_dR         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Jet1_Jet2_dR"        , ";#DeltaR(#j_{1}, j_{2})"             , nBinsdR  , mindR  , maxdR);
+  h_Jet1_Jet2_dEta       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Jet1_Jet2_dEta"      , ";#Delta#eta(#j_{1}, j_{2})"          , nBinsdEta, mindEta, maxdEta); 
+  h_Jet1_Jet2_dPhi       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "Jet1_Jet2_dPhi"      , ";#Delta#phi(#j_{1}, j_{2}) (rads)"   , nBinsdPhi, mindPhi, maxdPhi);  
 
 
   // TH2 
@@ -463,13 +464,13 @@ void KinematicsBkg::book(TDirectory *dir) {
   h_TauJets_Pt_Vs_MET    = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Pt_Vs_MET"   , ";p_{T}^{#tau_{h,1}} (GeV);E_{T}^{miss} (GeV)"      , nBinsPt, minPt, maxPt, 200, 0.0, 1000.0);
   h_TauJets_Eta_Vs_Eta   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Eta_Vs_Eta"  , ";#eta^{#tau_{h,1}};#eta^{#tau_{h,2}}"              , nBinsEta, minEta, maxEta, nBinsEta, minEta, maxEta);
   h_TauJets_Phi_Vs_Phi   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Phi_Vs_Phi"  , ";#phi^{#tau_{h,1}} (rads);#phi^{#tau_{h,2}} (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi);
-  h_TauJets_dEta_Vs_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_dEta_Vs_dPhi", ";#Delta#eta;#Delta#phi (rads)"                     , nBinsdEta, mindEta, maxdEta, nBinsdPhi, mindPhi, maxdPhi);
-  h_TauJets_Pt1_Vs_dR    = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Pt1_Vs_dR"   , ";p_{T}^{#tau_{h,1}} (GeV);#DeltaR_{#tau_{h}}"      , nBinsPt, minPt, maxPt, nBinsdR, mindR, maxdR);  
-  h_TauJets_Pt2_Vs_dR    = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Pt2_Vs_dR"   , ";p_{T}^{#tau_{h,2}} (GeV);#DeltaR_{#tau_{h}}"      , nBinsPt, minPt, maxPt, nBinsdR, mindR, maxdR);  
+  h_TauJets_dEta_Vs_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_dEta_Vs_dPhi", ";#Delta#eta(#tau_{h,1}, {#tau_{h,2}});#Delta#phi(#tau_{h,1}, {#tau_{h,2}}) (rads)", nBinsdEta, mindEta, maxdEta, nBinsdPhi, mindPhi, maxdPhi);
+  h_TauJets_Pt1_Vs_dR    = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Pt1_Vs_dR"   , ";p_{T}^{#tau_{h,1}} (GeV);#DeltaR(#tau_{h,1}, #tau_{h,2})", nBinsPt, minPt, maxPt, nBinsdR, mindR, maxdR);  
+  h_TauJets_Pt2_Vs_dR    = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Pt2_Vs_dR"   , ";p_{T}^{#tau_{h,2}} (GeV);#DeltaR(#tau_{h,1}, #tau_{h,2})", nBinsPt, minPt, maxPt, nBinsdR, mindR, maxdR);  
 
-  h_TauJet1_Muon1_dPhi_Vs_TauJet2_Muon1_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet1_Muon1_dPhi_Vs_TauJet2_Muon1_dPhi", ";#Delta#phi(#tau_{h,1},E_{T}^{miss}) (rads);#Delta#phi(#tau_{h,2}, E_{T}^{miss}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi);
+  h_TauJet1_Muon1_dPhi_Vs_TauJet2_Muon1_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet1_Muon1_dPhi_Vs_TauJet2_Muon1_dPhi", ";#Delta#phi(#tau_{h,1},#mu_{1}) (rads);#Delta#phi(#tau_{h,2}, #mu_{1}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi);
 
-  h_TauJet1_BJet1_dPhi_Vs_TauJet2_BJet1_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet1_BJet1_dPhi_Vs_TauJet2_BJet1_dPhi", ";#Delta#phi(#tau_{h,1},E_{T}^{miss}) (rads);#Delta#phi(#tau_{h,2}, E_{T}^{miss}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi);
+  h_TauJet1_BJet1_dPhi_Vs_TauJet2_BJet1_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet1_BJet1_dPhi_Vs_TauJet2_BJet1_dPhi", ";#Delta#phi(#tau_{h,1}, b_{1}) (rads);#Delta#phi(#tau_{h,2}, b_{1}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi);
 
   h_TauJet1_MET_dPhi_Vs_TauJet2_MET_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet1_MET_dPhi_Vs_TauJet2_MET_dPhi", ";#Delta#phi(#tau_{h,1},E_{T}^{miss}) (rads);#Delta#phi(#tau_{h,2}, E_{T}^{miss}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi);
 
@@ -481,7 +482,7 @@ void KinematicsBkg::book(TDirectory *dir) {
 
   h_TauJet1_MET_dPhi_Vs_Muon1_MET_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet1_MET_dPhi_Vs_Muon1_MET_dPhi", ";#Delta#phi(#tau_{h,1},E_{T}^{miss}) (rads);#Delta#phi(#mu_{1}, E_{T}^{miss}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi); 
 
-  h_TauJet2_MET_dPhi_Vs_Jet1_MET_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet2_MET_dPhi_Vs_Jet1_MET_dPhi", ";#Delta#phi(#tau_{h,1},E_{T}^{miss}) (rads);#Delta#phi(jet_{1}, E_{T}^{miss}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi); 
+  h_TauJet2_MET_dPhi_Vs_Jet1_MET_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet2_MET_dPhi_Vs_Jet1_MET_dPhi", ";#Delta#phi(#tau_{h,2},E_{T}^{miss}) (rads);#Delta#phi(jet_{1}, E_{T}^{miss}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi); 
    
   h_TauJet2_MET_dPhi_Vs_Jet2_MET_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJet2_MET_dPhi_Vs_Jet2_MET_dPhi", ";#Delta#phi(#tau_{h,1},E_{T}^{miss}) (rads);#Delta#phi(jet_{2}, E_{T}^{miss}) (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi); 
 
@@ -737,7 +738,7 @@ void KinematicsBkg::process(Long64_t entry) {
   double mVis_genP = ( selectedTaus.at(0).p4() + selectedTaus.at(1).p4() ).M();
   double mVis_genJ = ( selectedTauJets.at(0).p4() + selectedTauJets.at(1).p4() ).M();
 
-  // Effective mass (Provides better discrimination against backgrounds than "visible mass")
+  // Effective visible mass (Provides better discrimination against backgrounds than "visible mass")
   double mEff_genP = GetEffectiveMass((const math::XYZTLorentzVector) selectedTaus.at(0).p4()   , (const math::XYZTLorentzVector) selectedTaus.at(1).p4()   , met);
   double mEff_genJ = GetEffectiveMass((const math::XYZTLorentzVector) selectedTauJets.at(0).p4(), (const math::XYZTLorentzVector) selectedTauJets.at(1).p4(), met);
 
@@ -1976,11 +1977,13 @@ double KinematicsBkg::GetEffectiveMass(const math::XYZTLorentzVector tau1, const
   // const math::XYZVector metv(met.x(), met.y(), 0.0);
 
   // Calculation
-  double EtSq   = pow(sqrt(tau1.P()) + sqrt(tau2.P()) + sqrt(met.Mag2()), 2);
-  // double PtSq   = (tau1.Vect() + tau2.Vect() + metv).Dot(tau1.Vect() + tau2.Vect() + metv);
-  double PtSqX  = ( tau1.x() + tau2.x() + met.x() ) * ( tau1.x() + tau2.x() + met.x() );
-  double PtSqY  = ( tau1.y() + tau2.y() + met.y() ) * ( tau1.y() + tau2.y() + met.y() );
-  double PtSqZ  = ( tau1.z() + tau2.z() ) * ( tau1.z() + tau2.z() );
+  // double EtSq = pow(sqrt(tau1.P()) + sqrt(tau2.P()) + sqrt(met.Mag2()), 2);
+  // double PtSq = (tau1.Vect() + tau2.Vect() + metv).Dot(tau1.Vect() + tau2.Vect() + metv);
+  double EtSq   = pow(tau1.Et() + tau2.Et() + met.R(), 2);
+  double PtSqX  = ( tau1.px() + tau2.px() + met.x() ) * ( tau1.px() + tau2.px() + met.x() );
+  double PtSqY  = ( tau1.py() + tau2.py() + met.y() ) * ( tau1.py() + tau2.py() + met.y() );
+  double PtSqZ  = ( tau1.pz() + tau2.pz() ) * ( tau1.pz() + tau2.pz() );
+
   double PtSq   = (PtSqX + PtSqY + PtSqZ);
   double mEff   = -999.9;
   double mEffSq = EtSq - PtSq;
@@ -1989,8 +1992,14 @@ double KinematicsBkg::GetEffectiveMass(const math::XYZTLorentzVector tau1, const
 }
 
 double KinematicsBkg::GetCollinearMass(const math::XYZTLorentzVector tau1, const math::XYZTLorentzVector tau2, const math::XYVector& met) {
+  //
+  // Must check that the two taus are not back-to-back in the lab frame:
+  // | dPhi(tau1vis, tau2vis)| < 2.9 
+  // for example, otherwise the approximation breaks down.
+  // Mass resolution limited by missing transverse energy resolution.
+  //
 
-    // Calculate
+  // Calculation
   double mVis  = ( tau1 + tau2 ).M();
   double metEt = met.R();
   double x1    = tau1.Et()/(tau1.Et() + metEt );
@@ -1999,4 +2008,3 @@ double KinematicsBkg::GetCollinearMass(const math::XYZTLorentzVector tau1, const
   return mColl;
 
 }
-
