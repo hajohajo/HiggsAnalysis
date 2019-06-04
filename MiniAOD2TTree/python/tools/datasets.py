@@ -92,7 +92,7 @@ datasetsJetHTData_18Apr2017.append(Dataset('/JetHT/Run2016H-18Apr2017-v1/MINIAOD
 
 
 datasetsMuonData03Feb = []
-# Tau used when SingleMuon same
+# dasgoclient -query='dataset dataset=/SingleMuon/Run2016*-03Feb2017*-v*/MINIAOD  status=valid'
 datasetsMuonData03Feb.append(Dataset('/SingleMuon/Run2016B-03Feb2017_ver2-v2/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_273150-275376_13TeV_23Sep2016ReReco_Collisions16_JSON_Run2016B.txt"))
 datasetsMuonData03Feb.append(Dataset('/SingleMuon/Run2016C-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_275656-276283_13TeV_23Sep2016ReReco_Collisions16_JSON_Run2016C.txt"))
 datasetsMuonData03Feb.append(Dataset('/SingleMuon/Run2016D-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_276315-276811_13TeV_23Sep2016ReReco_Collisions16_JSON_Run2016D.txt"))
@@ -279,6 +279,35 @@ datasetsSignalTB_ext1.append(Dataset('/ChargedHiggs_HplusTB_HplusToTB_M-2000_13T
 datasetsSignalTB_ext1.append(Dataset('/ChargedHiggs_HplusTB_HplusToTB_M-2500_13TeV_amcatnlo_pythia8/'  + campaign + '_ext1-v1/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
 datasetsSignalTB_ext1.append(Dataset('/ChargedHiggs_HplusTB_HplusToTB_M-3000_13TeV_amcatnlo_pythia8/'  + campaign + '_ext1-v1/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
 
+datasetsSignalHW_Pythia8LO = []
+das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FChargedHiggs_TTToHplusBWB_HplusToTauNu_M-*%2FRunII*16MiniAODv2-*%2FMINIAODSIM"
+datasetsSignalHW_Pythia8LO.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das)) # m = 350
+
+datasetsSignalHW_MG_LO = []
+#https://cmsweb.cern.ch/das/request?input=%2FCRAB_PrivateMC%2Fmlotti-Hplus2hw_2ta_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f%2FUSER&instance=prod%2Fphys03
+#datasetsSignalHW_MG_LO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+datasetsSignalHW_MG_LO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp350_mh150-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+
+datasetsSignalHW_MG_NLO = []
+datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp300_mh200_noMatch_2-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m1500_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_2-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_3-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_4-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_5-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_6-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_7-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_8-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_9-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_10-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_11-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+
+datasetsSignalHW = []
+#datasetsSignalHW.extend(datasetsSignalHW_Pythia8LO)
+#datasetsSignalHW.extend(datasetsSignalHW_MG_LO)
+datasetsSignalHW.extend(datasetsSignalHW_MG_NLO)
+
+
 datasetsSignalTauNu = []
 das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FChargedHiggs_TTToHplusBWB_HplusToTauNu_M-*%2FRunII*16MiniAODv2-*%2FMINIAODSIM"
 datasetsSignalTauNu.append(Dataset('/ChargedHiggs_HplusTB_HplusToTauNu_M-180_13TeV_amcatnlo_pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
@@ -362,9 +391,9 @@ datasetsSingleTop.append(Dataset('/ST_s-channel_4f_InclusiveDecays_13TeV-amcatnl
 datasetsTop = []
 das = "https://cmsweb.cern.ch/das/request?instance=prod%2Fglobal&view=list&input=dataset%3D%2FTT_%2A%2FRunII%2APUMoriond17_80X_mcRun2%2A%2FMINIAODSIM&idx=150&limit=150"
 datasetsTop.append(Dataset('/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM', dataVersion="80Xmc", dasQuery=das)) # new tune
-datasetsTop.append(Dataset('/TT_Mtt-700to1000_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
-datasetsTop.append(Dataset('/TT_Mtt-1000toInf_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
-datasetsTop.append(Dataset('/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
+#datasetsTop.append(Dataset('/TT_Mtt-700to1000_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
+#datasetsTop.append(Dataset('/TT_Mtt-1000toInf_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
+#datasetsTop.append(Dataset('/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
 
 datasetsTopSyst = []
 das = "https://cmsweb.cern.ch/das/request?instance=prod%2Fglobal&view=list&input=dataset%3D%2FTT_%2A%2FRunII%2APUMoriond17_80X_mcRun2%2A%2FMINIAODSIM&idx=150&limit=150"
@@ -720,6 +749,19 @@ hplus2tbAnalysisDatasets.extend(datasetsTTZToQQ)
 # hplus2tbAnalysisDatasets.extend(datasetsQCD_HT_GenJets5) 
 
 
+# Signal Analysis (HToHW)
+hplus2hwAnalysisDatasets = []
+hplus2hwAnalysisDatasets.extend(datasetsMuonData03Feb)
+hplus2hwAnalysisDatasets.extend(datasetsSignalHW)
+hplus2hwAnalysisDatasets.extend(datasetsTop)
+hplus2hwAnalysisDatasets.extend(datasetsSingleTop)
+hplus2hwAnalysisDatasets.extend(datasetsDY)
+hplus2hwAnalysisDatasets.extend(datasetsWJets) #for doing the HT binned 0To70
+hplus2hwAnalysisDatasets.extend(datasetsWJetsHT)
+hplus2hwAnalysisDatasets.extend(datasetsZJetsToQQ)
+hplus2hwAnalysisDatasets.extend(datasetsDiboson)
+hplus2hwAnalysisDatasets.extend(datasetsQCD)
+
 # Trigger Efficiency (h2tb)
 JetTriggersDatasets = []
 #JetTriggersDatasets.extend(datasetsJetHTData)  
@@ -787,12 +829,13 @@ class DatasetGroup:
         Create dataset grouping in a dictionary for easy access.
         '''
 
-        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "JetTriggers", "TopSystBDT", "TauLeg", "METLeg", "L1Study", "All"]
+        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "JetTriggers", "TopSystBDT", "TauLeg", "METLeg", "L1Study", "All"]
         if self.analysis not in analyses:
             raise Exception("Unknown analysis \"%s\". Please select one of the following: \"%s" % (self.analysis, "\", \"".join(analyses) + "\".") )
 
         self.GroupDict["SignalAnalysis"]   = signalAnalysisDatasets
         self.GroupDict["Hplus2tbAnalysis"] = hplus2tbAnalysisDatasets
+        self.GroupDict["Hplus2hwAnalysis"] = hplus2hwAnalysisDatasets
         self.GroupDict["TauLeg"]           = tauLegDatasets
         self.GroupDict["METLeg"]           = metLegDatasets
         self.GroupDict["L1Study"]          = l1Datasets
