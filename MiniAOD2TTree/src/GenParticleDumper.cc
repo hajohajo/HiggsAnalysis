@@ -129,30 +129,34 @@ void GenParticleDumper::book(TTree* tree){
       // tree->Branch((name+"_collisionId").c_str(), &collisionId[i]); // particle comes from primary interaction or PU?
 
       // Booleans
-      tree->Branch((name+"_fromHardProcessBeforeFSR").c_str(), &fromHardProcessBeforeFSR[i]);
-      tree->Branch((name+"_fromHardProcessDecayed").c_str(), &fromHardProcessDecayed[i]);
-      tree->Branch((name+"_fromHardProcessFinalState").c_str(), &fromHardProcessFinalState[i]);
-      tree->Branch((name+"_isDirectHardProcessTauDecayProductFinalState").c_str(), &isDirectHardProcessTauDecayProductFinalState[i]);
-      tree->Branch((name+"_isDirectPromptTauDecayProductFinalState").c_str(), &isDirectPromptTauDecayProductFinalState[i]);
-      tree->Branch((name+"_isHardProcess").c_str(), &isHardProcess[i]);
-      tree->Branch((name+"_isLastCopy").c_str(), &isLastCopy[i]);
-      tree->Branch((name+"_isLastCopyBeforeFSR").c_str(), &isLastCopyBeforeFSR[i]);
-      // tree->Branch((name+"_isMostlyLikePythia6Status3").c_str(), &isMostlyLikePythia6Status3[i]);
-      tree->Branch((name+"_isPromptDecayed").c_str(), &isPromptDecayed[i]);
-      tree->Branch((name+"_isPromptFinalState").c_str(), &isPromptFinalState[i]);
+      if (inputCollections[i].getUntrackedParameter<bool>("saveGenBooleans", false)) {
+	tree->Branch((name+"_fromHardProcessBeforeFSR").c_str(), &fromHardProcessBeforeFSR[i]);
+	tree->Branch((name+"_fromHardProcessDecayed").c_str(), &fromHardProcessDecayed[i]);
+	tree->Branch((name+"_fromHardProcessFinalState").c_str(), &fromHardProcessFinalState[i]);
+	tree->Branch((name+"_isDirectHardProcessTauDecayProductFinalState").c_str(), &isDirectHardProcessTauDecayProductFinalState[i]);
+	tree->Branch((name+"_isDirectPromptTauDecayProductFinalState").c_str(), &isDirectPromptTauDecayProductFinalState[i]);
+	tree->Branch((name+"_isHardProcess").c_str(), &isHardProcess[i]);
+	tree->Branch((name+"_isLastCopy").c_str(), &isLastCopy[i]);
+	tree->Branch((name+"_isLastCopyBeforeFSR").c_str(), &isLastCopyBeforeFSR[i]);
+	// tree->Branch((name+"_isMostlyLikePythia6Status3").c_str(), &isMostlyLikePythia6Status3[i]);
+	tree->Branch((name+"_isPromptDecayed").c_str(), &isPromptDecayed[i]);
+	tree->Branch((name+"_isPromptFinalState").c_str(), &isPromptFinalState[i]);
+      }
 
       // Flags
-      tree->Branch((name+"_fromHardProcess").c_str(), &fromHardProcess[i]);
-      tree->Branch((name+"_isDecayedLeptonHadron").c_str(), &isDecayedLeptonHadron[i]);
-      tree->Branch((name+"_isDirectHadronDecayProduct").c_str(), &isDirectHadronDecayProduct[i]);
-      tree->Branch((name+"_isDirectHardProcessTauDecayProduct").c_str(), &isDirectHardProcessTauDecayProduct[i]);
-      tree->Branch((name+"_isDirectPromptTauDecayProduct").c_str(), &isDirectPromptTauDecayProduct[i]);
-      tree->Branch((name+"_isDirectTauDecayProduct").c_str(), &isDirectTauDecayProduct[i]);
-      tree->Branch((name+"_isFirstCopy").c_str(), &isFirstCopy[i]);
-      tree->Branch((name+"_isHardProcessTauDecayProduct").c_str(), &isHardProcessTauDecayProduct[i]);
-      tree->Branch((name+"_isPrompt").c_str(), &isPrompt[i]);
-      tree->Branch((name+"_isPromptTauDecayProduct").c_str(), &isPromptTauDecayProduct[i]);
-      tree->Branch((name+"_isTauDecayProduct").c_str(), &isTauDecayProduct[i]);
+      if (inputCollections[i].getUntrackedParameter<bool>("saveGenStatusFlags", false)) {
+	tree->Branch((name+"_fromHardProcess").c_str(), &fromHardProcess[i]);
+	tree->Branch((name+"_isDecayedLeptonHadron").c_str(), &isDecayedLeptonHadron[i]);
+	tree->Branch((name+"_isDirectHadronDecayProduct").c_str(), &isDirectHadronDecayProduct[i]);
+	tree->Branch((name+"_isDirectHardProcessTauDecayProduct").c_str(), &isDirectHardProcessTauDecayProduct[i]);
+	tree->Branch((name+"_isDirectPromptTauDecayProduct").c_str(), &isDirectPromptTauDecayProduct[i]);
+	tree->Branch((name+"_isDirectTauDecayProduct").c_str(), &isDirectTauDecayProduct[i]);
+	tree->Branch((name+"_isFirstCopy").c_str(), &isFirstCopy[i]);
+	tree->Branch((name+"_isHardProcessTauDecayProduct").c_str(), &isHardProcessTauDecayProduct[i]);
+	tree->Branch((name+"_isPrompt").c_str(), &isPrompt[i]);
+	tree->Branch((name+"_isPromptTauDecayProduct").c_str(), &isPromptTauDecayProduct[i]);
+	tree->Branch((name+"_isTauDecayProduct").c_str(), &isTauDecayProduct[i]);
+      }
 
     }
     if (inputCollections[i].getUntrackedParameter<bool>("saveGenElectrons", false)) {
