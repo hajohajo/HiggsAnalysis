@@ -55,6 +55,8 @@ process.load("HiggsAnalysis/MiniAOD2TTree/MET_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/METNoiseFilter_cfi")
 process.METNoiseFilter.triggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getMETFilteringProcess()))
 
+process.load("HiggsAnalysis.MiniAOD2TTree.SignalAnalysisSkim_cfi")
+
 process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
     OutputFileName = cms.string("miniaod2tree.root"),
     PUInfoInputFileName = process.PUInfo.OutputFileName,
@@ -76,15 +78,7 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
     ),
     Trigger = cms.PSet(
 	TriggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getTriggerProcess())),
-	TriggerBits = cms.vstring(
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_MET80_v",
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90_v",
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_MET110_v",
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v",
-            "HLT_VLooseIsoPFTau120_Trk50_eta2p1_v",
-            "HLT_VLooseIsoPFTau140_Trk50_eta2p1_v",
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_v"
-        ),
+        TriggerBits = process.skim.HLTPaths,
 	L1Extra = cms.InputTag("l1extraParticles:MET"),
 	L1TauObjects = cms.InputTag("caloStage2Digis:Tau"),
         L1EtSumObjects = cms.InputTag("caloStage2Digis:EtSum"),
@@ -150,7 +144,6 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
 )
 
 # === Setup skim counters
-process.load("HiggsAnalysis.MiniAOD2TTree.SignalAnalysisSkim_cfi")
 process.skimCounterAll        = cms.EDProducer("HplusEventCountProducer")
 process.skimCounterPassed     = cms.EDProducer("HplusEventCountProducer")
 process.skim.TriggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getTriggerProcess()))
