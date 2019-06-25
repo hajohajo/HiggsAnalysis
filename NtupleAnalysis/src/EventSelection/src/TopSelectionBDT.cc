@@ -929,7 +929,16 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
   bool bPass_Selection  = bPass_FreeBjet * bPass_BothMVA;
   bool bPass_AnyTwoTops = false; // at least TWO tops with BDT > -1.0
   if (fAllCleanedTops.MVA.size() > 1) bPass_AnyTwoTops = cfg_AnyTopMVACut.passedCut(fAllCleanedTops.MVA.at(1) );
-  
+  /*
+  // tmp - start
+  bool bPass_FreeBjet   = true;
+  bool bPass_BothMVA    = bPass_LdgMVA;
+  bool bPass_Selection  = bPass_BothMVA; //bPass_FreeBjet * bPass_BothMVA;
+  bool bPass_AnyTwoTops = false; // at least TWO tops with BDT > -1.0
+  if (fAllCleanedTops.MVA.size() > 0) bPass_AnyTwoTops = cfg_AnyTopMVACut.passedCut(fAllCleanedTops.MVA.at(0) );
+  // tmp - end
+  */
+
   // Fill in remaining data
   output.bPassedLdgMVA       = bPass_LdgMVA;
   output.bPassedSubldgMVA    = bPass_SubldgMVA;

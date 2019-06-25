@@ -112,8 +112,29 @@ _physicalMcAdd = {
     "QCD_HT2000toInf"      : "QCD_HT2000toInf",
     "QCD_HT2000toInf_ext1" : "QCD_HT2000toInf",
 
+    "QCD_Pt_80to120"         : "QCD_Pt_80to120"    , 
+    "QCD_Pt_80to120_ext1"    : "QCD_Pt_80to120"    ,
+    "QCD_Pt_80to120_ext2"    : "QCD_Pt_80to120"    ,
+    "QCD_Pt_120to170"        : "QCD_Pt_120to170"   ,
+    "QCD_Pt_120to170_ext1"   : "QCD_Pt_120to170"   ,
+    "QCD_Pt_170to300"        : "QCD_Pt_170to300"   ,
+    "QCD_Pt_170to300_ext1"   : "QCD_Pt_170to300"   ,
+    "QCD_Pt_300to470"        : "QCD_Pt_300to470"   ,
+    "QCD_Pt_300to470_ext1"   : "QCD_Pt_300to470"   ,
+    "QCD_Pt_600to800"        : "QCD_Pt_600to800"   ,
+    "QCD_Pt_600to800_ext1"   : "QCD_Pt_600to800"   ,
+    "QCD_Pt_800to1000"       : "QCD_Pt_800to1000"  ,
+    "QCD_Pt_800to1000_ext1"  : "QCD_Pt_800to1000"  ,
+    "QCD_Pt_1000to1400"      : "QCD_Pt_1000to1400" ,
+    "QCD_Pt_1000to1400_ext1" : "QCD_Pt_1000to1400" ,
+    "QCD_Pt_1400to1800"      : "QCD_Pt_1400to1800" ,
+    "QCD_Pt_1400to1800_ext1" : "QCD_Pt_1400to1800" ,
+    "QCD_Pt_1800to2400"      : "QCD_Pt_1800to2400" ,
+    "QCD_Pt_1800to2400_ext1" : "QCD_Pt_1800to2400" ,
+    "QCD_Pt_2400to3200"      : "QCD_Pt_2400to3200" ,
+    "QCD_Pt_2400to3200_ext1" : "QCD_Pt_2400to3200" ,
+
     "QCD_Pt20_MuEnriched"                : "QCD_Pt20_MuEnriched",
-    
     "QCD_Pt_15to20_MuEnrichedPt5"        : "QCD_Pt_15to20_MuEnrichedPt5",
     "QCD_Pt_20to30_MuEnrichedPt5"        : "QCD_Pt_20to30_MuEnrichedPt5",
     "QCD_Pt_30to50_MuEnrichedPt5"        : "QCD_Pt_30to50_MuEnrichedPt5",
@@ -1173,7 +1194,7 @@ def _createRatioHistos(histo1, histo2, ytitle, ratioType=None, ratioErrorOptions
         ret.append(h)
     elif ratioType == "errorScale":
         ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions))
-    elif ratioType == "errorScalePaper": #iro
+    elif ratioType == "errorScalePaper":
         ratioErrorOptions["paperStyle"] = True
         ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions) )
     else:
