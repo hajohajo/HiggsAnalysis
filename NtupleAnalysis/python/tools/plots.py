@@ -620,13 +620,12 @@ _datasetOrder.extend([
     "TTJets",
     "TT",
     "TT_Mtt",
-    "ZJetsToQQ_HT600toInf", # Htb
+    "SingleTop",
     "TTandSingleTop", #merged
     "DYJetsToLL",
     "DYJetsToLLHT",
     "DYJetsToQQHT",  # Htb
     "noTop", #Htb
-    "SingleTop",
     "ttX", # Htb
     "WJetsToQQ_HT_600ToInf", # Htb
     "TTZToQQ",     # Htb
@@ -638,6 +637,7 @@ _datasetOrder.extend([
     "WWTo4Q",      # Htb
     "TTBB",        # Htb
     "TTTT",        # Htb
+    "ZJetsToQQ_HT600toInf",
     ]) 
 
 # Map the logical dataset names to legend labels
@@ -647,14 +647,14 @@ _legendLabels = {
     "Diboson"  : "Diboson",
     "ttX"      : "t, tW, t#bar{t} + X",
     "noTop"    : "No t",
-    "SingleTop": "Single t",
+    #"SingleTop": "Single t",
     "QCD"      : "QCD",#"Mis-ID. #tau_{h} (data)",
     #"FakeB"    : "Fake b (data)",
     "FakeB"    : "Fake b",
     "GenuineB" : "Genuine b (MC)",
     "QCD-b"    : "QCD (b enr.)",
     "QCDdata"  : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
-
+    "SingleTop": "Single t",
     "TTJets"        : "t#bar{t}+jets",
     "TT"            : "t#bar{t}",
     "TTTT"          : "t#bar{t}t#bar{t}",

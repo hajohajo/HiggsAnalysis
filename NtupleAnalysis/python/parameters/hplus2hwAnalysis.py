@@ -185,6 +185,8 @@ metSelection = PSet(
 # Top selection BDT                                               
 #================================================================================================        
 topSelectionBDT = PSet(
+    NumberOfTopsCutValue     = 1,     # [default: 3]
+    NumberOfTopsCutDirection = "==",  # [default: "=="] (==, !=, <, <=, >, >=)
     AnyTopMVACutValue      = -0.95,   # [default: -1.0]
     AnyTopMVACutDirection  =  ">",    # [default: ">"]
     TopMVACutValue         =  0.40,   # [default: 0.40] NOTE: Only use numbers with 2 decimals
