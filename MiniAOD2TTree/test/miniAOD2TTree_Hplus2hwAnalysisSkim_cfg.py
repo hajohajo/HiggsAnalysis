@@ -137,7 +137,7 @@ process.load("HiggsAnalysis/MiniAOD2TTree/MET_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/METNoiseFilter_cfi")
 
 process.METNoiseFilter.triggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getMETFilteringProcess())) 
-print "check tau",process.Taus_TauPOGRecommendation[0]
+# print "check tau",process.Taus_TauPOGRecommendation[0]
 process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
     OutputFileName      = cms.string("miniaod2tree.root"),
     PUInfoInputFileName = process.PUInfo.OutputFileName,
@@ -174,7 +174,8 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
 	filter = cms.untracked.bool(False)
     ),
     METNoiseFilter = process.METNoiseFilter,
-    Taus      = process.Taus_TauPOGRecommendation,
+    #Taus      = process.Taus_TauPOGRecommendation,
+    Taus      = process.Taus,
     Electrons = process.Electrons,
     Muons     = process.Muons,
     Jets      = process.Jets,

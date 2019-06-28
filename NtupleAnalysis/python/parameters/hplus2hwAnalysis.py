@@ -76,10 +76,12 @@ tauSelection = PSet(
     rtau                 =   0.0, # [default: 0.0] (to disable set to 0.0)
     againstElectronDiscr = "againstElectronTightMVA6",
     againstMuonDiscr     = "againstMuonLoose3",
+    #isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Mikko
     #isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
-    #isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT", # MVA (default)
-    isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits", # [higher signal efficiency]
-    # isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT", # [boosted analysis]
+    # isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits",
+    isolationDiscr       = "byMediumCombinedIsolationDeltaBetaCorr3Hits",
     )
 
 
@@ -173,7 +175,7 @@ fatjetVeto = PSet(
 # MET selection
 #================================================================================================
 metSelection = PSet(
-    METCutValue                 = 40.0,        # [default: 40]
+    METCutValue                 = 20.0,        # [default: 30]
     METCutDirection             = ">",         # [default: ">"] (==, !=, <, <=, >, >=)
     METSignificanceCutValue     = -1000.0,     # [default: -1000.0]
     METSignificanceCutDirection = ">",         # [default: ">"] (==, !=, <, <=, >, >=)
@@ -302,7 +304,7 @@ commonPlotsOptions = PSet(
     angularCuts1DBins = PSet(nBins =  52, axisMin =  0.0, axisMax =  260.0), 
     topMassBins       = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width 
     wMassBins         = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width 
-    mtBins            = PSet(nBins = 800, axisMin =  0.0, axisMax = 4000.0), #  5 GeV bin width
+    mtBins            = PSet(nBins = 200, axisMin =  0.0, axisMax = 2000.0), # 10 GeV bin width
     invMassBins       = PSet(nBins = 600, axisMin =  0.0, axisMax = 3000.0), #  5 GeV bin width
 )
 
