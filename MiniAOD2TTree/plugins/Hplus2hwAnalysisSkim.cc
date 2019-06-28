@@ -66,6 +66,7 @@ private:
   const double cfg_jetEtCut;
   const double cfg_jetEtaCut;
   const int cfg_nJets;
+  const bool cfg_jetEnabled;
 
   edm::EDGetTokenT<edm::View<pat::PackedCandidate> > cfg_pfcandsToken;
   edm::EDGetTokenT<edm::View<reco::Vertex> > cfg_vertexToken;
@@ -77,6 +78,7 @@ private:
   const double cfg_electronPtCut;
   const double cfg_electronEtaCut;
   const int cfg_electronNCut;
+  const bool cfg_electronEnabled;
   
   edm::EDGetTokenT<edm::View<pat::Muon> > cfg_muonToken;
   std::string cfg_muonID;
@@ -84,12 +86,14 @@ private:
   const double cfg_muonPtCut;
   const double cfg_muonEtaCut;
   const int cfg_muonNCut;
+  const bool cfg_muonEnabled;
   
   edm::EDGetTokenT<edm::View<pat::Tau> > cfg_tauToken;
   std::vector<std::string>  cfg_tauDiscriminators;
   const double cfg_tauPtCut;
   const double cfg_tauEtaCut;
   const int cfg_tauNCut;
+  const bool cfg_tauEnabled;
   
   int nEvents;
   int nSelectedEvents;
@@ -105,11 +109,9 @@ Hplus2hwAnalysisSkim::Hplus2hwAnalysisSkim(const edm::ParameterSet& iConfig)
     cfg_jetEtCut(iConfig.getParameter<double>("JetEtCut")),
     cfg_jetEtaCut(iConfig.getParameter<double>("JetEtaCut")),
     cfg_nJets(iConfig.getParameter<int>("NJets")),
-    
+    cfg_jetEnabled(iConfig.getParameter<bool>("JetEnabled")),    
     cfg_pfcandsToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("PackedCandidatesCollection"))),
-    
-    cfg_vertexToken(consumes<edm::View<reco::Vertex> >(iConfig.getParameter<edm::InputTag>("VertexCollection"))),
-    
+    cfg_vertexToken(consumes<edm::View<reco::Vertex> >(iConfig.getParameter<edm::InputTag>("VertexCollection"))),    
     cfg_electronToken(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("ElectronCollection"))),
     cfg_rhoToken(consumes<double>(iConfig.getParameter<edm::InputTag>("ElectronRhoSource"))),
     cfg_electronID(iConfig.getParameter<std::string>("ElectronID")),
@@ -118,19 +120,20 @@ Hplus2hwAnalysisSkim::Hplus2hwAnalysisSkim(const edm::ParameterSet& iConfig)
     cfg_electronPtCut(iConfig.getParameter<double>("ElectronPtCut")),
     cfg_electronEtaCut(iConfig.getParameter<double>("ElectronEtaCut")),
     cfg_electronNCut(iConfig.getParameter<int>("ElectronNCut")),
-    
+    cfg_electronEnabled(iConfig.getParameter<bool>("ElectronEnabled")),
     cfg_muonToken(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("MuonCollection"))),
     cfg_muonID(iConfig.getParameter<std::string>("MuonID")),
     cfg_muonMiniRelIsoEA(iConfig.getParameter<double>("MuonMiniRelIsoEA")),
     cfg_muonPtCut(iConfig.getParameter<double>("MuonPtCut")),
     cfg_muonEtaCut(iConfig.getParameter<double>("MuonEtaCut")),
     cfg_muonNCut(iConfig.getParameter<int>("MuonNCut")),
-    
+    cfg_muonEnabled(iConfig.getParameter<bool>("MuonEnabled")),
     cfg_tauToken(consumes<edm::View<pat::Tau> >(iConfig.getParameter<edm::InputTag>("TauCollection"))),
     cfg_tauDiscriminators(iConfig.getParameter<std::vector<std::string> >("TauDiscriminators")),
     cfg_tauPtCut(iConfig.getParameter<double>("TauPtCut")),
     cfg_tauEtaCut(iConfig.getParameter<double>("TauEtaCut")),
     cfg_tauNCut(iConfig.getParameter<int>("TauNCut")),
+    cfg_tauEnabled(iConfig.getParameter<bool>("TauEnabled")),
     
     nEvents(0),
     nSelectedEvents(0)
@@ -242,9 +245,12 @@ bool Hplus2hwAnalysisSkim::filter(edm::Event& iEvent, const edm::EventSetup& iSe
 	nJets++;
       }
     }
-    // Apply Jet Selections
-    if(nJets < cfg_nJets) return false;
-    if (cfg_verbose) std::cout << "=== Passed Jets:\n\t" << nJets << " > " << cfg_nJets << std::endl;
+    // Apply Jet Selections?
+    if (cfg_jetEnabled)
+      {
+	if(nJets < cfg_nJets) return false;
+	if (cfg_verbose) std::cout << "=== Passed Jets:\n\t" << nJets << " > " << cfg_nJets << std::endl;
+      }
     
     
     // Electrons
@@ -302,8 +308,11 @@ bool Hplus2hwAnalysisSkim::filter(edm::Event& iEvent, const edm::EventSetup& iSe
       }
     }
     // Apply Electron Veto
-    if(nElectrons > cfg_electronNCut) return false;
-    if (cfg_verbose) std::cout << "=== nElectrons:\n\t" << nElectrons << " < " << cfg_electronNCut << std::endl;
+    if (cfg_electronEnabled)
+      {
+	if(nElectrons > cfg_electronNCut) return false;
+	if (cfg_verbose) std::cout << "=== nElectrons:\n\t" << nElectrons << " < " << cfg_electronNCut << std::endl;
+      }
     
     // Muons
     // Vertex (for Muon ID)
@@ -366,10 +375,13 @@ bool Hplus2hwAnalysisSkim::filter(edm::Event& iEvent, const edm::EventSetup& iSe
         nMuons++;
       }
     }
-    // Apply Electron Veto
-    if(nMuons > cfg_muonNCut) return false;
-    if (cfg_verbose) std::cout << "=== Passed Muons:\n\t" << nMuons << " < " << cfg_muonNCut << std::endl;
-    
+    // Apply Muon Selection/Veto
+    if (cfg_muonEnabled)
+      {
+	if(nMuons > cfg_muonNCut) return false;
+	if (cfg_verbose) std::cout << "=== Passed Muons:\n\t" << nMuons << " < " << cfg_muonNCut << std::endl;
+      }
+
     // Taus
     edm::Handle<edm::View<pat::Tau> > tauHandle;
     iEvent.getByToken(cfg_tauToken, tauHandle);
@@ -391,8 +403,13 @@ bool Hplus2hwAnalysisSkim::filter(edm::Event& iEvent, const edm::EventSetup& iSe
 	nTaus++;
       }
     }
-    if (nTaus > cfg_tauNCut) return false;
-    if (cfg_verbose) std::cout << "=== Passed Taus:\n\t" << nTaus << " < " << cfg_tauNCut << std::endl;
+
+    // Apply Tau Selection/Veto
+    if (cfg_tauEnabled)
+      {
+	if (nTaus > cfg_tauNCut) return false;
+	if (cfg_verbose) std::cout << "=== Passed Taus:\n\t" << nTaus << " < " << cfg_tauNCut << std::endl;
+      }
     
     // All selections passed
     nSelectedEvents++;

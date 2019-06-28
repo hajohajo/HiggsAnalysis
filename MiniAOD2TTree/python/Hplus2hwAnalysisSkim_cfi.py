@@ -18,6 +18,7 @@ skim = cms.EDFilter("Hplus2hwAnalysisSkim",
     JetEtCut       = cms.double(20.0),
     JetEtaCut      = cms.double(2.4),
     NJets          = cms.int32(0),
+    JetEnabled     = cms.bool(False),
        
     # PF Candidates
     PackedCandidatesCollection = cms.InputTag("packedPFCandidates"),
@@ -34,7 +35,8 @@ skim = cms.EDFilter("Hplus2hwAnalysisSkim",
     ElectronPtCut        = cms.double(10.0),
     ElectronEtaCut       = cms.double(2.1),
     ElectronNCut         = cms.int32(0),
-
+    ElectronEnabled      = cms.bool(False), # if False will do nothing
+       
     # Muons (https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2)
     MuonCollection   = cms.InputTag("slimmedMuons"),
     MuonID           = cms.string("Loose"),
@@ -42,6 +44,7 @@ skim = cms.EDFilter("Hplus2hwAnalysisSkim",
     MuonPtCut        = cms.double(10.0),
     MuonEtaCut       = cms.double(2.4),
     MuonNCut         = cms.int32(1),
+    MuonEnabled      = cms.bool(False), # if False will do nothing
 
     # Taus
     TauCollection     = cms.InputTag("slimmedTaus"),
@@ -49,8 +52,8 @@ skim = cms.EDFilter("Hplus2hwAnalysisSkim",
         "decayModeFinding",
         "byVLooseIsolationMVArun2v1DBoldDMwLT",
         ),
-    TauPtCut  = cms.double(20),
-    TauEtaCut = cms.double(2.3),
-    TauNCut   = cms.int32(999),
-
+    TauPtCut   = cms.double(20),
+    TauEtaCut  = cms.double(2.3),
+    TauNCut    = cms.int32(999),
+    TauEnabled = cms.bool(False), # if False will do nothing
 )
