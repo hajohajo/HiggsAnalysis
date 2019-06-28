@@ -1,1143 +1,0 @@
-Error in <TCling::RegisterModule>: cannot find dictionary module FrameworkDict_rdict.pcm
-Error in <TUnixSystem::Load>: version mismatch, /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so = 60601, ROOT = 60503
-===  main.py
-	Pileup reweighting will be done according to the sum of:
-	[1;34mSingleMuon_Run2016C_03Feb2017_v1_275656_276283
-	SingleMuon_Run2016D_03Feb2017_v1_276315_276811
-	SingleMuon_Run2016E_03Feb2017_v1_276831_277420
-	SingleMuon_Run2016F_03Feb2017_v1_277932_278800
-	SingleMuon_Run2016F_03Feb2017_v1_278801_278808
-	SingleMuon_Run2016G_03Feb2017_v1_278820_280385
-	SingleMuon_Run2016H_03Feb2017_ver2_v1_281613_284035
-	SingleMuon_Run2016H_03Feb2017_ver3_v1_284036_284044[0;0m
-===  scaleFactors.pyc
-	Setting top-tag misid (data and MC) filename to "topMisID_BDT0p40_TopMassCut400_noTopPtRew.json"
-	Setting top-tag tagging efficiency (data and MC) filename to "toptagEff_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json"
-===  scaleFactors.pyc
-	Opening file "/uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/data/toptagEff_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json" for reading the top-tag efficiencies
-	Setting top-tag tagging efficiency uncertainties (MC) filename to "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json"
-===  scaleFactors.pyc
-	Opening file "/uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/data/toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json" for reading the top-tag efficiency ucertainties
-===  AnalysisBuilder.py
-	Analysis type set to [1;34mHToTB[0;0m
-===  AnalysisBuilder.py
-	Created nominal module [1;34mHplus2hwAnalysis_80to1000_Run2016[0;0m
-===  main.py
-	Created output directory [1;34mHplus2hwAnalysis_190624_143357[0;0m
-===  main.py
-	Will process 80 datasets in total:
-	1) [1;34mDYJetsToLL_M_50_HT_100to200[0;0m
-	2) [1;34mDYJetsToLL_M_50_HT_100to200_ext1[0;0m
-	3) [1;34mDYJetsToLL_M_50_HT_1200to2500[0;0m
-	4) [1;34mDYJetsToLL_M_50_HT_200to400[0;0m
-	5) [1;34mDYJetsToLL_M_50_HT_200to400_ext1[0;0m
-	6) [1;34mDYJetsToLL_M_50_HT_2500toInf[0;0m
-	7) [1;34mDYJetsToLL_M_50_HT_400to600[0;0m
-	8) [1;34mDYJetsToLL_M_50_HT_400to600_ext1[0;0m
-	9) [1;34mDYJetsToLL_M_50_HT_600to800[0;0m
-	10) [1;34mDYJetsToLL_M_50_HT_70to100[0;0m
-	11) [1;34mDYJetsToLL_M_50_HT_800to1200[0;0m
-	12) [1;34mDYJetsToLL_M_50_ext1[0;0m
-	13) [1;34mDYJetsToLL_M_50_ext2[0;0m
-	14) [1;34mQCD_Pt_1000to1400_ext1[0;0m
-	15) [1;34mQCD_Pt_120to170[0;0m
-	16) [1;34mQCD_Pt_120to170_ext1[0;0m
-	17) [1;34mQCD_Pt_1400to1800[0;0m
-	18) [1;34mQCD_Pt_1400to1800_ext1[0;0m
-	19) [1;34mQCD_Pt_15to30[0;0m
-	20) [1;34mQCD_Pt_170to300[0;0m
-	21) [1;34mQCD_Pt_170to300_ext1[0;0m
-	22) [1;34mQCD_Pt_1800to2400[0;0m
-	23) [1;34mQCD_Pt_1800to2400_ext1[0;0m
-	24) [1;34mQCD_Pt_2400to3200[0;0m
-	25) [1;34mQCD_Pt_2400to3200_ext1[0;0m
-	26) [1;34mQCD_Pt_300to470[0;0m
-	27) [1;34mQCD_Pt_300to470_ext1[0;0m
-	28) [1;34mQCD_Pt_30to50[0;0m
-	29) [1;34mQCD_Pt_3200toInf[0;0m
-	30) [1;34mQCD_Pt_470to600[0;0m
-	31) [1;34mQCD_Pt_50to80[0;0m
-	32) [1;34mQCD_Pt_600to800[0;0m
-	33) [1;34mQCD_Pt_600to800_ext1[0;0m
-	34) [1;34mQCD_Pt_800to1000[0;0m
-	35) [1;34mQCD_Pt_800to1000_ext1[0;0m
-	36) [1;34mQCD_Pt_80to120[0;0m
-	37) [1;34mQCD_Pt_80to120_ext2[0;0m
-	38) [1;34mST_s_channel_4f_InclusiveDecays[0;0m
-	39) [1;34mST_tW_antitop_5f_inclusiveDecays[0;0m
-	40) [1;34mST_tW_antitop_5f_inclusiveDecays_ext1[0;0m
-	41) [1;34mST_tW_top_5f_inclusiveDecays[0;0m
-	42) [1;34mST_tW_top_5f_inclusiveDecays_ext1[0;0m
-	43) [1;34mST_t_channel_antitop_4f_inclusiveDecays[0;0m
-	44) [1;34mST_t_channel_top_4f_inclusiveDecays[0;0m
-	45) [1;34mSingleMuon_Run2016C_03Feb2017_v1_275656_276283[0;0m
-	46) [1;34mSingleMuon_Run2016D_03Feb2017_v1_276315_276811[0;0m
-	47) [1;34mSingleMuon_Run2016E_03Feb2017_v1_276831_277420[0;0m
-	48) [1;34mSingleMuon_Run2016F_03Feb2017_v1_277932_278800[0;0m
-	49) [1;34mSingleMuon_Run2016F_03Feb2017_v1_278801_278808[0;0m
-	50) [1;34mSingleMuon_Run2016G_03Feb2017_v1_278820_280385[0;0m
-	51) [1;34mSingleMuon_Run2016H_03Feb2017_ver2_v1_281613_284035[0;0m
-	52) [1;34mSingleMuon_Run2016H_03Feb2017_ver3_v1_284036_284044[0;0m
-	53) [1;34mTT[0;0m
-	54) [1;34mWJetsToLNu[0;0m
-	55) [1;34mWJetsToLNu_HT_100To200[0;0m
-	56) [1;34mWJetsToLNu_HT_100To200_ext1[0;0m
-	57) [1;34mWJetsToLNu_HT_100To200_ext2[0;0m
-	58) [1;34mWJetsToLNu_HT_1200To2500[0;0m
-	59) [1;34mWJetsToLNu_HT_1200To2500_ext1[0;0m
-	60) [1;34mWJetsToLNu_HT_200To400[0;0m
-	61) [1;34mWJetsToLNu_HT_200To400_ext1[0;0m
-	62) [1;34mWJetsToLNu_HT_200To400_ext2[0;0m
-	63) [1;34mWJetsToLNu_HT_2500ToInf[0;0m
-	64) [1;34mWJetsToLNu_HT_2500ToInf_ext1[0;0m
-	65) [1;34mWJetsToLNu_HT_400To600[0;0m
-	66) [1;34mWJetsToLNu_HT_400To600_ext1[0;0m
-	67) [1;34mWJetsToLNu_HT_600To800[0;0m
-	68) [1;34mWJetsToLNu_HT_600To800_ext1[0;0m
-	69) [1;34mWJetsToLNu_HT_70To100[0;0m
-	70) [1;34mWJetsToLNu_HT_800To1200[0;0m
-	71) [1;34mWJetsToLNu_HT_800To1200_ext1[0;0m
-	72) [1;34mWJetsToLNu_ext2[0;0m
-	73) [1;34mWWTo2L2Nu[0;0m
-	74) [1;34mWWTo4Q[0;0m
-	75) [1;34mWWToLNuQQ[0;0m
-	76) [1;34mWZ[0;0m
-	77) [1;34mWZ_ext1[0;0m
-	78) [1;34mZJetsToQQ_HT600toInf[0;0m
-	79) [1;34mZZ[0;0m
-	80) [1;34mZZ_ext1[0;0m
-===  main.py
-	Processing dataset (1/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_100to200                                 
-	 (0 %) at 0 MB/s       	Estimated time          : 00:14  (7.071 %) at 19 MB/s       	Estimated time          : 00:11  (14.14 %) at 8.68 MB/s       	Estimated time          : 00:10  (21.21 %) at 9.62 MB/s       	Estimated time          : 00:09  (28.28 %) at 12.3 MB/s       	Estimated time          : 00:08  (35.35 %) at 8.3 MB/s       	Estimated time          : 00:07  (42.42 %) at 16.3 MB/s       	Estimated time          : 00:06  (49.49 %) at 9.11 MB/s       	Estimated time          : 00:05  (56.56 %) at 13.9 MB/s       	Estimated time          : 00:04  (63.63 %) at 9.62 MB/s       	Estimated time          : 00:03  (70.71 %) at 10.9 MB/s       	Estimated time          : 00:02  (77.78 %) at 13 MB/s       	Estimated time          : 00:01  (84.85 %) at 7.1 MB/s       	Estimated time          : 00:00  (91.92 %) at 9.01 MB/s       	Estimated time          : 00:00  (98.99 %) at 12.6 MB/s       
-	Total entries processed : 282865
-	Read Calls              : 286                                                         
-	Read Speed              : 8.6 MB/s                                                    
-	Read Size               : 141.5 MB                                                    
-	Read Percent            : 76.4 %                                                      
-	Real time               : [1;34m0:00:16 (h:mm:ss)[0;0m                              
-	CPU time                : 12.5 s                                                      
-===  main.py
-	Processing dataset (2/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_100to200_ext1                            
-	 (0 %) at 0 MB/s       	Estimated time          : 01:06  (2.474 %) at 8.68 MB/s       	Estimated time          : 01:17  (4.947 %) at 5.38 MB/s       	Estimated time          : 01:12  (7.421 %) at 3.87 MB/s       	Estimated time          : 01:13  (9.894 %) at 5.66 MB/s       	Estimated time          : 01:09  (12.37 %) at 5.27 MB/s       	Estimated time          : 01:12  (14.84 %) at 4.9 MB/s       	Estimated time          : 01:10  (17.32 %) at 4.52 MB/s       	Estimated time          : 01:09  (19.79 %) at 4.13 MB/s       	Estimated time          : 01:08  (22.26 %) at 5.04 MB/s       	Estimated time          : 01:04  (24.74 %) at 4.51 MB/s       	Estimated time          : 01:01  (27.21 %) at 4.73 MB/s       	Estimated time          : 00:59  (29.68 %) at 3.92 MB/s       	Estimated time          : 00:57  (32.16 %) at 3.95 MB/s       	Estimated time          : 00:57  (34.63 %) at 4.7 MB/s       	Estimated time          : 00:55  (37.1 %) at 3.36 MB/s       	Estimated time          : 00:53  (39.58 %) at 5.59 MB/s       	Estimated time          : 00:50  (42.05 %) at 5.36 MB/s       	Estimated time          : 00:48  (44.52 %) at 5.98 MB/s       	Estimated time          : 00:45  (47 %) at 4.68 MB/s       	Estimated time          : 00:42  (49.47 %) at 6.14 MB/s       	Estimated time          : 00:40  (51.95 %) at 7.69 MB/s       	Estimated time          : 00:37  (54.42 %) at 5.08 MB/s       	Estimated time          : 00:35  (56.89 %) at 3.83 MB/s       	Estimated time          : 00:33  (59.37 %) at 5.04 MB/s       	Estimated time          : 00:31  (61.84 %) at 5.69 MB/s       	Estimated time          : 00:29  (64.31 %) at 6.16 MB/s       	Estimated time          : 00:27  (66.79 %) at 4.64 MB/s       	Estimated time          : 00:24  (69.26 %) at 5.2 MB/s       	Estimated time          : 00:22  (71.73 %) at 7.94 MB/s       	Estimated time          : 00:20  (74.21 %) at 5.16 MB/s       	Estimated time          : 00:18  (76.68 %) at 7.18 MB/s       	Estimated time          : 00:16  (79.15 %) at 8.28 MB/s       	Estimated time          : 00:14  (81.63 %) at 7.14 MB/s       	Estimated time          : 00:12  (84.1 %) at 4.65 MB/s       	Estimated time          : 00:10  (86.58 %) at 5.58 MB/s       	Estimated time          : 00:08  (89.05 %) at 8.51 MB/s       	Estimated time          : 00:06  (91.52 %) at 4.66 MB/s       	Estimated time          : 00:04  (94 %) at 5.39 MB/s       	Estimated time          : 00:02  (96.47 %) at 5.16 MB/s       	Estimated time          : 00:00  (98.94 %) at 8.45 MB/s       
-	Total entries processed : 808543
-	Read Calls              : 1130                                                        
-	Read Speed              : 5.4 MB/s                                                    
-	Read Size               : 414.5 MB                                                    
-	Read Percent            : 41.0 %                                                      
-	Real time               : [1;34m0:01:17 (h:mm:ss)[0;0m                              
-	CPU time                : 31.6 s                                                      
-===  main.py
-	Processing dataset (3/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_1200to2500                               
-	 (0 %) at 0 MB/s       	Estimated time          : 00:03  (33.39 %) at 19.1 MB/s       	Estimated time          : 00:01  (66.78 %) at 14.2 MB/s       
-	Total entries processed : 59895
-	Read Calls              : 41                                                          
-	Read Speed              : 11.9 MB/s                                                   
-	Read Size               : 67.2 MB                                                     
-	Read Percent            : 66.5 %                                                      
-	Real time               : [1;34m0:00:06 (h:mm:ss)[0;0m                              
-	CPU time                : 3.7 s                                                       
-===  main.py
-	Processing dataset (4/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_200to400                                 
-	 (0 %) at 0 MB/s       	Estimated time          : 00:14  (19.89 %) at 5.45 MB/s       	Estimated time          : 00:08  (39.78 %) at 5.11 MB/s       	Estimated time          : 00:04  (59.67 %) at 4.33 MB/s       	Estimated time          : 00:02  (79.56 %) at 7 MB/s       	Estimated time          : 00:00  (99.45 %) at 5.3 MB/s       
-	Total entries processed : 100557
-	Read Calls              : 200                                                         
-	Read Speed              : 5.0 MB/s                                                    
-	Read Size               : 61.0 MB                                                     
-	Read Percent            : 41.2 %                                                      
-	Real time               : [1;34m0:00:12 (h:mm:ss)[0;0m                              
-	CPU time                : 5.0 s                                                       
-===  main.py
-	Processing dataset (5/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_200to400_ext1                            
-	 (0 %) at 0 MB/s       	Estimated time          : 01:10  (2.187 %) at 14.5 MB/s       	Estimated time          : 01:09  (4.374 %) at 5.83 MB/s       	Estimated time          : 01:07  (6.562 %) at 9.46 MB/s       	Estimated time          : 01:08  (8.749 %) at 6.86 MB/s       	Estimated time          : 01:05  (10.94 %) at 6.09 MB/s       	Estimated time          : 01:05  (13.12 %) at 8.15 MB/s       	Estimated time          : 01:03  (15.31 %) at 7.23 MB/s       	Estimated time          : 01:01  (17.5 %) at 10.2 MB/s       	Estimated time          : 00:58  (19.68 %) at 10.4 MB/s       	Estimated time          : 00:55  (21.87 %) at 7.17 MB/s       	Estimated time          : 00:54  (24.06 %) at 9.04 MB/s       	Estimated time          : 00:51  (26.25 %) at 10.7 MB/s       	Estimated time          : 00:50  (28.43 %) at 11.4 MB/s       	Estimated time          : 00:47  (30.62 %) at 5.86 MB/s       	Estimated time          : 00:46  (32.81 %) at 8.67 MB/s       	Estimated time          : 00:46  (35 %) at 6.75 MB/s       	Estimated time          : 00:44  (37.18 %) at 4.94 MB/s       	Estimated time          : 00:43  (39.37 %) at 7.76 MB/s       	Estimated time          : 00:42  (41.56 %) at 9.14 MB/s       	Estimated time          : 00:40  (43.74 %) at 4.57 MB/s       	Estimated time          : 00:38  (45.93 %) at 11 MB/s       	Estimated time          : 00:36  (48.12 %) at 9.38 MB/s       	Estimated time          : 00:35  (50.31 %) at 7.12 MB/s       	Estimated time          : 00:33  (52.49 %) at 9.55 MB/s       	Estimated time          : 00:31  (54.68 %) at 7.68 MB/s       	Estimated time          : 00:29  (56.87 %) at 9.17 MB/s       	Estimated time          : 00:28  (59.05 %) at 9.31 MB/s       	Estimated time          : 00:26  (61.24 %) at 12 MB/s       	Estimated time          : 00:24  (63.43 %) at 6.65 MB/s       	Estimated time          : 00:23  (65.62 %) at 10.5 MB/s       	Estimated time          : 00:21  (67.8 %) at 9.36 MB/s       	Estimated time          : 00:20  (69.99 %) at 7.48 MB/s       	Estimated time          : 00:18  (72.18 %) at 6.41 MB/s       	Estimated time          : 00:17  (74.37 %) at 11.1 MB/s       	Estimated time          : 00:15  (76.55 %) at 7.93 MB/s       	Estimated time          : 00:14  (78.74 %) at 4.57 MB/s       	Estimated time          : 00:13  (80.93 %) at 7.05 MB/s       	Estimated time          : 00:11  (83.11 %) at 5.52 MB/s       	Estimated time          : 00:10  (85.3 %) at 5.79 MB/s       	Estimated time          : 00:08  (87.49 %) at 7.22 MB/s       	Estimated time          : 00:07  (89.68 %) at 6.88 MB/s       	Estimated time          : 00:05  (91.86 %) at 6.05 MB/s       	Estimated time          : 00:04  (94.05 %) at 4.89 MB/s       	Estimated time          : 00:02  (96.24 %) at 5.94 MB/s       	Estimated time          : 00:01  (98.42 %) at 5.25 MB/s       
-	Total entries processed : 914402
-	Read Calls              : 1607                                                        
-	Read Speed              : 7.6 MB/s                                                    
-	Read Size               : 568.0 MB                                                    
-	Read Percent            : 53.7 %                                                      
-	Real time               : [1;34m0:01:15 (h:mm:ss)[0;0m                              
-	CPU time                : 40.4 s                                                      
-===  main.py
-	Processing dataset (6/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_2500toInf                                
-	 (0 %) at 0 MB/s       	Estimated time          : 00:01  (52.05 %) at 15.8 MB/s       
-	Total entries processed : 38421
-	Read Calls              : 83                                                          
-	Read Speed              : 9.1 MB/s                                                    
-	Read Size               : 37.5 MB                                                     
-	Read Percent            : 78.4 %                                                      
-	Real time               : [1;34m0:00:04 (h:mm:ss)[0;0m                              
-	CPU time                : 3.2 s                                                       
-===  main.py
-	Processing dataset (7/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_400to600                                 
-	 (0 %) at 0 MB/s       	Estimated time          : 00:07  (17.66 %) at 28.2 MB/s       	Estimated time          : 00:05  (35.32 %) at 26 MB/s       	Estimated time          : 00:03  (52.97 %) at 27.1 MB/s       	Estimated time          : 00:02  (70.63 %) at 23 MB/s       	Estimated time          : 00:00  (88.29 %) at 25.7 MB/s       
-	Total entries processed : 113266
-	Read Calls              : 37                                                          
-	Read Speed              : 22.1 MB/s                                                   
-	Read Size               : 184.8 MB                                                    
-	Read Percent            : 78.2 %                                                      
-	Real time               : [1;34m0:00:08 (h:mm:ss)[0;0m                              
-	CPU time                : 6.5 s                                                       
-===  main.py
-	Processing dataset (8/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_400to600_ext1                            
-	 (0 %) at 0 MB/s       	Estimated time          : 00:36  (4.911 %) at 14.9 MB/s       	Estimated time          : 00:27  (9.822 %) at 5.74 MB/s       	Estimated time          : 00:24  (14.73 %) at 13.2 MB/s       	Estimated time          : 00:22  (19.64 %) at 11.3 MB/s       	Estimated time          : 00:20  (24.56 %) at 12.5 MB/s       	Estimated time          : 00:18  (29.47 %) at 12.8 MB/s       	Estimated time          : 00:16  (34.38 %) at 8.18 MB/s       	Estimated time          : 00:15  (39.29 %) at 13.8 MB/s       	Estimated time          : 00:13  (44.2 %) at 12.8 MB/s       	Estimated time          : 00:12  (49.11 %) at 11.7 MB/s       	Estimated time          : 00:11  (54.02 %) at 12.8 MB/s       	Estimated time          : 00:10  (58.93 %) at 12.8 MB/s       	Estimated time          : 00:09  (63.84 %) at 8.95 MB/s       	Estimated time          : 00:08  (68.76 %) at 9.39 MB/s       	Estimated time          : 00:06  (73.67 %) at 7.54 MB/s       	Estimated time          : 00:05  (78.58 %) at 8.74 MB/s       	Estimated time          : 00:04  (83.49 %) at 9.04 MB/s       	Estimated time          : 00:03  (88.4 %) at 6.73 MB/s       	Estimated time          : 00:01  (93.31 %) at 7.82 MB/s       	Estimated time          : 00:00  (98.22 %) at 9.62 MB/s       
-	Total entries processed : 407237
-	Read Calls              : 900                                                         
-	Read Speed              : 10.0 MB/s                                                   
-	Read Size               : 284.4 MB                                                    
-	Read Percent            : 68.4 %                                                      
-	Real time               : [1;34m0:00:28 (h:mm:ss)[0;0m                              
-	CPU time                : 19.5 s                                                      
-===  main.py
-	Processing dataset (9/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_600to800                                 
-	 (0 %) at 0 MB/s       	Estimated time          : 01:11  (2.307 %) at 15 MB/s       	Estimated time          : 01:01  (4.614 %) at 10.9 MB/s       	Estimated time          : 00:57  (6.921 %) at 12 MB/s       	Estimated time          : 00:55  (9.229 %) at 11.4 MB/s       	Estimated time          : 00:52  (11.54 %) at 6.11 MB/s       	Estimated time          : 00:50  (13.84 %) at 13.1 MB/s       	Estimated time          : 00:48  (16.15 %) at 11.9 MB/s       	Estimated time          : 00:45  (18.46 %) at 12.3 MB/s       	Estimated time          : 00:45  (20.76 %) at 14.2 MB/s       	Estimated time          : 00:44  (23.07 %) at 9.81 MB/s       	Estimated time          : 00:43  (25.38 %) at 11.8 MB/s       	Estimated time          : 00:41  (27.69 %) at 8.79 MB/s       	Estimated time          : 00:39  (29.99 %) at 9.78 MB/s       	Estimated time          : 00:40  (32.3 %) at 10.2 MB/s       	Estimated time          : 00:40  (34.61 %) at 3.82 MB/s       	Estimated time          : 00:41  (36.91 %) at 7.64 MB/s       	Estimated time          : 00:41  (39.22 %) at 5.42 MB/s       	Estimated time          : 00:41  (41.53 %) at 6.01 MB/s       	Estimated time          : 00:40  (43.84 %) at 3.81 MB/s       	Estimated time          : 00:40  (46.14 %) at 5.5 MB/s       	Estimated time          : 00:39  (48.45 %) at 7.38 MB/s       	Estimated time          : 00:38  (50.76 %) at 4.55 MB/s       	Estimated time          : 00:37  (53.06 %) at 5.2 MB/s       	Estimated time          : 00:36  (55.37 %) at 5 MB/s       	Estimated time          : 00:35  (57.68 %) at 4.55 MB/s       	Estimated time          : 00:34  (59.99 %) at 5.42 MB/s       	Estimated time          : 00:32  (62.29 %) at 5.8 MB/s       	Estimated time          : 00:30  (64.6 %) at 6.59 MB/s       	Estimated time          : 00:28  (66.91 %) at 9.97 MB/s       	Estimated time          : 00:25  (69.21 %) at 12.2 MB/s       	Estimated time          : 00:23  (71.52 %) at 7.64 MB/s       	Estimated time          : 00:21  (73.83 %) at 9.77 MB/s       	Estimated time          : 00:19  (76.14 %) at 9.38 MB/s       	Estimated time          : 00:17  (78.44 %) at 6.97 MB/s       	Estimated time          : 00:15  (80.75 %) at 7.25 MB/s       	Estimated time          : 00:14  (83.06 %) at 7.72 MB/s       	Estimated time          : 00:12  (85.36 %) at 6.84 MB/s       	Estimated time          : 00:10  (87.67 %) at 10.1 MB/s       	Estimated time          : 00:08  (89.98 %) at 13.9 MB/s       	Estimated time          : 00:06  (92.29 %) at 7.77 MB/s       	Estimated time          : 00:04  (94.59 %) at 14 MB/s       	Estimated time          : 00:02  (96.9 %) at 7.49 MB/s       	Estimated time          : 00:00  (99.21 %) at 8.46 MB/s       
-	Total entries processed : 866879
-	Read Calls              : 2312                                                        
-	Read Speed              : 7.8 MB/s                                                    
-	Read Size               : 625.5 MB                                                    
-	Read Percent            : 51.7 %                                                      
-	Real time               : [1;34m0:01:20 (h:mm:ss)[0;0m                              
-	CPU time                : 41.3 s                                                      
-===  main.py
-	Processing dataset (10/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_70to100                                  
-	 (0 %) at 0 MB/s       	Estimated time          : 00:50  (2.06 %) at 14.6 MB/s       	Estimated time          : 00:49  (4.12 %) at 13.4 MB/s       	Estimated time          : 00:46  (6.18 %) at 8.63 MB/s       	Estimated time          : 00:45  (8.241 %) at 7.53 MB/s       	Estimated time          : 00:44  (10.3 %) at 12.4 MB/s       	Estimated time          : 00:42  (12.36 %) at 7.87 MB/s       	Estimated time          : 00:41  (14.42 %) at 8.96 MB/s       	Estimated time          : 00:40  (16.48 %) at 6.33 MB/s       	Estimated time          : 00:39  (18.54 %) at 13.9 MB/s       	Estimated time          : 00:37  (20.6 %) at 7.22 MB/s       	Estimated time          : 00:36  (22.66 %) at 9.45 MB/s       	Estimated time          : 00:36  (24.72 %) at 5.81 MB/s       	Estimated time          : 00:36  (26.78 %) at 9.89 MB/s       	Estimated time          : 00:35  (28.84 %) at 8.62 MB/s       	Estimated time          : 00:34  (30.9 %) at 8.07 MB/s       	Estimated time          : 00:33  (32.96 %) at 10.5 MB/s       	Estimated time          : 00:32  (35.02 %) at 7.83 MB/s       	Estimated time          : 00:31  (37.08 %) at 10.8 MB/s       	Estimated time          : 00:30  (39.14 %) at 7.13 MB/s       	Estimated time          : 00:29  (41.2 %) at 6.83 MB/s       	Estimated time          : 00:28  (43.26 %) at 8.25 MB/s       	Estimated time          : 00:27  (45.32 %) at 11.4 MB/s       	Estimated time          : 00:26  (47.38 %) at 7.14 MB/s       	Estimated time          : 00:26  (49.44 %) at 6.49 MB/s       	Estimated time          : 00:25  (51.5 %) at 6.39 MB/s       	Estimated time          : 00:25  (53.56 %) at 6.94 MB/s       	Estimated time          : 00:24  (55.62 %) at 5.09 MB/s       	Estimated time          : 00:23  (57.68 %) at 3.6 MB/s       	Estimated time          : 00:22  (59.74 %) at 5.24 MB/s       	Estimated time          : 00:22  (61.8 %) at 3.68 MB/s       	Estimated time          : 00:21  (63.86 %) at 5.62 MB/s       	Estimated time          : 00:20  (65.92 %) at 3.25 MB/s       	Estimated time          : 00:19  (67.98 %) at 4.98 MB/s       	Estimated time          : 00:18  (70.04 %) at 5.32 MB/s       	Estimated time          : 00:17  (72.1 %) at 5.81 MB/s       	Estimated time          : 00:16  (74.16 %) at 5.74 MB/s       	Estimated time          : 00:15  (76.22 %) at 4.31 MB/s       	Estimated time          : 00:14  (78.28 %) at 5.02 MB/s       	Estimated time          : 00:12  (80.35 %) at 8.1 MB/s       	Estimated time          : 00:11  (82.41 %) at 5 MB/s       	Estimated time          : 00:10  (84.47 %) at 5.84 MB/s       	Estimated time          : 00:09  (86.53 %) at 4.64 MB/s       	Estimated time          : 00:07  (88.59 %) at 4.16 MB/s       	Estimated time          : 00:06  (90.65 %) at 5.76 MB/s       	Estimated time          : 00:04  (92.71 %) at 5.74 MB/s       	Estimated time          : 00:03  (94.77 %) at 5.1 MB/s       	Estimated time          : 00:02  (96.83 %) at 4.83 MB/s       	Estimated time          : 00:00  (98.89 %) at 5.22 MB/s       
-	Total entries processed : 970813
-	Read Calls              : 1058                                                        
-	Read Speed              : 6.5 MB/s                                                    
-	Read Size               : 450.6 MB                                                    
-	Read Percent            : 55.2 %                                                      
-	Real time               : [1;34m0:01:09 (h:mm:ss)[0;0m                              
-	CPU time                : 38.2 s                                                      
-===  main.py
-	Processing dataset (11/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_HT_800to1200                                
-	 (0 %) at 0 MB/s       	Estimated time          : 00:42  (7.307 %) at 7.01 MB/s       	Estimated time          : 00:44  (14.61 %) at 6.25 MB/s       	Estimated time          : 00:35  (21.92 %) at 4.47 MB/s       	Estimated time          : 00:28  (29.23 %) at 7.21 MB/s       	Estimated time          : 00:24  (36.54 %) at 6.31 MB/s       	Estimated time          : 00:21  (43.84 %) at 6.74 MB/s       	Estimated time          : 00:18  (51.15 %) at 5.08 MB/s       	Estimated time          : 00:15  (58.46 %) at 5.91 MB/s       	Estimated time          : 00:12  (65.77 %) at 6.93 MB/s       	Estimated time          : 00:09  (73.07 %) at 6.05 MB/s       	Estimated time          : 00:07  (80.38 %) at 7.57 MB/s       	Estimated time          : 00:04  (87.69 %) at 7.05 MB/s       	Estimated time          : 00:01  (95 %) at 4.75 MB/s       
-	Total entries processed : 273696
-	Read Calls              : 572                                                         
-	Read Speed              : 6.0 MB/s                                                    
-	Read Size               : 217.5 MB                                                    
-	Read Percent            : 39.3 %                                                      
-	Real time               : [1;34m0:00:36 (h:mm:ss)[0;0m                              
-	CPU time                : 14.2 s                                                      
-===  main.py
-	Processing dataset (12/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_ext1                                        
-	 (0 %) at 0 MB/s       	Estimated time          : 04:34  (0.4932 %) at 11.3 MB/s       	Estimated time          : 03:39  (0.9865 %) at 7.59 MB/s       	Estimated time          : 03:24  (1.48 %) at 9.29 MB/s       	Estimated time          : 03:10  (1.973 %) at 7.49 MB/s       	Estimated time          : 03:00  (2.466 %) at 7.38 MB/s       	Estimated time          : 02:53  (2.959 %) at 8.78 MB/s       	Estimated time          : 02:52  (3.453 %) at 8.44 MB/s       	Estimated time          : 02:46  (3.946 %) at 6.83 MB/s       	Estimated time          : 02:44  (4.439 %) at 8.43 MB/s       	Estimated time          : 02:42  (4.932 %) at 10.4 MB/s       	Estimated time          : 02:39  (5.426 %) at 8.51 MB/s       	Estimated time          : 02:38  (5.919 %) at 10.4 MB/s       	Estimated time          : 02:38  (6.412 %) at 14.7 MB/s       	Estimated time          : 02:36  (6.905 %) at 7.49 MB/s       	Estimated time          : 02:34  (7.398 %) at 9.32 MB/s       	Estimated time          : 02:34  (7.892 %) at 6.02 MB/s       	Estimated time          : 02:33  (8.385 %) at 7.63 MB/s       	Estimated time          : 02:32  (8.878 %) at 8.24 MB/s       	Estimated time          : 02:30  (9.371 %) at 6.49 MB/s       	Estimated time          : 02:29  (9.865 %) at 9.44 MB/s       	Estimated time          : 02:27  (10.36 %) at 8.39 MB/s       	Estimated time          : 02:26  (10.85 %) at 8.41 MB/s       	Estimated time          : 02:24  (11.34 %) at 8.7 MB/s       	Estimated time          : 02:26  (11.84 %) at 6.21 MB/s       	Estimated time          : 02:24  (12.33 %) at 13.7 MB/s       	Estimated time          : 02:23  (12.82 %) at 6.7 MB/s       	Estimated time          : 02:22  (13.32 %) at 9 MB/s       	Estimated time          : 02:20  (13.81 %) at 8.04 MB/s       	Estimated time          : 02:19  (14.3 %) at 8.17 MB/s       	Estimated time          : 02:18  (14.8 %) at 10.6 MB/s       	Estimated time          : 02:17  (15.29 %) at 7.64 MB/s       	Estimated time          : 02:17  (15.78 %) at 10.1 MB/s       	Estimated time          : 02:16  (16.28 %) at 12.1 MB/s       	Estimated time          : 02:15  (16.77 %) at 14.3 MB/s       	Estimated time          : 02:15  (17.26 %) at 8.98 MB/s       	Estimated time          : 02:13  (17.76 %) at 7.76 MB/s       	Estimated time          : 02:12  (18.25 %) at 7.91 MB/s       	Estimated time          : 02:12  (18.74 %) at 8.22 MB/s       	Estimated time          : 02:11  (19.24 %) at 8.65 MB/s       	Estimated time          : 02:10  (19.73 %) at 8.58 MB/s       	Estimated time          : 02:09  (20.22 %) at 8.24 MB/s       	Estimated time          : 02:08  (20.72 %) at 5.94 MB/s       	Estimated time          : 02:07  (21.21 %) at 7.7 MB/s       	Estimated time          : 02:07  (21.7 %) at 5.68 MB/s       	Estimated time          : 02:06  (22.2 %) at 9.76 MB/s       	Estimated time          : 02:05  (22.69 %) at 7.78 MB/s       	Estimated time          : 02:05  (23.18 %) at 7.69 MB/s       	Estimated time          : 02:04  (23.68 %) at 7.46 MB/s       	Estimated time          : 02:03  (24.17 %) at 6.69 MB/s       	Estimated time          : 02:02  (24.66 %) at 8.64 MB/s       	Estimated time          : 02:01  (25.15 %) at 14.2 MB/s       	Estimated time          : 02:00  (25.65 %) at 1.32 MB/s       	Estimated time          : 01:59  (26.14 %) at 8.07 MB/s       	Estimated time          : 01:59  (26.63 %) at 14.5 MB/s       	Estimated time          : 01:58  (27.13 %) at 8.37 MB/s       	Estimated time          : 01:57  (27.62 %) at 8.42 MB/s       	Estimated time          : 01:56  (28.11 %) at 9.45 MB/s       	Estimated time          : 01:55  (28.61 %) at 8.47 MB/s       	Estimated time          : 01:54  (29.1 %) at 8.06 MB/s       	Estimated time          : 01:53  (29.59 %) at 7.51 MB/s       	Estimated time          : 01:52  (30.09 %) at 7.7 MB/s       	Estimated time          : 01:51  (30.58 %) at 10.7 MB/s       	Estimated time          : 01:51  (31.07 %) at 9.33 MB/s       	Estimated time          : 01:50  (31.57 %) at 8.29 MB/s       	Estimated time          : 01:49  (32.06 %) at 7.59 MB/s       	Estimated time          : 01:48  (32.55 %) at 8.13 MB/s       	Estimated time          : 01:48  (33.05 %) at 6.72 MB/s       	Estimated time          : 01:47  (33.54 %) at 8.63 MB/s       	Estimated time          : 01:46  (34.03 %) at 6.89 MB/s       	Estimated time          : 01:45  (34.53 %) at 8.87 MB/s       	Estimated time          : 01:45  (35.02 %) at 14.1 MB/s       	Estimated time          : 01:44  (35.51 %) at 9.19 MB/s       	Estimated time          : 01:43  (36.01 %) at 7.53 MB/s       	Estimated time          : 01:42  (36.5 %) at 9.88 MB/s       	Estimated time          : 01:41  (36.99 %) at 9.51 MB/s       	Estimated time          : 01:40  (37.49 %) at 10.6 MB/s       	Estimated time          : 01:39  (37.98 %) at 9.29 MB/s       	Estimated time          : 01:38  (38.47 %) at 8.09 MB/s       	Estimated time          : 01:38  (38.97 %) at 15.2 MB/s       	Estimated time          : 01:37  (39.46 %) at 8.54 MB/s       	Estimated time          : 01:36  (39.95 %) at 1.9 MB/s       	Estimated time          : 01:35  (40.44 %) at 7.88 MB/s       	Estimated time          : 01:34  (40.94 %) at 9 MB/s       	Estimated time          : 01:34  (41.43 %) at 15.3 MB/s       	Estimated time          : 01:33  (41.92 %) at 7.82 MB/s       	Estimated time          : 01:32  (42.42 %) at 9.17 MB/s       	Estimated time          : 01:31  (42.91 %) at 7.64 MB/s       	Estimated time          : 01:30  (43.4 %) at 6.88 MB/s       	Estimated time          : 01:30  (43.9 %) at 7.41 MB/s       	Estimated time          : 01:29  (44.39 %) at 9.69 MB/s       	Estimated time          : 01:28  (44.88 %) at 8.2 MB/s       	Estimated time          : 01:27  (45.38 %) at 10.3 MB/s       	Estimated time          : 01:26  (45.87 %) at 0.0245 MB/s       	Estimated time          : 01:25  (46.36 %) at 8.63 MB/s       	Estimated time          : 01:25  (46.86 %) at 11.1 MB/s       	Estimated time          : 01:24  (47.35 %) at 8.51 MB/s       	Estimated time          : 01:23  (47.84 %) at 8.87 MB/s       	Estimated time          : 01:23  (48.34 %) at 1.38 MB/s       	Estimated time          : 01:22  (48.83 %) at 11.7 MB/s       	Estimated time          : 01:21  (49.32 %) at 13.3 MB/s       	Estimated time          : 01:20  (49.82 %) at 9.36 MB/s       	Estimated time          : 01:20  (50.31 %) at 6.87 MB/s       	Estimated time          : 01:19  (50.8 %) at 10.8 MB/s       	Estimated time          : 01:18  (51.3 %) at 0 MB/s       	Estimated time          : 01:17  (51.79 %) at 13.2 MB/s       	Estimated time          : 01:16  (52.28 %) at 7.5 MB/s       	Estimated time          : 01:16  (52.78 %) at 8.75 MB/s       	Estimated time          : 01:15  (53.27 %) at 7.86 MB/s       	Estimated time          : 01:14  (53.76 %) at 7.91 MB/s       	Estimated time          : 01:13  (54.26 %) at 9.75 MB/s       	Estimated time          : 01:12  (54.75 %) at 6.67 MB/s       	Estimated time          : 01:12  (55.24 %) at 10.7 MB/s       	Estimated time          : 01:11  (55.73 %) at 9.63 MB/s       	Estimated time          : 01:10  (56.23 %) at 7.16 MB/s       	Estimated time          : 01:09  (56.72 %) at 10.2 MB/s       	Estimated time          : 01:09  (57.21 %) at 1.14 MB/s       	Estimated time          : 01:08  (57.71 %) at 12.3 MB/s       	Estimated time          : 01:07  (58.2 %) at 10.9 MB/s       	Estimated time          : 01:06  (58.69 %) at 10.2 MB/s       	Estimated time          : 01:05  (59.19 %) at 2.62 MB/s       	Estimated time          : 01:05  (59.68 %) at 7.59 MB/s       	Estimated time          : 01:04  (60.17 %) at 7.62 MB/s       	Estimated time          : 01:03  (60.67 %) at 8.37 MB/s       	Estimated time          : 01:02  (61.16 %) at 8.14 MB/s       	Estimated time          : 01:02  (61.65 %) at 11.9 MB/s       	Estimated time          : 01:01  (62.15 %) at 6.41 MB/s       	Estimated time          : 01:00  (62.64 %) at 8.91 MB/s       	Estimated time          : 00:59  (63.13 %) at 6.71 MB/s       	Estimated time          : 00:59  (63.63 %) at 7.95 MB/s       	Estimated time          : 00:58  (64.12 %) at 7.06 MB/s       	Estimated time          : 00:57  (64.61 %) at 1.35 MB/s       	Estimated time          : 00:57  (65.11 %) at 6.63 MB/s       	Estimated time          : 00:56  (65.6 %) at 6.68 MB/s       	Estimated time          : 00:55  (66.09 %) at 6.31 MB/s       	Estimated time          : 00:55  (66.59 %) at 7.56 MB/s       	Estimated time          : 00:54  (67.08 %) at 5.55 MB/s       	Estimated time          : 00:53  (67.57 %) at 6.74 MB/s       	Estimated time          : 00:53  (68.07 %) at 6.22 MB/s       	Estimated time          : 00:52  (68.56 %) at 6.63 MB/s       	Estimated time          : 00:51  (69.05 %) at 6.54 MB/s       	Estimated time          : 00:50  (69.55 %) at 6.26 MB/s       	Estimated time          : 00:50  (70.04 %) at 5.71 MB/s       	Estimated time          : 00:49  (70.53 %) at 6.7 MB/s       	Estimated time          : 00:48  (71.03 %) at 6.44 MB/s       	Estimated time          : 00:47  (71.52 %) at 6.56 MB/s       	Estimated time          : 00:47  (72.01 %) at 5.32 MB/s       	Estimated time          : 00:46  (72.5 %) at 6.54 MB/s       	Estimated time          : 00:45  (73 %) at 5.54 MB/s       	Estimated time          : 00:44  (73.49 %) at 4.78 MB/s       	Estimated time          : 00:44  (73.98 %) at 4.94 MB/s       	Estimated time          : 00:43  (74.48 %) at 4.03 MB/s       	Estimated time          : 00:42  (74.97 %) at 5.01 MB/s       	Estimated time          : 00:42  (75.46 %) at 5.01 MB/s       	Estimated time          : 00:41  (75.96 %) at 7.89 MB/s       	Estimated time          : 00:40  (76.45 %) at 6.23 MB/s       	Estimated time          : 00:40  (76.94 %) at 5.48 MB/s       	Estimated time          : 00:39  (77.44 %) at 7.07 MB/s       	Estimated time          : 00:38  (77.93 %) at 4.82 MB/s       	Estimated time          : 00:37  (78.42 %) at 1.28 MB/s       	Estimated time          : 00:36  (78.92 %) at 5.67 MB/s       	Estimated time          : 00:36  (79.41 %) at 4.22 MB/s       	Estimated time          : 00:35  (79.9 %) at 4.9 MB/s       	Estimated time          : 00:34  (80.4 %) at 6.64 MB/s       	Estimated time          : 00:33  (80.89 %) at 6.52 MB/s       	Estimated time          : 00:33  (81.38 %) at 4.68 MB/s       	Estimated time          : 00:32  (81.88 %) at 5.39 MB/s       	Estimated time          : 00:31  (82.37 %) at 6.16 MB/s       	Estimated time          : 00:30  (82.86 %) at 5.18 MB/s       	Estimated time          : 00:29  (83.36 %) at 5.44 MB/s       	Estimated time          : 00:28  (83.85 %) at 4.39 MB/s       	Estimated time          : 00:28  (84.34 %) at 6.87 MB/s       	Estimated time          : 00:27  (84.84 %) at 5.96 MB/s       	Estimated time          : 00:26  (85.33 %) at 0.199 MB/s       	Estimated time          : 00:25  (85.82 %) at 5.29 MB/s       	Estimated time          : 00:24  (86.32 %) at 5.74 MB/s       	Estimated time          : 00:23  (86.81 %) at 4.97 MB/s       	Estimated time          : 00:23  (87.3 %) at 6.53 MB/s       	Estimated time          : 00:22  (87.79 %) at 0 MB/s       	Estimated time          : 00:21  (88.29 %) at 4.87 MB/s       	Estimated time          : 00:20  (88.78 %) at 4.86 MB/s       	Estimated time          : 00:19  (89.27 %) at 4.91 MB/s       	Estimated time          : 00:18  (89.77 %) at 7.07 MB/s       	Estimated time          : 00:17  (90.26 %) at 6.76 MB/s       	Estimated time          : 00:16  (90.75 %) at 7.58 MB/s       	Estimated time          : 00:16  (91.25 %) at 6.87 MB/s       	Estimated time          : 00:15  (91.74 %) at 5.94 MB/s       	Estimated time          : 00:14  (92.23 %) at 7.65 MB/s       	Estimated time          : 00:13  (92.73 %) at 7.02 MB/s       	Estimated time          : 00:12  (93.22 %) at 6.69 MB/s       	Estimated time          : 00:11  (93.71 %) at 6.29 MB/s       	Estimated time          : 00:10  (94.21 %) at 7.33 MB/s       	Estimated time          : 00:09  (94.7 %) at 8.1 MB/s       	Estimated time          : 00:08  (95.19 %) at 7.62 MB/s       	Estimated time          : 00:07  (95.69 %) at 6.91 MB/s       	Estimated time          : 00:07  (96.18 %) at 9.68 MB/s       	Estimated time          : 00:06  (96.67 %) at 11.4 MB/s       	Estimated time          : 00:05  (97.17 %) at 11.1 MB/s       	Estimated time          : 00:04  (97.66 %) at 0.0524 MB/s       	Estimated time          : 00:03  (98.15 %) at 13.5 MB/s       	Estimated time          : 00:02  (98.65 %) at 7.59 MB/s       	Estimated time          : 00:01  (99.14 %) at 10.4 MB/s       	Estimated time          : 00:00  (99.63 %) at 7.96 MB/s       
-	Total entries processed : 4054907
-	Read Calls              : 1863                                                        
-	Read Speed              : 7.5 MB/s                                                    
-	Read Size               : 1387.0 MB                                                   
-	Read Percent            : 72.1 %                                                      
-	Real time               : [1;34m0:03:04 (h:mm:ss)[0;0m                              
-	CPU time                : 133.0 s                                                     
-===  main.py
-	Processing dataset (13/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : DYJetsToLL_M_50_ext2                                        
-	 (0 %) at 0 MB/s       	Estimated time          : 06:46  (0.251 %) at 16 MB/s       	Estimated time          : 05:51  (0.502 %) at 6.49 MB/s       	Estimated time          : 05:40  (0.753 %) at 9.67 MB/s       	Estimated time          : 05:47  (1.004 %) at 5.92 MB/s       	Estimated time          : 05:53  (1.255 %) at 8.04 MB/s       	Estimated time          : 05:49  (1.506 %) at 7.57 MB/s       	Estimated time          : 05:39  (1.757 %) at 7.69 MB/s       	Estimated time          : 05:36  (2.008 %) at 7.81 MB/s       	Estimated time          : 05:36  (2.259 %) at 7.45 MB/s       	Estimated time          : 05:30  (2.51 %) at 8.58 MB/s       	Estimated time          : 05:25  (2.761 %) at 7.59 MB/s       	Estimated time          : 05:28  (3.012 %) at 8.63 MB/s       	Estimated time          : 05:23  (3.263 %) at 8.14 MB/s       	Estimated time          : 05:22  (3.514 %) at 8.58 MB/s       	Estimated time          : 05:18  (3.765 %) at 9.21 MB/s       	Estimated time          : 05:16  (4.016 %) at 8.08 MB/s       	Estimated time          : 05:15  (4.267 %) at 6.71 MB/s       	Estimated time          : 05:13  (4.518 %) at 7.39 MB/s       	Estimated time          : 05:13  (4.769 %) at 8.29 MB/s       	Estimated time          : 05:13  (5.02 %) at 6.91 MB/s       	Estimated time          : 05:12  (5.271 %) at 8.35 MB/s       	Estimated time          : 05:10  (5.522 %) at 8.41 MB/s       	Estimated time          : 05:08  (5.773 %) at 8.94 MB/s       	Estimated time          : 05:06  (6.024 %) at 7.75 MB/s       	Estimated time          : 05:04  (6.275 %) at 7.51 MB/s       	Estimated time          : 05:04  (6.526 %) at 15.9 MB/s       	Estimated time          : 05:02  (6.777 %) at 8.97 MB/s       	Estimated time          : 05:00  (7.028 %) at 10.2 MB/s       	Estimated time          : 04:58  (7.279 %) at 7.82 MB/s       	Estimated time          : 04:59  (7.53 %) at 11.3 MB/s       	Estimated time          : 04:57  (7.781 %) at 0.157 MB/s       	Estimated time          : 04:57  (8.032 %) at 8.61 MB/s       	Estimated time          : 04:56  (8.283 %) at 8.27 MB/s       	Estimated time          : 04:54  (8.534 %) at 7.91 MB/s       	Estimated time          : 04:53  (8.785 %) at 9.22 MB/s       	Estimated time          : 04:52  (9.036 %) at 6.88 MB/s       	Estimated time          : 04:51  (9.287 %) at 12.9 MB/s       	Estimated time          : 04:51  (9.538 %) at 9.67 MB/s       	Estimated time          : 04:50  (9.789 %) at 8.32 MB/s       	Estimated time          : 04:49  (10.04 %) at 10.5 MB/s       	Estimated time          : 04:47  (10.29 %) at 0.971 MB/s       	Estimated time          : 04:46  (10.54 %) at 8.86 MB/s       	Estimated time          : 04:47  (10.79 %) at 12.9 MB/s       	Estimated time          : 04:46  (11.04 %) at 7.78 MB/s       	Estimated time          : 04:46  (11.29 %) at 6.95 MB/s       	Estimated time          : 04:45  (11.55 %) at 7.76 MB/s       	Estimated time          : 04:44  (11.8 %) at 10.2 MB/s       	Estimated time          : 04:44  (12.05 %) at 10.5 MB/s       	Estimated time          : 04:43  (12.3 %) at 7.98 MB/s       	Estimated time          : 04:42  (12.55 %) at 7.93 MB/s       	Estimated time          : 04:41  (12.8 %) at 8.99 MB/s       	Estimated time          : 04:41  (13.05 %) at 8.03 MB/s       	Estimated time          : 04:40  (13.3 %) at 8.6 MB/s       	Estimated time          : 04:39  (13.55 %) at 7.63 MB/s       	Estimated time          : 04:38  (13.8 %) at 15.9 MB/s       	Estimated time          : 04:38  (14.06 %) at 7.54 MB/s       	Estimated time          : 04:37  (14.31 %) at 11.4 MB/s       	Estimated time          : 04:36  (14.56 %) at 7.1 MB/s       	Estimated time          : 04:35  (14.81 %) at 9.52 MB/s       	Estimated time          : 04:35  (15.06 %) at 6.99 MB/s       	Estimated time          : 04:33  (15.31 %) at 2.56 MB/s       	Estimated time          : 04:35  (15.56 %) at 6.22 MB/s       	Estimated time          : 04:39  (15.81 %) at 5.86 MB/s       	Estimated time          : 04:43  (16.06 %) at 6.86 MB/s       	Estimated time          : 04:44  (16.31 %) at 4.79 MB/s       	Estimated time          : 04:46  (16.57 %) at 4.28 MB/s       	Estimated time          : 04:48  (16.82 %) at 4.97 MB/s       	Estimated time          : 04:49  (17.07 %) at 6.18 MB/s       	Estimated time          : 04:49  (17.32 %) at 4.98 MB/s       	Estimated time          : 04:51  (17.57 %) at 6.21 MB/s       	Estimated time          : 04:51  (17.82 %) at 6.44 MB/s       	Estimated time          : 04:52  (18.07 %) at 3.72 MB/s       	Estimated time          : 04:53  (18.32 %) at 6.13 MB/s       	Estimated time          : 04:54  (18.57 %) at 4.82 MB/s       	Estimated time          : 04:55  (18.82 %) at 5.38 MB/s       	Estimated time          : 04:55  (19.08 %) at 4.94 MB/s       	Estimated time          : 04:57  (19.33 %) at 5.64 MB/s       	Estimated time          : 04:57  (19.58 %) at 5.06 MB/s       	Estimated time          : 04:58  (19.83 %) at 6.41 MB/s       	Estimated time          : 04:58  (20.08 %) at 4.39 MB/s       	Estimated time          : 04:59  (20.33 %) at 4.72 MB/s       	Estimated time          : 05:00  (20.58 %) at 5.52 MB/s       	Estimated time          : 05:01  (20.83 %) at 4.42 MB/s       	Estimated time          : 05:02  (21.08 %) at 4.91 MB/s       	Estimated time          : 05:02  (21.33 %) at 5.95 MB/s       	Estimated time          : 05:03  (21.59 %) at 3 MB/s       	Estimated time          : 05:03  (21.84 %) at 4.35 MB/s       	Estimated time          : 05:04  (22.09 %) at 5.8 MB/s       	Estimated time          : 05:04  (22.34 %) at 5.68 MB/s       	Estimated time          : 05:03  (22.59 %) at 5.75 MB/s       	Estimated time          : 05:03  (22.84 %) at 4.39 MB/s       	Estimated time          : 05:02  (23.09 %) at 5.53 MB/s       	Estimated time          : 05:01  (23.34 %) at 9.6 MB/s       	Estimated time          : 05:02  (23.59 %) at 5.83 MB/s       	Estimated time          : 05:02  (23.84 %) at 6.71 MB/s       	Estimated time          : 05:00  (24.09 %) at 7.06 MB/s       	Estimated time          : 04:58  (24.35 %) at 8.94 MB/s       	Estimated time          : 04:57  (24.6 %) at 10.4 MB/s       	Estimated time          : 04:55  (24.85 %) at 8.73 MB/s       	Estimated time          : 04:53  (25.1 %) at 9.64 MB/s       	Estimated time          : 04:52  (25.35 %) at 8.15 MB/s       	Estimated time          : 04:50  (25.6 %) at 7.82 MB/s       	Estimated time          : 04:48  (25.85 %) at 8.14 MB/s       	Estimated time          : 04:47  (26.1 %) at 8.76 MB/s       	Estimated time          : 04:46  (26.35 %) at 8.79 MB/s       	Estimated time          : 04:44  (26.6 %) at 7.82 MB/s       	Estimated time          : 04:43  (26.86 %) at 7.29 MB/s       	Estimated time          : 04:41  (27.11 %) at 9.18 MB/s       	Estimated time          : 04:40  (27.36 %) at 7.39 MB/s       	Estimated time          : 04:38  (27.61 %) at 6.53 MB/s       	Estimated time          : 04:37  (27.86 %) at 9.13 MB/s       	Estimated time          : 04:35  (28.11 %) at 8.34 MB/s       	Estimated time          : 04:34  (28.36 %) at 9.6 MB/s       	Estimated time          : 04:33  (28.61 %) at 7.47 MB/s       	Estimated time          : 04:31  (28.86 %) at 6.97 MB/s       	Estimated time          : 04:30  (29.11 %) at 13.4 MB/s       	Estimated time          : 04:28  (29.37 %) at 0 MB/s       	Estimated time          : 04:27  (29.62 %) at 11.3 MB/s       	Estimated time          : 04:26  (29.87 %) at 6.83 MB/s       	Estimated time          : 04:25  (30.12 %) at 7.84 MB/s       	Estimated time          : 04:24  (30.37 %) at 7.78 MB/s       	Estimated time          : 04:22  (30.62 %) at 7.03 MB/s       	Estimated time          : 04:21  (30.87 %) at 8.14 MB/s       	Estimated time          : 04:20  (31.12 %) at 6.49 MB/s       	Estimated time          : 04:19  (31.37 %) at 8.65 MB/s       	Estimated time          : 04:19  (31.62 %) at 7.32 MB/s       	Estimated time          : 04:18  (31.88 %) at 1.15 MB/s       	Estimated time          : 04:18  (32.13 %) at 6.42 MB/s       	Estimated time          : 04:17  (32.38 %) at 6.1 MB/s       	Estimated time          : 04:17  (32.63 %) at 4.97 MB/s       	Estimated time          : 04:16  (32.88 %) at 5.47 MB/s       	Estimated time          : 04:15  (33.13 %) at 5.76 MB/s       	Estimated time          : 04:15  (33.38 %) at 5.91 MB/s       	Estimated time          : 04:14  (33.63 %) at 6.7 MB/s       	Estimated time          : 04:14  (33.88 %) at 8.86 MB/s       	Estimated time          : 04:13  (34.13 %) at 7.43 MB/s       	Estimated time          : 04:12  (34.39 %) at 7.67 MB/s       	Estimated time          : 04:12  (34.64 %) at 5.53 MB/s       	Estimated time          : 04:11  (34.89 %) at 8.67 MB/s       	Estimated time          : 04:10  (35.14 %) at 7 MB/s       	Estimated time          : 04:10  (35.39 %) at 6.33 MB/s       	Estimated time          : 04:09  (35.64 %) at 5.44 MB/s       	Estimated time          : 04:08  (35.89 %) at 6.94 MB/s       	Estimated time          : 04:08  (36.14 %) at 4.74 MB/s       	Estimated time          : 04:07  (36.39 %) at 6.82 MB/s       	Estimated time          : 04:07  (36.64 %) at 6.79 MB/s       	Estimated time          : 04:07  (36.9 %) at 5.89 MB/s       	Estimated time          : 04:06  (37.15 %) at 7.72 MB/s       	Estimated time          : 04:05  (37.4 %) at 7.33 MB/s       	Estimated time          : 04:04  (37.65 %) at 5.9 MB/s       	Estimated time          : 04:03  (37.9 %) at 5.79 MB/s       	Estimated time          : 04:02  (38.15 %) at 6.21 MB/s       	Estimated time          : 04:02  (38.4 %) at 5.33 MB/s       	Estimated time          : 04:01  (38.65 %) at 6.33 MB/s       	Estimated time          : 04:00  (38.9 %) at 4.58 MB/s       	Estimated time          : 04:00  (39.15 %) at 5.83 MB/s       	Estimated time          : 03:59  (39.41 %) at 5.22 MB/s       	Estimated time          : 03:58  (39.66 %) at 10.6 MB/s       	Estimated time          : 03:57  (39.91 %) at 9.96 MB/s       	Estimated time          : 03:55  (40.16 %) at 0.0443 MB/s       	Estimated time          : 03:54  (40.41 %) at 13.6 MB/s       	Estimated time          : 03:53  (40.66 %) at 9.72 MB/s       	Estimated time          : 03:51  (40.91 %) at 0 MB/s       	Estimated time          : 03:50  (41.16 %) at 7.85 MB/s       	Estimated time          : 03:49  (41.41 %) at 7.28 MB/s       	Estimated time          : 03:47  (41.66 %) at 8.88 MB/s       	Estimated time          : 03:46  (41.92 %) at 8.11 MB/s       	Estimated time          : 03:45  (42.17 %) at 9.28 MB/s       	Estimated time          : 03:44  (42.42 %) at 7.94 MB/s       	Estimated time          : 03:42  (42.67 %) at 14.4 MB/s       	Estimated time          : 03:41  (42.92 %) at 8.43 MB/s       	Estimated time          : 03:40  (43.17 %) at 5.78 MB/s       	Estimated time          : 03:39  (43.42 %) at 7.11 MB/s       	Estimated time          : 03:37  (43.67 %) at 8.24 MB/s       	Estimated time          : 03:36  (43.92 %) at 12.2 MB/s       	Estimated time          : 03:35  (44.17 %) at 6.45 MB/s       	Estimated time          : 03:34  (44.42 %) at 8.65 MB/s       	Estimated time          : 03:33  (44.68 %) at 8.54 MB/s       	Estimated time          : 03:32  (44.93 %) at 7.68 MB/s       	Estimated time          : 03:31  (45.18 %) at 7.35 MB/s       	Estimated time          : 03:30  (45.43 %) at 7.68 MB/s       	Estimated time          : 03:28  (45.68 %) at 9.04 MB/s       	Estimated time          : 03:28  (45.93 %) at 12.4 MB/s       	Estimated time          : 03:26  (46.18 %) at 7.81 MB/s       	Estimated time          : 03:25  (46.43 %) at 6.93 MB/s       	Estimated time          : 03:24  (46.68 %) at 7.86 MB/s       	Estimated time          : 03:23  (46.93 %) at 7.51 MB/s       	Estimated time          : 03:22  (47.19 %) at 7.65 MB/s       	Estimated time          : 03:21  (47.44 %) at 8.29 MB/s       	Estimated time          : 03:20  (47.69 %) at 10.8 MB/s       	Estimated time          : 03:19  (47.94 %) at 5.57 MB/s       	Estimated time          : 03:19  (48.19 %) at 6.01 MB/s       	Estimated time          : 03:18  (48.44 %) at 6.13 MB/s       	Estimated time          : 03:17  (48.69 %) at 6.8 MB/s       	Estimated time          : 03:17  (48.94 %) at 4.83 MB/s       	Estimated time          : 03:16  (49.19 %) at 6.58 MB/s       	Estimated time          : 03:15  (49.44 %) at 4.38 MB/s       	Estimated time          : 03:15  (49.7 %) at 4.58 MB/s       	Estimated time          : 03:14  (49.95 %) at 6.84 MB/s       	Estimated time          : 03:13  (50.2 %) at 5.46 MB/s       	Estimated time          : 03:12  (50.45 %) at 5.24 MB/s       	Estimated time          : 03:12  (50.7 %) at 8.23 MB/s       	Estimated time          : 03:11  (50.95 %) at 6.81 MB/s       	Estimated time          : 03:10  (51.2 %) at 5.77 MB/s       	Estimated time          : 03:09  (51.45 %) at 4.14 MB/s       	Estimated time          : 03:09  (51.7 %) at 5.35 MB/s       	Estimated time          : 03:08  (51.95 %) at 4.49 MB/s       	Estimated time          : 03:07  (52.21 %) at 6.5 MB/s       	Estimated time          : 03:06  (52.46 %) at 5.47 MB/s       	Estimated time          : 03:05  (52.71 %) at 5.16 MB/s       	Estimated time          : 03:04  (52.96 %) at 6.21 MB/s       	Estimated time          : 03:03  (53.21 %) at 5.83 MB/s       	Estimated time          : 03:02  (53.46 %) at 7.3 MB/s       	Estimated time          : 03:01  (53.71 %) at 6.6 MB/s       	Estimated time          : 03:00  (53.96 %) at 5.39 MB/s       	Estimated time          : 02:59  (54.21 %) at 6.22 MB/s       	Estimated time          : 02:59  (54.46 %) at 4.58 MB/s       	Estimated time          : 02:58  (54.72 %) at 6.12 MB/s       	Estimated time          : 02:57  (54.97 %) at 5.61 MB/s       	Estimated time          : 02:56  (55.22 %) at 7.86 MB/s       	Estimated time          : 02:55  (55.47 %) at 5.28 MB/s       	Estimated time          : 02:54  (55.72 %) at 4.44 MB/s       	Estimated time          : 02:54  (55.97 %) at 5.98 MB/s       	Estimated time          : 02:53  (56.22 %) at 4.82 MB/s       	Estimated time          : 02:52  (56.47 %) at 5.96 MB/s       	Estimated time          : 02:51  (56.72 %) at 5.73 MB/s       	Estimated time          : 02:50  (56.97 %) at 7.35 MB/s       	Estimated time          : 02:49  (57.23 %) at 6.27 MB/s       	Estimated time          : 02:48  (57.48 %) at 7.28 MB/s       	Estimated time          : 02:47  (57.73 %) at 7.86 MB/s       	Estimated time          : 02:46  (57.98 %) at 7.12 MB/s       	Estimated time          : 02:45  (58.23 %) at 4.46 MB/s       	Estimated time          : 02:44  (58.48 %) at 7.07 MB/s       	Estimated time          : 02:43  (58.73 %) at 5.52 MB/s       	Estimated time          : 02:42  (58.98 %) at 6.77 MB/s       	Estimated time          : 02:41  (59.23 %) at 5.25 MB/s       	Estimated time          : 02:40  (59.48 %) at 3.38 MB/s       	Estimated time          : 02:39  (59.74 %) at 7.22 MB/s       	Estimated time          : 02:38  (59.99 %) at 6.55 MB/s       	Estimated time          : 02:38  (60.24 %) at 7.64 MB/s       	Estimated time          : 02:37  (60.49 %) at 6.47 MB/s       	Estimated time          : 02:36  (60.74 %) at 5.98 MB/s       	Estimated time          : 02:35  (60.99 %) at 6.1 MB/s       	Estimated time          : 02:34  (61.24 %) at 6.63 MB/s       	Estimated time          : 02:32  (61.49 %) at 5.96 MB/s       	Estimated time          : 02:32  (61.74 %) at 10.8 MB/s       	Estimated time          : 02:31  (61.99 %) at 6.56 MB/s       	Estimated time          : 02:30  (62.25 %) at 8.01 MB/s       	Estimated time          : 02:29  (62.5 %) at 8.4 MB/s       	Estimated time          : 02:28  (62.75 %) at 7.05 MB/s       	Estimated time          : 02:27  (63 %) at 6.19 MB/s       	Estimated time          : 02:26  (63.25 %) at 6.63 MB/s       	Estimated time          : 02:24  (63.5 %) at 6.24 MB/s       	Estimated time          : 02:23  (63.75 %) at 6.2 MB/s       	Estimated time          : 02:23  (64 %) at 9.13 MB/s       	Estimated time          : 02:21  (64.25 %) at 12.3 MB/s       	Estimated time          : 02:20  (64.5 %) at 10.9 MB/s       	Estimated time          : 02:19  (64.76 %) at 10 MB/s       	Estimated time          : 02:18  (65.01 %) at 5.81 MB/s       	Estimated time          : 02:17  (65.26 %) at 9.6 MB/s       	Estimated time          : 02:16  (65.51 %) at 7.96 MB/s       	Estimated time          : 02:15  (65.76 %) at 7.61 MB/s       	Estimated time          : 02:14  (66.01 %) at 10.8 MB/s       	Estimated time          : 02:13  (66.26 %) at 7.57 MB/s       	Estimated time          : 02:11  (66.51 %) at 10.8 MB/s       	Estimated time          : 02:10  (66.76 %) at 11.3 MB/s       	Estimated time          : 02:09  (67.01 %) at 8.11 MB/s       	Estimated time          : 02:08  (67.26 %) at 7.05 MB/s       	Estimated time          : 02:07  (67.52 %) at 7.97 MB/s       	Estimated time          : 02:06  (67.77 %) at 8.68 MB/s       	Estimated time          : 02:05  (68.02 %) at 3.53 MB/s       	Estimated time          : 02:04  (68.27 %) at 8.88 MB/s       	Estimated time          : 02:03  (68.52 %) at 7.78 MB/s       	Estimated time          : 02:02  (68.77 %) at 8.87 MB/s       	Estimated time          : 02:01  (69.02 %) at 9.61 MB/s       	Estimated time          : 02:00  (69.27 %) at 8.55 MB/s       	Estimated time          : 01:59  (69.52 %) at 6.6 MB/s       	Estimated time          : 01:58  (69.77 %) at 14.7 MB/s       	Estimated time          : 01:57  (70.03 %) at 1.27 MB/s       	Estimated time          : 01:56  (70.28 %) at 8.43 MB/s       	Estimated time          : 01:55  (70.53 %) at 14.2 MB/s       	Estimated time          : 01:54  (70.78 %) at 8.28 MB/s       	Estimated time          : 01:53  (71.03 %) at 7.24 MB/s       	Estimated time          : 01:52  (71.28 %) at 8.38 MB/s       	Estimated time          : 01:51  (71.53 %) at 8.98 MB/s       	Estimated time          : 01:50  (71.78 %) at 8.67 MB/s       	Estimated time          : 01:49  (72.03 %) at 6.61 MB/s       	Estimated time          : 01:48  (72.28 %) at 7.02 MB/s       	Estimated time          : 01:47  (72.54 %) at 6.37 MB/s       	Estimated time          : 01:46  (72.79 %) at 7.05 MB/s       	Estimated time          : 01:45  (73.04 %) at 4.56 MB/s       	Estimated time          : 01:44  (73.29 %) at 4.01 MB/s       	Estimated time          : 01:43  (73.54 %) at 8.63 MB/s       	Estimated time          : 01:42  (73.79 %) at 1.4 MB/s       	Estimated time          : 01:42  (74.04 %) at 6.76 MB/s       	Estimated time          : 01:41  (74.29 %) at 5.7 MB/s       	Estimated time          : 01:40  (74.54 %) at 5.57 MB/s       	Estimated time          : 01:39  (74.79 %) at 6.21 MB/s       	Estimated time          : 01:38  (75.05 %) at 4.98 MB/s       	Estimated time          : 01:37  (75.3 %) at 5.43 MB/s       	Estimated time          : 01:36  (75.55 %) at 5.59 MB/s       	Estimated time          : 01:35  (75.8 %) at 5.26 MB/s       	Estimated time          : 01:34  (76.05 %) at 5.02 MB/s       	Estimated time          : 01:33  (76.3 %) at 4.99 MB/s       	Estimated time          : 01:32  (76.55 %) at 6.2 MB/s       	Estimated time          : 01:31  (76.8 %) at 4.92 MB/s       	Estimated time          : 01:30  (77.05 %) at 4.99 MB/s       	Estimated time          : 01:30  (77.3 %) at 5.11 MB/s       	Estimated time          : 01:29  (77.56 %) at 7.15 MB/s       	Estimated time          : 01:28  (77.81 %) at 5.9 MB/s       	Estimated time          : 01:27  (78.06 %) at 8.52 MB/s       	Estimated time          : 01:26  (78.31 %) at 6.13 MB/s       	Estimated time          : 01:25  (78.56 %) at 7.17 MB/s       	Estimated time          : 01:24  (78.81 %) at 4.8 MB/s       	Estimated time          : 01:23  (79.06 %) at 6.02 MB/s       	Estimated time          : 01:22  (79.31 %) at 5.28 MB/s       	Estimated time          : 01:21  (79.56 %) at 5.16 MB/s       	Estimated time          : 01:20  (79.81 %) at 5.33 MB/s       	Estimated time          : 01:19  (80.07 %) at 5.46 MB/s       	Estimated time          : 01:18  (80.32 %) at 4.02 MB/s       	Estimated time          : 01:17  (80.57 %) at 11.1 MB/s       	Estimated time          : 01:16  (80.82 %) at 9.32 MB/s       	Estimated time          : 01:15  (81.07 %) at 8.11 MB/s       	Estimated time          : 01:14  (81.32 %) at 6.7 MB/s       	Estimated time          : 01:13  (81.57 %) at 9.27 MB/s       	Estimated time          : 01:12  (81.82 %) at 7.7 MB/s       	Estimated time          : 01:11  (82.07 %) at 8.9 MB/s       	Estimated time          : 01:10  (82.32 %) at 8.16 MB/s       	Estimated time          : 01:09  (82.58 %) at 9.18 MB/s       	Estimated time          : 01:08  (82.83 %) at 8.03 MB/s       	Estimated time          : 01:07  (83.08 %) at 7.69 MB/s       	Estimated time          : 01:05  (83.33 %) at 8.47 MB/s       	Estimated time          : 01:04  (83.58 %) at 9.93 MB/s       	Estimated time          : 01:03  (83.83 %) at 9.2 MB/s       	Estimated time          : 01:02  (84.08 %) at 6.24 MB/s       	Estimated time          : 01:01  (84.33 %) at 12.5 MB/s       	Estimated time          : 01:00  (84.58 %) at 8.64 MB/s       	Estimated time          : 00:59  (84.83 %) at 10.3 MB/s       	Estimated time          : 00:58  (85.09 %) at 9.09 MB/s       	Estimated time          : 00:57  (85.34 %) at 9.21 MB/s       	Estimated time          : 00:56  (85.59 %) at 9.1 MB/s       	Estimated time          : 00:55  (85.84 %) at 6.84 MB/s       	Estimated time          : 00:54  (86.09 %) at 12.7 MB/s       	Estimated time          : 00:53  (86.34 %) at 0.045 MB/s       	Estimated time          : 00:52  (86.59 %) at 13.3 MB/s       	Estimated time          : 00:51  (86.84 %) at 6.97 MB/s       	Estimated time          : 00:50  (87.09 %) at 8.47 MB/s       	Estimated time          : 00:49  (87.34 %) at 8.25 MB/s       	Estimated time          : 00:48  (87.59 %) at 8.53 MB/s       	Estimated time          : 00:47  (87.85 %) at 8.55 MB/s       	Estimated time          : 00:46  (88.1 %) at 8.03 MB/s       	Estimated time          : 00:45  (88.35 %) at 8.65 MB/s       	Estimated time          : 00:44  (88.6 %) at 5.54 MB/s       	Estimated time          : 00:43  (88.85 %) at 6.74 MB/s       	Estimated time          : 00:42  (89.1 %) at 8.36 MB/s       	Estimated time          : 00:41  (89.35 %) at 9 MB/s       	Estimated time          : 00:40  (89.6 %) at 5.91 MB/s       	Estimated time          : 00:39  (89.85 %) at 7.5 MB/s       	Estimated time          : 00:38  (90.1 %) at 0.00815 MB/s       	Estimated time          : 00:37  (90.36 %) at 5.65 MB/s       	Estimated time          : 00:36  (90.61 %) at 7.17 MB/s       	Estimated time          : 00:35  (90.86 %) at 6.58 MB/s       	Estimated time          : 00:34  (91.11 %) at 7.09 MB/s       	Estimated time          : 00:33  (91.36 %) at 6.02 MB/s       	Estimated time          : 00:32  (91.61 %) at 6.03 MB/s       	Estimated time          : 00:31  (91.86 %) at 5.33 MB/s       	Estimated time          : 00:30  (92.11 %) at 5.86 MB/s       	Estimated time          : 00:29  (92.36 %) at 7.16 MB/s       	Estimated time          : 00:28  (92.61 %) at 6.56 MB/s       	Estimated time          : 00:27  (92.87 %) at 6.14 MB/s       	Estimated time          : 00:26  (93.12 %) at 6.57 MB/s       	Estimated time          : 00:25  (93.37 %) at 8.75 MB/s       	Estimated time          : 00:24  (93.62 %) at 2.58 MB/s       	Estimated time          : 00:24  (93.87 %) at 9.41 MB/s       	Estimated time          : 00:23  (94.12 %) at 5.49 MB/s       	Estimated time          : 00:22  (94.37 %) at 7.37 MB/s       	Estimated time          : 00:21  (94.62 %) at 6.95 MB/s       	Estimated time          : 00:20  (94.87 %) at 0.0291 MB/s       	Estimated time          : 00:19  (95.12 %) at 6.83 MB/s       	Estimated time          : 00:18  (95.38 %) at 6.5 MB/s       	Estimated time          : 00:17  (95.63 %) at 8.76 MB/s       	Estimated time          : 00:16  (95.88 %) at 6.96 MB/s       	Estimated time          : 00:15  (96.13 %) at 6.98 MB/s       	Estimated time          : 00:14  (96.38 %) at 5.94 MB/s       	Estimated time          : 00:13  (96.63 %) at 10.6 MB/s       	Estimated time          : 00:12  (96.88 %) at 3.62 MB/s       	Estimated time          : 00:11  (97.13 %) at 5.93 MB/s       	Estimated time          : 00:10  (97.38 %) at 6.07 MB/s       	Estimated time          : 00:09  (97.63 %) at 6.11 MB/s       	Estimated time          : 00:08  (97.89 %) at 7.46 MB/s       	Estimated time          : 00:07  (98.14 %) at 0.126 MB/s       	Estimated time          : 00:06  (98.39 %) at 7.79 MB/s       	Estimated time          : 00:05  (98.64 %) at 0.00649 MB/s       	Estimated time          : 00:04  (98.89 %) at 5.79 MB/s       	Estimated time          : 00:03  (99.14 %) at 3.56 MB/s       	Estimated time          : 00:02  (99.39 %) at 5.5 MB/s       	Estimated time          : 00:01  (99.64 %) at 5.3 MB/s       	Estimated time          : 00:00  (99.89 %) at 7.53 MB/s       
-	Total entries processed : 7968493
-	Read Calls              : 3660                                                        
-	Read Speed              : 7.0 MB/s                                                    
-	Read Size               : 2749.5 MB                                                   
-	Read Percent            : 67.3 %                                                      
-	Real time               : [1;34m0:06:35 (h:mm:ss)[0;0m                              
-	CPU time                : 265.9 s                                                     
-===  main.py
-	Processing dataset (14/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_1000to1400_ext1                                      
-	 (0 %) at 0 MB/s       
-	Total entries processed : 5179
-	Read Calls              : 21                                                          
-	Read Speed              : 5.8 MB/s                                                    
-	Read Size               : 9.8 MB                                                      
-	Read Percent            : 74.2 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.3 s                                                       
-===  main.py
-	Processing dataset (15/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_120to170                                             
-	 (0 %) at 0 MB/s       
-	Total entries processed : 725
-	Read Calls              : 14                                                          
-	Read Speed              : 3.1 MB/s                                                    
-	Read Size               : 4.6 MB                                                      
-	Read Percent            : 74.0 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (16/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_120to170_ext1                                        
-	 (0 %) at 0 MB/s       
-	Total entries processed : 612
-	Read Calls              : 14                                                          
-	Read Speed              : 2.6 MB/s                                                    
-	Read Size               : 3.8 MB                                                      
-	Read Percent            : 78.5 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.2 s                                                       
-===  main.py
-	Processing dataset (17/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_1400to1800                                           
-	 (0 %) at 0 MB/s       
-	Total entries processed : 387
-	Read Calls              : 14                                                          
-	Read Speed              : 1.9 MB/s                                                    
-	Read Size               : 2.9 MB                                                      
-	Read Percent            : 84.6 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.3 s                                                       
-===  main.py
-	Processing dataset (18/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_1400to1800_ext1                                      
-	 (0 %) at 0 MB/s       
-	Total entries processed : 2484
-	Read Calls              : 21                                                          
-	Read Speed              : 6.2 MB/s                                                    
-	Read Size               : 9.2 MB                                                      
-	Read Percent            : 78.1 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.2 s                                                       
-===  main.py
-	Processing dataset (19/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_15to30                                               
-	 (0 %) at 0 MB/s       
-	Total entries processed : 83
-	Read Calls              : 14                                                          
-	Read Speed              : 1.3 MB/s                                                    
-	Read Size               : 1.7 MB                                                      
-	Read Percent            : 82.4 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (20/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_170to300                                             
-	 (0 %) at 0 MB/s       
-	Total entries processed : 1051
-	Read Calls              : 15                                                          
-	Read Speed              : 3.8 MB/s                                                    
-	Read Size               : 6.8 MB                                                      
-	Read Percent            : 74.2 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.3 s                                                       
-===  main.py
-	Processing dataset (21/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_170to300_ext1                                        
-	 (0 %) at 0 MB/s       
-	Total entries processed : 1150
-	Read Calls              : 15                                                          
-	Read Speed              : 4.4 MB/s                                                    
-	Read Size               : 6.7 MB                                                      
-	Read Percent            : 83.4 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.3 s                                                       
-===  main.py
-	Processing dataset (22/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_1800to2400                                           
-	 (0 %) at 0 MB/s       
-	Total entries processed : 462
-	Read Calls              : 14                                                          
-	Read Speed              : 2.7 MB/s                                                    
-	Read Size               : 3.5 MB                                                      
-	Read Percent            : 81.9 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (23/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_1800to2400_ext1                                      
-	 (0 %) at 0 MB/s       
-	Total entries processed : 1900
-	Read Calls              : 15                                                          
-	Read Speed              : 6.1 MB/s                                                    
-	Read Size               : 9.2 MB                                                      
-	Read Percent            : 76.4 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (24/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_2400to3200                                           
-	 (0 %) at 0 MB/s       
-	Total entries processed : 563
-	Read Calls              : 14                                                          
-	Read Speed              : 2.6 MB/s                                                    
-	Read Size               : 4.2 MB                                                      
-	Read Percent            : 68.2 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (25/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_2400to3200_ext1                                      
-	 (0 %) at 0 MB/s       
-	Total entries processed : 758
-	Read Calls              : 14                                                          
-	Read Speed              : 3.6 MB/s                                                    
-	Read Size               : 5.7 MB                                                      
-	Read Percent            : 70.2 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (26/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_300to470                                             
-	 (0 %) at 0 MB/s       
-	Total entries processed : 917
-	Read Calls              : 14                                                          
-	Read Speed              : 4.8 MB/s                                                    
-	Read Size               : 6.6 MB                                                      
-	Read Percent            : 83.0 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (27/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_300to470_ext1                                        
-	 (0 %) at 0 MB/s       
-	Total entries processed : 4342
-	Read Calls              : 15                                                          
-	Read Speed              : 5.2 MB/s                                                    
-	Read Size               : 9.0 MB                                                      
-	Read Percent            : 73.6 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.3 s                                                       
-===  main.py
-	Processing dataset (28/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_30to50                                               
-	 (0 %) at 0 MB/s       
-	Total entries processed : 129
-	Read Calls              : 14                                                          
-	Read Speed              : 1.0 MB/s                                                    
-	Read Size               : 1.2 MB                                                      
-	Read Percent            : 87.7 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (29/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_3200toInf                                            
-	 (0 %) at 0 MB/s       
-	Total entries processed : 577
-	Read Calls              : 14                                                          
-	Read Speed              : 2.3 MB/s                                                    
-	Read Size               : 4.5 MB                                                      
-	Read Percent            : 66.1 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.3 s                                                       
-===  main.py
-	Processing dataset (30/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_470to600                                             
-	 (0 %) at 0 MB/s       
-	Total entries processed : 1328
-	Read Calls              : 15                                                          
-	Read Speed              : 5.6 MB/s                                                    
-	Read Size               : 7.6 MB                                                      
-	Read Percent            : 83.3 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (31/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_50to80                                               
-	 (0 %) at 0 MB/s       
-	Total entries processed : 459
-	Read Calls              : 14                                                          
-	Read Speed              : 1.9 MB/s                                                    
-	Read Size               : 2.8 MB                                                      
-	Read Percent            : 72.4 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (32/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_600to800                                             
-	 (0 %) at 0 MB/s       
-	Total entries processed : 1745
-	Read Calls              : 15                                                          
-	Read Speed              : 5.1 MB/s                                                    
-	Read Size               : 7.9 MB                                                      
-	Read Percent            : 73.9 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (33/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_600to800_ext1                                        
-	 (0 %) at 0 MB/s       
-	Total entries processed : 4259
-	Read Calls              : 47                                                          
-	Read Speed              : 5.8 MB/s                                                    
-	Read Size               : 9.8 MB                                                      
-	Read Percent            : 81.7 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.4 s                                                       
-===  main.py
-	Processing dataset (34/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_800to1000                                            
-	 (0 %) at 0 MB/s       
-	Total entries processed : 2240
-	Read Calls              : 21                                                          
-	Read Speed              : 5.4 MB/s                                                    
-	Read Size               : 8.6 MB                                                      
-	Read Percent            : 75.8 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.2 s                                                       
-===  main.py
-	Processing dataset (35/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_800to1000_ext1                                       
-	 (0 %) at 0 MB/s       
-	Total entries processed : 8928
-	Read Calls              : 21                                                          
-	Read Speed              : 5.6 MB/s                                                    
-	Read Size               : 12.1 MB                                                     
-	Read Percent            : 64.4 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.4 s                                                       
-===  main.py
-	Processing dataset (36/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_80to120                                              
-	 (0 %) at 0 MB/s       
-	Total entries processed : 578
-	Read Calls              : 14                                                          
-	Read Speed              : 2.2 MB/s                                                    
-	Read Size               : 3.4 MB                                                      
-	Read Percent            : 73.0 %                                                      
-	Real time               : [1;34m0:00:02 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (37/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : QCD_Pt_80to120_ext2                                         
-	 (0 %) at 0 MB/s       
-	Total entries processed : 605
-	Read Calls              : 14                                                          
-	Read Speed              : 2.9 MB/s                                                    
-	Read Size               : 3.7 MB                                                      
-	Read Percent            : 84.3 %                                                      
-	Real time               : [1;34m0:00:01 (h:mm:ss)[0;0m                              
-	CPU time                : 1.1 s                                                       
-===  main.py
-	Processing dataset (38/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : ST_s_channel_4f_InclusiveDecays                             
-	 (0 %) at 0 MB/s       	Estimated time          : 00:09  (11.2 %) at 19.6 MB/s       	Estimated time          : 00:07  (22.4 %) at 14.5 MB/s       	Estimated time          : 00:06  (33.6 %) at 11.9 MB/s       	Estimated time          : 00:04  (44.8 %) at 13.4 MB/s       	Estimated time          : 00:03  (56 %) at 20.8 MB/s       	Estimated time          : 00:02  (67.2 %) at 17 MB/s       	Estimated time          : 00:01  (78.4 %) at 11.6 MB/s       	Estimated time          : 00:00  (89.6 %) at 13.6 MB/s       
-	Total entries processed : 178574
-	Read Calls              : 41                                                          
-	Read Speed              : 13.6 MB/s                                                   
-	Read Size               : 136.1 MB                                                    
-	Read Percent            : 83.0 %                                                      
-	Real time               : [1;34m0:00:10 (h:mm:ss)[0;0m                              
-	CPU time                : 8.3 s                                                       
-===  main.py
-	Processing dataset (39/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : ST_tW_antitop_5f_inclusiveDecays                            
-	 (0 %) at 0 MB/s       	Estimated time          : 00:15  (16.92 %) at 10 MB/s       	Estimated time          : 00:13  (33.84 %) at 7.64 MB/s       	Estimated time          : 00:08  (50.76 %) at 6.39 MB/s       	Estimated time          : 00:05  (67.68 %) at 6.88 MB/s       	Estimated time          : 00:02  (84.6 %) at 7.08 MB/s       
-	Total entries processed : 118198
-	Read Calls              : 278                                                         
-	Read Speed              : 7.1 MB/s                                                    
-	Read Size               : 123.5 MB                                                    
-	Read Percent            : 39.3 %                                                      
-	Real time               : [1;34m0:00:17 (h:mm:ss)[0;0m                              
-	CPU time                : 6.8 s                                                       
-===  main.py
-	Processing dataset (40/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : ST_tW_antitop_5f_inclusiveDecays_ext1                       
-	 (0 %) at 0 MB/s       	Estimated time          : 01:27  (2.447 %) at 38.4 MB/s       	Estimated time          : 01:12  (4.893 %) at 43.5 MB/s       	Estimated time          : 01:08  (7.34 %) at 42.9 MB/s       	Estimated time          : 01:04  (9.786 %) at 44.6 MB/s       	Estimated time          : 01:02  (12.23 %) at 36.6 MB/s       	Estimated time          : 01:00  (14.68 %) at 45.2 MB/s       	Estimated time          : 00:57  (17.13 %) at 45.6 MB/s       	Estimated time          : 00:55  (19.57 %) at 43 MB/s       	Estimated time          : 00:54  (22.02 %) at 40.5 MB/s       	Estimated time          : 00:52  (24.47 %) at 44.3 MB/s       	Estimated time          : 00:50  (26.91 %) at 42.2 MB/s       	Estimated time          : 00:48  (29.36 %) at 42.6 MB/s       	Estimated time          : 00:46  (31.8 %) at 45.5 MB/s       	Estimated time          : 00:45  (34.25 %) at 43 MB/s       	Estimated time          : 00:43  (36.7 %) at 43.6 MB/s       	Estimated time          : 00:41  (39.14 %) at 46.4 MB/s       	Estimated time          : 00:40  (41.59 %) at 40.9 MB/s       	Estimated time          : 00:38  (44.04 %) at 40.1 MB/s       	Estimated time          : 00:36  (46.48 %) at 45.1 MB/s       	Estimated time          : 00:34  (48.93 %) at 45.3 MB/s       	Estimated time          : 00:33  (51.38 %) at 39.4 MB/s       	Estimated time          : 00:31  (53.82 %) at 47 MB/s       	Estimated time          : 00:29  (56.27 %) at 43.6 MB/s       	Estimated time          : 00:28  (58.72 %) at 43.1 MB/s       	Estimated time          : 00:26  (61.16 %) at 47.1 MB/s       	Estimated time          : 00:24  (63.61 %) at 45.1 MB/s       	Estimated time          : 00:23  (66.06 %) at 47.7 MB/s       	Estimated time          : 00:21  (68.5 %) at 44 MB/s       	Estimated time          : 00:19  (70.95 %) at 46.6 MB/s       	Estimated time          : 00:18  (73.4 %) at 42.2 MB/s       	Estimated time          : 00:16  (75.84 %) at 44.3 MB/s       	Estimated time          : 00:14  (78.29 %) at 43.3 MB/s       	Estimated time          : 00:13  (80.73 %) at 45.4 MB/s       	Estimated time          : 00:11  (83.18 %) at 42.3 MB/s       	Estimated time          : 00:09  (85.63 %) at 38.7 MB/s       	Estimated time          : 00:08  (88.07 %) at 48 MB/s       	Estimated time          : 00:06  (90.52 %) at 43.4 MB/s       	Estimated time          : 00:04  (92.97 %) at 46.3 MB/s       	Estimated time          : 00:03  (95.41 %) at 46.3 MB/s       	Estimated time          : 00:01  (97.86 %) at 37.9 MB/s       
-	Total entries processed : 817492
-	Read Calls              : 1576                                                        
-	Read Speed              : 42.6 MB/s                                                   
-	Read Size               : 2941.4 MB                                                   
-	Read Percent            : 67.3 %                                                      
-	Real time               : [1;34m0:01:09 (h:mm:ss)[0;0m                              
-	CPU time                : 46.4 s                                                      
-===  main.py
-	Processing dataset (41/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : ST_tW_top_5f_inclusiveDecays                                
-	 (0 %) at 0 MB/s       	Estimated time          : 00:06  (17.05 %) at 21 MB/s       	Estimated time          : 00:04  (34.1 %) at 9.97 MB/s       	Estimated time          : 00:03  (51.16 %) at 15.5 MB/s       	Estimated time          : 00:02  (68.21 %) at 16.2 MB/s       	Estimated time          : 00:01  (85.26 %) at 12.9 MB/s       
-	Total entries processed : 117289
-	Read Calls              : 280                                                         
-	Read Speed              : 12.6 MB/s                                                   
-	Read Size               : 102.0 MB                                                    
-	Read Percent            : 80.9 %                                                      
-	Real time               : [1;34m0:00:08 (h:mm:ss)[0;0m                              
-	CPU time                : 6.6 s                                                       
-===  main.py
-	Processing dataset (42/80)
-	UsePUweights            : 1                                                           
-	UseTopPtCorrection      : 0                                                           
-	Dataset                 : ST_tW_top_5f_inclusiveDecays_ext1                           
-	 (0 %) at 0 MB/s       	Estimated time          : 01:06  (2.435 %) at 14.9 MB/s       	Estimated time          : 01:16  (4.87 %) at 9.23 MB/s       	Estimated time          : 01:08  (7.305 %) at 9.41 MB/s       	Estimated time          : 01:12  (9.741 %) at 8.14 MB/s       	Estimated time          : 01:04  (12.18 %) at 5.34 MB/s       	Estimated time          : 01:05  (14.61 %) at 14.5 MB/s       	Estimated time          : 01:04  (17.05 %) at 8.26 MB/s       	Estimated time          : 01:00  (19.48 %) at 7.56 MB/s       	Estimated time          : 00:59  (21.92 %) at 10.4 MB/s       	Estimated time          : 00:57  (24.35 %) at 10.7 MB/s       	Estimated time          : 00:55  (26.79 %) at 9.06 MB/s       	Estimated time          : 00:54  (29.22 %) at 9.44 MB/s       	Estimated time          : 00:51  (31.66 %) at 9.74 MB/s       	Estimated time          : 00:50  (34.09 %) at 10.5 MB/s       	Estimated time          : 00:48  (36.53 %) at 9.96 MB/s       	Estimated time          : 00:46  (38.96 %) at 12.4 MB/s       	Estimated time          : 00:44  (41.4 %) at 11.7 MB/s       	Estimated time          : 00:41  (43.83 %) at 12.3 MB/s       	Estimated time          : 00:39  (46.27 %) at 15.5 MB/s       	Estimated time          : 00:37  (48.7 %) at 15 MB/s       	Estimated time          : 00:35  (51.14 %) at 11.7 MB/s       	Estimated time          : 00:33  (53.57 %) at 18.6 MB/s       	Estimated time          : 00:31  (56.01 %) at 13.6 MB/s       	Estimated time          : 00:29  (58.44 %) at 15 MB/s       	Estimated time          : 00:27  (60.88 %) at 13.2 MB/s       	Estimated time          : 00:25  (63.31 %) at 10.2 MB/s       	Estimated time          : 00:23  (65.75 %) at 14.8 MB/s       	Estimated time          : 00:21  (68.18 %) at 12.1 MB/s       	Estimated time          : 00:19  (70.62 %) at 16.3 MB/s       	Estimated time          : 00:18  (73.05 %) at 18.9 MB/s       
- *** Break *** segmentation violation
-
-
-
-===========================================================
-There was a crash.
-This is the entire stack trace of all threads:
-===========================================================
-
-Thread 6 (Thread 0x7fbaf847b700 (LWP 7128)):
-#0  0x00000031d1ae9243 in epoll_wait () from /lib64/libc.so.6
-#1  0x00007fbaf88403e2 in XrdSys::IOEvents::PollE::Begin(XrdSysSemaphore*, int&, char const**) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#2  0x00007fbaf883cc2d in XrdSys::IOEvents::BootStrap::Start(void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#3  0x00007fbaf883b447 in XrdSysThread_Xeq () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#4  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#5  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 5 (Thread 0x7fbaf7a7a700 (LWP 7129)):
-#0  0x00000031d220f00d in nanosleep () from /lib64/libpthread.so.0
-#1  0x00007fbaf883bbdb in XrdSysTimer::Wait(int) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#2  0x00007fbaf86fdf11 in XrdCl::TaskManager::RunTasks() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00007fbaf86fe079 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#4  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#5  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 4 (Thread 0x7fbaf7079700 (LWP 7130)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 3 (Thread 0x7fbaf6678700 (LWP 7131)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 2 (Thread 0x7fbaf5c77700 (LWP 7132)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 1 (Thread 0x7fbb0ad2f700 (LWP 7099)):
-#0  0x00000031d1aac8dd in waitpid () from /lib64/libc.so.6
-#1  0x00000031d1a3e4e9 in do_system () from /lib64/libc.so.6
-#2  0x00000031d1a3e820 in system () from /lib64/libc.so.6
-#3  0x00007fbb04223c2a in TUnixSystem::StackTrace() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#4  0x00007fbb04225bfc in TUnixSystem::DispatchSignals(ESignals) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#5  <signal handler called>
-#6  0x00007fbaf9e7dce9 in Particle<JetCollection>::polarP4() const () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#7  0x00007fbaf9f44151 in TopSelectionBDT::privateAnalyze(Event const&, std::vector<Jet, std::allocator<Jet> >, std::vector<Jet, std::allocator<Jet> >) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#8  0x00007fbaf9f47141 in TopSelectionBDT::analyze(Event const&, JetSelection::Data const&, BJetSelection::Data const&) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#9  0x00007fbaf9f9af3d in Hplus2hwAnalysis::process(long long) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#10 0x00007fbaf9f97c4f in SelectorImpl::Process(long long) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#11 0x00007fbaf8fbfcb8 in TTreePlayer::Process(TSelector*, char const*, long long, long long) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libTreePlayer.so
-#12 0x00007fbaf48a209f in __cf_44 ()
-#13 0x00007fbb04a102b1 in FastCall(long, void*, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#14 0x00007fbb04a10e90 in Cppyy::CallLL(long, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#15 0x00007fbb049f9e7f in PyROOT::TLongLongExecutor::Execute(long, void*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#16 0x00007fbb04a070bd in PyROOT::TMethodHolder::CallSafe(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#17 0x00007fbb04a05df5 in PyROOT::TMethodHolder::Execute(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#18 0x00007fbb04a04dd3 in PyROOT::TMethodHolder::Call(PyROOT::ObjectProxy*&, _object*, _object*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#19 0x00007fbb04a01d1b in PyROOT::(anonymous namespace)::mp_call(PyROOT::MethodProxy*, _object*, _object*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#20 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#21 0x00007fbb0ae5c40e in PyEval_EvalFrameEx () at Python/ceval.c:4239
-#22 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#23 0x00007fbb0ae5e19b in PyEval_EvalFrameEx () at Python/ceval.c:4117
-#24 0x00007fbb0ae5e2be in PyEval_EvalFrameEx () at Python/ceval.c:4107
-#25 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#26 0x00007fbb0ae5f7c9 in PyEval_EvalCode () at Python/ceval.c:667
-#27 0x00007fbb0ae834da in PyRun_FileExFlags () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#28 0x00007fbb0ae84a57 in PyRun_SimpleFileExFlags () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#29 0x00007fbb0ae9aab5 in Py_Main () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#30 0x00000031d1a1ed20 in __libc_start_main () from /lib64/libc.so.6
-#31 0x00000000004006b1 in _start ()
-===========================================================
-
-
-The lines below might hint at the cause of the crash.
-If they do not help you then please submit a bug report at
-http://root.cern.ch/bugs. Please post the ENTIRE stack trace
-from above as an attachment in addition to anything else
-that might help us fixing this issue.
-===========================================================
-#6  0x00007fbaf9e7dce9 in Particle<JetCollection>::polarP4() const () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#7  0x00007fbaf9f44151 in TopSelectionBDT::privateAnalyze(Event const&, std::vector<Jet, std::allocator<Jet> >, std::vector<Jet, std::allocator<Jet> >) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#8  0x00007fbaf9f47141 in TopSelectionBDT::analyze(Event const&, JetSelection::Data const&, BJetSelection::Data const&) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#9  0x00007fbaf9f9af3d in Hplus2hwAnalysis::process(long long) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#10 0x00007fbaf9f97c4f in SelectorImpl::Process(long long) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#11 0x00007fbaf8fbfcb8 in TTreePlayer::Process(TSelector*, char const*, long long, long long) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libTreePlayer.so
-#12 0x00007fbaf48a209f in __cf_44 ()
-#13 0x00007fbb04a102b1 in FastCall(long, void*, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#14 0x00007fbb04a10e90 in Cppyy::CallLL(long, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#15 0x00007fbb049f9e7f in PyROOT::TLongLongExecutor::Execute(long, void*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#16 0x00007fbb04a070bd in PyROOT::TMethodHolder::CallSafe(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#17 0x00007fbb04a05df5 in PyROOT::TMethodHolder::Execute(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#18 0x00007fbb04a04dd3 in PyROOT::TMethodHolder::Call(PyROOT::ObjectProxy*&, _object*, _object*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#19 0x00007fbb04a01d1b in PyROOT::(anonymous namespace)::mp_call(PyROOT::MethodProxy*, _object*, _object*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#20 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#21 0x00007fbb0ae5c40e in PyEval_EvalFrameEx () at Python/ceval.c:4239
-#22 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#23 0x00007fbb0ae5e19b in PyEval_EvalFrameEx () at Python/ceval.c:4117
-#24 0x00007fbb0ae5e2be in PyEval_EvalFrameEx () at Python/ceval.c:4107
-#25 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#26 0x00007fbb0ae5f7c9 in PyEval_EvalCode () at Python/ceval.c:667
-#27 0x00007fbb0ae834da in PyRun_FileExFlags () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#28 0x00007fbb0ae84a57 in PyRun_SimpleFileExFlags () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#29 0x00007fbb0ae9aab5 in Py_Main () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#30 0x00000031d1a1ed20 in __libc_start_main () from /lib64/libc.so.6
-#31 0x00000000004006b1 in _start ()
-===========================================================
-
-
-	Estimated time          : 00:34  (75.49 %) at 0.348 MB/s       	Estimated time          : 00:34  (75.73 %) at 0 MB/s       	Estimated time          : 00:33  (75.98 %) at 13.1 MB/s       	Estimated time          : 00:33  (76.22 %) at 0 MB/s       	Estimated time          : 00:33  (76.46 %) at 0 MB/s       	Estimated time          : 00:30  (77.92 %) at 9.72 MB/s       	Estimated time          : 00:27  (80.36 %) at 7.03 MB/s       	Estimated time          : 00:23  (82.79 %) at 7.05 MB/s       	Estimated time          : 00:19  (85.23 %) at 5.85 MB/s       	Estimated time          : 00:16  (87.66 %) at 13.1 MB/s       	Estimated time          : 00:13  (90.1 %) at 7.45 MB/s       	Estimated time          : 00:09  (92.53 %) at 5.96 MB/s       	Estimated time          : 00:06  (94.97 %) at 8.54 MB/s       	Estimated time          : 00:03  (97.41 %) at 9.31 MB/s       	Estimated time          : 00:00  (99.84 %) at 8.2 MB/s       	Estimated time          : 00:-2  (102.3 %) at 7.36 MB/s       	Estimated time          : 00:-5  (104.7 %) at 6.38 MB/s       	Estimated time          : 00:-9  (107.1 %) at 9.69 MB/s       	Estimated time          : 00:-12  (109.6 %) at 8.03 MB/s       	Estimated time          : 00:-14  (112 %) at 11.4 MB/s       	Estimated time          : 00:-17  (114.5 %) at 10.8 MB/s       	Estimated time          : 00:-20  (116.9 %) at 10.9 MB/s       	Estimated time          : 00:-23  (119.3 %) at 17.1 MB/s       	Estimated time          : 00:-25  (121.8 %) at 15.4 MB/s       	Estimated time          : 00:-28  (124.2 %) at 11.5 MB/s       	Estimated time          : 00:-31  (126.6 %) at 18 MB/s       	Estimated time          : 00:-33  (129.1 %) at 15.1 MB/s       	Estimated time          : 00:-36  (131.5 %) at 17 MB/s       	Estimated time          : 00:-38  (133.9 %) at 13.5 MB/s       	Estimated time          : 00:-40  (136.4 %) at 4.72 MB/s       	Estimated time          : 00:-43  (138.8 %) at 17.5 MB/s       	Estimated time          : 00:-45  (141.2 %) at 11.9 MB/s       	Estimated time          : 00:-47  (143.7 %) at 14.3 MB/s       	Estimated time          : 00:-50  (146.1 %) at 15.9 MB/s       
- *** Break *** segmentation violation
-
-
-
-===========================================================
-There was a crash.
-This is the entire stack trace of all threads:
-===========================================================
-
-Thread 6 (Thread 0x7fbaf847b700 (LWP 7128)):
-#0  0x00000031d1ae9243 in epoll_wait () from /lib64/libc.so.6
-#1  0x00007fbaf88403e2 in XrdSys::IOEvents::PollE::Begin(XrdSysSemaphore*, int&, char const**) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#2  0x00007fbaf883cc2d in XrdSys::IOEvents::BootStrap::Start(void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#3  0x00007fbaf883b447 in XrdSysThread_Xeq () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#4  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#5  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 5 (Thread 0x7fbaf7a7a700 (LWP 7129)):
-#0  0x00000031d220f00d in nanosleep () from /lib64/libpthread.so.0
-#1  0x00007fbaf883bbdb in XrdSysTimer::Wait(int) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#2  0x00007fbaf86fdf11 in XrdCl::TaskManager::RunTasks() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00007fbaf86fe079 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#4  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#5  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 4 (Thread 0x7fbaf7079700 (LWP 7130)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 3 (Thread 0x7fbaf6678700 (LWP 7131)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 2 (Thread 0x7fbaf5c77700 (LWP 7132)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 1 (Thread 0x7fbb0ad2f700 (LWP 7099)):
-#0  0x00000031d1aac8dd in waitpid () from /lib64/libc.so.6
-#1  0x00000031d1a3e4e9 in do_system () from /lib64/libc.so.6
-#2  0x00000031d1a3e820 in system () from /lib64/libc.so.6
-#3  0x00007fbb04223c2a in TUnixSystem::StackTrace() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#4  0x00007fbb04225bfc in TUnixSystem::DispatchSignals(ESignals) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#5  <signal handler called>
-#6  0x00007fbaf9e7dce9 in Particle<JetCollection>::polarP4() const () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#7  0x00007fbaf9f44151 in TopSelectionBDT::privateAnalyze(Event const&, std::vector<Jet, std::allocator<Jet> >, std::vector<Jet, std::allocator<Jet> >) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#8  0x00007fbaf9f47141 in TopSelectionBDT::analyze(Event const&, JetSelection::Data const&, BJetSelection::Data const&) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#9  0x00007fbaf9f9af3d in Hplus2hwAnalysis::process(long long) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#10 0x00007fbaf9f97c4f in SelectorImpl::Process(long long) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#11 0x00007fbaf8fbfcb8 in TTreePlayer::Process(TSelector*, char const*, long long, long long) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libTreePlayer.so
-#12 0x00007fbaf48a209f in __cf_44 ()
-#13 0x00007fbb04a102b1 in FastCall(long, void*, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#14 0x00007fbb04a10e90 in Cppyy::CallLL(long, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#15 0x00007fbb049f9e7f in PyROOT::TLongLongExecutor::Execute(long, void*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#16 0x00007fbb04a070bd in PyROOT::TMethodHolder::CallSafe(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#17 0x00007fbb04a05df5 in PyROOT::TMethodHolder::Execute(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#18 0x00007fbb04a04dd3 in PyROOT::TMethodHolder::Call(PyROOT::ObjectProxy*&, _object*, _object*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#19 0x00007fbb04a01877 in PyROOT::(anonymous namespace)::mp_call(PyROOT::MethodProxy*, _object*, _object*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#20 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#21 0x00007fbb0ae5c40e in PyEval_EvalFrameEx () at Python/ceval.c:4239
-#22 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#23 0x00007fbb0ae5e19b in PyEval_EvalFrameEx () at Python/ceval.c:4117
-#24 0x00007fbb0ae5e2be in PyEval_EvalFrameEx () at Python/ceval.c:4107
-#25 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#26 0x00007fbb0ae5f7c9 in PyEval_EvalCode () at Python/ceval.c:667
-#27 0x00007fbb0ae834da in PyRun_FileExFlags () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#28 0x00007fbb0ae84a57 in PyRun_SimpleFileExFlags () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#29 0x00007fbb0ae9aab5 in Py_Main () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#30 0x00000031d1a1ed20 in __libc_start_main () from /lib64/libc.so.6
-#31 0x00000000004006b1 in _start ()
-===========================================================
-
-
-The lines below might hint at the cause of the crash.
-If they do not help you then please submit a bug report at
-http://root.cern.ch/bugs. Please post the ENTIRE stack trace
-from above as an attachment in addition to anything else
-that might help us fixing this issue.
-===========================================================
-#6  0x00007fbaf9e7dce9 in Particle<JetCollection>::polarP4() const () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#7  0x00007fbaf9f44151 in TopSelectionBDT::privateAnalyze(Event const&, std::vector<Jet, std::allocator<Jet> >, std::vector<Jet, std::allocator<Jet> >) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#8  0x00007fbaf9f47141 in TopSelectionBDT::analyze(Event const&, JetSelection::Data const&, BJetSelection::Data const&) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#9  0x00007fbaf9f9af3d in Hplus2hwAnalysis::process(long long) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#10 0x00007fbaf9f97c4f in SelectorImpl::Process(long long) () from /uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/lib/libHPlusAnalysis.so
-#11 0x00007fbaf8fbfcb8 in TTreePlayer::Process(TSelector*, char const*, long long, long long) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libTreePlayer.so
-#12 0x00007fbaf48a209f in __cf_44 ()
-#13 0x00007fbb04a102b1 in FastCall(long, void*, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#14 0x00007fbb04a10e90 in Cppyy::CallLL(long, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#15 0x00007fbb049f9e7f in PyROOT::TLongLongExecutor::Execute(long, void*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#16 0x00007fbb04a070bd in PyROOT::TMethodHolder::CallSafe(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#17 0x00007fbb04a05df5 in PyROOT::TMethodHolder::Execute(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#18 0x00007fbb04a04dd3 in PyROOT::TMethodHolder::Call(PyROOT::ObjectProxy*&, _object*, _object*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#19 0x00007fbb04a01877 in PyROOT::(anonymous namespace)::mp_call(PyROOT::MethodProxy*, _object*, _object*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#20 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#21 0x00007fbb0ae5c40e in PyEval_EvalFrameEx () at Python/ceval.c:4239
-#22 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#23 0x00007fbb0ae5e19b in PyEval_EvalFrameEx () at Python/ceval.c:4117
-#24 0x00007fbb0ae5e2be in PyEval_EvalFrameEx () at Python/ceval.c:4107
-#25 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#26 0x00007fbb0ae5f7c9 in PyEval_EvalCode () at Python/ceval.c:667
-#27 0x00007fbb0ae834da in PyRun_FileExFlags () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#28 0x00007fbb0ae84a57 in PyRun_SimpleFileExFlags () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#29 0x00007fbb0ae9aab5 in Py_Main () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#30 0x00000031d1a1ed20 in __libc_start_main () from /lib64/libc.so.6
-#31 0x00000000004006b1 in _start ()
-===========================================================
-
-
-Traceback (most recent call last):
-  File "./run.py", line 350, in <module>
-    main()
-  File "./run.py", line 242, in main
-    process.run()
-  File "/uscms_data/d3/aattikis/workspace/cmssw/CMSSW_8_0_30/src/HiggsAnalysis/.python/HiggsAnalysis/NtupleAnalysis/main.py", line 651, in run
-    tchain.Process(tselector)
-TypeError: none of the 2 overloaded methods succeeded. Full details:
-  Long64_t TChain::Process(const char* filename, const char* option = "", Long64_t nentries = kMaxEntries, Long64_t firstentry = 0) =>
-    could not convert argument 1 (expected string or Unicode object, SelectorImpl found)
-  Long64_t TChain::Process(TSelector* selector, const char* option = "", Long64_t nentries = kMaxEntries, Long64_t firstentry = 0) =>
-    problem in C++; program state has been reset
-
- *** Break *** segmentation violation
-
-
-
-===========================================================
-There was a crash.
-This is the entire stack trace of all threads:
-===========================================================
-
-Thread 6 (Thread 0x7fbaf847b700 (LWP 7128)):
-#0  0x00000031d1ae9243 in epoll_wait () from /lib64/libc.so.6
-#1  0x00007fbaf88403e2 in XrdSys::IOEvents::PollE::Begin(XrdSysSemaphore*, int&, char const**) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#2  0x00007fbaf883cc2d in XrdSys::IOEvents::BootStrap::Start(void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#3  0x00007fbaf883b447 in XrdSysThread_Xeq () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#4  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#5  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 5 (Thread 0x7fbaf7a7a700 (LWP 7129)):
-#0  0x00000031d220f00d in nanosleep () from /lib64/libpthread.so.0
-#1  0x00007fbaf883bbdb in XrdSysTimer::Wait(int) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#2  0x00007fbaf86fdf11 in XrdCl::TaskManager::RunTasks() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00007fbaf86fe079 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#4  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#5  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 4 (Thread 0x7fbaf7079700 (LWP 7130)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 3 (Thread 0x7fbaf6678700 (LWP 7131)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 2 (Thread 0x7fbaf5c77700 (LWP 7132)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 1 (Thread 0x7fbb0ad2f700 (LWP 7099)):
-#0  0x00000031d1aac8dd in waitpid () from /lib64/libc.so.6
-#1  0x00000031d1a3e4e9 in do_system () from /lib64/libc.so.6
-#2  0x00000031d1a3e820 in system () from /lib64/libc.so.6
-#3  0x00007fbb04223c2a in TUnixSystem::StackTrace() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#4  0x00007fbb04225bfc in TUnixSystem::DispatchSignals(ESignals) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#5  <signal handler called>
-#6  0x00007fbb04149753 in TDirectory::RegisterContext(TDirectory::TContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#7  0x00007fbb0455cb1b in TDirectoryFile::Save() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#8  0x00007fbb0455aebc in TDirectoryFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#9  0x00007fbb045a89e4 in TFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#10 0x00007fbaf88adc77 in TNetXNGFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libNetxNG.so
-#11 0x00007fbb040a33a0 in (anonymous namespace)::R__ListSlowClose(TList*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#12 0x00007fbb040a3ede in TROOT::CloseFiles() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#13 0x00007fbb040a44c9 in TROOT::EndOfProcessCleanups() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#14 0x00007fbaf5230027 in __cf_366 ()
-#15 0x00007fbb04a102b1 in FastCall(long, void*, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#16 0x00007fbb049f9a3f in PyROOT::TVoidExecutor::Execute(long, void*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#17 0x00007fbb04a070bd in PyROOT::TMethodHolder::CallSafe(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#18 0x00007fbb04a05df5 in PyROOT::TMethodHolder::Execute(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#19 0x00007fbb04a04dd3 in PyROOT::TMethodHolder::Call(PyROOT::ObjectProxy*&, _object*, _object*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#20 0x00007fbb04a01fe1 in PyROOT::(anonymous namespace)::mp_call(PyROOT::MethodProxy*, _object*, _object*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#21 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#22 0x00007fbb0ae5c40e in PyEval_EvalFrameEx () at Python/ceval.c:4239
-#23 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#24 0x00007fbb0add9985 in function_call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#25 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#26 0x00007fbb0ae59aa3 in PyEval_EvalFrameEx () at Python/ceval.c:4334
-#27 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#28 0x00007fbb0add98bc in function_call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#29 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#30 0x00007fbb0ae582e7 in PyEval_CallObjectWithKeywords () at Python/ceval.c:3890
-#31 0x00007fbb0ae84257 in Py_Finalize () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#32 0x00007fbb0ae9a43f in Py_Main () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#33 0x00000031d1a1ed20 in __libc_start_main () from /lib64/libc.so.6
-#34 0x00000000004006b1 in _start ()
-===========================================================
-
-
-The lines below might hint at the cause of the crash.
-If they do not help you then please submit a bug report at
-http://root.cern.ch/bugs. Please post the ENTIRE stack trace
-from above as an attachment in addition to anything else
-that might help us fixing this issue.
-===========================================================
-#6  0x00007fbb04149753 in TDirectory::RegisterContext(TDirectory::TContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#7  0x00007fbb0455cb1b in TDirectoryFile::Save() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#8  0x00007fbb0455aebc in TDirectoryFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#9  0x00007fbb045a89e4 in TFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#10 0x00007fbaf88adc77 in TNetXNGFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libNetxNG.so
-#11 0x00007fbb040a33a0 in (anonymous namespace)::R__ListSlowClose(TList*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#12 0x00007fbb040a3ede in TROOT::CloseFiles() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#13 0x00007fbb040a44c9 in TROOT::EndOfProcessCleanups() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#14 0x00007fbaf5230027 in __cf_366 ()
-#15 0x00007fbb04a102b1 in FastCall(long, void*, void*, void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#16 0x00007fbb049f9a3f in PyROOT::TVoidExecutor::Execute(long, void*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#17 0x00007fbb04a070bd in PyROOT::TMethodHolder::CallSafe(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#18 0x00007fbb04a05df5 in PyROOT::TMethodHolder::Execute(void*, long, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#19 0x00007fbb04a04dd3 in PyROOT::TMethodHolder::Call(PyROOT::ObjectProxy*&, _object*, _object*, PyROOT::TCallContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#20 0x00007fbb04a01fe1 in PyROOT::(anonymous namespace)::mp_call(PyROOT::MethodProxy*, _object*, _object*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#21 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#22 0x00007fbb0ae5c40e in PyEval_EvalFrameEx () at Python/ceval.c:4239
-#23 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#24 0x00007fbb0add9985 in function_call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#25 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#26 0x00007fbb0ae59aa3 in PyEval_EvalFrameEx () at Python/ceval.c:4334
-#27 0x00007fbb0ae5f6a0 in PyEval_EvalCodeEx () at Python/ceval.c:3253
-#28 0x00007fbb0add98bc in function_call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#29 0x00007fbb0ada8133 in PyObject_Call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#30 0x00007fbb0ae582e7 in PyEval_CallObjectWithKeywords () at Python/ceval.c:3890
-#31 0x00007fbb0ae84257 in Py_Finalize () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#32 0x00007fbb0ae9a43f in Py_Main () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#33 0x00000031d1a1ed20 in __libc_start_main () from /lib64/libc.so.6
-#34 0x00000000004006b1 in _start ()
-===========================================================
-
-
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/python2.7/atexit.py", line 24, in _run_exitfuncs
-    func(*targs, **kargs)
-  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/ROOT.py", line 623, in cleanup
-    gROOT.EndOfProcessCleanups()
-SystemError: void TROOT::EndOfProcessCleanups() =>
-    problem in C++; program state has been reset
-Error in sys.exitfunc:
-
- *** Break *** segmentation violation
-
-
-
-===========================================================
-There was a crash.
-This is the entire stack trace of all threads:
-===========================================================
-
-Thread 6 (Thread 0x7fbaf847b700 (LWP 7128)):
-#0  0x00000031d1ae9243 in epoll_wait () from /lib64/libc.so.6
-#1  0x00007fbaf88403e2 in XrdSys::IOEvents::PollE::Begin(XrdSysSemaphore*, int&, char const**) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#2  0x00007fbaf883cc2d in XrdSys::IOEvents::BootStrap::Start(void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#3  0x00007fbaf883b447 in XrdSysThread_Xeq () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#4  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#5  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 5 (Thread 0x7fbaf7a7a700 (LWP 7129)):
-#0  0x00000031d220f00d in nanosleep () from /lib64/libpthread.so.0
-#1  0x00007fbaf883bbdb in XrdSysTimer::Wait(int) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdUtils.so.2
-#2  0x00007fbaf86fdf11 in XrdCl::TaskManager::RunTasks() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00007fbaf86fe079 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#4  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#5  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 4 (Thread 0x7fbaf7079700 (LWP 7130)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 3 (Thread 0x7fbaf6678700 (LWP 7131)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 2 (Thread 0x7fbaf5c77700 (LWP 7132)):
-#0  0x00000031d1ae5499 in syscall () from /lib64/libc.so.6
-#1  0x00007fbaf8756c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#2  0x00007fbaf8756df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2/lib/libXrdCl.so.2
-#3  0x00000031d2207aa1 in start_thread () from /lib64/libpthread.so.0
-#4  0x00000031d1ae8c4d in clone () from /lib64/libc.so.6
-
-Thread 1 (Thread 0x7fbb0ad2f700 (LWP 7099)):
-#0  0x00000031d1aac8dd in waitpid () from /lib64/libc.so.6
-#1  0x00000031d1a3e4e9 in do_system () from /lib64/libc.so.6
-#2  0x00000031d1a3e820 in system () from /lib64/libc.so.6
-#3  0x00007fbb04223c2a in TUnixSystem::StackTrace() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#4  0x00007fbb04225bfc in TUnixSystem::DispatchSignals(ESignals) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#5  <signal handler called>
-#6  0x00007fbb04149753 in TDirectory::RegisterContext(TDirectory::TContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#7  0x00007fbb0455cb1b in TDirectoryFile::Save() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#8  0x00007fbb0455aebc in TDirectoryFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#9  0x00007fbb045a89e4 in TFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#10 0x00007fbaf88adc77 in TNetXNGFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libNetxNG.so
-#11 0x00007fbaf88adf0f in TNetXNGFile::~TNetXNGFile() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libNetxNG.so
-#12 0x00007fbaf88ae119 in TNetXNGFile::~TNetXNGFile() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libNetxNG.so
-#13 0x00007fbb0490dd71 in TChain::~TChain() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libTree.so
-#14 0x00007fbb0490dea9 in TChain::~TChain() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libTree.so
-#15 0x00007fbb041fa903 in TClass::Destructor(void*, bool) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#16 0x00007fbb049f66cf in PyROOT::op_dealloc_nofree(PyROOT::ObjectProxy*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#17 0x00007fbb049f6819 in PyROOT::(anonymous namespace)::op_dealloc(PyROOT::ObjectProxy*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#18 0x00007fbb0ae0d072 in subtype_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#19 0x00007fbb0add8679 in frame_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#20 0x00007fbb0ae8c97b in tb_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#21 0x00007fbb0ae8c98b in tb_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#22 0x00007fbb0ae8c98b in tb_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#23 0x00007fbb0adedc17 in insertdict () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#24 0x00007fbb0adef157 in PyDict_SetItem () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#25 0x00007fbb0adf07a8 in PyDict_SetItemString () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#26 0x00007fbb0ae83fae in PyErr_PrintEx () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#27 0x00007fbb0ae843ae in Py_Finalize () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#28 0x00007fbb0ae9a43f in Py_Main () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#29 0x00000031d1a1ed20 in __libc_start_main () from /lib64/libc.so.6
-#30 0x00000000004006b1 in _start ()
-===========================================================
-
-
-The lines below might hint at the cause of the crash.
-If they do not help you then please submit a bug report at
-http://root.cern.ch/bugs. Please post the ENTIRE stack trace
-from above as an attachment in addition to anything else
-that might help us fixing this issue.
-===========================================================
-#6  0x00007fbb04149753 in TDirectory::RegisterContext(TDirectory::TContext*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#7  0x00007fbb0455cb1b in TDirectoryFile::Save() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#8  0x00007fbb0455aebc in TDirectoryFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#9  0x00007fbb045a89e4 in TFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libRIO.so
-#10 0x00007fbaf88adc77 in TNetXNGFile::Close(char const*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libNetxNG.so
-#11 0x00007fbaf88adf0f in TNetXNGFile::~TNetXNGFile() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libNetxNG.so
-#12 0x00007fbaf88ae119 in TNetXNGFile::~TNetXNGFile() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libNetxNG.so
-#13 0x00007fbb0490dd71 in TChain::~TChain() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libTree.so
-#14 0x00007fbb0490dea9 in TChain::~TChain() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libTree.so
-#15 0x00007fbb041fa903 in TClass::Destructor(void*, bool) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libCore.so
-#16 0x00007fbb049f66cf in PyROOT::op_dealloc_nofree(PyROOT::ObjectProxy*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#17 0x00007fbb049f6819 in PyROOT::(anonymous namespace)::op_dealloc(PyROOT::ObjectProxy*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.06.00/lib/libPyROOT.so
-#18 0x00007fbb0ae0d072 in subtype_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#19 0x00007fbb0add8679 in frame_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#20 0x00007fbb0ae8c97b in tb_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#21 0x00007fbb0ae8c98b in tb_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#22 0x00007fbb0ae8c98b in tb_dealloc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#23 0x00007fbb0adedc17 in insertdict () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#24 0x00007fbb0adef157 in PyDict_SetItem () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#25 0x00007fbb0adf07a8 in PyDict_SetItemString () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#26 0x00007fbb0ae83fae in PyErr_PrintEx () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#27 0x00007fbb0ae843ae in Py_Finalize () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#28 0x00007fbb0ae9a43f in Py_Main () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke/lib/libpython2.7.so.1.0
-#29 0x00000031d1a1ed20 in __libc_start_main () from /lib64/libc.so.6
-#30 0x00000000004006b1 in _start ()
-===========================================================
-
-

@@ -6,6 +6,8 @@ skim = cms.EDFilter("Hplus2hwAnalysisSkim",
     HLTPaths       = cms.vstring(
         "HLT_IsoMu24_v",
         "HLT_IsoTkMu24_v"
+        "HLT_Ele27_WPTight_Gsf_v",
+        "HLT_Ele27_eta2p1_WPTight_Gsf_v",
         ),
 
     # Jets (https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID#Recommendations_for_13_TeV_data)
