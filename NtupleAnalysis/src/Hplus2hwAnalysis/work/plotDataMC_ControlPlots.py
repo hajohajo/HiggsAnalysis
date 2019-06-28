@@ -172,6 +172,23 @@ def main(opts):
         histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(folder)        
         histoPaths = [os.path.join(folder, h) for h in histoList]
         myHistos   = []
+        skipList   = [
+            "counters",
+            "Weighting",
+            "ForDataDrivenCtrlPlots",
+            "ForDataDrivenCtrlPlotsEWKFakeB",
+            "ForDataDrivenCtrlPlotsEWKGenuineB",
+            "PUDependency",
+            "jetSelection_",
+            "bjetSelection_",
+            "eSelection_Veto",
+            "muSelection_",
+            "tauSelection_",
+            "metSelection_",
+            "topSelectionBDT_",
+            "config",
+            "NSelectedVsRunNumber",
+            ]
 
         # For-loop: All histograms
         for h in histoPaths:
@@ -187,6 +204,10 @@ def main(opts):
                 continue
             if "topEff_Vs_TopPt_Genuine" in h:
                 continue
+
+            if opts.folder == "":
+                if h in skipList:
+                    continue
             DataMCHistograms(datasetsMgr, h)
         
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)    
@@ -602,7 +623,7 @@ def GetHistoKwargs(h, opts):
         kwargs["rebinX"] = 5
         return kwargs
 
-    if "met" in h.lower():
+    if "met_" in h.lower():
         units            = "GeV"
         kwargs["rebinX"] =  systematics._dataDrivenCtrlPlotBinning["MET_AfterAllSelections"] #4
         kwargs["xlabel"] = "E_{T}^{miss} (%s)" % (units)
@@ -672,10 +693,12 @@ def GetHistoKwargs(h, opts):
         kwargs["moveLegend"] = _legSW
         kwargs["opts"]       = {"ymin": 1e0, "ymax": 1e9}
         if h == "counter":
-            xMin = 8.0
-            xMax = 23.0
+            xMin =  8.0
+            xMax = 25.0 # 26.0 is actual last. using 1 before because blinding fails there
             kwargs["opts"]   = {"xmin": xMin, "xmax": xMax, "ymin": 1e0, "ymax": 1e9}
             kwargs["moveLegend"] = _legNE
+            kwargs["blindingRangeString"] = "21-26"
+            kwargs["moveBlindedText"]     = {"dx": 0.0, "dy": 0.04, "dh": 0.0}
         else:
             kwargs["opts"]   = {"ymin": 1e0, "ymaxfactor": 10}
 
@@ -683,11 +706,26 @@ def GetHistoKwargs(h, opts):
         kwargs["rebinX"] = 4
 
     if "Mass" in h:
-        kwargs["rebinX"] = 4
-        kwargs["opts"]   = {"xmax": 400.0, "ymin": 1e-1, "ymaxfactor": 2}
-        units            = "GeV"
-        kwargs["xlabel"] = "m_{t} (%s)" % units
-        kwargs["ylabel"] = _yLabel + units
+        if "TransverseMass_" in h:
+            kwargs["rebinX"] = 2
+            kwargs["opts"]   = {"xmax": 1000.0, "ymin": 1e-1, "ymaxfactor": 2}
+            #kwargs["opts"]   = {"xmax": 1000.0, "ymin": 0.9e-3, "ymaxfactor": 2}
+            units            = "GeV"
+            #kwargs["divideByBinWidth"] = True
+            kwargs["ylabel"] = _yLabel + units
+        elif "TauTau" in h:
+            kwargs["rebinX"] = 2
+            kwargs["opts"]   = {"xmax": 500.0, "ymin": 1e-1, "ymaxfactor": 2}
+            units            = "GeV"
+            kwargs["ylabel"] = _yLabel + units
+            units            = "GeV"
+            kwargs["xlabel"] = "m_{vis} (%s)" % units
+        else:
+            kwargs["rebinX"] = 4
+            kwargs["opts"]   = {"xmax": 400.0, "ymin": 1e-1, "ymaxfactor": 2}
+            units            = "GeV"
+            kwargs["xlabel"] = "m_{t} (%s)" % units
+            kwargs["ylabel"] = _yLabel + units
 
     if "eta" in h.lower():
         kwargs["moveLegend"] = _legNE
@@ -803,9 +841,12 @@ def replaceBinLabels(p, histoName):
     '''
     myBinList = []
     if histoName == "counter" or histoName == "weighted/counter":
+        #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
+        #             "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
+        #             "b jets SF", "1 top" ]
         myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
                      "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
-                     "b jets SF", "1 top" ]
+                     "b jets SF", "E_{T}^{miss}","1 top", "top SF", "selected"]
     elif "bjet" in histoName:
         myBinList = ["All", "#eta", "p_{T}", "CSVv2 (M)", "Trg Match", "#geq 3"]
     elif "jet" in histoName:
