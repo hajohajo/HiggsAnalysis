@@ -289,7 +289,9 @@ datasetsSignalHW_MG_LO = []
 datasetsSignalHW_MG_LO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp350_mh150-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
 
 datasetsSignalHW_MG_NLO = []
-datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp300_mh200_noMatch_2-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp700_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp300_mh200_noMatch_2-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
 #datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m1500_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
 #datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_2-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
 #datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_3-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
@@ -750,15 +752,15 @@ hplus2tbAnalysisDatasets.extend(datasetsTTZToQQ)
 
 
 # Signal Analysis (HToHW)
-hplus2hwAnalysisDatasets = []
-hplus2hwAnalysisDatasets.extend(datasetsMuonData03Feb)
+hplus2hwAnalysisDatasets = [] 
 hplus2hwAnalysisDatasets.extend(datasetsSignalHW)
+hplus2hwAnalysisDatasets.extend(datasetsMuonData03Feb)
 hplus2hwAnalysisDatasets.extend(datasetsTop)
 hplus2hwAnalysisDatasets.extend(datasetsSingleTop)
 hplus2hwAnalysisDatasets.extend(datasetsDY)
 hplus2hwAnalysisDatasets.extend(datasetsWJets) #for doing the HT binned 0To70
 hplus2hwAnalysisDatasets.extend(datasetsWJetsHT)
-hplus2hwAnalysisDatasets.extend(datasetsZJetsToQQ)
+#hplus2hwAnalysisDatasets.extend(datasetsZJetsToQQ)
 hplus2hwAnalysisDatasets.extend(datasetsDiboson)
 hplus2hwAnalysisDatasets.extend(datasetsQCD)
 
