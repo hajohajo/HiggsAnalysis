@@ -251,6 +251,7 @@ def GetHistoKwargs(h, opts):
         "divideByBinWidth" : False, #True
         "log"              : logY,
         "moveLegend"       : _legNE,
+        "moveBlindedText"  : {"dx": -0.23, "dy": +0.08, "dh": 0.0},
         }
 
     kwargs = copy.deepcopy(_kwargs)
@@ -260,6 +261,7 @@ def GetHistoKwargs(h, opts):
         kwargs["rebinX"]     = 5
         kwargs["ylabel"]     = _yLabel + units
         kwargs["moveLegend"] = _legNE
+        kwargs["opts"]   = {"xmax": +800.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
     if "eta" in h.lower():
         kwargs["rebinX"] = 2
@@ -286,7 +288,7 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 400.0, "ymin": yMin, "ymaxfactor": yMaxF}
         kwargs["rebinX"] = 4
-        return kwargs
+        #return kwargs
 
     if "DeltaR" in h or "DeltaY" in h or "DR" in h:
         kwargs["ylabel"] = "Events / %.2f "
@@ -514,7 +516,7 @@ def GetHistoKwargs(h, opts):
             kwargs["opts"] = {"xmin": -1.2, "xmax": 1.2, "ymin": 1e-1, "ymaxfactor": yMaxF}
         if "pt" in h.lower() and "tau" in opts.folder.lower():
             kwargs["opts"] = {"xmin": -1.0, "xmax":1.0, "ymin": 1e-1, "ymaxfactor": yMaxF}
-        return kwargs
+        #return kwargs
 
     if h == "tauNpassed":
         units            = "GeV" #"GeV/c"
@@ -587,7 +589,7 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.5, "xmax": 2.0, "ymin": yMin, "ymaxfactor": yMaxF}
         kwargs["ratio"]  = False
         kwargs["rebinX"] = 5
-        return kwargs
+        #return kwargs
 
     if "met_" in h.lower():
         units            = "GeV"
@@ -650,10 +652,6 @@ def GetHistoKwargs(h, opts):
         kwargs["xlabel"] = "vertex multiplicity"
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 65.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
-    if "SubldgTrijetBjetPt" in h:
-        if "AllSelections" in h:
-            kwargs["opts"]   = {"xmin": 0.0, "xmax": 500.0, "ymin": yMin, "ymaxfactor": yMaxF}
-
     if "counters" in opts.folder.lower():
         kwargs["ratio"]      = True
         kwargs["moveLegend"] = _legSW
@@ -682,7 +680,7 @@ def GetHistoKwargs(h, opts):
             #kwargs["divideByBinWidth"] = True
         elif "TauTau" in h:
             kwargs["rebinX"] = 2
-            kwargs["opts"]   = {"xmax": 500.0, "ymin": 1e-1, "ymaxfactor": 2}
+            kwargs["opts"]   = {"xmax": 600.0, "ymin": 1e-1, "ymaxfactor": 2}
             kwargs["xlabel"] = "m_{vis} (%s)" % units
         elif "TrijetMass" in h:
             kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetMass_AfterAllSelections"] #2
@@ -707,16 +705,23 @@ def GetHistoKwargs(h, opts):
             units            = "GeV"
             kwargs["xlabel"] = "m_{?} (%s)" % units
             kwargs["ylabel"] = _yLabel + units
-            raise Exception("Unexpected histogram \"%s\"." % h)
+            #raise Exception("Unexpected histogram \"%s\"." % h)
+            Print("Unexpected histogram \"%s\"." % h, True)
 
     if "eta" in h.lower():
         kwargs["moveLegend"] = _legNE
         if "resolution" not in h.lower():
             kwargs["moveLegend"] = _legSE
 
-    
+    if "_AfterAllSelections" in h or "_AfterTopSelection" in h or "_AfterMetSelection" in h:
+        kwargs["blindingRangeString"] = "0-%s" % (5000)
+        kwargs["ratio"] = False
+
     if kwargs["divideByBinWidth"]:
         kwargs["ylabel"] = "<" + ["ylabel"] + ">"
+    
+    if  opts.folder == "ForDataDrivenCtrlPlotsEWKFakeB" or opts.folder == "ForDataDrivenCtrlPlotsEWKGenuineB":
+        kwargs["ratio"] = False
     return kwargs
     
 
