@@ -143,6 +143,30 @@ jetSelection = PSet(
 )
 
 #================================================================================================
+# Angular cuts / collinear
+#================================================================================================
+angularCutsCollinear = PSet(
+    nConsideredJets = 3,    # Number of highest-pt jets to consider (excluding jet corresponding to tau)
+    enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
+    cutValueJet1 = 0.0,   # Cut value in degrees (circular cut)
+    cutValueJet2 = 0.0,   # Cut value in degrees (circular cut)
+    cutValueJet3 = 0.0,   # Cut value in degrees (circular cut)
+    cutValueJet4 = 0.0,   # Cut value in degrees (circular cut)
+    )
+ 
+#================================================================================================
+# Angular cuts / back-to-back
+#================================================================================================
+angularCutsBackToBack = PSet(
+       nConsideredJets = 3,    # Number of highest-pt jets to consider (excluding jet corresponding to tau)
+enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
+        cutValueJet1 = 40.0,   # Cut value in degrees (circular cut)
+        cutValueJet2 = 40.0,   # Cut value in degrees (circular cut)
+        cutValueJet3 = 40.0,   # Cut value in degrees (circular cut)
+        cutValueJet4 = 40.0,   # Cut value in degrees (circular cut)
+)
+
+#================================================================================================
 # B-jet selection
 #================================================================================================
 bjetSelection = PSet(
@@ -319,8 +343,10 @@ allSelections = PSet(
     MuonSelection         = muonSelection,
     TauSelection          = tauSelection,
     JetSelection          = jetSelection,
+    AngularCutsCollinear  = angularCutsCollinear,
     BJetSelection         = bjetSelection,
     METSelection          = metSelection,
+    AngularCutsBackToBack = angularCutsBackToBack,
     TopSelectionBDT       = topSelectionBDT,
     # FatJetSelection       = fatjetVeto,
     #FakeBMeasurement      = fakeBMeasurement,

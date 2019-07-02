@@ -39,9 +39,11 @@ private:
   Count cFakeTauSFCounter;
   // Count cTauDMCounter;
   JetSelection fJetSelection;
+  AngularCutsCollinear fAngularCutsCollinear;
   BJetSelection fBJetSelection;
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
+  AngularCutsBackToBack fAngularCutsBackToBack;
   Count cTopTaggingSFCounter;
   TopSelectionBDT fTopSelection;
   // FatJetSelection fFatJetSelection;
@@ -86,9 +88,11 @@ Hplus2hwAnalysis::Hplus2hwAnalysis(const ParameterSet& config, const TH1* skimCo
     cFakeTauSFCounter(fEventCounter.addCounter("Fake #tau SF")),
     // cTauDMCounter(fEventCounter.addCounter("#tau DM")),
     fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cBTaggingSFCounter(fEventCounter.addCounter("b-tag SF")),
     fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
     fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
@@ -108,8 +112,10 @@ void Hplus2hwAnalysis::book(TDirectory *dir) {
   fMuonSelection.bookHistograms(dir);
   fTauSelection.bookHistograms(dir);
   fJetSelection.bookHistograms(dir);
+  fAngularCutsCollinear.bookHistograms(dir);
   fBJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
+  fAngularCutsBackToBack.bookHistograms(dir);
   fTopSelection.bookHistograms(dir);
   // fFatJetSelection.bookHistograms(dir);
 
@@ -227,7 +233,7 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   //================================================================================================   
   if (0) std::cout << "=== Tau Selection" << std::endl;
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
-  const METSelection::Data MetData = fMETSelection.silentAnalyze(fEvent, nVertices);
+  const METSelection::Data silentMetData = fMETSelection.silentAnalyze(fEvent, nVertices);
   if (!tauData.hasIdentifiedTaus() ) return;
   if (0) std::cout << "=== Tau Selection: Has Identified taus" << std::endl;
     
@@ -274,11 +280,10 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   // 7) Jet selection
   //================================================================================================
   if (0) std::cout << "=== Jet selection" << std::endl;
-  // const JetSelection::Data jetData = fJetSelection.analyzeWithoutTau(fEvent);
   const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau()); // fixme (only 1 tau is returned)
 
-  // Calculate transverse mass using MetData (not METData!)
-  double mT   = TransverseMass::reconstruct(tauData.getSelectedTaus()[0], tauData.getSelectedTaus()[1], muData.getSelectedMuons()[0], MetData.getMET());
+  // Calculate transverse mass using silentMetData (not MetData!)
+  double mT   = TransverseMass::reconstruct(tauData.getSelectedTaus()[0], tauData.getSelectedTaus()[1], muData.getSelectedMuons()[0], silentMetData.getMET());
   double mVis = (tauData.getSelectedTaus()[0].p4()  + tauData.getSelectedTaus()[1].p4()).M();
   hTauTauMass_AfterTauSelection->Fill(mVis);
   hTransverseMass_AfterTauSelection->Fill(mT);
@@ -290,6 +295,14 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   hTauTauMass_AfterJetSelection->Fill(mVis);
   hTransverseMass_AfterJetSelection->Fill(mT);
  
+
+  //================================================================================================  
+  // Collinear angular cuts
+  //================================================================================================  
+  if (0) std::cout << "=== Angular Cuts (coll)" << std::endl;
+  const AngularCutsCollinear::Data collinearData = fAngularCutsCollinear.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, silentMetData);
+  // if (!collinearData.passedSelection()) return;
+
   //================================================================================================  
   // 8) BJet selection
   //================================================================================================
@@ -311,28 +324,37 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   hTauTauMass_AfterBjetSelection->Fill(mVis);
   hTransverseMass_AfterBjetSelection->Fill(mT);
 
+  // Fill histos after StandardSelections
+  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, silentMetData, QuarkGluonLikelihoodRatio::Data(), topData, (isGenuineTau > 0));
+
   //================================================================================================
   // - MET selection
   //================================================================================================
   if (0) std::cout << "=== MET selection" << std::endl;
-  const METSelection::Data METData = fMETSelection.analyze(fEvent, nVertices);
-  if (!METData.passedSelection()) return;
+  const METSelection::Data MetData = fMETSelection.analyze(fEvent, nVertices);
+  if (!MetData.passedSelection()) return;
 
   // Fill Histos
   hTauTauMass_AfterMetSelection->Fill(mVis);
   hTransverseMass_AfterMetSelection ->Fill(mT);
 
   //================================================================================================
+  // Back-to-back angular cuts
+  //================================================================================================
+  if (0) std::cout << "=== Angular Cuts (b2b)" << std::endl;
+  const AngularCutsBackToBack::Data backToBackData = fAngularCutsBackToBack.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, MetData);
+  // if (!backToBackData.passedSelection()) return;
+
+
+  //================================================================================================
   // 10) Top selection
   //================================================================================================
   if (0) std::cout << "=== Top (BDT) selection" << std::endl;
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  // const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
 
   // Require at least 1 cleaned top candidate (no BDT threshold)
   if (topData.getAllCleanedTopsSize() < 1) return;
-
-  // Fill histos after StandardSelections
-  fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, METData, QuarkGluonLikelihoodRatio::Data(), topData, isGenuineTau);
 
   // Apply top selection
   if (!topData.passedSelection()) return;  

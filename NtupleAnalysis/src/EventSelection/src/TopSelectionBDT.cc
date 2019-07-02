@@ -1,4 +1,4 @@
-// -*- c++ -*-
+// -*- cut++ -*-
 #include "EventSelection/interface/TopSelectionBDT.h"
 
 #include "Framework/interface/ParameterSet.h"
@@ -731,10 +731,9 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
   // Fill output data
   //================================================================================================
   if (0) std::cout << "=== TopSelectionBDT:: Fill output" << std::endl;
-  bool bPass_MVA   = false;
   if (fAllCleanedTops.MVA.size() > 0) 
     {
-      bPass_MVA = cfg_TopMVACut.passedCut( fAllCleanedTops.MVA.at(0) );
+      output.bPassedSelection = cfg_TopMVACut.passedCut( fAllCleanedTops.MVA.at(0) );
       
       // Leading-in-MVA top
       output.fTopMVA      = fAllCleanedTops.MVA.at(0);
@@ -746,8 +745,6 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
     }
 
   // Fill in remaining data
-  output.bPassedSelection = bPass_MVA;
-
   for (size_t i = 0; i < fSelectedTops.MVA.size(); i++)
     {
       output.fSelectedTopsJet1.push_back(fSelectedTops.Jet1.at(i));
@@ -794,7 +791,7 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
   if (0) std::cout << "=== TopSelectionBDT:: Increment counters" << std::endl;
 
   //=== Apply cut on leading MVA top
-  if (!bPass_MVA) return output;
+  if (!output.bPassedSelection) return output;
   cSubPassedMVACut.increment();
   
   //=== Apply cut on number of tops with MVA score above threshold
