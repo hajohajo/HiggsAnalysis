@@ -624,7 +624,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   //================================================================================================
   if (cfg_Verbose) std::cout << "=== Electron veto" << std::endl;
   vector<genParticle> selectedElectrons = GetGenParticles(fEvent.genparticles().getGenParticles(), cfg_ElectronPtCut, cfg_ElectronEtaCut, 11, true, false);
-  if (0)
+  if (cfg_Verbose)
     {
       std::cout << "\nnElectrons = " << selectedElectrons.size() << std::endl;
       for (auto& p: selectedElectrons) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads), status = " << p.status() << std::endl;
@@ -638,7 +638,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   //================================================================================================
   if (cfg_Verbose) std::cout << "=== Muon selection" << std::endl;
   vector<genParticle> selectedMuons = GetGenParticles(fEvent.genparticles().getGenParticles(), cfg_MuonPtCut, cfg_MuonEtaCut, 13, true, false);
-  if (0)
+  if (cfg_Verbose)
     {
       std::cout << "nMuons = " << selectedMuons.size() << std::endl;
       for (auto& p: selectedMuons) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads), status = " << p.status() << std::endl;
@@ -651,7 +651,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   //================================================================================================
   if (cfg_Verbose) std::cout << "=== Tau selection" << std::endl;
   vector<genParticle> selectedTaus = GetGenParticles(fEvent.genparticles().getGenParticles(), cfg_TauPtCut, cfg_TauEtaCut, 15, true, false);
-  if (0)
+  if (cfg_Verbose)
     {
       std::cout << "nTaus = " << selectedTaus.size() << std::endl;
       for (auto& p: selectedTaus) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads), status = " << p.status() << std::endl;
@@ -665,7 +665,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   //================================================================================================
   if (cfg_Verbose) std::cout << "=== Jet Selection" << std::endl;
   vector<GenJet> selectedJets = GetGenJets(fEvent.genjets(), cfg_JetPtCuts, cfg_JetEtaCuts);
-  if (0)
+  if (cfg_Verbose)
     {
       std::cout << "nJets = " << selectedJets.size() << std::endl;
       for (auto& p: selectedJets) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads)" << std::endl;
@@ -702,7 +702,7 @@ void KinematicsHToHW::process(Long64_t entry) {
     }
   std::sort( selectedBQuarks.begin(), selectedBQuarks.end(), PtComparator() );  
 
-  if (0)
+  if (cfg_Verbose)
     {
       std::cout << "\nnBQuarks = " << selectedBQuarks.size() << std::endl;
       for (auto& p: selectedBQuarks)
@@ -714,7 +714,7 @@ void KinematicsHToHW::process(Long64_t entry) {
 
   // Match b-quarks with GenJets
   vector<GenJet> selectedBJets = GetGenJets(selectedJets, cfg_BJetPtCuts, cfg_BJetEtaCuts, selectedBQuarks);
-  if (0) 
+  if (cfg_Verbose)
     {
       std::cout << "nBJets = " << selectedBJets.size() << std::endl;
       for (auto& p: selectedBJets) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads)" << std::endl;
@@ -754,7 +754,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   //================================================================================================
   if (cfg_Verbose) std::cout << "=== MET Selection" << std::endl;
   if (!cfg_METCut.passedCut(fEvent.genMET().et())) return;
-  if (0) std::cout << "=== MET = " << fEvent.genMET().et() << std::endl;      
+  if (cfg_Verbose) std::cout << "=== MET = " << fEvent.genMET().et() << std::endl;      
   cMETSelection.increment();
 
 
@@ -961,7 +961,7 @@ void KinematicsHToHW::process(Long64_t entry) {
     row++;
 	       
 
-    if (0) std::cout << "=== taus" << std::endl;
+    if (cfg_Verbose) std::cout << "=== taus" << std::endl;
     if ( abs(genP_pdgId) == 15)
       {
 	
@@ -1019,7 +1019,7 @@ void KinematicsHToHW::process(Long64_t entry) {
       }// taus
   
 
-    if (0) std::cout << "=== t quarks" << std::endl;
+    if (cfg_Verbose) std::cout << "=== t quarks" << std::endl;
     if ( abs(genP_pdgId) == 6)
       {
 
@@ -1030,7 +1030,7 @@ void KinematicsHToHW::process(Long64_t entry) {
       } //tops
   
 
-    if (0) std::cout << "=== H+ or H- bosons-" << std::endl;
+    if (cfg_Verbose) std::cout << "=== H+ or H- bosons-" << std::endl;
     if ( abs(genP_pdgId) == 37)
       {
 	// Get last copy (after all radiative corrections)
@@ -1042,7 +1042,7 @@ void KinematicsHToHW::process(Long64_t entry) {
       } // Hpm
 	    
 
-    if (0) std::cout << "=== H0 or h0 bosons" << std::endl;
+    if (cfg_Verbose) std::cout << "=== H0 or h0 bosons" << std::endl;
     if ( (abs(genP_pdgId) == 25) || (abs(genP_pdgId) == 35) )// h0 = H0_{1}, H0 = H0_{2}
       {
 	// Get last copy (after all radiative corrections)
@@ -1054,7 +1054,7 @@ void KinematicsHToHW::process(Long64_t entry) {
       } // H0 or h0
     
 
-    if (0) std::cout << "=== W bosons" << std::endl;
+    if (cfg_Verbose) std::cout << "=== W bosons" << std::endl;
     if ( abs(genP_pdgId) == 24)
       {
 	// Get last copy (after all radiative corrections)
@@ -1194,7 +1194,7 @@ void KinematicsHToHW::process(Long64_t entry) {
 
       }// WBoson
 
-    if (0) std::cout << "=== b quarks" << std::endl;
+    if (cfg_Verbose) std::cout << "=== b quarks" << std::endl;
     if ( abs(genP_pdgId) == 5)
       {
 	// Get last copy (after all radiative corrections)
@@ -1243,7 +1243,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   ///////////////////////////////////////////////////////////////////////////
   // GenJets (selected)
   ///////////////////////////////////////////////////////////////////////////
-  if (0) std::cout << "=== GenJets" << std::endl;
+  if (cfg_Verbose) std::cout << "=== GenJets" << std::endl;
   double genP_HT = (bHt_HToHW_HBoson_Tau_p4.pt() + bHt_HToHW_HBoson_Antitau_p4.pt() 
 		    + bHt_HToHW_WBoson_Quark_p4.pt() + bHt_HToHW_WBoson_Antiquark_p4.pt() + bHt_HToHW_WBoson_Lepton_p4.pt() 
 		    + bHt_tWb_WBoson_Quark_p4.pt() + bHt_tWb_WBoson_Antiquark_p4.pt() + bHt_tWb_WBoson_Lepton_p4.pt() 
@@ -1496,7 +1496,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Fill TH1
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  if (0) std::cout << "=== Fill TH1" << std::endl;
+  if (cfg_Verbose) std::cout << "=== Fill TH1" << std::endl;
   if (selJets_p4.size() > 3) 
     {
       double jet1_Eta = selJets_p4.at(0).eta();

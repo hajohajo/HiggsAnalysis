@@ -9,16 +9,12 @@ USAGE:
 
 
 EXAMPLES:
-./plotTH2.py -m Hplus2tbAnalysis_3bjets40_MVA0p80_MVA0p80_TopMassCutOff600GeV_180112_023556 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset ChargedHiggs_HplusTB_HplusToTB_M_1000 --normalizeToLumi --logZ 
-./plotTH2.py -m Hplus2tbAnalysis_3bjets40_MVA0p80_MVA0p80_TopMassCutOff600GeV_180112_023556 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset TT --normalizeToOne --logZ 
-./plotTH2.py -m Hplus2tbAnalysis_3bjets40_MVA0p80_MVA0p80_TopMassCutOff600GeV_180112_023556 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeByCrossSection --logZ 
-./plotTH2.py -m Hplus2tbAnalysis_3bjets40_MVA0p80_MVA0p80_TopMassCutOff600GeV_180112_023556 --folder ForDataDrivenCtrlPlots --dataset TT --gridX --gridY --logY --logX
-./plotTH2.py -m Hplus2tbAnalysis_3bjets40_MVA0p80_MVA0p80_TopMassCutOff600GeV_180112_023556 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeToLumi --logZ --intLumi 100000
 ./plotTH2.py -m Hplus2tbAnalysis_3bjets40_MVA0p80_MVA0p80_TopMassCutOff600GeV_180112_023556 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeToLumi --logZ 
-
+./plotTH2.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeToLumi --logZ 
 
 LAST USED:
-./plotTH2.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeToLumi --logZ 
+./plotTH2.py -m Hplus2hwAnalysis_AngularCuts_No2016B_02July2019 --folder AngularCuts_Collinear --gridX --gridY --dataset TT --normalizeToOne --logZ
+./plotTH2.py -m Hplus2hwAnalysis_AngularCuts_No2016B_02July2019 --folder AngularCuts_BackToBack --gridX --gridY --dataset TT --normalizeToOne --logZ
 
 '''
 
@@ -197,8 +193,9 @@ def main(opts):
 
         # For-loop: All histograms
         for h in histoPaths:
-            if "_Vs_" not in h:
-                continue
+            #if "_Vs_" not in h:
+            #    continue
+            Print(h, True)
             Plot2dHistograms(datasetsMgr, h)
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)    
@@ -248,6 +245,31 @@ def GetHistoKwargs(h, opts):
         "moveLegend"       : {"dx": -2.0, "dy": 0.0, "dh": -100.0}, #hack to remove legend (tmp)
         "zlabel"           : zLabel
         }
+
+    if "Collinear" in h:
+        units             = "#circ"
+        # kwargs["xlabel"]  = "R_{coll}^{jet} " + units
+        kwargs["ylabel"]  = "#Delta#phi(jet,MET)"
+        #kwargs["cutBox"]  = cutBox
+        #kwargs["cutBoxY"] = cutBoxY
+        kwargs["rebinX"]  = 2
+        kwargs["rebinY"]  = 2
+        kwargs["opts"]    = {"xmax": +180.0, "ymax": 180}
+        #ROOT.gStyle.SetNdivisions(8, "X")
+        #ROOT.gStyle.SetNdivisions(8, "Y")
+
+    if "BackToBack" in h:
+        units             = "#circ"
+        #kwargs["xlabel"]  = "R_{}^{jet} " + units
+        kwargs["ylabel"]  = "#Delta#phi(jet,MET)"
+        #kwargs["cutBox"]  = cutBox
+        #kwargs["cutBoxY"] = cutBoxY
+        kwargs["rebinX"]  = 2
+        kwargs["rebinY"]  = 2
+        kwargs["opts"]    = {"xmax": +180.0, "ymax": 180}
+        #ROOT.gStyle.SetNdivisions(8, "X")
+        #ROOT.gStyle.SetNdivisions(8, "Y")        
+
 
     if "LdgTrijetPt_Vs_LdgTrijetDijetPt" in h:
         units             = "(GeV/c)"
@@ -368,7 +390,7 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "Hplus2tbAnalysis"
+    ANALYSISNAME = "Hplus2hwAnalysis"
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
     OPTMODE      = None
@@ -482,6 +504,7 @@ if __name__ == "__main__":
                       "eSelection_Veto", "muSelection_Veto", "tauSelection_Veto",
                       "ForDataDrivenCtrlPlotsEWKFakeB", "ForDataDrivenCtrlPlotsEWKGenuineB",
                       "jetSelection_", "bjetSelection_", "metSelection_", 
+                      "AngularCuts_Collinear", "AngularCuts_BackToBack",
                       "topologySelection_", "topbdtSelection_", "ForDataDrivenCtrlPlots"]
 
     if opts.folder not in allowedFolders:

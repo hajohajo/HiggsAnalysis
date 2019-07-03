@@ -178,6 +178,8 @@ def main(opts):
             "ForDataDrivenCtrlPlots",
             "ForDataDrivenCtrlPlotsEWKFakeB",
             "ForDataDrivenCtrlPlotsEWKGenuineB",
+            "AngularCuts_Collinear",
+            "AngularCuts_BackToBack",
             "PUDependency",
             "jetSelection_",
             "bjetSelection_",
@@ -281,14 +283,31 @@ def GetHistoKwargs(h, opts):
         if "BDT_Selected" in h:
             kwargs["moveLegend"] = _legNW
 
-    if "TopMass_" in h:
-        units            = "GeV"
-        kwargs["xlabel"] = "m_{t} (%s)" % units
+    if "CollinearAngularCuts" in h:
+        units = "#circ" #^{#circ}"
+        if "Jet" in h:
+            kwargs["xlabel"] = "R_{coll}^{jet} (%s)" % units
+            kwargs["moveLegend"] = _legNW
+        if "Minimum" in h:
+            kwargs["xlabel"] = "R_{coll}^{min} (%s)" % units                
+            kwargs["moveLegend"] = _legNE
         kwargs["ylabel"] = _yLabel + units
-        kwargs["cutBox"] = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": 400.0, "ymin": yMin, "ymaxfactor": yMaxF}
+        #kwargs["cutBox"] = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["rebinX"] = 4
-        #return kwargs
+        kwargs["opts"]   = {"ymin": yMin, "ymaxfactor": yMaxF*2.0}
+
+    if "BackToBackAngularCuts" in h:
+        units = "#circ" #^{#circ}"
+        if "Jet" in h:
+            kwargs["xlabel"] = "R_{bb}^{jet} (%s)" % units
+            kwargs["moveLegend"] = _legNW
+        if "Minimum" in h:
+            kwargs["xlabel"] = "R_{bb}^{min} (%s)" % units                
+            kwargs["moveLegend"] = _legNE
+        kwargs["ylabel"] = _yLabel + units
+        #kwargs["cutBox"] = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["rebinX"] = 4
+        kwargs["opts"]   = {"ymin": yMin, "ymaxfactor": yMaxF*2.0}
 
     if "DeltaR" in h or "DeltaY" in h or "DR" in h:
         kwargs["ylabel"] = "Events / %.2f "
@@ -314,7 +333,7 @@ def GetHistoKwargs(h, opts):
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "top multiplicity"
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +40.0, "ymin": yMin, "ymaxfactor": yMaxF}
-        kwargs["cutBox"] = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if h == "BDTGresponse":
         kwargs["rebinX"] = 1
@@ -384,28 +403,28 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": yMin, "ymaxfactor": yMaxF}
 
-    if "dgTrijetDiJetEta" in h:
+    if "DiJetEta" in h:
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "#eta"
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": yMin, "ymaxfactor": yMaxF}
         
-    if "dgTrijetDiJetPt" in h:
+    if "DiJetPt" in h:
         units            = "GeV" #"GeV/c"
         #kwargs["rebinX"] = 2
         kwargs["xlabel"] = "p_{T,jj}^{BDT} (%s)" % units
         kwargs["ylabel"] = _yLabel + units
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +800.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
-    if  "dgTrijetJet1Eta" in h or "ldgTrijetJet2Eta" in h:
+    if  "TopJet1Eta" in h or "ldgTrijetJet2Eta" in h:
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "#eta"
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": yMin, "ymaxfactor": yMaxF}
 
-    if  "ldgTrijetJet1Pt" in h or "ldgTrijetJet2Pt" in h:
+    if  "TopJet1Pt" in h or "ldgTrijetJet2Pt" in h:
         units            = "GeV" #"GeV" #"GeV/c"
         #kwargs["rebinX"] = 2
         kwargs["xlabel"] = "p_{T} (%s)" % units
@@ -413,19 +432,19 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 40.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +600.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
-    if "dgTrijetPt" in h:
+    if "TopPt" in h:
         ROOT.gStyle.SetNdivisions(8, "X")
         units            = "GeV" #"GeV" #"GeV/c"
         kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetPt_AfterAllSelections"]
         kwargs["xlabel"] = "p_{T} (%s)" % (units)
         kwargs["ylabel"] = _yLabel + units
 
-    if "nselectedcleanedtops" in h.lower():
+    if "nselectedcleaned" in h.lower():
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "top multiplicity"
         kwargs["ylabel"] = _yLabel
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +8.0, "ymin": yMin, "ymaxfactor": yMaxF}
-        kwargs["cutBox"] = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "topmultiplicity" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +8.0, "ymin": yMin, "ymaxfactor": yMaxF}
@@ -436,14 +455,14 @@ def GetHistoKwargs(h, opts):
         kwargs["xlabel"] = "top multiplicity"
         kwargs["ylabel"] = _yLabel
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +8.0, "ymin": yMin, "ymaxfactor": yMaxF}
-        kwargs["cutBox"] = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
 
     if "nallcleanedtops" in h.lower():
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "top multiplicity"
         kwargs["ylabel"] = _yLabel
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +8.0, "ymin": yMin, "ymaxfactor": yMaxF}
-        kwargs["cutBox"] = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
                 
     if "counters" in opts.folder:
         ROOT.gStyle.SetLabelSize(16.0, "X")
@@ -526,7 +545,7 @@ def GetHistoKwargs(h, opts):
 
     if "HT" in h or "JT" in h:
         ROOT.gStyle.SetNdivisions(8, "X")
-        kwargs["rebinX"] = 2 #systematics._dataDrivenCtrlPlotBinning["HT_AfterAllSelections"]
+        kwargs["rebinX"] = 5 #systematics._dataDrivenCtrlPlotBinning["HT_AfterAllSelections"]
         units            = "GeV"
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +1000.0, "ymin": yMin, "ymaxfactor": yMaxF}
         #kwargs["ylabel"] = "<%s>" % (_yLabel + units)
@@ -653,16 +672,18 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 65.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
     if "counters" in opts.folder.lower():
-        kwargs["ratio"]      = True
+        kwargs["ratio"]      = False
         kwargs["moveLegend"] = _legSW
         kwargs["opts"]       = {"ymin": 1e0, "ymax": 1e9}
         if h == "counter":
             xMin =  8.0
-            xMax = 25.0 # 26.0 is actual last. using 1 before because blinding fails there
-            kwargs["opts"]   = {"xmin": xMin, "xmax": xMax, "ymin": 1e0, "ymax": 1e9}
+            xMax = 27.0 # 26.0 is actual last. using 1 before because blinding fails there
+            #xMin =  8.0
+            #xMax = 25.0 # 26.0 is actual last. using 1 before because blinding fails there
+            kwargs["opts"]   = {"xmin": xMin, "xmax": xMax, "ymin": 1e0, "ymax": 5e9}
             kwargs["moveLegend"] = _legNE
-            kwargs["blindingRangeString"] = "21-26"
-            kwargs["moveBlindedText"]     = {"dx": 0.0, "dy": 0.04, "dh": 0.0}
+            kwargs["blindingRangeString"] = "0-100"
+            #kwargs["moveBlindedText"]     = {"dx": 0.0, "dy": 0.04, "dh": 0.0}
         else:
             kwargs["opts"]   = {"ymin": 1e0, "ymaxfactor": 10}
 
@@ -674,23 +695,14 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = _yLabel + units
 
         if "TransverseMass_" in h:
-            kwargs["rebinX"] = 2
+            kwargs["rebinX"] = 3
             kwargs["opts"]   = {"xmax": 1000.0, "ymin": 1e-1, "ymaxfactor": 2}
             #kwargs["opts"]   = {"xmax": 1000.0, "ymin": 0.9e-3, "ymaxfactor": 2}
             #kwargs["divideByBinWidth"] = True
         elif "TauTau" in h:
-            kwargs["rebinX"] = 2
+            kwargs["rebinX"] = 3
             kwargs["opts"]   = {"xmax": 600.0, "ymin": 1e-1, "ymaxfactor": 2}
             kwargs["xlabel"] = "m_{vis} (%s)" % units
-        elif "TrijetMass" in h:
-            kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetMass_AfterAllSelections"] #2
-            kwargs["xlabel"] = "m_{jjb} (%s)" % units
-            kwargs["cutBox"] = {"cutValue": 173.21, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        elif "dijetmass" in h.lower():
-            kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetDijetMass_AfterAllSelections"] #2
-            kwargs["xlabel"] = "m_{jj} (%s)" % units
-            kwargs["opts"]   = {"xmax": +300.0, "ymin": yMin, "ymaxfactor": yMaxF}
-            kwargs["cutBox"] = {"cutValue": 80.385, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         elif "TopMassWMassRatio" in h:
             units            = ""
             kwargs["rebinX"] = 2
@@ -699,6 +711,21 @@ def GetHistoKwargs(h, opts):
             kwargs["cutBox"] = {"cutValue": (173.21/80.385), "fillColor": 16, "box": False, "line": True, "greaterThan": True} 
             #if "AfterStandardSelections" in h:
             #    kwargs["opts"]   = {"xmin": 0.0, "xmax": +10.0, "ymin": yMin, "ymaxfactor": yMaxF}
+        elif "TopMass" in h:
+            kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetMass_AfterAllSelections"] #2
+            kwargs["xlabel"] = "m_{jjb} (%s)" % units
+            kwargs["cutBox"] = {"cutValue": 173.21, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            # units            = "GeV"
+            # kwargs["xlabel"] = "m_{t} (%s)" % units
+            # kwargs["ylabel"] = _yLabel + units
+            # kwargs["cutBox"] = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            kwargs["opts"]   = {"xmin": 0.0, "xmax": 500.0, "ymin": yMin, "ymaxfactor": yMaxF}
+            # kwargs["rebinX"] = 4
+        elif "dijetmass" in h.lower():
+            kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetDijetMass_AfterAllSelections"] #2
+            kwargs["xlabel"] = "m_{jj} (%s)" % units
+            kwargs["opts"]   = {"xmax": +300.0, "ymin": yMin, "ymaxfactor": yMaxF}
+            kwargs["cutBox"] = {"cutValue": 80.385, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         else:
             kwargs["rebinX"] = 4
             kwargs["opts"]   = {"xmax": 400.0, "ymin": 1e-1, "ymaxfactor": 2}
@@ -835,9 +862,12 @@ def replaceBinLabels(p, histoName):
         #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
         #             "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
         #             "b jets SF", "1 top" ]
+        #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
+        #             "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
+        #             "b jets SF", "E_{T}^{miss}","1 top", "top SF", "selected"]
         myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
-                     "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
-                     "b jets SF", "E_{T}^{miss}","1 top", "top SF", "selected"]
+                     "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "R_{coll}^{min}", "#geq 1 b jets",
+                     "b jets SF", "E_{T}^{miss}", "R_{bb}^{min}", "1 top", "selected"] # "top SF" = "selected"
     elif "bjet" in histoName:
         myBinList = ["All", "#eta", "p_{T}", "CSVv2 (M)", "Trg Match", "#geq 3"]
     elif "jet" in histoName:
