@@ -325,7 +325,7 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   hTransverseMass_AfterBjetSelection->Fill(mT);
 
   // Fill histos after StandardSelections
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData); // causes counter to be wrongly placed?
   fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, silentMetData, QuarkGluonLikelihoodRatio::Data(), topData, (isGenuineTau > 0));
 
   //================================================================================================

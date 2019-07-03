@@ -31,7 +31,8 @@ metFilter = PSet(
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
         "Flag_eeBadScFilter",
         "Flag_goodVertices",
-        "Flag_globalTightHalo2016Filter",
+        #"Flag_globalTightHalo2016Filter",
+        "Flag_globalSuperTightHalo2016Filter",
         "badPFMuonFilter",
         "badChargedCandidateFilter"]
     )
@@ -78,10 +79,10 @@ tauSelection = PSet(
     againstMuonDiscr     = "againstMuonLoose3",
     #isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
     #isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
-    #isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Mikko
+    isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Mikko
     #isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
     # isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits",
-    isolationDiscr       = "byMediumCombinedIsolationDeltaBetaCorr3Hits",
+    #isolationDiscr       = "byMediumCombinedIsolationDeltaBetaCorr3Hits",
     )
 
 

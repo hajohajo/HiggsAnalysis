@@ -1126,6 +1126,7 @@ void CommonPlots::fillControlPlotsAfterStandardSelections(const Event& event,
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopMassAfterStdSelections      , bIsGenuineB, fTopData.getTop().mass() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopMassWMassRatioAfterStdSelections, bIsGenuineB, fTopData.getTopMassWMassRatio() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopPt_Vs_TopDijetPtAfterStdSelections, bIsGenuineB, fTopData.getTop().pt(), fTopData.getTopDijet().pt());
+      // add MVA value
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBJetPtAfterStdSelections    , bIsGenuineB, fTopData.getTopBJet().p4().pt() ); 
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBJetEtaAfterStdSelections   , bIsGenuineB, fTopData.getTopBJet().p4().eta() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBJetBdiscAfterStdSelections , bIsGenuineB, fTopData.getTopBJet().bjetDiscriminator() );
