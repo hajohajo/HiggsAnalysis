@@ -17,11 +17,15 @@ endif
 #================================================================================================
 set INITIAL = `echo $USER | cut -c1-1`
 set MYDIR   = ${1}
+set DSETS   = "ST_"
+#set FORMATS = "png"
+set FORMATS = "png,pdf,C"
 
-./plot_1d.py -n --url -e "ST_|WW|WZ|ZZ|mH150|mH200" -s png,pdf -m ${MYDIR}
-./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s png,pdf -m ${MYDIR} -i "TT"
-./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s png,pdf -m ${MYDIR} -i "M1500_mH150"
-./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s png,pdf -m ${MYDIR} -i "M1500_mh125"
-./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s png,pdf -m ${MYDIR} -i "M300_mH200"
-./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s png,pdf -m ${MYDIR} -i "M350_mH150"
-./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s png,pdf -m ${MYDIR} -i "M350_mh125"
+./plot_1d.py -n --url -e $DSETS -s $FORMATS -m ${MYDIR}
+./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s $FORMATS -m ${MYDIR} -i "TT"
+./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s $FORMATS -m ${MYDIR} -i "M300_mH200"
+./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s $FORMATS -m ${MYDIR} -i "M700_mH200"
+#./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s $FORMATS -m ${MYDIR} -i "M700_mH200"
+#./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s $FORMATS -m ${MYDIR} -i "M300_mH200"
+#./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s $FORMATS -m ${MYDIR} -i "M350_mH150"
+#./plot_2d.py --normalizeToOne --url  --gridX --gridY --logZ -s $FORMATS -m ${MYDIR} -i "M350_mh125"

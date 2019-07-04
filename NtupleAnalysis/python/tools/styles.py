@@ -402,9 +402,9 @@ signalStyleHToTB220 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROO
 signalStyleHToTB250 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kAzure+6, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kAzure+6, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kAzure+6, fillStyle=0)])
-signalStyleHToTB300 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kTeal+3, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                   StyleLine(lineColor=ROOT.kTeal+3, lineStyle=ROOT.kDashed, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kTeal+3, fillStyle=0)])
+signalStyleHToTB300 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kOrange-3, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                   StyleLine(lineColor=ROOT.kOrange-3, lineStyle=ROOT.kDashed, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kOrange-3, fillStyle=0)])
 signalStyleHToTB350 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kTeal-4, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kTeal-4, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kTeal-4, fillStyle=0)])
