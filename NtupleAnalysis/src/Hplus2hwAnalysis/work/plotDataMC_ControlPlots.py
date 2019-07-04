@@ -282,7 +282,8 @@ def GetHistoKwargs(h, opts):
 
     if "BDT" in h:
         kwargs["ylabel"] = "Events / %.2f "
-        kwargs["cutBox"] = {"cutValue": 0.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": -0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        # kwargs["cutBox"] = {"cutValue": 0.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": -1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["rebinX"] = 2        
         if "BDT_Selected" in h:
@@ -331,6 +332,12 @@ def GetHistoKwargs(h, opts):
         kwargs["xlabel"] = "top multiplicity"
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +40.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
+    if "topbdt_NotSelectedCandidates" in h.lower():
+        kwargs["rebinX"] = 1
+        kwargs["xlabel"] = "top candidate multiplicity"
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": +15.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        return kwargs
 
     if h == "BDTGresponse":
         kwargs["rebinX"] = 1
@@ -418,10 +425,14 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
-    if "nalltops" in h.lower() or "allcandidates" in h.lower():
-        kwargs["rebinX"] = 1
+    if "nalltops" in h.lower() or "topbdt_allcandidates" in h.lower():
+        if "allcandidates" in h.lower():
+            kwargs["rebinX"] = 10
+        else:
+            kwargs["rebinX"] = 1
         kwargs["xlabel"] = "top multiplicity"
-        kwargs["ylabel"] = _yLabel
+        #kwargs["ylabel"] = _yLabel
+        kwargs["ylabel"] = "Events / %.1f "
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +15.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
 
@@ -611,7 +622,7 @@ def GetHistoKwargs(h, opts):
 
     if "Njets" in h:
         kwargs["xlabel"] = "jet multiplicity"
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": 12.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 3.0, "xmax": 12.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 3.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "vtx" in h.lower():
@@ -666,7 +677,7 @@ def GetHistoKwargs(h, opts):
             #if "AfterStandardSelections" in h:
             #    kwargs["opts"]   = {"xmin": 0.0, "xmax": +10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         elif "TopMass" in h:
-            kwargs["rebinX"] = 5 #systematics._dataDrivenCtrlPlotBinning["LdgTrijetMass_AfterAllSelections"] #2
+            kwargs["rebinX"] = 10 #systematics._dataDrivenCtrlPlotBinning["LdgTrijetMass_AfterAllSelections"] #2
             kwargs["xlabel"] = "m_{jjb} (%s)" % units
             kwargs["cutBox"] = {"cutValue": 173.21, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
             kwargs["opts"]   = {"xmin": 0.0, "xmax": 1000.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -680,10 +691,9 @@ def GetHistoKwargs(h, opts):
             kwargs["rebinX"] = 4
             kwargs["opts"]   = {"xmax": 400.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
             units            = "GeV"
-            kwargs["xlabel"] = "m_{?} (%s)" % units
+            kwargs["xlabel"] = "m_{jjb} (%s)" % units
             kwargs["ylabel"] = _yLabel + units
-            #raise Exception("Unexpected histogram \"%s\"." % h)
-            Print("Unexpected histogram \"%s\"." % h, True)
+            #Print("Unexpected histogram \"%s\"." % h, True)
 
     if "resolution" in h.lower():
         kwargs["moveLegend"] = _legCE

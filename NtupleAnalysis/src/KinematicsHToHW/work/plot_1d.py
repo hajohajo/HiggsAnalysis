@@ -11,10 +11,11 @@ USAGE:
 EXAMPLES:
 ./plot_1d.py -n --url -m KinematicsHToHW_190424_050703 && ./plot_2d.py --url --normalizeToOne --gridX --gridY --logZ -m KinematicsHToHW_190424_050703/
 ./plot_1d.py -n --url -m KinematicsHToHW_FullStats_BeforeTaus* && ./plot_2d.py --url --normalizeToOne --gridX --gridY --logZ -m KinematicsHToHW_FullStats_BeforeTaus*
+./plot_1d.py -n --url -m KinematicsHToHW_FullStats_22May2019 -e "M1500_mh125|M350_mh125" -s png,pdf,C && ./plot_2d.py --url --normalizeToOne --gridX --gridY --logZ -m KinematicsHToHW_FullStats_22May2019 -s png,pdf,C
 
 
 LAST USED:
-./plot_1d.py -n --url -m KinematicsHToHW_FullStats_22May2019 -e "M1500_mh125|M350_mh125" -s png,pdf,C && ./plot_2d.py --url --normalizeToOne --gridX --gridY --logZ -m KinematicsHToHW_FullStats_22May2019 -s png,pdf,C
+./plot_1d.py -n --url -i "Charged" -s png,pdf,C -m && ./plot_2d.py --url --normalizeToOne --gridX --gridY --logZ -s png,pdf,C -m 
 
 
 '''

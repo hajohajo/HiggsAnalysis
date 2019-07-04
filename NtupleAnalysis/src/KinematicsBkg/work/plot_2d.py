@@ -290,28 +290,25 @@ def GetHistoKwargs(h, opts):
         _kwargs["rebinX"]  =  1
         _kwargs["rebinY"]  =  1
         _kwargs["opts"]    = {"xmin": 30.0, "xmax": 300.0, "ymin": 30.0, "ymax": 300.0}
-#        _kwargs["cutBoxY"] = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True,
-#                              "mainCanvas": True, "ratioCanvas": False}
-#        _kwargs["cutBoxX"] = {"cutValue": 100.0, "fillColor": 16, "box": True, "line": True, "greaterThan": True} # does not work
-#
+
 
     if "Pt1_Vs_dR" in h:
-        _kwargs["rebinX"]  =  1
-        _kwargs["rebinY"]  =  1
+        _kwargs["rebinX"]  =  2
+        _kwargs["rebinY"]  =  2
         _kwargs["opts"]    = {"xmin": 30.0, "xmax": 500.0, "ymin": 0.0, "ymax": 4.0}
         _kwargs["cutBoxY"] = {"cutValue": 0.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True,
                               "mainCanvas": True, "ratioCanvas": False} # box = True not working       
 
     if "Pt2_Vs_dR" in h:
-        _kwargs["rebinX"]  =  1
-        _kwargs["rebinY"]  =  1
+        _kwargs["rebinX"]  =  2
+        _kwargs["rebinY"]  =  2
         _kwargs["opts"]    = {"xmin": 30.0, "xmax": 500.0, "ymin": 0.0, "ymax": 4.0}
         _kwargs["cutBoxY"] = {"cutValue": 0.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True,
                               "mainCanvas": True, "ratioCanvas": False} # box = True not working       
         
-    if "MET_dPhi_Vs_TauJet2_MET_dPhi" in h:
-        _kwargs["rebinX"]  =  1
-        _kwargs["rebinY"]  =  1
+    if "MET_dPhi_Vs_TauJet2_MET_dPhi" in h or "MET_dPhi_Vs_Muon1_MET_dPhi" in h:
+        _kwargs["rebinX"]  =  2
+        _kwargs["rebinY"]  =  2
         _kwargs["opts"]    = {"xmin": 0.0, "xmax": 3.2, "ymin": 0.0, "ymax": 3.2}
         _kwargs["cutBoxY"] = {"cutValue": 0.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True,
                               "mainCanvas": True, "ratioCanvas": False} # box = True not working       
@@ -323,8 +320,8 @@ def GetHistoKwargs(h, opts):
 
 
     if "dEta_Vs_dPhi" in h:
-        _kwargs["rebinX"]  =  1
-        _kwargs["rebinY"]  =  1
+        _kwargs["rebinX"]  =  2
+        _kwargs["rebinY"]  =  2
         _kwargs["opts"]    = {"xmin": 0.0, "xmax": 3.0, "ymin": 0.0, "ymax": 3.2}
 
 
