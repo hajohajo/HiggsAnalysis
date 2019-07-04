@@ -464,7 +464,7 @@ void KinematicsBkg::book(TDirectory *dir) {
   h_TauJets_Pt_Vs_MET    = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Pt_Vs_MET"   , ";p_{T}^{#tau_{h,1}} (GeV);E_{T}^{miss} (GeV)"      , nBinsPt, minPt, maxPt, 200, 0.0, 1000.0);
   h_TauJets_Eta_Vs_Eta   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Eta_Vs_Eta"  , ";#eta^{#tau_{h,1}};#eta^{#tau_{h,2}}"              , nBinsEta, minEta, maxEta, nBinsEta, minEta, maxEta);
   h_TauJets_Phi_Vs_Phi   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Phi_Vs_Phi"  , ";#phi^{#tau_{h,1}} (rads);#phi^{#tau_{h,2}} (rads)", nBinsPhi, minPhi, maxPhi, nBinsPhi, minPhi, maxPhi);
-  h_TauJets_dEta_Vs_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_dEta_Vs_dPhi", ";#Delta#eta(#tau_{h,1}, {#tau_{h,2}});#Delta#phi(#tau_{h,1}, {#tau_{h,2}}) (rads)", nBinsdEta, mindEta, maxdEta, nBinsdPhi, mindPhi, maxdPhi);
+  h_TauJets_dEta_Vs_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_dEta_Vs_dPhi", ";#Delta#eta(#tau_{h,1}, #tau_{h,2});#Delta#phi(#tau_{h,1}, #tau_{h,2}) (rads)", nBinsdEta, mindEta, maxdEta, nBinsdPhi, mindPhi, maxdPhi);
   h_TauJets_Pt1_Vs_dR    = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Pt1_Vs_dR"   , ";p_{T}^{#tau_{h,1}} (GeV);#DeltaR(#tau_{h,1}, #tau_{h,2})", nBinsPt, minPt, maxPt, nBinsdR, mindR, maxdR);  
   h_TauJets_Pt2_Vs_dR    = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "TauJets_Pt2_Vs_dR"   , ";p_{T}^{#tau_{h,2}} (GeV);#DeltaR(#tau_{h,1}, #tau_{h,2})", nBinsPt, minPt, maxPt, nBinsdR, mindR, maxdR);  
 

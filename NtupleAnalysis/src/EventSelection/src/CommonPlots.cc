@@ -463,7 +463,7 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
 						       fTopMassBinSettings.bins(), fTopMassBinSettings.min(), fTopMassBinSettings.max());
 
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlTopMassWMassRatioAfterStdSelections,
-						       "TopMassWMassRatioAfterStandardSelections", ";R_{32}", 100 , 0.0, 10.0);
+						       "TopMassWMassRatio_AfterStandardSelections", ";R_{32}", 100 , 0.0, 10.0);
 
       fHistoSplitter.createShapeHistogramTriplet<TH2F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlTopPt_Vs_TopDijetPtAfterStdSelections, 
 						       "TopPt_Vs_TopDijetPtAfterStandardSelections" ,";p_{T} (GeV/c);p_{T} (GeV/c)",
