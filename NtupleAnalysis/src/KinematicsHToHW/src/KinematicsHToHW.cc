@@ -432,6 +432,8 @@ void KinematicsHToHW::book(TDirectory *dir) {
   h_bHt_HToHW_HBoson_Antitau_Pt   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_HBoson_Antitau_Pt"  , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_bHt_HToHW_WBoson_Leptons_Pt   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Leptons_Pt"  , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_bHt_HToHW_WBoson_Neutrinos_Pt =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Neutrinos_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_bHt_HToHW_WBoson_Quark_Pt     =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Quark_Pt"    , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_bHt_HToHW_WBoson_Antiquark_Pt =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Antiquark_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
 
   h_bHt_Hpm_Eta                    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_Hpm_Eta"                   , ";#eta", nBinsEta, minEta, maxEta);
   h_bHt_TQuark_Eta                 =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_TQuark_Eta"                , ";#eta", nBinsEta, minEta, maxEta);
@@ -447,6 +449,8 @@ void KinematicsHToHW::book(TDirectory *dir) {
   h_bHt_HToHW_HBoson_Antitau_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_HBoson_Antitau_Eta"  , ";#eta", nBinsEta, minEta, maxEta);
   h_bHt_HToHW_WBoson_Leptons_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Leptons_Eta"  , ";#eta", nBinsEta, minEta, maxEta);
   h_bHt_HToHW_WBoson_Neutrinos_Eta =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Neutrinos_Eta", ";#eta", nBinsEta, minEta, maxEta);
+  h_bHt_HToHW_WBoson_Quark_Eta     =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Quark_Eta"    , ";#eta", nBinsEta, minEta, maxEta);
+  h_bHt_HToHW_WBoson_Antiquark_Eta =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Antiquark_Eta", ";#eta", nBinsEta, minEta, maxEta);
 
   h_bHt_Hpm_Rap                    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_Hpm_Rap"                   , ";#omega", nBinsEta, minRap, maxRap);
   h_bHt_TQuark_Rap                 =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_TQuark_Rap"                , ";#omega", nBinsRap, minRap, maxRap);
@@ -462,6 +466,8 @@ void KinematicsHToHW::book(TDirectory *dir) {
   h_bHt_HToHW_HBoson_Antitau_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_HBoson_Antitau_Rap"  , ";#omega", nBinsEta, minRap, maxRap);
   h_bHt_HToHW_WBoson_Leptons_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Leptons_Rap"  , ";#omega", nBinsEta, minRap, maxRap);
   h_bHt_HToHW_WBoson_Neutrinos_Rap =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Neutrinos_Rap", ";#omega", nBinsEta, minRap, maxRap);
+  h_bHt_HToHW_WBoson_Quark_Rap     =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Quark_Rap"    , ";#omega", nBinsEta, minRap, maxRap);
+  h_bHt_HToHW_WBoson_Antiquark_Rap =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_WBoson_Antiquark_Rap", ";#omega", nBinsEta, minRap, maxRap);
 
   h_bHt_HToHW_HBoson_Taus_dR                   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_HToHW_HBoson_Taus_dR"                  , ";#DeltaR", nBinsdR, mindR, maxdR);
   h_bHt_Hpm_bHt_tWb_WBoson_dR                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_Hpm_bHt_tWb_WBoson_dR"                 , ";#DeltaR", nBinsdR, mindR, maxdR);
@@ -599,7 +605,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   cAllEvents.increment();
 
   // if (entry != 383) return;
-  // if (1) std::cout << "\n=== Event " << entry << std::endl; // iro - xenios
+  // if (1) std::cout << "\n=== Event " << entry << std::endl;
 
   //================================================================================================
   // 1) Apply trigger
@@ -1185,10 +1191,10 @@ void KinematicsHToHW::process(Long64_t entry) {
 	  } // Tops
 	    else
 	      {
-		// mcTools.PrintGenParticle(firstCopy);
-		// mcTools.PrintGenParticle(firstMom);
-		// mcTools.PrintGenParticle(p);
-		// table.Print();
+		mcTools.PrintGenParticle(firstCopy);
+		mcTools.PrintGenParticle(firstMom);
+		mcTools.PrintGenParticle(p);
+	        table.Print();
 		throw hplus::Exception("Logic") << "KinematicsHToHW::process() Could not determine W boson original mother.";
 	      }
 
@@ -1522,7 +1528,6 @@ void KinematicsHToHW::process(Long64_t entry) {
       h_Jet1Jet2_dEta_Vs_Jet1Jet2_Mass ->Fill(jet12_dEta, jet12_Mass);
       h_Jet3Jet4_dEta_Vs_Jet3Jet4_Mass ->Fill(jet34_dEta, jet34_Mass);
     }
-  
   h_genHT_GenParticles->Fill(genP_HT);
   h_genHT_GenJets     ->Fill(genJ_HT);
   h_genMET_Et         ->Fill(fEvent.genMET().et()); 
@@ -1541,7 +1546,6 @@ void KinematicsHToHW::process(Long64_t entry) {
   h_bHt_HToHW_HBoson_Taus_dR  ->Fill(Taus_dR);
   h_bHt_HToHW_HBoson_Taus_dEta->Fill(Taus_dEta);
   h_bHt_HToHW_HBoson_Taus_dPhi->Fill(Taus_dPhi);
-  // xenios
   h_bHt_HToHW_HBoson_Tau1_MET_dPhi->Fill(Tau1_MET_dPhi);
   h_bHt_HToHW_HBoson_Tau2_MET_dPhi->Fill(Tau2_MET_dPhi);										
   h_bHt_HToHW_HBoson_Tau1_bHt_tWb_BQuark_dR->Fill(Tau1_bHt_tWb_BQuark_dR);
@@ -1611,8 +1615,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   h_bHt_HToHW_HBoson_Pt          ->Fill( bHt_HToHW_HBoson_p4.pt()  );
   h_bHt_HToHW_HBoson_Eta         ->Fill( bHt_HToHW_HBoson_p4.eta() );
   h_bHt_HToHW_HBoson_Rap         ->Fill( mcTools.GetRapidity(bHt_HToHW_HBoson_p4) );
-  // xenios
-  // Tau1_p4.phi()
+  // Tau1_p4.phi()  // xenios
   h_bHt_HToHW_HBoson_Tau_Pt      ->Fill( bHt_HToHW_HBoson_Tau_p4.pt()  );
   h_bHt_HToHW_HBoson_Tau_Eta     ->Fill( bHt_HToHW_HBoson_Tau_p4.eta() );
   h_bHt_HToHW_HBoson_Tau_Rap     ->Fill( mcTools.GetRapidity(bHt_HToHW_HBoson_Tau_p4) );
@@ -1622,7 +1625,6 @@ void KinematicsHToHW::process(Long64_t entry) {
   h_bHt_HToHW_WBoson_Pt          ->Fill( bHt_HToHW_WBoson_p4.pt()  );
   h_bHt_HToHW_WBoson_Eta         ->Fill( bHt_HToHW_WBoson_p4.eta() );
   h_bHt_HToHW_WBoson_Rap         ->Fill( mcTools.GetRapidity(bHt_HToHW_WBoson_p4) );
-
   if ( (nGenP_HToHW_WNeutrinos > 0) && (nGenP_HToHW_WLeptons > 0) )
     {
       h_bHt_HToHW_WBoson_Leptons_Pt   ->Fill( bHt_HToHW_WBoson_Lepton_p4.pt() );
@@ -1641,7 +1643,6 @@ void KinematicsHToHW::process(Long64_t entry) {
       h_bHt_HToHW_WBoson_Antiquark_Eta->Fill( bHt_HToHW_WBoson_Antiquark_p4.eta() );
       h_bHt_HToHW_WBoson_Antiquark_Rap->Fill( mcTools.GetRapidity(bHt_HToHW_WBoson_Antiquark_p4) );
     }
-
   h_bHt_Hpm_bHt_tWb_WBoson_dR         ->Fill(dR_bHt_Hpm_bHt_tWb_WBoson);
   h_bHt_Hpm_bHt_TQuark_dR             ->Fill(dR_bHt_Hpm_bHt_TQuark);
   h_bHt_HToHW_WBoson_bHt_tWb_WBoson_dR->Fill(dR_bHt_HToHW_WBoson_bHt_tWb_WBoson); 
@@ -1660,6 +1661,7 @@ void KinematicsHToHW::process(Long64_t entry) {
       h_bHt_tWb_BQuark_bHt_tWb_WBoson_Quark_dRap     ->Fill(dRap_bHt_tWb_BQuark_bHt_tWb_WBoson_Quark);
       h_bHt_tWb_BQuark_bHt_tWb_WBoson_Antiquark_dRap ->Fill(dRap_bHt_tWb_BQuark_bHt_tWb_WBoson_Antiquark);
     }
+
   h_bHt_Hpm_bHt_tWb_WBoson_dEta         ->Fill(dEta_bHt_Hpm_bHt_tWb_WBoson);
   h_bHt_Hpm_bHt_TQuark_dEta             ->Fill(dEta_bHt_Hpm_bHt_TQuark);
   h_bHt_HToHW_WBoson_bHt_tWb_WBoson_dEta->Fill(dEta_bHt_HToHW_WBoson_bHt_tWb_WBoson); 
@@ -1678,7 +1680,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Fill TH2
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  if (0) std::cout << "=== Fill TH2" << std::endl;
+  if (cfg_Verbose) std::cout << "=== Fill TH2" << std::endl;
   h_bHt_tWb_bqq_dRMax_dRap_Vs_dPhi ->Fill( bqq_dRap, bqq_dPhi );
 
   h_bHt_HToHW_HBoson_Taus_Pt_Vs_Pt     ->Fill( Tau1_p4.pt(), Tau2_p4.pt());
@@ -1694,7 +1696,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   h_Bquark_Antiquark_dEta_Vs_dPhi->Fill( dEta_bqbar, dPhi_bqbar );
   h_Bquark_Quark_dEta_Vs_dPhi    ->Fill( dEta_bq   , dPhi_bq    );
   h_Quark_Antiquark_dEta_Vs_dPhi ->Fill( dEta_qq   , dPhi_qq    );
-  
+
   return;
 }
 
