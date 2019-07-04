@@ -10,6 +10,7 @@ void MuonGeneratedCollection::setupBranches(BranchManager& mgr) {
   ParticleCollection::setupBranches(mgr);
   fMCmuon.setupBranches(mgr);
 
+  mgr.book(prefix()+"_TrgMatch_HLT_IsoMu24_v", &fTrgMatch_HLT_IsoMu24_v);
   mgr.book(prefix()+"_isGlobalMuon", &fIsGlobalMuon);
   mgr.book(prefix()+"_muIDLoose", &fMuIDLoose);
   mgr.book(prefix()+"_muIDMedium", &fMuIDMedium);
