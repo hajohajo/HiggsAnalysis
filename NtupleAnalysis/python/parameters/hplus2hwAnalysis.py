@@ -78,8 +78,8 @@ tauSelection = PSet(
     againstElectronDiscr = "againstElectronTightMVA6",
     againstMuonDiscr     = "againstMuonLoose3",
     #isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
-    #isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
-    isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Mikko
+    isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Default
     #isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
     # isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits",
     #isolationDiscr       = "byMediumCombinedIsolationDeltaBetaCorr3Hits",
@@ -200,12 +200,12 @@ fatjetVeto = PSet(
 # MET selection
 #================================================================================================
 metSelection = PSet(
-    METCutValue                 = 20.0,        # [default: 30]
-    METCutDirection             = ">",         # [default: ">"] (==, !=, <, <=, >, >=)
+    METCutValue                 = 0.0,         # [default: 30]
+    METCutDirection             = ">=",        # [default: ">"] (==, !=, <, <=, >, >=)
     METSignificanceCutValue     = -1000.0,     # [default: -1000.0]
     METSignificanceCutDirection = ">",         # [default: ">"] (==, !=, <, <=, >, >=)
     METType                     = "MET_Type1", # [default: "MET_Type1"] ("MET_Type1_NoHF", "MET_Puppi", "GenMET", "L1MET", "HLTMET", "CaloMET"))
-    applyPhiCorrections         = False       #  [default: False]
+    applyPhiCorrections         = False        #  [default: False]
     )
 
 #================================================================================================
@@ -214,13 +214,13 @@ metSelection = PSet(
 topSelectionBDT = PSet(
     NumberOfTopsCutValue     = 1,     # [default: 3]
     NumberOfTopsCutDirection = "==",  # [default: "=="] (==, !=, <, <=, >, >=)
-    AnyTopMVACutValue      = -0.95,   # [default: -1.0]
+    AnyTopMVACutValue      = -1.0,   # [default: -1.0]
     AnyTopMVACutDirection  =  ">",    # [default: ">"]
-    TopMVACutValue         =  0.40,   # [default: 0.40] NOTE: Only use numbers with 2 decimals
+    TopMVACutValue         = -0.50,   # [default: 0.40] NOTE: Only use numbers with 2 decimals
     TopMVACutDirection     =  ">=",   # [default: ">="]
     TopMassLowCutValue     =   0.0,   # [default: 0.0]
     TopMassLowCutDirection =  ">=",   # [default: ">="]
-    TopMassUppCutValue     =  400.0,  # [default: 400.0]
+    TopMassUppCutValue     = 1000.0,  # [default: 400.0]
     TopMassUppCutDirection =  "<=",   # [default: "<"]
     CSV_bDiscCutValue      = 0.8484,  # [default: 0.8484]
     CSV_bDiscCutDirection  = ">=",    # [default: ">="]
