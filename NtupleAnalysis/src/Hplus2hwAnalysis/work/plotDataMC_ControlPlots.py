@@ -826,7 +826,7 @@ def replaceBinLabels(p, histoName):
         #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
         #             "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
         #             "b jets SF", "E_{T}^{miss}","1 top", "top SF", "selected"]
-        myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "#ge 0 #tau", "genuine #tau",
+        myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
                      "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "R_{coll}^{min}", "#geq 1 b jets",
                      "b jets SF", "E_{T}^{miss}", "R_{bb}^{min}", "1 top", "selected"] # "top SF" = "selected"
     elif "bjet" in histoName:
