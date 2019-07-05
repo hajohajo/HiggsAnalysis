@@ -56,7 +56,7 @@ import ROOT
 #================================================================================================
 # Options
 #================================================================================================
-prefix      = "Hplus2hwAnalysis"
+prefix      = "Hplus2hwAnalysisWithTop"
 postfix     = ""
 dataEras    = ["2016"]
 searchModes = ["80to1000"]
@@ -164,7 +164,7 @@ def main():
     # ================================================================================================
     # Overwrite Default Settings  
     # ================================================================================================
-    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysis import allSelections
+    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysisWithTop import allSelections
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
     # allSelections.BjetSelection.triggerMatchingApply = True

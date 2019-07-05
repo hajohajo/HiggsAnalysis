@@ -9,10 +9,10 @@
 
 #include "TDirectory.h"
 
-class Hplus2hwAnalysis: public BaseSelector {
+class Hplus2hwAnalysisWithTop: public BaseSelector {
 public:
-  explicit Hplus2hwAnalysis(const ParameterSet& config, const TH1* skimCounters);
-  virtual ~Hplus2hwAnalysis() {}
+  explicit Hplus2hwAnalysisWithTop(const ParameterSet& config, const TH1* skimCounters);
+  virtual ~Hplus2hwAnalysisWithTop() {}
 
   /// Books histograms
   virtual void book(TDirectory *dir) override;
@@ -70,11 +70,11 @@ private:
 };
 
 #include "Framework/interface/SelectorFactory.h"
-REGISTER_SELECTOR(Hplus2hwAnalysis);
+REGISTER_SELECTOR(Hplus2hwAnalysisWithTop);
 
-Hplus2hwAnalysis::Hplus2hwAnalysis(const ParameterSet& config, const TH1* skimCounters)
+Hplus2hwAnalysisWithTop::Hplus2hwAnalysisWithTop(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper), // CommonPlots::kHplus2hwAnalysis
+    fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper), // CommonPlots::kHplus2hwAnalysisWithTop
     cAllEvents(fEventCounter.addCounter("all events")),
     cTrigger(fEventCounter.addCounter("passed trigger")),
     fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -100,9 +100,9 @@ Hplus2hwAnalysis::Hplus2hwAnalysis(const ParameterSet& config, const TH1* skimCo
 { }
 
 
-void Hplus2hwAnalysis::book(TDirectory *dir) {
+void Hplus2hwAnalysisWithTop::book(TDirectory *dir) {
 
-  if (0) std::cout << "=== Hplus2hwAnalysis::book()" << std::endl;
+  if (0) std::cout << "=== Hplus2hwAnalysisWithTop::book()" << std::endl;
   // Book common plots histograms
   fCommonPlots.book(dir, isData());
 
@@ -152,13 +152,13 @@ void Hplus2hwAnalysis::book(TDirectory *dir) {
 }
 
 
-void Hplus2hwAnalysis::setupBranches(BranchManager& branchManager) {
+void Hplus2hwAnalysisWithTop::setupBranches(BranchManager& branchManager) {
   fEvent.setupBranches(branchManager);
   return;
 }
 
 
-void Hplus2hwAnalysis::process(Long64_t entry) {
+void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
 
   //====== Initialize
   fCommonPlots.initialize();
@@ -372,7 +372,7 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
 
   //================================================================================================
   // All Selections
-  // https://github.com/mlotti/HplusHW/blob/master/NtupleAnalysis/src/Hplus2hwAnalysis/src/Hplus2hwAnalysis.cc#L339
+  // https://github.com/mlotti/HplusHW/blob/master/NtupleAnalysis/src/Hplus2hwAnalysisWithTop/src/Hplus2hwAnalysisWithTop.cc#L339
   //================================================================================================
   if (0) std::cout << "=== All Selections" << std::endl;
   cSelected.increment();

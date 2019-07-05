@@ -222,6 +222,7 @@ def main(opts):
 def GetHistoKwargs(h, opts):
 
     # Common bin settings
+    _legRM  = {"dx": -10000.23, "dy": -10000.01, "dh": -0.1}
     _legNE  = {"dx": -0.23, "dy": -0.01, "dh": 0.1}
     _legNW  = {"dx": -0.52, "dy": -0.01, "dh": 0.1}
     _legSE  = {"dx": -0.23, "dy": -0.50, "dh": 0.1}
@@ -270,24 +271,9 @@ def GetHistoKwargs(h, opts):
         kwargs["moveLegend"] = _legNE
         kwargs["opts"]   = {"xmax": +800.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
-    if "eta" in h.lower():
-        kwargs["rebinX"] = 2
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["moveLegend"] = _legNE
-
     if "DeltaEta" in h:
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"]   = {"xmax": +6.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-
-    if "BDT" in h:
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["cutBox"] = {"cutValue": -0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        # kwargs["cutBox"] = {"cutValue": 0.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": -1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["rebinX"] = 2        
-        if "BDT_Selected" in h:
-            kwargs["moveLegend"] = _legNW
 
     if "CollinearAngularCuts" in h:
         units = "#circ" #^{#circ}"
@@ -333,11 +319,14 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +40.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
-    if "topbdt_NotSelectedCandidates" in h.lower():
-        kwargs["rebinX"] = 1
-        kwargs["xlabel"] = "top candidate multiplicity"
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": +15.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        return kwargs
+    if "BDT" in h or "topbdt" in h.lower():
+        kwargs["ylabel"] = "Events / %.2f "
+        kwargs["cutBox"] = {"cutValue": -0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["opts"]   = {"xmin": -1.0, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["rebinX"] = 2        
+        kwargs["xlabel"] = "BDTG scrore"
+        if "BDT_Selected" in h:
+            kwargs["moveLegend"] = _legNW
 
     if h == "BDTGresponse":
         kwargs["rebinX"] = 1
@@ -371,13 +360,6 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 40.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +600.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
-    if "dgTrijetBJetEta" in h:
-        kwargs["rebinX"] = 1
-        kwargs["xlabel"] = "#eta"
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
-
     if "DiJetEta" in h:
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "#eta"
@@ -392,7 +374,7 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = _yLabel + units
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +800.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
-    if  "TopJet1Eta" in h or "ldgTrijetJet2Eta" in h:
+    if  "TopJet1Eta" in h or "Jet2Eta" in h:
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "#eta"
         kwargs["ylabel"] = "Events / %.2f "
@@ -422,14 +404,14 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "topmultiplicity" in h.lower():
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": +8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": +20.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
-    if "nalltops" in h.lower() or "topbdt_allcandidates" in h.lower():
-        if "allcandidates" in h.lower():
-            kwargs["rebinX"] = 10
-        else:
-            kwargs["rebinX"] = 1
+    #if "topbdt_allcandidates" in h.lower():
+    #    kwargs["rebinX"] = 10
+      
+    if "nalltops" in h.lower():
+        kwargs["rebinX"] = 1
         kwargs["xlabel"] = "top multiplicity"
         #kwargs["ylabel"] = _yLabel
         kwargs["ylabel"] = "Events / %.1f "
@@ -644,7 +626,7 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]       = {"ymin": 1e0, "ymax": 1e9}
         if h == "counter":
             xMin =  8.0
-            xMax = 27.0 # 26.0 is actual last. using 1 before because blinding fails there
+            xMax = 25.0 # 27.0 is actual last. using 1 before because blinding fails there
             #xMin =  8.0
             #xMax = 25.0 # 26.0 is actual last. using 1 before because blinding fails there
             kwargs["opts"]   = {"xmin": xMin, "xmax": xMax, "ymin": 1e0, "ymax": 5e9}
@@ -683,7 +665,8 @@ def GetHistoKwargs(h, opts):
             kwargs["opts"]   = {"xmin": 0.0, "xmax": 1000.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
             # kwargs["rebinX"] = 4
         elif "dijetmass" in h.lower():
-            kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetDijetMass_AfterAllSelections"] #2
+            kwargs["rebinX"] = 4
+            #kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetDijetMass_AfterAllSelections"] #2
             kwargs["xlabel"] = "m_{jj} (%s)" % units
             kwargs["opts"]   = {"xmax": +300.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
             kwargs["cutBox"] = {"cutValue": 80.385, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
@@ -702,10 +685,12 @@ def GetHistoKwargs(h, opts):
         if "pt" in h.lower() and "tau" in opts.folder.lower():
             kwargs["opts"] = {"xmin": -1.0, "xmax":1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
+
     if "eta" in h.lower():
-        kwargs["moveLegend"] = _legNE
-        if "resolution" not in h.lower():
-            kwargs["moveLegend"] = _legSE
+        kwargs["rebinX"] = 2
+        kwargs["ylabel"] = "Events / %.2f "
+        kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["moveLegend"] = _legRM #_legNE
 
     if "_AfterAllSelections" in h or "_AfterTopSelection" in h or "_AfterMetSelection" in h:
         kwargs["blindingRangeString"] = "0-%s" % (5000)
@@ -836,9 +821,13 @@ def replaceBinLabels(p, histoName):
         #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
         #             "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
         #             "b jets SF", "E_{T}^{miss}","1 top", "top SF", "selected"]
-        myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
-                     "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "R_{coll}^{min}", "#geq 1 b jets",
-                     "b jets SF", "E_{T}^{miss}", "R_{bb}^{min}", "1 top", "selected"] # "top SF" = "selected"
+        #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
+        #             "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "R_{coll}^{min}", "#geq 1 b jets",
+        #             "b jets SF", "E_{T}^{miss}", "R_{bb}^{min}", "1 top", "selected"] # "top SF" = "selected"
+        myBinList = ["trigger", "filter", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
+                     "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "#geq 1 b jets",
+                     "b jets SF", "E_{T}^{miss}", "1 top", "top SF", "selected"] # "top SF" = "selected"
+
     elif "bjet" in histoName:
         myBinList = ["All", "#eta", "p_{T}", "CSVv2 (M)", "Trg Match", "#geq 3"]
     elif "jet" in histoName:
@@ -888,7 +877,7 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "Hplus2hwAnalysis"
+    ANALYSISNAME = "Hplus2hwAnalysisWithTop"
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
     GRIDX        = False
