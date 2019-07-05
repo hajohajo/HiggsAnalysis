@@ -649,14 +649,20 @@ _legendLabels = {
     "Diboson"  : "Diboson",
     "ttX"      : "t, tW, t#bar{t} + X",
     "noTop"    : "No t",
-    #"SingleTop": "Single t",
-    "QCD"      : "QCD",#"Mis-ID. #tau_{h} (data)",
-    #"FakeB"    : "Fake b (data)",
-    "FakeB"    : "Fake b",
-    "GenuineB" : "Genuine b (MC)",
-    "QCD-b"    : "QCD (b enr.)",
-    "QCDdata"  : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
-    "SingleTop": "Single t",
+#     #"SingleTop": "Single t",
+#     "QCD"      : "QCD",#"Mis-ID. #tau_{h} (data)",
+#     #"FakeB"    : "Fake b (data)",
+#     "FakeB"    : "Fake b",
+#     "GenuineB" : "Genuine b (MC)",
+#     "QCD-b"    : "QCD (b enr.)",
+#     "QCDdata"  : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
+#     "SingleTop": "Single t",
+    "SingleTop"     : "Single t",
+    "QCD"           : "Mis-ID. #tau_{h} (data)",
+    "FakeB"         : "Fake b (data)",
+    "GenuineB"      : "Genuine b (MC)",
+    "QCD-b"         : "QCD (b enr.)",
+    "QCDdata"       : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
     "TTJets"        : "t#bar{t}+jets",
     "TT"            : "t#bar{t}",
     "TTTT"          : "t#bar{t}t#bar{t}",
@@ -1152,7 +1158,7 @@ def replaceLightHplusWithSignalPlusBackground(datasetMgr, backgroundsWithoutTT=N
         if not isLast:
             datasetMgr.remove(name, close=False)
         datasetMgr.rename(name+"Tmp", name)
-        _legendLabels[name] = "with H^{+}#rightarrow#tau^{+}#nu"
+        _legendLabels[name] = "with H^{+}#rightarrowH_{SM}W"
 
 
 def replaceQCDFromData(datasetMgr, datasetQCDdata):
@@ -1439,7 +1445,7 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
                 self._gr = gr
                 self._ratio = False
             def ratioDrawStyle(self):
-                return "PZ"
+                return "E0PZ"
             def begin(self):
                 return 0
             def end(self):

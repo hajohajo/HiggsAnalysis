@@ -1,59 +1,24 @@
 import FWCore.ParameterSet.Config as cms
 
 skim = cms.EDFilter("Hplus2hwAnalysisSkim",
-    Verbose        = cms.bool(False),
     TriggerResults = cms.InputTag("TriggerResults::HLT"),
-    HLTPaths       = cms.vstring(
+    HLTPaths	   = cms.vstring(
         "HLT_IsoMu24_v",
-        "HLT_IsoTkMu24_v"
-        "HLT_Ele27_WPTight_Gsf_v",
-        "HLT_Ele27_eta2p1_WPTight_Gsf_v",
-        ),
-
-    # Jets (https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID#Recommendations_for_13_TeV_data)
-    JetCollection  = cms.InputTag("slimmedJets"),
-    JetUserFloats  = cms.vstring(
-	"pileupJetId:fullDiscriminant", #currently disabled
+	"HLT_IsoTkMu24_v",
+	"HLT_Ele27_eta2p1_WPTight_Gsf_v"
     ),
-    JetEtCut       = cms.double(20.0),
-    JetEtaCut      = cms.double(2.4),
-    NJets          = cms.int32(0),
-    JetEnabled     = cms.bool(False),
-       
-    # PF Candidates
-    PackedCandidatesCollection = cms.InputTag("packedPFCandidates"),
-                    
-    # Vertex
-    VertexCollection = cms.InputTag("offlineSlimmedPrimaryVertices"),
 
-    # Electrons (https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2)
-    ElectronCollection   = cms.InputTag("slimmedElectrons"),
-    ElectronID           = cms.string("cutBasedElectronID-Spring15-25ns-V1-standalone-veto"),
-    ElectronMVA          = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values"),
-    ElectronRhoSource    = cms.InputTag("fixedGridRhoFastjetCentralNeutral"),
-    ElectronMiniRelIsoEA = cms.double(0.2), # MIT cut is at 0.40. Allow wiggle room by cutting at LOWER value
-    ElectronPtCut        = cms.double(10.0),
-    ElectronEtaCut       = cms.double(2.1),
-    ElectronNCut         = cms.int32(0),
-    ElectronEnabled      = cms.bool(False), # if False will do nothing
-       
-    # Muons (https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2)
-    MuonCollection   = cms.InputTag("slimmedMuons"),
-    MuonID           = cms.string("Loose"),
-    MuonMiniRelIsoEA = cms.double(0.10),  # MIT cut is at 0.40. Allow wiggle room by cutting at LOWER value
-    MuonPtCut        = cms.double(10.0),
-    MuonEtaCut       = cms.double(2.4),
-    MuonNCut         = cms.int32(1),
-    MuonEnabled      = cms.bool(False), # if False will do nothing
+    src   = cms.InputTag("externalLHEProducer"),
 
-    # Taus
-    TauCollection     = cms.InputTag("slimmedTaus"),
-    TauDiscriminators = cms.vstring(
-        "decayModeFinding",
-        "byVLooseIsolationMVArun2v1DBoldDMwLT",
-        ),
-    TauPtCut   = cms.double(20),
-    TauEtaCut  = cms.double(2.3),
-    TauNCut    = cms.int32(999),
-    TauEnabled = cms.bool(False), # if False will do nothing
-)
+    JetCollection	= cms.InputTag("slimmedJets"),
+
+    METCollection	= cms.InputTag("slimmedMETs"),
+
+    MuonCollection	= cms.InputTag("slimmedMuons"),
+    NMuons 		= cms.int32(1),
+
+    ElectronCollection	= cms.InputTag("slimmedElectrons"),
+
+    TauCollection	= cms.InputTag("slimmedTaus"),
+    NTaus		= cms.int32(2),
+    )

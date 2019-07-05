@@ -877,7 +877,8 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "Hplus2hwAnalysisWithTop"
+    ANALYSISNAME = "Hplus2hwAnalysis"
+    #ANALYSISNAME = "Hplus2hwAnalysisWithTop"
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
     GRIDX        = False

@@ -33,7 +33,7 @@ cmsTextMode = CMSMode.PRELIMINARY
 ## Global dictionary to hold the CMS text labels
 cmsText = {
     CMSMode.NONE: None,
-    CMSMode.PRELIMINARY: "Preliminary",
+    CMSMode.PRELIMINARY: "Very preliminary",
     CMSMode.PAPER: "",
     CMSMode.UNPUBLISHED: "Preliminary",
     CMSMode.SIMULATION : "Simulation",
@@ -2379,7 +2379,8 @@ class HistoManager:
             raise Exception("Can't normalize after the histograms have been created!")
         for h in self.datasetRootHistos:
             if h.getDataset().isMC():
-                h.normalizeByCrossSection()
+                print "taalla normitellaaan xsectionilla"
+		h.normalizeByCrossSection()
         self.luminosity = None
 
     ## Set the MC histogram normalization <i>by luminosity</i>.
@@ -2402,6 +2403,7 @@ class HistoManager:
         if lumi == None:
             raise Exception("Unable to normalize by luminosity, no data datasets")
 
+	print "ja taalla normitellaan lumilla"
         self.normalizeMCToLuminosity(lumi)
 
     ## Set the MC histogram normalization <i>to luminosity</i>.
@@ -2415,6 +2417,7 @@ class HistoManager:
             raise Exception("Can't normalize after the histograms have been created!")
         for h in self.datasetRootHistos:
             if h.getDataset().isMC():
+		print "mut taalla lumiin"
                 h.normalizeToLuminosity(lumi)
         self.luminosity = lumi
 

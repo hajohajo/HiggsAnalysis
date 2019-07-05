@@ -307,11 +307,11 @@ def ConvertSymLinks(fileList):
     Verbose("ConvertSymLinks()", True)
     HOST = socket.gethostname()
     bUseSymLinks = False
-    
+
     if "fnal" in HOST:
         prefix = "root://cmseos.fnal.gov//"
     elif "lxplus" in HOST:
-        prefix = "root://eoscms.cern.ch//"
+        prefix = "root://eoscms.cern.ch/"
     else:
         prefix = ""
 
@@ -2084,7 +2084,7 @@ class DatasetRootHisto(DatasetRootHistoBase):
         if self.normalization == "byCrossSection":
             return h
         elif self.normalization == "toLuminosity":
-            return _normalizeToFactor(h, self.luminosity)
+	    return _normalizeToFactor(h, self.luminosity)
         else:
             raise Exception("Internal error")
 
@@ -2115,7 +2115,6 @@ class DatasetRootHisto(DatasetRootHistoBase):
     def normalizeToLuminosity(self, lumi):
         if not self.dataset.isMC():
             raise Exception("Can't normalize non-MC histogram to luminosity")
-
         self.normalization = "toLuminosity"
         self.luminosity = lumi
     
@@ -2547,7 +2546,7 @@ class DatasetRootHistoAddedMC(DatasetRootHistoCompoundBase):
         if self.normalization == "byCrossSection":
             return hsum
         elif self.normalization == "toLuminosity":
-            return _normalizeToFactor(hsum, self.luminosity)
+	    return _normalizeToFactor(hsum, self.luminosity)
         else:
             raise Exception("Internal error, got normalization %s" % self.normalization)
 
@@ -3178,7 +3177,7 @@ class Dataset:
         if nAllEvents == 0:
             Print("WARNING! nAllEvents = %s" % (nAllEvents), True)
             return 0
-        return self.getCrossSection() / nAllEvents
+	return self.getCrossSection() / nAllEvents
 
     def hasRootHisto(self, name, **kwargs):
         '''
@@ -4357,12 +4356,14 @@ class DatasetPrecursor:
         for name in self._filenames:
 
             Verbose("Opening ROOT file \"%s\"" % (name), False)
+#	    print "Opening ROOT file \"%s\"" % (name)
             rf = ROOT.TFile.Open(name)
 
             # Below is important to use '==' instead of 'is' to check for
             # null file
             if rf == None:
                 raise Exception("Unable to open ROOT file '%s' for dataset '%s'" % (name, self._name))
+
             self._rootFiles.append(rf)
 
             # Get the data version (e.g. 80Xdata or 80Xmc)
@@ -4427,6 +4428,8 @@ class DatasetPrecursor:
                 if self._nAllEvents == 0.0:
                     print "Warning (DatasetPrecursor): N(allEvents) = 0 !!!"
 
+#            rf.Close()
+
         if self._dataVersion is None:
             self._isData = False
             self._isPseudo = False
@@ -4435,6 +4438,7 @@ class DatasetPrecursor:
             self._isData = "data" in self._dataVersion
             self._isPseudo = "pseudo" in self._dataVersion
             self._isMC = not (self._isData or self._isPseudo)
+
 
     def getName(self):
         return self._name
@@ -4508,7 +4512,6 @@ class DatasetManagerCreator:
         self._label = None
         self._precursors = [DatasetPrecursor(name, filenames) for name, filenames in rootFileList]
         self._baseDirectory = kwargs.get("baseDirectory", "")
-        
         mcRead = False
         for d in self._precursors:
             #if d.isMC() or d.isPseudo():
@@ -4643,7 +4646,7 @@ class DatasetManagerCreator:
     def createDatasetManager(self, **kwargs):
         _args = {}
         _args.update(kwargs)
-
+        print "creating datasetmanager"
         # First check that if some of these is not given, if there is
         # exactly one it available, use that.
         for arg, attr in [("analysisName", "getAnalyses"),

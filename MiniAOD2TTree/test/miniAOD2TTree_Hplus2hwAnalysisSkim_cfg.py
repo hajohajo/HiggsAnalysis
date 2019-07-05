@@ -131,13 +131,12 @@ process.load("HiggsAnalysis/MiniAOD2TTree/Electron_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/Muon_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/Jet_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/FatJet_cfi")
-process.load("HiggsAnalysis/MiniAOD2TTree/SecondaryVertex_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/Top_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/MET_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/METNoiseFilter_cfi")
 
 process.METNoiseFilter.triggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getMETFilteringProcess())) 
-# print "check tau",process.Taus_TauPOGRecommendation[0]
+
 process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
     OutputFileName      = cms.string("miniaod2tree.root"),
     PUInfoInputFileName = process.PUInfo.OutputFileName,
@@ -162,15 +161,23 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
 	TriggerBits    = cms.vstring(
             "HLT_IsoMu24_v",
             "HLT_IsoTkMu24_v",
-            # "HLT_IsoMu22_eta2p1_v",
+            "HLT_Ele27_eta2p1_WPTight_Gsf_v",
             ),
 	L1Extra        = cms.InputTag("l1extraParticles:MET"),
+        L1EtSumObjects = cms.InputTag("caloStage2Digis:EtSum"),
 	TriggerObjects = cms.InputTag("selectedPatTrigger"),
         TriggerMatch   = cms.untracked.vstring(
-            "HLT_IsoMu24_v"
-            #"HLT_IsoTkMu24_v",
-            ## "HLT_IsoMu22_eta2p1_v",
+            "HLT_IsoMu24_v",
+            "HLT_IsoTkMu24_v",
+            "HLT_Ele27_eta2p1_WPTight_Gsf_v",
         ),
+        TriggerPrescales = cms.untracked.PSet(
+            src   = cms.InputTag("patTrigger",""),
+            paths = cms.vstring(
+                "HLT_IsoMu24_v", 
+                "HLT_Ele27_eta2p1_WPTight_Gsf_v",
+                )
+            ),
 	filter = cms.untracked.bool(False)
     ),
     METNoiseFilter = process.METNoiseFilter,
@@ -254,7 +261,7 @@ for idmod in ['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Sp
 #================================================================================================ 
 process.runEDFilter = cms.Path(process.PUInfo*
                                process.TopPtProducer*
-                               process.egmGsfElectronIDSequence*
+                               process.egmGsfElectronIDSequence* # needed?
                                process.skimCounterAll*
                                process.skim*
                                process.skimCounterPassed*
