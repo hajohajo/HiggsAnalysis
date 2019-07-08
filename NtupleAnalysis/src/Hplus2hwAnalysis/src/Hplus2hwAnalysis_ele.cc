@@ -28,9 +28,10 @@ private:
   /// Common plots
   CommonPlots fCommonPlots;
 
-  TreeWriter fTreeWriter;
   // Event selection classes and event counters (in same order like they are applied)
   Count cAllEvents;
+
+  METFilterSelection fMETFilterSelection;
 
   ElectronSelection fElectronSelection;
 
@@ -42,8 +43,6 @@ private:
   Count cFakeTauSFCounter;
 
   MuonSelection fMuonSelection;
-
-  METFilterSelection fMETFilterSelection;
 
   JetSelection fJetSelection;
 
@@ -88,13 +87,13 @@ Hplus2hwAnalysis_ele::Hplus2hwAnalysis_ele(const ParameterSet& config, const TH1
 : BaseSelector(config, skimCounters),
   fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2hw_ele_Analysis, fHistoWrapper),
   cAllEvents(fEventCounter.addCounter("All events")),
+  fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   cOverTwoTausCounter(fEventCounter.addCounter("Over two selected tau leptons")),
   cTauIDSFCounter(fEventCounter.addCounter("Tau ID SF")),
   cFakeTauSFCounter(fEventCounter.addCounter("Fake tau SF")),
   fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
-  fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),

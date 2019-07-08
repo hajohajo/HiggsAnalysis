@@ -26,39 +26,23 @@ private:
 
   /// Common plots
   CommonPlots fCommonPlots;
-//  CommonPlots fNormalizationSystematicsSignalRegion;
 
   // Event selection classes and event counters (in same order like they are applied)
   Count cAllEvents;
+
+  METFilterSelection fMETFilterSelection;
 
   MuonSelection fMuonSelection;
 
   TauSelection fLooseTauSelection;
   TauSelection fTauSelection;
 
-//  Count cTauSelection;
-
   Count cOverTwoTausCounter;
 
   Count cTauIDSFCounter;
   Count cFakeTauSFCounter;
 
-
   ElectronSelection fElectronSelection;
-
-  METFilterSelection fMETFilterSelection;
-
-//  MuonSelection fMuonSelection;
-
-
-//  METSelection fMETSelection;
-//  Count cElectronVeto;
-
-
-//  Count cMuonSelection;
-
-//  Count cJetSelection;
-//  Count cMETSelection;
 
   JetSelection fJetSelection;
 
@@ -95,10 +79,6 @@ private:
 
   WrappedTH1 *hTransverseMass;
   WrappedTH1 *hTransverseMass_genuine;
-  // WrappedTH1 *hTransverseMass_ttRegion;
-  // WrappedTH1 *hTransverseMass_WRegion;
-  // WrappedTH1 *hTransverseMass_ttRegion_bbcuts;
-  // WrappedTH1 *hTransverseMass_WRegion_bbcuts;
 };
 
 
@@ -109,8 +89,8 @@ REGISTER_SELECTOR(Hplus2hwAnalysis_background);
 Hplus2hwAnalysis_background::Hplus2hwAnalysis_background(const ParameterSet& config, const TH1* skimCounters)
 : BaseSelector(config, skimCounters),
   fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kQCDMeasurement, fHistoWrapper),
-//  fNormalizationSystematicsSignalRegion(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kQCDNormalizationSystematicsSignalRegion, fHistoWrapper),
   cAllEvents(fEventCounter.addCounter("All events")),
+  fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -118,13 +98,7 @@ Hplus2hwAnalysis_background::Hplus2hwAnalysis_background(const ParameterSet& con
   cTauIDSFCounter(fEventCounter.addCounter("Tau ID SF")),
   cFakeTauSFCounter(fEventCounter.addCounter("Fake tau SF")),
   fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
-  fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-//  fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-//  cTauSelection(fEventCounter.addCounter("Tau selection")),
-//  cMuonSelection(fEventCounter.addCounter("Muon selection")),
-//  cJetSelection(fEventCounter.addCounter("Jet selection")),
   fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-//  cMETSelection(fEventCounter.addCounter("MET selection")),
   fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   cSelected(fEventCounter.addCounter("Selected events"))
@@ -160,33 +134,6 @@ void Hplus2hwAnalysis_background::book(TDirectory *dir) {
   // hAssociatedTop_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "associatedTop_Eta", "Associated t eta;#eta",$
 
 
-  // ====== Normalization histograms
-//  HistoSplitter histoSplitter = fCommonPlots.getHistoSplitter();
-  // Create directories for normalization
-//  std::string myInclusiveLabel = "ForQCDNormalization";
-//  std::string myFakeLabel = myInclusiveLabel+"EWKFakeTaus";
-//  std::string myGenuineLabel = myInclusiveLabel+"EWKGenuineTaus";
-//  TDirectory* myNormDir = fHistoWrapper.mkdir(HistoLevel::kSystematics, dir, myInclusiveLabel);
-//  TDirectory* myNormEWKFakeTausDir = fHistoWrapper.mkdir(HistoLevel::kSystematics, dir, myFakeLabel);
-//  TDirectory* myNormGenuineTausDir = fHistoWrapper.mkdir(HistoLevel::kSystematics, dir, myGenuineLabel);
-//  std::vector<TDirectory*> myNormalizationDirs = {myNormDir, myNormEWKFakeTausDir, myNormGenuineTausDir};
-
-  // Normalization bin settings
-//  const float fMetMin = fCommonPlots.getMetBinSettings().min();
-//  const float fMetMax = fCommonPlots.getMetBinSettings().max();
-//  const int nMetBins = fMetMax-fMetMin; // Use 1 GeV bin width
-//  const int nMtBins = fCommonPlots.getMtBinSettings().bins();
-//  const float fMtMin = fCommonPlots.getMtBinSettings().min();
-//  const float fMtMax = fCommonPlots.getMtBinSettings().max();
-//  if ((fMetMax-fMetMin) / nMetBins > 10.0) {
-//    throw hplus::Exception("config") << "MET histogram bin width is larger than 10 GeV! This is not good for QCD measurement (edit python/parameters/signalAnalysisParameters.py)";
-//  }
-
-//  histoSplitter.createShapeHistogramTriplet<TH1F>(true, HistoLevel::kSystematics, myNormalizationDirs,
-//    hMtInvertedTauAfterStdSelections,
-//    "NormalizationMtInvertedTauAfterStdSelections", ";m_{T} (GeV);N_{events}",
-//    nMtBins, fMtMin, fMtMax);
-
 
   hTauPt =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt", "Tau pT", 40, 0, 400);
   hMuonPt =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "muPt", "Muon pT", 40, 0, 400);
@@ -221,9 +168,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   ////////////
 
   fCommonPlots.initialize();
-//  fNormalizationSystematicsSignalRegion.initialize();
 
-//  fCommonPlots.setFactorisationBinForEvent(std::vector<float> {});
   cAllEvents.increment();
 
 
@@ -237,7 +182,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   int nVertices = fEvent.vertexInfo().value();
 
   ////////////
-  // 3) Primarty Vertex (Check that a PV exists)
+  // Primarty Vertex (Check that a PV exists)
   ////////////
 
   if (nVertices < 1)
@@ -252,7 +197,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
     return;
 
   ////////////
-  // 5) Muon
+  // Muon
   ////////////
 
   const MuonSelection::Data muData = fMuonSelection.analyze(fEvent);
@@ -283,7 +228,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 
 
   ////////////
-  // 6) Tau
+  // Tau
   ////////////
 
   const TauSelection::Data looseTauData = fLooseTauSelection.analyzeTight(fEvent);
@@ -296,19 +241,6 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 
   if (!looseTauData.hasIdentifiedTaus())
     return;
-
-//  cMETSelection.increment();
-
-//  std::cout << "loosetaudata get identified " << looseTauData.getSelectedTaus().size()  << "\n";
-
-//  std::cout << "loosetaudata get antiIso " << looseTauData.getAntiIsolatedTaus().size()  << "\n";
-
-///  std::cout << "taudata get identified " << tauData.getSelectedTaus().size()  << "\n";
-
-//  std::cout << "taudata get antiIso " << tauData.getAntiIsolatedTaus().size()  << "\n";
-
-//  std::cout << "--- ---" << "\n";
-
 
   if(looseTauData.getSelectedTaus().size() != 2)
     return;
@@ -429,20 +361,18 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 
 
   ////////////
-  // 4) Electron veto (Fully hadronic + orthogonality)
+  // Electron veto (Fully hadronic + orthogonality)
   ////////////
 
   const ElectronSelection::Data eData = fElectronSelection.analyze(fEvent);
   if (eData.hasIdentifiedElectrons())
     return;
 
-//  fCommonPlots.fillControlPlotsAfterMETFilter(fEvent);
-
 
 
 
   ////////////
-  // 7) Jet selection
+  // Jet selection
   ////////////
 
   const JetSelection::Data jetData = fJetSelection.analyze(fEvent, looseTauData.getSelectedTau());
@@ -451,7 +381,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 
 
   ////////////
-  // 8) BJet selection
+  // BJet selection
   ////////////
 
   const BJetSelection::Data bjetData = fBJetSelection.analyze(fEvent, jetData);
@@ -460,7 +390,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
     return;
 
   ////////////
-  // 9) BJet SF
+  // BJet SF
   ////////////
 
   if (fEvent.isMC()) {
@@ -471,7 +401,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 
 
   ////////////
-  // 10) MET selection
+  // MET selection
   ////////////
 
   const METSelection::Data METData = fMETSelection.analyze(fEvent, nVertices);
