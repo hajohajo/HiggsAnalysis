@@ -168,7 +168,7 @@ void Hplus2hwAnalysis_fake::book(TDirectory *dir) {
   // hAssociatedTop_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "associatedTop_Eta", "Associated t eta;#eta",$
 
   double bin[8] = {20,25,30,35,40,50,60,120};
-  double bin_2[4] = {20,40,60,140};
+//  double bin_2[4] = {20,40,60,140};
 
   hTauPt_num_1pr =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_1pr", "Tau pT num", 7, bin);
   hTauPt_den_1pr =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_1pr", "Tau pT den", 7, bin);
@@ -398,11 +398,11 @@ void Hplus2hwAnalysis_fake::process(Long64_t entry) {
 //  cMETSelection.increment();
 
 
-  double drMuTau1 = 0;
+//  double drMuTau1 = 0;
 
-  double drMuTau2 = 0;
+//  double drMuTau2 = 0;
 
-  double drMuMu = 0;
+//  double drMuMu = 0;
 
 //  fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, tauData);
 

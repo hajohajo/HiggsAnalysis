@@ -1,3 +1,4 @@
+
 // -*- c++ -*-
 #include "Framework/interface/BaseSelector.h"
 #include "Framework/interface/makeTH.h"
@@ -9,10 +10,10 @@
 
 #include "TDirectory.h"
 
-class Hplus2hwAnalysis_background: public BaseSelector {
+class Hplus2hwAnalysis_background_ele: public BaseSelector {
 public:
-  explicit Hplus2hwAnalysis_background(const ParameterSet& config, const TH1* skimCounters);
-  virtual ~Hplus2hwAnalysis_background();
+  explicit Hplus2hwAnalysis_background_ele(const ParameterSet& config, const TH1* skimCounters);
+  virtual ~Hplus2hwAnalysis_background_ele();
 
   /// Books histograms
   virtual void book(TDirectory *dir) override;
@@ -32,17 +33,19 @@ private:
 
   METFilterSelection fMETFilterSelection;
 
-  MuonSelection fMuonSelection;
+  ElectronSelection fElectronSelection;
 
   TauSelection fLooseTauSelection;
   TauSelection fTauSelection;
+
 
   Count cOverTwoTausCounter;
 
   Count cTauIDSFCounter;
   Count cFakeTauSFCounter;
 
-  ElectronSelection fElectronSelection;
+
+  MuonSelection fMuonSelection;
 
   JetSelection fJetSelection;
 
@@ -83,21 +86,21 @@ private:
 
 
 #include "Framework/interface/SelectorFactory.h"
-REGISTER_SELECTOR(Hplus2hwAnalysis_background);
+REGISTER_SELECTOR(Hplus2hwAnalysis_background_ele);
 
 
-Hplus2hwAnalysis_background::Hplus2hwAnalysis_background(const ParameterSet& config, const TH1* skimCounters)
+Hplus2hwAnalysis_background_ele::Hplus2hwAnalysis_background_ele(const ParameterSet& config, const TH1* skimCounters)
 : BaseSelector(config, skimCounters),
-  fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kQCDMeasurement, fHistoWrapper),
+  fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kQCDMeasurement_ele, fHistoWrapper),
   cAllEvents(fEventCounter.addCounter("All events")),
   fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-  fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+  fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   cOverTwoTausCounter(fEventCounter.addCounter("Over two selected tau leptons")),
   cTauIDSFCounter(fEventCounter.addCounter("Tau ID SF")),
   cFakeTauSFCounter(fEventCounter.addCounter("Fake tau SF")),
-  fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
+  fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
   fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -106,16 +109,15 @@ Hplus2hwAnalysis_background::Hplus2hwAnalysis_background(const ParameterSet& con
 
 
 
-Hplus2hwAnalysis_background::~Hplus2hwAnalysis_background() {
+Hplus2hwAnalysis_background_ele::~Hplus2hwAnalysis_background_ele() {
   fCommonPlots.getHistoSplitter().deleteHistograms(hMtInvertedTauAfterStdSelections);
   fCommonPlots.getHistoSplitter().deleteHistograms(hBaselineTauTransverseMass);
 }
 
-void Hplus2hwAnalysis_background::book(TDirectory *dir) {
+void Hplus2hwAnalysis_background_ele::book(TDirectory *dir) {
 
   // Book common plots histograms
   fCommonPlots.book(dir, isData());
-//  fNormalizationSystematicsSignalRegion.book(dir, isData());
 
 
   // Book histograms in event selection classes
@@ -123,8 +125,8 @@ void Hplus2hwAnalysis_background::book(TDirectory *dir) {
 
 
   fElectronSelection.bookHistograms(dir);
-  fTauSelection.bookHistograms(dir);
   fLooseTauSelection.bookHistograms(dir);
+  fTauSelection.bookHistograms(dir);
   fMuonSelection.bookHistograms(dir);
   fJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
@@ -132,6 +134,7 @@ void Hplus2hwAnalysis_background::book(TDirectory *dir) {
   // Book non-common histograms
   // hAssociatedTop_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "associatedTop_Pt", "Associated t pT;p_{T} (G$
   // hAssociatedTop_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "associatedTop_Eta", "Associated t eta;#eta",$
+
 
 
 
@@ -156,19 +159,21 @@ void Hplus2hwAnalysis_background::book(TDirectory *dir) {
 }
 
 
-void Hplus2hwAnalysis_background::setupBranches(BranchManager& branchManager) {
+void Hplus2hwAnalysis_background_ele::setupBranches(BranchManager& branchManager) {
   fEvent.setupBranches(branchManager);
 //  return;
 }
 
-void Hplus2hwAnalysis_background::process(Long64_t entry) {
+void Hplus2hwAnalysis_background_ele::process(Long64_t entry) {
 
   ////////////
   // Initialize
   ////////////
 
   fCommonPlots.initialize();
+//  fNormalizationSystematicsSignalRegion.initialize();
 
+//  fCommonPlots.setFactorisationBinForEvent(std::vector<float> {});
   cAllEvents.increment();
 
 
@@ -197,21 +202,21 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
     return;
 
   ////////////
-  // Muon
+  // Electron
   ////////////
 
-  const MuonSelection::Data muData = fMuonSelection.analyze(fEvent);
-  if(!(muData.hasIdentifiedMuons()))
+  const ElectronSelection::Data eData = fElectronSelection.analyze(fEvent);
+  if(!(eData.hasIdentifiedElectrons()))
     return;
 
-  if (muData.getSelectedMuons().size() != 1)
+  if (eData.getSelectedElectrons().size() != 1)
     return;
 
   ////////////
   // Dummy Trigger SF for first check
   ////////////
 
-  if (fEvent.isMC()) {
+/*  if (fEvent.isMC()) {
     if (26 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 30) fEventWeight.multiplyWeight(0.9664);
     if (30 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 40) fEventWeight.multiplyWeight(0.9781);
     if (40 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 50) fEventWeight.multiplyWeight(0.9819);
@@ -225,7 +230,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 
   hMuonPt_afterMuonSelection->Fill(muData.getSelectedMuons()[0].pt());
   hMuonEta_afterMuonSelection->Fill(muData.getSelectedMuons()[0].eta());
-
+*/
 
   ////////////
   // Tau
@@ -245,7 +250,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   if(looseTauData.getSelectedTaus().size() != 2)
     return;
 
-  if(looseTauData.getSelectedTaus()[0].charge() != looseTauData.getSelectedTaus()[1].charge())
+  if(looseTauData.getSelectedTaus()[0].charge() == looseTauData.getSelectedTaus()[1].charge())
     return;
 
 //  if (fEvent.isMC() && looseTauData.getSelectedTaus()[0].isGenuineTau() && looseTauData.getSelectedTaus()[1].isGenuineTau()) { //if genuine tau, reject the event
@@ -271,6 +276,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
     return;
   }
 */
+//  std::cout << "--- DEBUG ---" << "\n";
 
   if (tauData.getAntiIsolatedTaus().size() == 2 && tauData.getSelectedTaus().size()==0) { // both anti tight Iso
 
@@ -359,17 +365,13 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 /// -------------------------------------
 
 
-
   ////////////
-  // Electron veto (Fully hadronic + orthogonality)
+  // muon veto (Fully hadronic + orthogonality)
   ////////////
 
-  const ElectronSelection::Data eData = fElectronSelection.analyze(fEvent);
-  if (eData.hasIdentifiedElectrons())
+  const MuonSelection::Data muData = fMuonSelection.analyze(fEvent);
+  if (muData.hasIdentifiedMuons())
     return;
-
-
-
 
   ////////////
   // Jet selection
@@ -385,7 +387,6 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   ////////////
 
   const BJetSelection::Data bjetData = fBJetSelection.analyze(fEvent, jetData);
-
   if (!bjetData.passedSelection())
     return;
 
@@ -421,8 +422,8 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
     hTauCharge->Fill(looseTauData.getSelectedTaus()[i].charge());
   }
 
-  hMuonPt->Fill(muData.getSelectedMuons()[0].pt());
-  hMuonEta->Fill(muData.getSelectedMuons()[0].eta());
+//  hMuonPt->Fill(muData.getSelectedMuons()[0].pt());
+//  hMuonEta->Fill(muData.getSelectedMuons()[0].eta());
 
   hNTau->Fill(looseTauData.getSelectedTaus().size());
 
@@ -430,7 +431,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 
 //  hNJet->Fill(jetData.getNumberOfSelectedJets());
 
-  double myTransverseMass = TransverseMass::reconstruct(looseTauData.getSelectedTaus()[0],looseTauData.getSelectedTaus()[1],muData.getSelectedMuons()[0], METData.getMET());
+  double myTransverseMass = TransverseMass::reconstruct(looseTauData.getSelectedTaus()[0],looseTauData.getSelectedTaus()[1],eData.getSelectedElectrons()[0], METData.getMET());
 
 
   hTransverseMass->Fill(myTransverseMass);
@@ -438,17 +439,17 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   if (fEvent.isMC()) {
     if (tauData.getAntiIsolatedTaus().size() == 2) {
       if (tauData.getAntiIsolatedTaus()[0].isGenuineTau() && tauData.getAntiIsolatedTaus()[1].isGenuineTau()) {
-        myTransverseMass = TransverseMass::reconstruct(tauData.getAntiIsolatedTaus()[0],tauData.getAntiIsolatedTaus()[1],muData.getSelectedMuons()[0], METData.getMET());
+        myTransverseMass = TransverseMass::reconstruct(tauData.getAntiIsolatedTaus()[0],tauData.getAntiIsolatedTaus()[1],eData.getSelectedElectrons()[0], METData.getMET());
         hTransverseMass_genuine->Fill(myTransverseMass);
       } else if (tauData.getAntiIsolatedTaus()[0].isGenuineTau()) {
-        myTransverseMass = TransverseMass::reconstruct(looseTauData.getSelectedTaus()[0],tauData.getAntiIsolatedTaus()[0],muData.getSelectedMuons()[0], METData.getMET());
+        myTransverseMass = TransverseMass::reconstruct(looseTauData.getSelectedTaus()[0],tauData.getAntiIsolatedTaus()[0],eData.getSelectedElectrons()[0], METData.getMET());
         hTransverseMass_genuine->Fill(myTransverseMass);
       } else if (tauData.getAntiIsolatedTaus()[1].isGenuineTau()) {
-        myTransverseMass = TransverseMass::reconstruct(looseTauData.getSelectedTaus()[0],tauData.getAntiIsolatedTaus()[1],muData.getSelectedMuons()[0], METData.getMET());
+        myTransverseMass = TransverseMass::reconstruct(looseTauData.getSelectedTaus()[0],tauData.getAntiIsolatedTaus()[1],eData.getSelectedElectrons()[0], METData.getMET());
         hTransverseMass_genuine->Fill(myTransverseMass);
       }
     } else if (tauData.getAntiIsolatedTaus()[0].isGenuineTau()) {
-      myTransverseMass = TransverseMass::reconstruct(looseTauData.getSelectedTaus()[0],tauData.getAntiIsolatedTaus()[0],muData.getSelectedMuons()[0], METData.getMET());
+      myTransverseMass = TransverseMass::reconstruct(looseTauData.getSelectedTaus()[0],tauData.getAntiIsolatedTaus()[0],eData.getSelectedElectrons()[0], METData.getMET());
       hTransverseMass_genuine->Fill(myTransverseMass);
     }
   }
@@ -460,6 +461,9 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   ////////////
 
   fCommonPlots.fillControlPlotsAfterAllSelections(fEvent);
+
+//  std::cout << "--- DEBUG AFTER COMMON PLOTS ---" << "\n";
+
 //  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hNormalizationInvertedTauAfterStdSelections, isGenuineTau, METvalue);
 //  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hMtInvertedTauAfterStdSelections, tauData.getAntiIsolatedTauIsGenuineTau(), myTransverseMass);
 
@@ -472,14 +476,14 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
 
 }
 
-void Hplus2hwAnalysis_background::doBaselineAnalysis(const Event& event, const TauSelection::Data& tauData, const int nVertices) {
+void Hplus2hwAnalysis_background_ele::doBaselineAnalysis(const Event& event, const TauSelection::Data& tauData, const int nVertices) {
 
 
 
 }
 
 
-void Hplus2hwAnalysis_background::doSignalAnalysis(const Event& event, const TauSelection::Data& tauData, const int nVertices) {
+void Hplus2hwAnalysis_background_ele::doSignalAnalysis(const Event& event, const TauSelection::Data& tauData, const int nVertices) {
 
 
 

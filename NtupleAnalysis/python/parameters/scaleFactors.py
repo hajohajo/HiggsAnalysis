@@ -75,13 +75,6 @@ def assignTauIdentificationSF(tauSelectionPset):
     return
 
 def assignTauMisidentificationSF(tauSelectionPset, partonFakingTau, direction):
-    '''
-    Tau misidentification (simple SF)
-
-     \param tauSelectionPset  the tau config PSet
-     \param partonFakingTau   "eToTau", "muToTau", "jetToTau"
-     \param direction         "nominal, "up", "down"
-    '''
     dirNumber = 0
     if direction == "up":
         dirNumber = 1
@@ -95,39 +88,39 @@ def assignTauMisidentificationSF(tauSelectionPset, partonFakingTau, direction):
         _assignJetToTauSF(tauSelectionPset, dirNumber)
     else:
         raise Exception("Error: unknown option for parton faking tau ('%s')!"%partonFakingTau)
-    return
 
-def _assignEToTauSF(tauSelectionPset, etaRegion, dirNumber):
-    if etaRegion == "barrel":
-        tauSelectionPset.tauMisidetificationEToTauBarrelSF = 1.0 + dirNumber*0.20
-    elif etaRegion == "endcap":
-        tauSelectionPset.tauMisidetificationEToTauEndcapSF = 1.0 + dirNumber*0.20
-    elif etaRegion == "full":
-        tauSelectionPset.tauMisidetificationEToTauSF = 1.0 + dirNumber*0.20
-    else:
-        raise Exception("Error: unknown option for eta region (\"%s\")!" % (etaRegion) )
-    return
+# Values from https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV#Electron_to_tau_fake_rate
+# Measured SF in Run-2 (2016), for Tight WP
+def _assignEToTauSF(tauSelectionPset, dirNumber):
+    tauSelectionPset.tauMisidetificationEToTauElectronBarrelSF = 1.40 + dirNumber*0.12
+    tauSelectionPset.tauMisidetificationEToTauElectronEndcapSF = 1.90 + dirNumber*0.30
+#    tauSelectionPset.tauMisidetificationEToTauSF = 1.0 + dirNumber*0.30
 
-def _assignMuToTauSF(tauSelectionPset, etaRegion, dirNumber):
-    if etaRegion == "barrel":
-        tauSelectionPset.tauMisidetificationMuToTauBarrelSF = 1.0 + dirNumber*0.30
-    elif etaRegion == "endcap":
-        tauSelectionPset.tauMisidetificationMuToTauEndcapSF = 1.0 + dirNumber*0.30
-    elif etaRegion == "full":
-        tauSelectionPset.tauMisidetificationMuToTauSF = 1.0 + dirNumber*0.30
-    else:
-        raise Exception("Error: unknown option for eta region (\"%s\")!" % (etaRegion) )
-    return
+# Values from https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV#Muon_Rejection,
+# Measured SF in Run-2 with bad muon filter, for Cut-based Loose WP
+def _assignMuToTauSF(tauSelectionPset, dirNumber):
+    tauSelectionPset.tauMisidetificationMuToTauBarrel0to0p4SF   = 1.22 + dirNumber*0.04
+    tauSelectionPset.tauMisidetificationMuToTauBarrel0p4to0p8SF = 1.12 + dirNumber*0.04
+    tauSelectionPset.tauMisidetificationMuToTauBarrel0p8to1p2SF = 1.26 + dirNumber*0.04
+    tauSelectionPset.tauMisidetificationMuToTauBarrel1p2to1p7SF = 1.22 + dirNumber*0.15
+    tauSelectionPset.tauMisidetificationMuToTauEndcapSF = 2.39 + dirNumber*0.16
+#    tauSelectionPset.tauMisidetificationMuToTauSF = 1.0 + dirNumber*0.30
 
-def _assignJetToTauSF(tauSelectionPset, etaRegion, dirNumber):
-    if etaRegion == "barrel":
-        tauSelectionPset.tauMisidetificationJetToTauBarrelSF = 1.0 + dirNumber*0.20
-    elif etaRegion == "endcap":
-        tauSelectionPset.tauMisidetificationJetToTauEndcapSF = 1.0 + dirNumber*0.20
-    elif etaRegion == "full":
-        tauSelectionPset.tauMisidetificationJetToTauSF = 1.0 + dirNumber*0.20
+def _assignJetToTauSF(tauSelectionPset, dirNumber):
+    tauSelectionPset.tauMisidetificationJetToTauBarrelSF = 1.0 + dirNumber*0.20
+    tauSelectionPset.tauMisidetificationJetToTauEndcapSF = 1.0 + dirNumber*0.20
+#    tauSelectionPset.tauMisidetificationJetToTauSF = 1.0 + dirNumber*0.20
+
+# Top-tagging
+def assignMisIDSF(pset, direction, jsonfile, variationType="MC"):
+    reader = TriggerSFJsonReader("2016", "runs_273150_284044", jsonfile)
+    result = reader.getResult()
+    if variationType == "MC":
+        _assignTrgSF("MisIDSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], pset, direction)
+    elif variationType == "Data":
+        _assignTrgSF("MisIDSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], pset, direction)
     else:
-        raise Exception("Error: unknown option for eta region (\"%s\")!" % (etaRegion) )
+        raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
     return
 
 def assignTauTriggerSF(tauSelectionPset, direction, tauTrgJson, variationType="MC"):
