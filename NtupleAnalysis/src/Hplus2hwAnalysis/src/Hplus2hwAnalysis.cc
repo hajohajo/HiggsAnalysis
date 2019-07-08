@@ -52,11 +52,11 @@ private:
 
   Count cSelected;
 
-  double drMuTau1 = 0;
+//  double drMuTau1 = 0;
 
-  double drMuTau2 = 0;
+//  double drMuTau2 = 0;
 
-  double drTauTau = 0;
+//  double drTauTau = 0;
 
   // Non-common histograms
 

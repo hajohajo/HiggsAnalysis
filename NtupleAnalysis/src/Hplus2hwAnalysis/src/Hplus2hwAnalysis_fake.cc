@@ -398,11 +398,11 @@ void Hplus2hwAnalysis_fake::process(Long64_t entry) {
 //  cMETSelection.increment();
 
 
-  double drMuTau1 = 0;
+//  double drMuTau1 = 0;
 
-  double drMuTau2 = 0;
+//  double drMuTau2 = 0;
 
-  double drMuMu = 0;
+//  double drMuMu = 0;
 
 //  fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, tauData);
 
