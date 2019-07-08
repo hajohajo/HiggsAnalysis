@@ -203,7 +203,7 @@ class AnalysisBuilder:
                  intermediateSignalSF=1.0,  # scale intermediate mass range signal samples by this number
                  # Systematics options
                  doSystematicVariations=False, # Enable/disable adding modules for systematic uncertainty variation
-                 analysisType="HToTauNu", # Define the analysis type (e.g. "HToTauNu", "HToTB")
+                 analysisType="HToTauNu", # Define the analysis type (e.g. "HToTauNu", "HToTB", "HToHW", "HToHW_background", "HToHW_withTopTag")
                  verbose=False,
                  systVarsList = [], # Overwrite the default systematics
                 ):
@@ -248,7 +248,7 @@ class AnalysisBuilder:
         return
 
     def _getAnalysisType(self, analysis):
-        myAnalyses = ["HToTauNu", "HToTB","HToHW","HToHW_background"]
+        myAnalyses = ["HToTauNu", "HToTB","HToHW", "HToHW_background", "HToHW_withTopTag"]
         if analysis not in myAnalyses:
             msg = "Unsupported analysis \"%s\". Please select one of the following: %s" % (analysis, ", ".join(myAnalyses))
             raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle() )
@@ -264,6 +264,8 @@ class AnalysisBuilder:
             systList = self.getSystematicsForHToTB()
 	elif  self._analysisType == "HToHW":
             systList = self.getSystematicsForHToHW()
+	elif  self._analysisType == "HToHW_withTopTag":
+            systList = self.getSystematicsForHToHW_withTopTag()
 	elif  self._analysisType == "HToHW_background":
             systList = self.getSystematicsForHToHW_background()
         else:
@@ -325,6 +327,33 @@ class AnalysisBuilder:
         return items
 
     def getSystematicsForHToHW(self):
+        items = []
+
+        # Trigger systematics
+        items.extend(["MuonTrgEffData"])
+
+        # Tau ID variation systematics
+        items.extend(["FakeTauElectron", "FakeTauMuon", "FakeTauJet", "TauIDSyst"])
+
+        # Muon ID variation systematics
+        items.extend(["MuonIDSyst"])
+
+        # Energy scales and JER systematics
+        items.extend(["TauES", "JES", "JER", "UES"])
+
+        # b quark systematics
+        items.extend(["BTagSF", "BMistagSF"])
+
+        # top quark systematics
+        if self._useTopPtReweighting:
+            items.append("TopPt")
+
+        # PU weight systematics
+        items.extend(["PUWeight"])
+
+        return items
+
+    def getSystematicsForHToHW_withTopTag(self):
         items = []
 
         # Trigger systematics

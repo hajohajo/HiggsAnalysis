@@ -21,6 +21,7 @@ public:
     kSignalAnalysis,
     kHplus2tbAnalysis,
     kHplus2hwAnalysis,
+    kHplus2hwAnalysisWithTopTag,
     kHplus2hw_ele_Analysis,
     kBTagEfficiencyAnalysis,
     kTauAnalysis,
@@ -90,7 +91,7 @@ public:
    * (it is usually set through TauSelection via CommonPlots::fillControlPlotsAfterTauSelection)
    */
   void setGenuineTauStatus(const bool isGenuineTau) { bIsGenuineTau = isGenuineTau; };
-  void setGenuineBStatus(const bool isGenuineB) { bIsGenuineB = isGenuineB; };
+  void setGenuineBkgStatus(const bool isGenuineBkg) { bIsGenuineBkg = isGenuineBkg; };
   
   //===== unique filling methods (to be called inside the event selection routine only, i.e. (before a passing decision is done))
   void fillControlPlotsAtVertexSelection(const Event& event);
@@ -120,9 +121,7 @@ public:
 					       const JetSelection::Data& jetData, 
 					       const BJetSelection::Data& bjetData, 
 					       const METSelection::Data& METData, 
-					       const QuarkGluonLikelihoodRatio::Data& qglrData,
-					       const TopSelectionBDT::Data& topData,
-					       bool bIsGenuineB); //HToTB-specific
+					       const TopSelectionBDT::Data& topData);
   void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
   void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false);
   void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineB);  //HToTB-specific
@@ -241,6 +240,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlNAllCleanedTopsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNSelectedCleanedTopsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetMassAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopMassAfterStdSelections;
@@ -337,6 +337,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlNAllCleanedTopsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNSelectedCleanedTopsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetMassAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopMassAfterAllSelections;
@@ -364,7 +365,7 @@ private:
   TauSelection::Data fTauData;
   //FakeTauIdentifier::Data fFakeTauData;
   bool bIsGenuineTau;
-  bool bIsGenuineB;
+  bool bIsGenuineBkg;
   ElectronSelection::Data fElectronData;
   MuonSelection::Data fMuonData;
   JetSelection::Data fJetData;
