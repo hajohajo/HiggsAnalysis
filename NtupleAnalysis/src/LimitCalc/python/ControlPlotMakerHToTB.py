@@ -30,14 +30,24 @@ _legendLabelEWKMC = "EWK (MC)"
 _legendLabelFakeB = "Fake-b (data)" 
 
 drawPlot = plots.PlotDrawer(ratio             = True, 
-                            ratioYlabel       = "Data/Bkg. ",
+                            ratioYlabel       = "Data / Bkg  ",
                             ratioCreateLegend = True,
                             ratioType         = "errorScale",
                             ratioErrorOptions = {"numeratorStatSyst": False},
                             stackMCHistograms = True, 
                             addMCUncertainty  = True, 
                             addLuminosityText = True,
-                            cmsTextPosition="outframe")
+                            cmsTextPosition   = "outframe")
+
+drawPlotPaper = plots.PlotDrawer(ratio             = True, 
+                                 ratioYlabel       = "Data / Bkg  ",
+                                 ratioCreateLegend = True,
+                                 ratioType         = "errorScalePaper",
+                                 ratioErrorOptions = {"numeratorStatSyst": False},
+                                 stackMCHistograms = True, 
+                                 addMCUncertainty  = True, 
+                                 addLuminosityText = True,
+                                 cmsTextPosition   = "outframe")
 
 drawPlot2D = plots.PlotDrawer(opts2={"ymin": 0.5, "ymax": 1.5},
                               ratio=False, 
@@ -67,11 +77,17 @@ class ControlPlotMakerHToTB:
         # Define label options
         myStyle = tdrstyle.TDRStyle()
         myStyle.setOptStat(False)
-        plots._legendLabels["MCStatError"] = "Bkg. stat."
-        plots._legendLabels["MCStatSystError"] = "Bkg. stat.#oplussyst."
-        plots._legendLabels["BackgroundStatError"] = "Bkg. stat. unc"
-        plots._legendLabels["BackgroundStatSystError"] = "Bkg. stat.#oplussyst. unc."
-
+        if self._config.OptionPaper:
+            plots._legendLabels["MCStatError"] = "Stat unc"
+            plots._legendLabels["MCStatSystError"] = "Stat #oplus syst unc"
+            plots._legendLabels["BackgroundStatError"] = "Stat #oplus syst unc"
+            plots._legendLabels["BackgroundStatSystError"] = "Stat #oplus syst unc"
+        else:
+            plots._legendLabels["MCStatError"] = "Bkg. stat."
+            plots._legendLabels["MCStatSystError"] = "Bkg. stat.#oplussyst."
+            plots._legendLabels["BackgroundStatError"] = "Bkg. stat. unc"
+            plots._legendLabels["BackgroundStatSystError"] = "Bkg. stat.#oplussyst. unc."
+            
         # Make control plots
         self.Verbose(ShellStyles.HighlightStyle() + "Generating control plots" + ShellStyles.NormalStyle(), True)
 
@@ -190,7 +206,7 @@ class ControlPlotMakerHToTB:
                     myHisto = histograms.Histo(hSignal, mySignalLabel)
                     myHisto.setIsDataMC(isData=False, isMC=True)
                     myStackList.insert(1, myHisto)
-                    
+            
                 # Add data to selection flow plot
                 selectionFlow.addColumn(myCtrlPlot.flowPlotCaption, hDataUnblinded, myStackList[1:])
 
@@ -200,8 +216,10 @@ class ControlPlotMakerHToTB:
                 myStackPlot = plots.DataMCPlot2(myStackList)
                 myStackPlot.setLuminosity(self._luminosity)
                 myStackPlot.setEnergy("%d" % self._config.OptionSqrtS)
-                myStackPlot.setDefaultStyles()
-                
+                myStackPlot.setDefaultStyles(paperStyle=self._config.OptionPaper)
+                if self._config.OptionPaper:
+                    myStackPlot.setLegendHeader("Associated production")
+            
                 # Tweak paramaters
                 if not "unit" in myParams.keys():
                     myParams["unit"] = ""
@@ -230,7 +248,11 @@ class ControlPlotMakerHToTB:
                             })
 
                 # Do plotting
-                drawPlot(myStackPlot, saveName, **myParams)
+                if self._config.OptionPaper:
+                    drawPlotPaper(myStackPlot, saveName, **myParams)
+                else:
+                    drawPlot(myStackPlot, saveName, **myParams)
+                    
                 
             # Do selection flow plot
             selectionFlow.makePlot(self._dirname, m, len(self._config.ControlPlots), self._luminosity)
@@ -307,13 +329,18 @@ class ControlPlotMakerHToTB:
 
     def _setRatioLegendPosition(self, myParams):
         if "ratioLegendPosition" in myParams.keys():
+            dy = 0.03
+            if self._config.OptionPaper:
+                dh = -0.12
+            else:
+                dh = 0.0
             self.Verbose("Setting the legend (ratio) position to \"%s\"" % ( myParams["ratioLegendPosition"] ) )
             if myParams["ratioLegendPosition"] == "left":
-                myParams["ratioMoveLegend"] = {"dx": -0.51, "dy": 0.03}
+                myParams["ratioMoveLegend"] = {"dx": -0.51, "dy": dy, "dh": dh}
             elif myParams["ratioLegendPosition"] == "right":
-                myParams["ratioMoveLegend"] = {"dx": -0.08, "dy": 0.03}
+                myParams["ratioMoveLegend"] = {"dx": -0.01, "dy": dy, "dh": dh}
             elif myParams["ratioLegendPosition"] == "SE":
-                myParams["ratioMoveLegend"] = {"dx": -0.08, "dy": -0.33}
+                myParams["ratioMoveLegend"] = {"dx": -0.08, "dy": -0.33, "dh": dh}
             else:
                 raise Exception("Unknown value for option ratioLegendPosition: %s!", myParams["ratioLegendPosition"])
             del myParams["ratioLegendPosition"]
@@ -325,18 +352,22 @@ class ControlPlotMakerHToTB:
     def _setLegendPosition(self, myParams):
         if "legendPosition" in myParams.keys():
             self.Verbose("Setting the legend position to \"%s\"" % ( myParams["legendPosition"] ) )
+            dh = 0.14
             if self._config.OptionBr == 1.0:
                 dx = -0.10
             else:
                 dx = -0.12
+            if self._config.OptionPaper:
+                dx = -0.20
+                dh = +0.05
             if myParams["legendPosition"] == "NE":
-                myParams["moveLegend"] = {"dx": dx, "dy": -0.02, "dh": 0.14}
+                myParams["moveLegend"] = {"dx": dx, "dy": -0.02, "dh": dh}
             elif myParams["legendPosition"] == "SE":
-                myParams["moveLegend"] = {"dx": dx, "dy": -0.40, "dh": 0.14}
+                myParams["moveLegend"] = {"dx": dx, "dy": -0.40, "dh": dh}
             elif myParams["legendPosition"] == "SW":
-                myParams["moveLegend"] = {"dx": -0.53, "dy": -0.40, "dh": 0.14}
+                myParams["moveLegend"] = {"dx": -0.53, "dy": -0.40, "dh": dh}
             elif myParams["legendPosition"] == "NW":
-                myParams["moveLegend"] = {"dx": -0.53, "dy": -0.02, "dh": 0.14}
+                myParams["moveLegend"] = {"dx": -0.53, "dy": -0.02, "dh": dh}
             elif myParams["legendPosition"] == "RM":
                 myParams["moveLegend"] = {"dx": +10.0, "dy": +10.0, "dh": -100.0}
             else:
@@ -645,6 +676,7 @@ class SelectionFlowPlotMaker:
         myStackPlot.setLuminosity(luminosity)
         myStackPlot.setEnergy("%d"%self._config.OptionSqrtS)
         myStackPlot.setDefaultStyles()
+
         myParams = {}
         myParams["ylabel"] = "Events"
         myParams["log"] = True

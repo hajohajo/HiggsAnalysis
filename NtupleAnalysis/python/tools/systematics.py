@@ -309,6 +309,160 @@ def getBinningForTetrajetMass(binLevel=0):
             myBins.append(i)
         for i in range(2000, 3000, 500):
             myBins.append(i)
+    elif binLevel == 20:
+        for i in range(0, 800, 50):
+            myBins.append(i)
+        for i in range(800, 1000, 100):
+            myBins.append(i)
+        for i in range(1000, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 21:
+        for i in range(0, 800, 40):
+            myBins.append(i)
+        for i in range(800, 1000, 100):
+            myBins.append(i)
+        for i in range(1000, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 22:
+        for i in range(0, 500, 25):
+            myBins.append(i)
+        for i in range(500, 800, 50):
+            myBins.append(i)
+        for i in range(800, 1000, 100):
+            myBins.append(i)
+        for i in range(1000, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 23:
+        for i in range(0, 500, 20):
+            myBins.append(i)
+        for i in range(500, 1000, 40):
+            myBins.append(i)
+        for i in range(1000, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 24:
+        for i in range(0, 650, 25):
+            myBins.append(i)
+        for i in range(650, 800, 50):
+            myBins.append(i)
+        for i in range(800, 100, 100):
+            myBins.append(i)
+        for i in range(1000, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 25:
+        for i in range(0, 1000, 40):
+            myBins.append(i)
+        for i in range(1000, 1600, 100):
+            myBins.append(i)
+        for i in range(1600, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 26:
+        for i in range(0, 120, 40):
+            myBins.append(i)
+        for i in range(120, 1000, 40):
+            myBins.append(i)
+        for i in range(1000, 1600, 100):
+            myBins.append(i)
+        for i in range(1600, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 27:
+        for i in range(0, 120, 120):
+            myBins.append(i)
+        for i in range(120, 600, 40):
+            myBins.append(i)
+        for i in range(600, 1600, 100):
+            myBins.append(i)
+        for i in range(1600, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 28:
+        for i in range(0, 200, 200):
+            myBins.append(i)
+        for i in range(200, 600, 40):
+            myBins.append(i)
+        for i in range(600, 1200, 50):
+            myBins.append(i)
+        for i in range(1200, 1600, 100):
+            myBins.append(i)
+        for i in range(1600, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 29:
+        for i in range(0, 200, 200):
+            myBins.append(i)
+        for i in range(200, 600, 40):
+            myBins.append(i)
+        for i in range(600, 1000, 50):
+            myBins.append(i)
+        for i in range(1000, 1600, 100):
+            myBins.append(i)
+        for i in range(1600, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 30:
+        for i in range(0, 200, 200):
+            myBins.append(i)
+        for i in range(200, 600, 40):
+            myBins.append(i)
+        for i in range(600, 1600, 100):
+            myBins.append(i)
+        for i in range(1600, 2000, 200):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 31:
+        for i in range(0, 160, 160):
+            myBins.append(i)
+        for i in range(160, 600, 40):
+            myBins.append(i)
+        for i in range(600, 1700, 100):
+            myBins.append(i)
+        for i in range(1700, 2000, 300):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 32:
+        for i in range(0, 150, 150):
+            myBins.append(i)
+        for i in range(150, 600, 30):
+            myBins.append(i)
+        for i in range(600, 1000, 40):
+            myBins.append(i)
+        for i in range(1000, 1700, 100):
+            myBins.append(i)
+        for i in range(1700, 2000, 300):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
+    elif binLevel == 33:
+        for i in range(0, 160, 160):
+            myBins.append(i)
+        for i in range(160, 600, 40):
+            myBins.append(i)
+        for i in range(600, 1400, 80):
+            myBins.append(i)
+        for i in range(1400, 1700, 100):
+            myBins.append(i)
+        for i in range(1700, 2000, 300):
+            myBins.append(i)
+        for i in range(2000, 3000, 500):
+            myBins.append(i)
     else:
         raise Exception(ShellStyles.ErrorStyle() + "Please choose bin-level from -1 to 2" + ShellStyles.NormalStyle())
     return myBins
@@ -370,6 +524,26 @@ _dataDrivenCtrlPlotBinning = {
     "TauPlusMETPt_AfterAllSelections": [0,40,80,120,160,200,240,280,320,360,400,450,500,600,700,800,900,1000],
 
     # Tau
+    "TransverseMass*": [0,100,200,300,400,500,600,700,800,900,1600], #extended to 1600
+#    "TransverseMass*": [0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,350,400,500,600,700,800,900,1000,1500], # MIT rebin
+
+#    "shapeTransverseMass": [0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,440,460,480,500,600,700,800],
+#    "shapeTransverseMass": [0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,440,460,480,500,600,700,800,900,1000,1500,2000,3000,4000,5000], #default extended to 5000
+    "shapeTransverseMass": [0,50,100,150,200,250,300,350,400,400,500,600,700,800,900,1000], #aggressive rebinning to get rid of empty bins
+#    "shapeTransverseMass": [0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,350,400,500,600,700,800,900,1000,1500], # MIT rebin
+
+    "tauPt": [0,20,70,120,170,220,270,320,370,420,470,520,570],
+    "muPt": [0,20,70,120,170,220,270,300,370,420,470,520,570],
+    "MET": [0,40,90,140,190,240,290,340,390,440,490],
+    "muPt_afterMuonSelection": [0,50,100,150,200,250,300,350,400,500],
+    "muEta_afterMuonSelection": [-2.4,-2.2,-2.0,-1.8,-1.6,-1.4,-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,-0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4],
+    "muEta": [-2.4,-2.1,-1.8,-1.5,-1.2,-0.9,-0.6,-0.3,-0.0,0.3,0.6,0.9,1.2,1.5,1.8,2.1,2.4],
+    "tauEta": [-2.4,-2.1,-1.8,-1.5,-1.2,-0.9,-0.6,-0.3,-0.0,0.3,0.6,0.9,1.2,1.5,1.8,2.1,2.4],
+    "nJet": [0,1,2,3,4,5,6,7,8,9,10],
+    "nTau": [0,1,2,3,4,5,6,7,8,9,10], 
+
+    "shapeInvariantMass": [0,20,40,60,80,100,120,140,160,200,300,400,500,600,700,800,900,1000,1500,2000,3000,4000,5000],
+    "InvariantMass*": [0,20,40,60,80,100,120,140,160,200,400,500,600,700,800,900,1000,1500,2000,3000,4000,5000],
     "SelectedTau_pT_AfterStandardSelections": [0,50,60,70,80,90,100,110,120,130,140,150,170,190,220,250,300,400,500,600,700,800,900,1000],
     "SelectedTau_eta_AfterStandardSelections": [-2.5,-2.1,-2.0,-1.8,-1.6,-1.4,-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,-0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.1,2.5],
     "SelectedTau_phi_AfterStandardSelections": [-3.14,-2.75,-2.36,-1.96,-1.57,-1.18,-0.79,-0.39,0.00,0.39,0.79,1.18,1.57,1.96,2.36,2.75,3.14],
@@ -381,7 +555,10 @@ _dataDrivenCtrlPlotBinning = {
     "SelectedTau_DecayMode_AfterStandardSelections": None,
     "SelectedTau_Nprongs_AfterStandardSelections": None,
     "SelectedTau_source_AfterStandardSelections": None,
-    "SelectedTau_pT_AfterAllSelections": [0,50,60,80,100,150,200,300,400,500,600,700,800,900,1000],
+    "SelectedTaus_pT_AfterAllSelections": [0,20,40,60,80,100,150,200,300,400,500,600,700,800,900,1000],
+    "SelectedTaus_eta_AfterAllSelections": [-2.5,-2.1,-1.8,-1.6,-1.4,-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,-0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.1,2.5],
+    "SelectedTaus_phi_AfterAllSelections": [-3.14,-2.36,-1.57,-0.79,0.00,0.79,1.57,2.36,3.14],
+    "SelectedTau_pT_AfterAllSelections": [0,20,40,60,80,100,150,200,300,400,500,600,700,800,900,1000],
     "SelectedTau_eta_AfterAllSelections": [-2.5,-2.1,-1.8,-1.6,-1.4,-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,-0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.1,2.5],
     "SelectedTau_phi_AfterAllSelections": [-3.14,-2.36,-1.57,-0.79,0.00,0.79,1.57,2.36,3.14],
     "SelectedTau_ldgTrkPt_AfterAllSelections": [0,20,40,50,60,70,80,100,150,200,300,400,500,600,700,800,900,1000],
@@ -437,7 +614,8 @@ _dataDrivenCtrlPlotBinning = {
     "HT_AfterAllSelections"   : [i for i in range(500, 1000, 50)] + [i for i in range(1000, 1500, 100)] + [i for i in range(1500, 2500+200, 200)] + [3000],
     "MHT_AfterAllSelections"  : [i for i in range(0, 140, 10)] + [i for i in range(140, 240, 20)] + [i for i in range(240, 400, 50)],
     "QGLR_AfterAllSelections" : [float(i)/100.0 for i in range(0, 105, 5)],
-    "LdgTrijetPt_AfterAllSelections"        : [j for j in range(0, 500, 50)] + [k for k in range(500, 900+100, 100)],
+    #"LdgTrijetPt_AfterAllSelections"        : [j for j in range(0, 500, 50)] + [k for k in range(500, 900+100, 100)],
+    "LdgTrijetPt_AfterAllSelections"        : [j for j in range(0, 400, 50)] + [k for k in range(400, 700, 100)] + [800], #paper-v2 (best)
     "SubldgTrijetPt_AfterAllSelections"     : [j for j in range(0, 500, 50)] + [k for k in range(500, 900+100, 100)],
     "LdgTrijetMass_AfterAllSelections"      : [i for i in range(40, 360+20, 20)],
     "SubldgTrijetMass_AfterAllSelections"   : [i for i in range(40, 360+20, 20)],
@@ -456,8 +634,8 @@ _dataDrivenCtrlPlotBinning = {
     "TetrajetBjetEta_AfterAllSelections"    : None,
     "LdgTetrajetPt_AfterAllSelections"      : [j for j in range(0, 500, 20)] + [k for k in range(500, 700, 50)] + [k for k in range(700, 900+100, 100)],
     "SubldgTetrajetPt_AfterAllSelections"   : [j for j in range(0, 500, 20)] + [k for k in range(500, 700, 50)] + [k for k in range(700, 900+100, 100)],
-    "LdgTetrajetMass_AfterAllSelections"    : getBinningForTetrajetMass(18),
-    "SubldgTetrajetMass_AfterAllSelections" : getBinningForTetrajetMass(18),
+    "LdgTetrajetMass_AfterAllSelections"    : getBinningForTetrajetMass(33), #getBinningForTetrajetMass(18), # 06 Mar 2019 -tmp
+    "SubldgTetrajetMass_AfterAllSelections" : getBinningForTetrajetMass(33), #getBinningForTetrajetMass(18), # 06 Mar 2019 -tmp
     "Njets_AfterAllSelections"  : [i for i in range(7, 19, 1)],
     "Jet1Pt_AfterAllSelections" : [i for i in range(0,300, 20)] + [300, 400, 500, 700, 1000],
     "Jet2Pt_AfterAllSelections" : [i for i in range(0,300, 20)] + [300, 400, 500, 700],
@@ -503,8 +681,8 @@ _dataDrivenCtrlPlotBinning = {
     "TetrajetBjetEta_AfterStandardSelections"    : None,
     "LdgTetrajetPt_AfterStandardSelections"      : [j for j in range(0, 500, 20)] + [k for k in range(500, 700, 50)] + [k for k in range(700, 900+100, 100)],
     "SubldgTetrajetPt_AfterStandardSelections"   : [j for j in range(0, 500, 20)] + [k for k in range(500, 700, 50)] + [k for k in range(700, 900+100, 100)],
-    "LdgTetrajetMass_AfterStandardSelections"    : getBinningForTetrajetMass(18),
-    "SubldgTetrajetMass_AfterStandardSelections" : getBinningForTetrajetMass(18),
+    "LdgTetrajetMass_AfterStandardSelections"    : getBinningForTetrajetMass(33), #getBinningForTetrajetMass(18), # 06 Mar 2019 -tmp
+    "SubldgTetrajetMass_AfterStandardSelections" : getBinningForTetrajetMass(33), #getBinningForTetrajetMass(18), # 06 Mar 2019 -tmp
     "Njets_AfterStandardSelections"  : [i for i in range(7, 19, 1)],
     "Jet1Pt_AfterStandardSelections" : [i for i in range(0,300, 20)] + [300, 400, 500, 700, 1000],
     "Jet2Pt_AfterStandardSelections" : [i for i in range(0,300, 20)] + [300, 400, 500, 700],

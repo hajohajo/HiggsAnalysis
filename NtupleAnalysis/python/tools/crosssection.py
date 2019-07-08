@@ -32,6 +32,8 @@ https://twiki.cern.ch/twiki/bin/view/CMS/HowToGenXSecAnalyzer#Running_the_GenXSe
 '''
 
 DEGUB = False
+SIGNALXSECTION = 1.0
+
 def Verbose(msg, printHeader=False):
     '''
     Calls Print() only if verbose options is set to true.
@@ -118,6 +120,7 @@ class CrossSectionList:
 # [19] https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopSigma
 # [20] https://github.com/UHH2/UHH2/wiki/Ntuple-Production-(Run-II,-2nd-round,-50ns)
 # [21] CMS AN2018_042_v4, Table 3
+
 
 backgroundCrossSections = CrossSectionList(
     CrossSection("QCD_Pt_15to30", {
@@ -223,8 +226,9 @@ backgroundCrossSections = CrossSectionList(
     CrossSection("WW", {
             "7": 43.0, # [3]
             "8": 54.838, # [9], took value for CTEQ PDF since CTEQ6L1 was used in pythia simulation
-            #"13": 64.46, # [13] from Andrea: WW -> lnqq : 52pb + WW -> lnln : 12.46pb
+#            "13": 64.46, # [13] from Andrea: WW -> lnqq : 52pb + WW -> lnln : 12.46pb
             "13": 118.7, # [13] from Andrea: WW -> lnqq : 52pb + WW -> lnln : 12.46pb
+
             }),
     CrossSection("WWToLNuQQ", {
             "13": 49.997, #[17] 
@@ -382,7 +386,7 @@ backgroundCrossSections = CrossSectionList(
             #}),
     CrossSection("WJetsToLNu", {
             "13": 20508.9*3, # [13,17] 20508.9*3, McM for the MLM dataset: 5.069e4
-            }),
+	    }),
     CrossSection("WJetsToLNu_HT_0To70", {
             "13": 20508.9*3, # set to inclusive xsect as HT_0To70 is skimmed from the inclusive sample
             }),
@@ -715,12 +719,15 @@ def setBackgroundCrossSections(datasets, doWNJetsWeighting=True, quietMode=False
     for dset in datasets.getMCDatasets():
         setBackgroundCrossSectionForDataset(dset, doWNJetsWeighting, quietMode)
 
+def getSignalCrossSection():
+    return SIGNALXSECTION
+
 def setBackgroundCrossSectionForDataset(dataset, doWNJetsWeighting=True, quietMode=False):
     datasetName = dataset.getName().split("_ext", 1)[0] #use only the first part of dataset name, before "_ext"
     value = backgroundCrossSections.crossSection(datasetName, dataset.getEnergy())
     if value is None:
         if "ChargedHiggs" in dataset.getName() or "HplusToTauNu" in dataset.getName():
-            value = 1.0 # Force signal xsection to 1 pb
+            value = SIGNALXSECTION #1.0 # Force signal xsection to 1 pb
         else:
             for wnJets in ["W1Jets", "W2Jets", "W3Jets", "W4Jets"]:
                 if wnJets in dataset.getName():

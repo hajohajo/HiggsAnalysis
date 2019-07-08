@@ -11,7 +11,8 @@
 
 class MuonGeneratedCollection: public ParticleCollection<double> {
 public:
-  explicit MuonGeneratedCollection(const std::string& prefix="Muons")
+//  explicit MuonGeneratedCollection(const std::string& prefix="Muons")
+  MuonGeneratedCollection(const std::string& prefix="Muons")
   : ParticleCollection(prefix),
     fMCmuon(prefix)
   {
@@ -31,6 +32,7 @@ protected:
   ParticleCollection<double> fMCmuon;
 
 protected:
+  const Branch<std::vector<bool>> *fTrgMatch_HLT_IsoMu24_v;
   const Branch<std::vector<bool>> *fIsGlobalMuon;
   const Branch<std::vector<bool>> *fMuIDLoose;
   const Branch<std::vector<bool>> *fMuIDMedium;
@@ -64,6 +66,7 @@ public:
 
   const Particle<ParticleCollection<double>>* MCmuon() const { return &fMCmuon; }
 
+  bool TrgMatch_HLT_IsoMu24_v() const { return this->fCollection->fTrgMatch_HLT_IsoMu24_v->value()[this->index()]; }
   bool isGlobalMuon() const { return this->fCollection->fIsGlobalMuon->value()[this->index()]; }
   bool muIDLoose() const { return this->fCollection->fMuIDLoose->value()[this->index()]; }
   bool muIDMedium() const { return this->fCollection->fMuIDMedium->value()[this->index()]; }

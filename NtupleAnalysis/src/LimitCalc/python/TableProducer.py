@@ -1012,6 +1012,7 @@ class TableProducer:
                         HST = c.getCachedShapeRootHistogramWithUncertainties().Clone()
                     elif c.typeIsQCD() or c.typeIsFakeB():
                         containsQCDdataset = True
+##
                         if QCD == None:
                             try:
                                 QCD = c.getCachedShapeRootHistogramWithUncertainties().Clone()
@@ -1020,6 +1021,7 @@ class TableProducer:
                                 raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle())
                         else:
                             QCD.Add(c.getCachedShapeRootHistogramWithUncertainties())
+##
                     elif c.typeIsEWK() or (c.typeIsEWKfake() and self._config.OptionGenuineTauBackgroundSource == "MC_FakeAndGenuineTauNotSeparated") or c.typeIsEWKMC() or c.typeIsGenuineB():
                         # fixme: what a mess! c.typeIsEWKMC() and c.typeIsGenuineB() ORs added for h2tb. must make a proper code!
                         if Embedding == None:
@@ -1031,9 +1033,10 @@ class TableProducer:
                             EWKFakes = c.getCachedShapeRootHistogramWithUncertainties().Clone()
                         else:
                             EWKFakes.Add(c.getCachedShapeRootHistogramWithUncertainties())
-                    else:
-                        msg = "Unknown dataset type for dataset %s!%s" % (c.getLabel(), ShellStyles.NormalStyle())
-                        raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle())
+                    #else:
+		    #	print "yllatys"
+                    #    msg = "Unknown dataset type for dataset %s!%s" % (c.getLabel(), ShellStyles.NormalStyle())
+                    #    raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle())
                     
 
             # Calculate signal yield
@@ -1079,7 +1082,7 @@ class TableProducer:
             if not (self._config.OptionLimitOnSigmaBr or m > 179):
                 myOutput += "Signal, mH+=%3d GeV, Br(t->bH+)=%.2f: %s"%(m,myBr,self.getResultString(HW, self.formatStr, self.myPrecision))
             else:
-                myOutput += "Signal, mH+=%3d GeV, sigma x Br=1 pb: %s"%(m,self.getResultString(HW, self.formatStr, self.myPrecision))
+                myOutput += "Signal, mH+=%3d GeV, sigma x Br=1 fb: %s"%(m,self.getResultString(HW, self.formatStr, self.myPrecision))
             myOutput += "Backgrounds:\n"
             if containsQCDdataset:
                 myOutput += "                           Multijets: %s"%self.getResultString(QCD, self.formatStr, self.myPrecision)
@@ -1274,6 +1277,7 @@ class TableProducer:
                                    ["CMS_HPTB_mu_RF_HPTB", "RF scale acceptance (signal)"],
                                    ["CMS_HPTB_mu_RF_top" , "RF scale acceptance (top)"],
                                    ["CMS_HPTB_mu_RF_ewk" , "RF scale acceptance (EWK)"],
+                                   ["CMS_HPTB_fakeB_transferfactor", "Fake $b$ transfer factors"], # added 7 Mar 2018 (was accidentally deleted?)
                                    ]
             else:
                 myNuisanceOrder = [["CMS_eff_trg_MC", "trigger efficiency"],
@@ -1346,8 +1350,9 @@ class TableProducer:
                                ["QCDscale_VV", "diboson scale"],
                                ["pdf_VV", "diboson pdf"],
                                ["lumi_13TeV","luminosity (13 TeV)"],
-                               ["CMS_Hptntj_fake_t_fit","Fake tau template fit"],
-                               ["CMS_Hptntj_fake_t_shape","Fake tau mT shape"]
+			       ["CMS_FakeRate","Fake Rate measurement"],
+                               ["CMS_Hptntj_QCDbkg_templateFit","Fake tau template fit"],
+                               ["CMS_Hptntj_QCDkbg_metshape","Fake tau MET shape"]
                                ]
             
         # Make table - The horror!

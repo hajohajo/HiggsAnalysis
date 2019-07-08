@@ -36,7 +36,7 @@ forPaper = True
 BR = "#it{B}"
 
 # Label for H+ decay mode
-hplusDecayMode    = "H^{+} #rightarrow #tau^{+}#nu_{#tau}"
+hplusDecayMode    = "H^{+} #rightarrow H_{SM}W#rightarrow#tau#tau#mu#nu"
 hplusDecayModeHtb = "H^{+} #rightarrow t#bar{b}"
 
 # The label for the physics process
@@ -125,10 +125,11 @@ def useParentheses():
     https://twiki.cern.ch/twiki/bin/viewauth/CMS/Internal/FigGuidelines (10 Sep 2018)
     '''
     global BRlimit, sigmaBRlimit
-    #BRlimit      = "95%% CL limit on %s(t#rightarrowH^{+}b)#times%s(%s)" % (BR, BR, hplusDecayMode)
-    #sigmaBRlimit = "95%% CL limit on #sigma(H^{+})#times%s(%s) (pb)" % (BR, hplusDecayMode)
-    BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
-    sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
+    
+    #BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
+    #sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
+    BRlimit      = "%s(t#rightarrowH^{+}b)#times%s(%s)" % (BR, BR, hplusDecayMode)
+    sigmaBRlimit = "#sigma(H^{+})#times%s(%s) (fb)" % (BR, hplusDecayMode)
     return
 
     
@@ -138,15 +139,16 @@ def useSubscript(HToTB=False):
     '''
     global BRlimit, sigmaBRlimit
     if HToTB:
-        #BRlimit      = "95%% CL limit on %s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayModeHtb)
-        #sigmaBRlimit = "95%% CL limit on #sigma_{H^{+}}#times%s_{%s} (pb)" % (BR, hplusDecayModeHtb)
         BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
         sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
+#    else:
+#        BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayMode)
+#        sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayMode)
+#        BRlimit      = " %s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayModeHtb)
+#        sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (fb)" % (BR, hplusDecayModeHtb)
     else:
-        #BRlimit      = "95%% CL limit on %s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayMode)
-        #sigmaBRlimit = "95%% CL limit on #sigma_{H^{+}}#times%s_{%s} (pb)" % (BR, hplusDecayMode)
-        BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayMode)
-        sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayMode)
+        BRlimit      = "%s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayMode)
+        sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (fb)" % (BR, hplusDecayMode)
     return
 
 useSubscript()

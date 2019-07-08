@@ -131,9 +131,19 @@ AngularCutsBase::Data AngularCutsBase::analyze(const Event& event, const Tau& ta
   // Send data to CommonPlots
   if (fCommonPlots != nullptr) {
     if (fType == kCollinear)
-      fCommonPlots->fillControlPlotsAtAngularCutsCollinear(event, data);
+      {
+	// std::cout << "=== AngularCutBase::analyze() fType = " << fType << "(kCollinear)" << std::endl;
+	fCommonPlots->fillControlPlotsAtAngularCutsCollinear(event, data);
+      }
     else if (fType == kBackToBack)
-      fCommonPlots->fillControlPlotsAtAngularCutsBackToBack(event, data);
+      {
+	// std::cout << "=== AngularCutBase::analyze() fType = " << fType << "(kBackToBack)" << std::endl;
+	fCommonPlots->fillControlPlotsAtAngularCutsBackToBack(event, data);
+      }
+    else
+      {
+	throw hplus::Exception("assert") << "AngularCuts::Data: Unexpected fType = " << fType << " [options: kCollinear, kBackToBack]. This should not be reached";
+      }
   }
   // Return data
   return data;

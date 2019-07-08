@@ -49,6 +49,7 @@ import dataset
 import histograms
 import styles
 import aux
+import HiggsAnalysis.NtupleAnalysis.tools.crosssection as xsect
 
 #================================================================================================
 # Global Definitions
@@ -111,8 +112,29 @@ _physicalMcAdd = {
     "QCD_HT2000toInf"      : "QCD_HT2000toInf",
     "QCD_HT2000toInf_ext1" : "QCD_HT2000toInf",
 
+    "QCD_Pt_80to120"         : "QCD_Pt_80to120"    , 
+    "QCD_Pt_80to120_ext1"    : "QCD_Pt_80to120"    ,
+    "QCD_Pt_80to120_ext2"    : "QCD_Pt_80to120"    ,
+    "QCD_Pt_120to170"        : "QCD_Pt_120to170"   ,
+    "QCD_Pt_120to170_ext1"   : "QCD_Pt_120to170"   ,
+    "QCD_Pt_170to300"        : "QCD_Pt_170to300"   ,
+    "QCD_Pt_170to300_ext1"   : "QCD_Pt_170to300"   ,
+    "QCD_Pt_300to470"        : "QCD_Pt_300to470"   ,
+    "QCD_Pt_300to470_ext1"   : "QCD_Pt_300to470"   ,
+    "QCD_Pt_600to800"        : "QCD_Pt_600to800"   ,
+    "QCD_Pt_600to800_ext1"   : "QCD_Pt_600to800"   ,
+    "QCD_Pt_800to1000"       : "QCD_Pt_800to1000"  ,
+    "QCD_Pt_800to1000_ext1"  : "QCD_Pt_800to1000"  ,
+    "QCD_Pt_1000to1400"      : "QCD_Pt_1000to1400" ,
+    "QCD_Pt_1000to1400_ext1" : "QCD_Pt_1000to1400" ,
+    "QCD_Pt_1400to1800"      : "QCD_Pt_1400to1800" ,
+    "QCD_Pt_1400to1800_ext1" : "QCD_Pt_1400to1800" ,
+    "QCD_Pt_1800to2400"      : "QCD_Pt_1800to2400" ,
+    "QCD_Pt_1800to2400_ext1" : "QCD_Pt_1800to2400" ,
+    "QCD_Pt_2400to3200"      : "QCD_Pt_2400to3200" ,
+    "QCD_Pt_2400to3200_ext1" : "QCD_Pt_2400to3200" ,
+
     "QCD_Pt20_MuEnriched"                : "QCD_Pt20_MuEnriched",
-    
     "QCD_Pt_15to20_MuEnrichedPt5"        : "QCD_Pt_15to20_MuEnrichedPt5",
     "QCD_Pt_20to30_MuEnrichedPt5"        : "QCD_Pt_20to30_MuEnrichedPt5",
     "QCD_Pt_30to50_MuEnrichedPt5"        : "QCD_Pt_30to50_MuEnrichedPt5",
@@ -172,6 +194,15 @@ _physicalMcAdd = {
     "ChargedHiggs_HplusTB_HplusToTauNu_M_1000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_1000",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_2000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_2000",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_3000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_3000",
+
+    "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO": "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
+    "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO": "ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
+    "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"     : "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta",
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO": "ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO",
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO": "ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO",
+    "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO": "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
+    "ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO" : "ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO",
+    "ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO" : "ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO",
 
     "ChargedHiggs_HplusTB_HplusToTB_M_180_ext1" : "ChargedHiggs_HplusTB_HplusToTB_M_180",
     "ChargedHiggs_HplusTB_HplusToTB_M_200_ext1" : "ChargedHiggs_HplusTB_HplusToTB_M_200",
@@ -591,13 +622,12 @@ _datasetOrder.extend([
     "TTJets",
     "TT",
     "TT_Mtt",
-    "ZJetsToQQ_HT600toInf", # Htb
+    "SingleTop",
     "TTandSingleTop", #merged
     "DYJetsToLL",
     "DYJetsToLLHT",
     "DYJetsToQQHT",  # Htb
     "noTop", #Htb
-    "SingleTop",
     "ttX", # Htb
     "WJetsToQQ_HT_600ToInf", # Htb
     "TTZToQQ",     # Htb
@@ -609,23 +639,30 @@ _datasetOrder.extend([
     "WWTo4Q",      # Htb
     "TTBB",        # Htb
     "TTTT",        # Htb
+    "ZJetsToQQ_HT600toInf",
     ]) 
 
 # Map the logical dataset names to legend labels
 _legendLabels = {
     "Data"     : "Data",
-    "EWK"      : "EWK",
+    "EWK"      : "Electroweak",
     "Diboson"  : "Diboson",
-    "ttX"      : "t,tW,t#bar{t}+X",
+    "ttX"      : "t, tW, t#bar{t} + X",
     "noTop"    : "No t",
-    "SingleTop": "Single t",
-    "QCD"      : "QCD",#"Mis-ID. #tau_{h} (data)",
-    #"FakeB"    : "Fake b (data)",
-    "FakeB"    : "Fake b",
-    "GenuineB" : "Genuine b (MC)",
-    "QCD-b"    : "QCD (b enr.)",
-    "QCDdata"  : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
-
+#     #"SingleTop": "Single t",
+#     "QCD"      : "QCD",#"Mis-ID. #tau_{h} (data)",
+#     #"FakeB"    : "Fake b (data)",
+#     "FakeB"    : "Fake b",
+#     "GenuineB" : "Genuine b (MC)",
+#     "QCD-b"    : "QCD (b enr.)",
+#     "QCDdata"  : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
+#     "SingleTop": "Single t",
+    "SingleTop"     : "Single t",
+    "QCD"           : "Mis-ID. #tau_{h} (data)",
+    "FakeB"         : "Fake b (data)",
+    "GenuineB"      : "Genuine b (MC)",
+    "QCD-b"         : "QCD (b enr.)",
+    "QCDdata"       : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
     "TTJets"        : "t#bar{t}+jets",
     "TT"            : "t#bar{t}",
     "TTTT"          : "t#bar{t}t#bar{t}",
@@ -738,6 +775,7 @@ _legendLabels = {
     "MCStatError"            : "Sim. stat. unc.",
     "MCSystError"            : "Sim. syst. unc.",
     "MCStatSystError"        : "Sim. stat.#oplussyst. unc.",
+    "StatSystError"          : "Stat #oplus syst unc",
     "PostFitError"           : "Post-fit unc."
     }
 
@@ -761,8 +799,19 @@ for mass in _heavyHplusMasses:
     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
 
 for mass in _heavyHplusToTBbarMasses:
-    _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
-    _legendLabels["HplusToTBbar_M%d"%mass] = "H^{+}#rightarrowtb m_{H^{+}}=%d GeV" % mass
+    #_legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} (%d GeV, #sigma = %.1f pb)" % (mass, xsect.getSignalCrossSection())
+     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{#pm} (%d GeV, #sigma#it{#Beta} = %.1f pb)" % (mass, xsect.getSignalCrossSection())
+     _legendLabels["HplusToTBbar_M%d"%mass] = "H^{+}#rightarrowtb m_{H^{+}}=%d GeV" % mass
+
+
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO"] = "H^{+} (1500 GeV, #sigma#it{#Beta} = %.1f pb)" % (xsect.getSignalCrossSection())
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO"] = "H^{+} (1500 GeV, #sigma#it{#Beta} = %.1f pb)" % (xsect.getSignalCrossSection())
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO"] = "H^{+} (300 GeV, #sigma#it{#Beta} = %.1f pb)"  % (xsect.getSignalCrossSection())
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"     ] = "H^{+} (1500 GeV, #sigma#it{#Beta} = %.1f pb)" % (xsect.getSignalCrossSection())
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO"] = "H^{+} (700 GeV, #sigma#it{#Beta} = %.1f pb)"  % (xsect.getSignalCrossSection())
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO" ] = "H^{+} (350 GeV, #sigma#it{#Beta} = %.1f pb)"  % (xsect.getSignalCrossSection())
+_legendLabels["ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO" ] = "H^{+} (350 GeV, #sigma#it{#Beta} = %.1f pb)"  % (xsect.getSignalCrossSection()) 
+
 
 ## Map the logical dataset names to plot styles
 _plotStyles = {
@@ -784,6 +833,16 @@ _plotStyles = {
     "ChargedHiggs_HplusTB_HplusToTB_M_5000" : styles.signalStyleHToTB,
     "ChargedHiggs_HplusTB_HplusToTB_M_7000" : styles.signalStyleHToTB,
     "ChargedHiggs_HplusTB_HplusToTB_M_10000": styles.signalStyleHToTB,
+
+
+    "ChargedHiggs_HplusTB_HplusToHW_M_300_200_2ta"     : styles.signalStyleHToTB300,
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO": styles.signalStyleHToTB1500,
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO": styles.signalStyleHToTB2000,
+    "ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO": styles.signalStyleHToTB1500,
+    "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO": styles.signalStyleHToTB300,
+    "ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO": styles.signalStyleHToTB1500,
+    "ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO" : styles.signalStyleHToTB500,
+    "ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO" : styles.signalStyleHToTB400,
 
     "HplusTBintermediate_M145": styles.mcStyle,
     "HplusTBintermediate_withNeutral_M145": styles.mcStyle2,
@@ -855,6 +914,7 @@ _plotStyles = {
     "BackgroundStatError"    : styles.errorRatioStatStyle,
     "BackgroundSystError"    : styles.errorRatioSystStyle,
     "BackgroundStatSystError": styles.errorRatioSystStyle,
+    "StatSystError"          : styles.errorRatioStatStyle,
     "RatioLine"              : styles.ratioLineStyle,
     }
 
@@ -1098,7 +1158,7 @@ def replaceLightHplusWithSignalPlusBackground(datasetMgr, backgroundsWithoutTT=N
         if not isLast:
             datasetMgr.remove(name, close=False)
         datasetMgr.rename(name+"Tmp", name)
-        _legendLabels[name] = "with H^{+}#rightarrow#tau^{+}#nu"
+        _legendLabels[name] = "with H^{+}#rightarrowH_{SM}W"
 
 
 def replaceQCDFromData(datasetMgr, datasetQCDdata):
@@ -1143,8 +1203,11 @@ def _createRatioHistos(histo1, histo2, ytitle, ratioType=None, ratioErrorOptions
         ret.append(h)
     elif ratioType == "errorScale":
         ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions))
+    elif ratioType == "errorScalePaper":
+        ratioErrorOptions["paperStyle"] = True
+        ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions) )
     else:
-        raise Exception("Invalid value for argument ratioType '%s', valid are 'errorPropagation', 'binomial', 'errorScale'")
+        raise Exception("Invalid value for argument ratioType '%s', valid are 'errorPropagation', 'binomial', 'errorScale', 'errorScalePaper'")
     return ret        
 
 ## Creates a ratio histogram by propagating the uncertainties to the ratio
@@ -1332,7 +1395,7 @@ def _createRatioBinomial(histo1, histo2, ytitle):
 # Scales the histo1 values+uncertainties, and histo2 uncertainties by
 # histo2 values. Creates separate entries for histo2 statistical and
 # stat+syst uncertainties, if systematic uncertainties exist.
-def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True, denominatorStatSyst=True, numeratorOriginatesFromTH1=False):
+def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True, denominatorStatSyst=True, numeratorOriginatesFromTH1=False, paperStyle=False):
     addAlsoHatchedUncertaintyHisto = False
     #addAlsoHatchedUncertaintyHisto = True
 
@@ -1382,7 +1445,7 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
                 self._gr = gr
                 self._ratio = False
             def ratioDrawStyle(self):
-                return "PZ"
+                return "E0PZ"
             def begin(self):
                 return 0
             def end(self):
@@ -1507,7 +1570,7 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
 
         # Add scaled stat uncertainty
         #ret.extend(_createRatioHistosErrorScale(h1, h2, ytitle))
-        ret.extend(_createRatioHistosErrorScale(gr1, gr2, ytitle, numeratorOriginatesFromTH1 = isinstance(histo1.getRootHisto(), ROOT.TH1)))
+        ret.extend( _createRatioHistosErrorScale(gr1, gr2, ytitle, numeratorOriginatesFromTH1 = isinstance(histo1.getRootHisto(), ROOT.TH1)) )
         if histograms.uncertaintyMode.equal(histograms.Uncertainty.StatOnly):
             return ret
 
@@ -1539,6 +1602,8 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         ratioSyst1.SetName(histo1.GetName()+"_syst")
         ratioSyst2.GetYaxis().SetTitle(ytitle)
         name = "BackgroundStatSystError"
+        if paperStyle:
+            name = "StatSystError" #iro
         ratioSyst2.SetName(name)
         if not histograms.uncertaintyMode.addStatToSyst():
             name = "BackgroundSystError"
@@ -1547,7 +1612,11 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         if numeratorStatSyst:
             ret.append(_createHisto(ratioSyst1, drawStyle="[]", legendLabel=None))
         if denominatorStatSyst:
-            ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=_legendLabels[name], legendStyle="F"))
+            if paperStyle:
+                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=None, legendStyle="F"))  #iro
+            else:
+                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=_legendLabels[name], legendStyle="F"))  #iro
+
         if addAlsoHatchedUncertaintyHisto:
             ratioSyst2_2 = ratioSyst.Clone("BackgroundStatSystError2")
             styles.errorStyle.apply(ratioSyst2_2)
@@ -1826,6 +1895,7 @@ class PlotBase:
         self.histoMgr.forEachHisto(SetPlotStyle(_plotStyles))
         if self.histoMgr.hasHisto("Data"):
             self.histoMgr.setHistoDrawStyle("Data", "EP")
+
 
     ## Set default legend labels and styles, and plot styles
     def setDefaultStyles(self):
@@ -2496,7 +2566,7 @@ class PlotSameBase(PlotBase):
         if self.histoMgr.hasHisto("MCuncertainty"):
             dataset._normalizeToFactor(self.histoMgr.getHisto("MCuncertainty").getRootHisto(), 1.0/sumInt)
             handled.append("MCuncertainty")
-        
+
         # Normalize the rest
         for h in self.histoMgr.getHistos():
             if not h.getName() in handled:
@@ -2663,7 +2733,7 @@ class DataMCPlot(PlotSameBase, PlotRatioBase):
             self._createFrameRatio(filename,
                                    self.histoMgr.getHisto("Data").getRootHistoWithUncertainties(),
                                    self.histoMgr.getHisto("StackedMC").getSumRootHistoWithUncertainties(),
-                                   "Data/MC", **kwargs)
+                                   "Data/MC", **kwargs)        
 
     ## Create TCanvas and frames for the histogram and a data/MC ratio
     #
@@ -2704,10 +2774,11 @@ class DataMCPlot2(PlotBase, PlotRatioBase):
         self.normalizeToOne = normalizeToOne
         self.dataDatasetNames = ["Data"]
 
-    def setDefaultStyles(self):
+    def setDefaultStyles(self, paperStyle=False):
         self._setLegendStyles()
         self._setLegendLabels()
         self._setPlotStyles()
+        self._paperStyle=paperStyle
 
     ## Set the names of data histograms
     #
@@ -2748,7 +2819,10 @@ class DataMCPlot2(PlotBase, PlotRatioBase):
         elif histograms.uncertaintyMode.equal(histograms.Uncertainty.SystOnly):
             self.histoMgr.addMCUncertainty(styles.getErrorStyle(), nameList=["StackedMC"], legendLabel=_legendLabels[systKey])
         else:
-            self.histoMgr.addMCUncertainty(styles.getErrorStyle(), nameList=["StackedMC"], legendLabel=_legendLabels["MCStatError"], uncertaintyLegendLabel=_legendLabels[systKey])
+            if self._paperStyle:
+                self.histoMgr.addMCUncertainty(styles.getErrorStylePaper(), nameList=["StackedMC"], legendLabel=_legendLabels["StatSystError"], uncertaintyLegendLabel=None)
+            else:
+                self.histoMgr.addMCUncertainty(styles.getErrorStyle(), nameList=["StackedMC"], legendLabel=_legendLabels["MCStatError"], uncertaintyLegendLabel=_legendLabels[systKey])
 
     ## Create TCanvas and frames for the histogram and a data/MC ratio
     #
@@ -2781,7 +2855,7 @@ class DataMCPlot2(PlotBase, PlotRatioBase):
         PlotBase.draw(self)
         PlotRatioBase._draw(self)
 
-    ## Helper function to do the work for "normalization to one"
+    ## sHelper function to do the work for "normalization to one"
     def _normalizeToOne(self):
         # First check that the normalizeToOne is enabled
         if not self.normalizeToOne:
@@ -3351,13 +3425,18 @@ class PlotDrawer:
                         raise Exception("Unsupported type(rh) = %s. EXIT" % (str(type(rh))), True)
 
                     if rh_type == "TGraphAsymmErrors":
-                        for i in xrange(1, rh.GetN()):
-
+                        for i in xrange(0, rh.GetN()): # start from 0 bin, not 1!
+                            
                             # Get bin-width and divide all values
                             dx = rh.GetErrorX(i)*2
                             rh.GetY()[i] = rh.GetY()[i]/dx
                             rh.GetEYhigh()[i] = rh.GetEYhigh()[i]/dx
                             rh.GetEYlow()[i]  = rh.GetEYlow()[i]/dx
+                            # print "i = %d, dx = %.1f" % (i, dx)
+                            # print "1) rh.GetY()[i] = ", rh.GetY()[i]
+                            # print "1) rh.GetEYlow()[i] = ", rh.GetEYlow()[i]
+                            # print "1) rh.GetEYhigh()[i] = ", rh.GetEYhigh()[i]
+                            # print
 
                     if rh_type == "TH1F":
                         if "data" not in rh_name.lower():

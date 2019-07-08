@@ -41,7 +41,7 @@ class AnalysisConfig:
 	    value = kwargs[key]
 	    if key == "systematics":
                 self._config.histogramAmbientLevel = "Systematics"
-          
+
                 # Energy scales
 		if value.startswith("TauES"):
 		    self._config.TauSelection.systematicVariation = "_"+value.replace("Plus","down").replace("Minus","up").replace("TauES","TES")
@@ -53,6 +53,8 @@ class AnalysisConfig:
                     # FIXME: should also _y be taken into account?
 		    self._config.METSelection.systematicVariation = "_"+value.replace("Plus_x","down_x").replace("Minus_x","up_x").replace("UES","MET_Type1_UnclusteredEn") 
 		    self._config.METSelection.systematicVariation = "_"+value.replace("Plus_y","down_y").replace("Minus_y","up_y").replace("UES","MET_Type1_UnclusteredEn")
+		    self._config.METSelection.systematicVariation = "_"+value.replace("Plus_x","down_x").replace("Minus_x","up_x").replace("UES","MET_Type1_UnclusteredEn") #FIXME: should also _y be taken into account?
+		    self._config.METSelection.systematicVariation = "_"+value.replace("Plus_y","down_y").replace("Minus_y","up_y").replace("UES","MET_Type1_UnclusteredEn") #FIXME: should also _y be taken into account?
 		# Fake tau 
 		elif value.startswith("FakeTau"):
                     partonFakingTau = None
@@ -72,9 +74,16 @@ class AnalysisConfig:
                 elif value.startswith("METTrgEff"):
                     variationType = value.replace("METTrgEff","").replace("Minus","").replace("Plus","")
                     scaleFactors.assignMETTriggerSF(self._config.METSelection, self._config.BJetSelection.bjetDiscrWorkingPoint, self._getDirectionString(value), self._config.Trigger.METtriggerEfficiencyJsonName, variationType)
+                elif value.startswith("MuonTrgEff"):
+                    variationType = value.replace("MuonTrgEff","").replace("Minus","").replace("Plus","")
+                    scaleFactors.assignMuonTriggerSF(self._config.MuonSelection, self._getDirectionString(value), self._config.Trigger.MuontriggerEfficiencyJsonName, variationType)
 
                 # tau ID syst
                 elif value.startswith("TauIDSyst"):
+                    self._config.systematicVariation = "_"+value.replace("Plus","down").replace("Minus","up")
+
+		# muon ID syst
+                elif value.startswith("MuonIDSyst"):
                     self._config.systematicVariation = "_"+value.replace("Plus","down").replace("Minus","up")
 
 		# b tag SF
@@ -239,7 +248,7 @@ class AnalysisBuilder:
         return
 
     def _getAnalysisType(self, analysis):
-        myAnalyses = ["HToTauNu", "HToTB"]
+        myAnalyses = ["HToTauNu", "HToTB","HToHW","HToHW_background"]
         if analysis not in myAnalyses:
             msg = "Unsupported analysis \"%s\". Please select one of the following: %s" % (analysis, ", ".join(myAnalyses))
             raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle() )
@@ -253,6 +262,10 @@ class AnalysisBuilder:
             systList =  self.getSystematicsForHToTauNu()
         elif  self._analysisType == "HToTB":
             systList = self.getSystematicsForHToTB()
+	elif  self._analysisType == "HToHW":
+            systList = self.getSystematicsForHToHW()
+	elif  self._analysisType == "HToHW_background":
+            systList = self.getSystematicsForHToHW_background()
         else:
             raise Exception(ShellStyles.ErrorStyle() + "This should never be reached" + ShellStyles.NormalStyle() )
         if len(systList) < 1:
@@ -264,7 +277,7 @@ class AnalysisBuilder:
     def getSystematicsForHToTauNu(self):
         items = []
         # Trigger systematics
-        items.extend(["TauTrgEffData", "TauTrgEffMC"]) 
+        items.extend(["TauTrgEffData", "TauTrgEffMC"])
 
         #items.extend(["L1ETMDataEff", "L1ETMMCEff"])
         items.extend(["METTrgEffData", "METTrgEffMC"])
@@ -274,6 +287,7 @@ class AnalysisBuilder:
 
         # Tau mis-ID systematics
         items.extend(["FakeTauElectron", "FakeTauMuon"])
+
 
         # Energy scales and JER systematics
 #        items.extend(["TauES", "JES", "UES"]) # use in case of problems with JER
@@ -308,6 +322,41 @@ class AnalysisBuilder:
         # TopTagSF weight systematics
         self.Print("Disabled top-tag SF systematic variations (temporary", True)
         # items.extend(["TopTagSF"])
+        return items
+
+    def getSystematicsForHToHW(self):
+        items = []
+
+        # Trigger systematics
+        items.extend(["MuonTrgEffData"])
+
+        # Tau ID variation systematics
+        items.extend(["FakeTauElectron", "FakeTauMuon", "FakeTauJet", "TauIDSyst"])
+
+        # Muon ID variation systematics
+        items.extend(["MuonIDSyst"])
+
+        # Energy scales and JER systematics
+        items.extend(["TauES", "JES", "JER", "UES"])
+
+        # b quark systematics
+        items.extend(["BTagSF", "BMistagSF"])
+
+        # top quark systematics
+        if self._useTopPtReweighting:
+            items.append("TopPt")
+
+        # PU weight systematics
+        items.extend(["PUWeight"])
+
+        return items
+
+    def getSystematicsForHToHW_background(self):
+        items = []
+
+        # Trigger systematics
+        items.extend(["MuonTrgEffData"])
+
         return items
 
     def _processSystematicsVariations(self, systVarsList=[]):
