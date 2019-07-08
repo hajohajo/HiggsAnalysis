@@ -120,13 +120,13 @@ scaleFactors.assignTauIdentificationSF(looseTauSelection)
 ## tau misidentification scale factor
 ##########
 
-scaleFactors.assignTauMisidentificationSF(tauSelection, "eToTau", "full", "nominal")
-scaleFactors.assignTauMisidentificationSF(tauSelection, "muToTau", "full", "nominal")
-scaleFactors.assignTauMisidentificationSF(tauSelection, "jetToTau", "full", "nominal")
+scaleFactors.assignTauMisidentificationSF(tauSelection, "eToTau", "nominal")
+scaleFactors.assignTauMisidentificationSF(tauSelection, "muToTau", "nominal")
+scaleFactors.assignTauMisidentificationSF(tauSelection, "jetToTau", "nominal")
 
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "eToTau", "full", "nominal")
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "muToTau", "full", "nominal")
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau", "full", "nominal")
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "eToTau", "nominal")
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "muToTau", "nominal")
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau", "nominal")
 
 ##########
 ## Jet selection
