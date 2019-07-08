@@ -176,11 +176,6 @@ private:
   Count cSubPassedAntiIsolation;
   Count cSubPassedAntiIsolationRtau;
   Count cSubPassedTauSelectionGenuine;
-  Count cSubPassedElectronToTau;
-  Count cSubPassedMuonToTau;
-  Count cSubPassedJetToTau;
-  Count cSubPassedGluonToTau;
-  Count cSubPassedUnknownToTau;
   Count cSubPassedTauSelectionMultipleTaus;
   Count cSubPassedAntiIsolatedTauSelection;
   Count cSubPassedAntiIsolatedTauSelectionMultipleTaus;
