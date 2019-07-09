@@ -41,21 +41,23 @@ metFilter = PSet(
 # Electron veto
 #================================================================================================
 eVeto = PSet(
-    electronPtCut     = 10.0,    # [default: 10.0]
-    electronEtaCut    = 2.4,     # [default: 2.4]
-    electronIDType    = "MVA",   # [default: "MVA] ("default", "MVA")
-    electronID        = "cutBasedElectronID_Spring15_25ns_V1_standalone_veto",
-    electronMVA       = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
-    electronMVACut    = "Loose", # [default: "Loose"]
-    electronIsolation = "veto",  # [default: "veto"] ("veto", "tight")
-    electronIsolType  = "mini",  # [default: "mini"] ("mini", "default")
+    applyTriggerMatching = False,
+    triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
+    electronPtCut        = 10.0,    # [default: 10.0]
+    electronEtaCut       = 2.4,     # [default: 2.4]
+    electronIDType       = "MVA",   # [default: "MVA] ("default", "MVA")
+    electronID           = "cutBasedElectronID_Spring15_25ns_V1_standalone_veto",
+    electronMVA          = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
+    electronMVACut       = "Loose", # [default: "Loose"]
+    electronIsolation    = "veto",  # [default: "veto"] ("veto", "tight")
+    electronIsolType     = "mini",  # [default: "mini"] ("mini", "default")
     )
 
 #================================================================================================
-# Muon veto
+# Muon Selection
 #================================================================================================
 muonSelection = PSet(
-    applyTriggerMatching = True,
+    applyTriggerMatching = False,
     triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
     muonPtCut            = 26.0,        # [default: 10.0]
     muonEtaCut           = 2.4,         # [default: 2.4]

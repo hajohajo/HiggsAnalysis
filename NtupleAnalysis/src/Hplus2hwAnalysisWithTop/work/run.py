@@ -201,9 +201,11 @@ def main():
                               usePUreweighting       = opts.usePUreweighting,
                               useTopPtReweighting    = opts.useTopPtReweighting,
                               doSystematicVariations = opts.doSystematics,
+                              # analysisType="HToHW_withTop",#iro
                               analysisType="HToTB",
                               verbose=opts.verbose)
 
+    print "=== run.py: TESTing!"
     # Add variations (e.g. for optimisation)
     # builder.addVariation("METSelection.METCutValue", [100,120,140])
     # builder.addVariation("AngularCutsBackToBack.workingPoint", ["Loose","Medium","Tight"])

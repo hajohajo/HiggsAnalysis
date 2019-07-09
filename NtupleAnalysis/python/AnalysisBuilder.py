@@ -248,7 +248,7 @@ class AnalysisBuilder:
         return
 
     def _getAnalysisType(self, analysis):
-        myAnalyses = ["HToTauNu", "HToTB","HToHW", "HToHW_background", "HToHW_withTopTag"]
+        myAnalyses = ["HToTauNu", "HToTB","HToHW", "HToHW_background", "HToHW_withTop"]
         if analysis not in myAnalyses:
             msg = "Unsupported analysis \"%s\". Please select one of the following: %s" % (analysis, ", ".join(myAnalyses))
             raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle() )
@@ -264,8 +264,8 @@ class AnalysisBuilder:
             systList = self.getSystematicsForHToTB()
 	elif  self._analysisType == "HToHW":
             systList = self.getSystematicsForHToHW()
-	elif  self._analysisType == "HToHW_withTopTag":
-            systList = self.getSystematicsForHToHW_withTopTag()
+	elif  self._analysisType == "HToHW_withTop":
+            systList = self.getSystematicsForHToHW_withTop()
 	elif  self._analysisType == "HToHW_background":
             systList = self.getSystematicsForHToHW_background()
         else:
@@ -353,7 +353,7 @@ class AnalysisBuilder:
 
         return items
 
-    def getSystematicsForHToHW_withTopTag(self):
+    def getSystematicsForHToHW_withTop(self):
         items = []
 
         # Trigger systematics

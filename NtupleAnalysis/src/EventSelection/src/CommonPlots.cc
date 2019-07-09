@@ -266,7 +266,7 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
     
   // Create histograms
   const bool hplus2tb     = ( (fAnalysisType == kFakeBMeasurement) || (fAnalysisType == kHplus2tbAnalysis) );
-  const bool hplus2hw     = ( (fAnalysisType == kHplus2hwAnalysis) || (fAnalysisType == kHplus2hwAnalysisWithTopTag) );
+  const bool hplus2hw     = ( (fAnalysisType == kHplus2hwAnalysis) || (fAnalysisType == kHplus2hwAnalysisWithTop) );
   const bool hplus2hw_ele = ( (fAnalysisType == kHplus2hw_ele_Analysis) );
 
   // vertex
@@ -1189,7 +1189,7 @@ void CommonPlots::fillControlPlotsAfterStandardSelections(const Event& event,
   // fHistoSplitter.fillShapeHistogramTriplet(hCtrlQGLRNGluonJetsAfterStdSelections,bIsGenuineBkg, fQGLRData.getNumberOfGluonJets());					   
 
   // TopSelection histograms
-  if (fAnalysisType == kHplus2hwAnalysisWithTopTag)
+  if (fAnalysisType == kHplus2hwAnalysisWithTop)
     {
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlNAllCleanedTopsAfterStdSelections, bIsGenuineBkg, fTopData.getAllCleanedTopsMVA().size() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlNSelectedCleanedTopsAfterStdSelections, bIsGenuineBkg, fTopData.getSelectedCleanedTopsMVA().size() );
@@ -1402,6 +1402,8 @@ void CommonPlots::fillControlPlotsAfterTopologicalSelections(const Event& event,
     fHistoSplitter.fillShapeHistogramTriplet(hCtrlJetEtaAfterStdSelections, bIsGenuineTau, p.eta());
     fHistoSplitter.fillShapeHistogramTriplet(hCtrlJetEtaPhiAfterStdSelections, bIsGenuineTau, p.eta(), p.phi());
   }
+
+  return;
 }
 
 void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau) {
@@ -1525,7 +1527,10 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
 
       } else {
        if ((fAnalysisType == kSignalAnalysis)) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTau(), fMETData.getMET());
-       if (fAnalysisType == kHplus2hwAnalysis) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getSelectedTaus()[1],fMuonData.getSelectedMuons()[0], fMETData.getMET());
+       if ( (fAnalysisType == kHplus2hwAnalysis) || (fAnalysisType == kHplus2hwAnalysisWithTop) )
+	 {
+	   myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getSelectedTaus()[1],fMuonData.getSelectedMuons()[0], fMETData.getMET());
+	 }
        if (fAnalysisType == kHplus2hw_ele_Analysis) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getSelectedTaus()[1],fElectronData.getSelectedElectrons()[0], fMETData.getMET());
       }
 
@@ -1549,7 +1554,7 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
   }
 
   // TopSelection histograms
-  if (fAnalysisType == kHplus2hwAnalysisWithTopTag)
+  if (fAnalysisType == kHplus2hwAnalysisWithTop)
     {
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlNAllCleanedTopsAfterStdSelections, bIsGenuineBkg, fTopData.getAllCleanedTopsMVA().size() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlNSelectedCleanedTopsAfterStdSelections, bIsGenuineBkg, fTopData.getSelectedCleanedTopsMVA().size() );

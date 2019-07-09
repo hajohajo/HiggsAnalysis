@@ -177,10 +177,13 @@ MuonSelection::Data MuonSelection::silentAnalyze(const Event& event) {
 MuonSelection::Data MuonSelection::analyze(const Event& event) {
   ensureAnalyzeAllowed(event.eventID());
   MuonSelection::Data data = privateAnalyze(event);
+
   // Send data to CommonPlots
-  if (fCommonPlotsIsEnabled())
+  if (fCommonPlotsIsEnabled()) 
+    {
     fCommonPlots->fillControlPlotsAtMuonSelection(event, data);
-  // Return data
+    }
+
   return data;
 }
 
@@ -197,7 +200,7 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
 
   std::vector<math::LorentzVectorT<double>> myTriggerMuonMomenta;
   if (bApplyTriggerMatching) {
-    for (HLTMuon p: event.triggerMuons()) {
+    for (HLTMuon p: event.triggerMuons()) {      
       myTriggerMuonMomenta.push_back(p.p4());
     }
   }
@@ -313,8 +316,8 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
 }
 
 bool MuonSelection::passTrgMatching(const Muon& muon, std::vector<math::LorentzVectorT<double>>& trgMuons) const {
-  if (!bApplyTriggerMatching)
-    return true;
+  if (!bApplyTriggerMatching) return true;
+
   double myMinDeltaR = 9999.0;
   for (auto& p: trgMuons) {
     double myDeltaR = ROOT::Math::VectorUtil::DeltaR(p, muon.p4());

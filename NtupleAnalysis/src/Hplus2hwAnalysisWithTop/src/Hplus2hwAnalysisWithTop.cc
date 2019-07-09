@@ -37,7 +37,7 @@ private:
   Count cTauOSCounter;
   Count cTauSFCounter;
   Count cFakeTauSFCounter;
-  // Count cTauDMCounter;
+  Count cTauDMCounter;
   JetSelection fJetSelection;
   // AngularCutsCollinear fAngularCutsCollinear;
   BJetSelection fBJetSelection;
@@ -74,7 +74,7 @@ REGISTER_SELECTOR(Hplus2hwAnalysisWithTop);
 
 Hplus2hwAnalysisWithTop::Hplus2hwAnalysisWithTop(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper), // CommonPlots::kHplus2hwAnalysisWithTop
+    fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2hwAnalysisWithTop, fHistoWrapper),
     cAllEvents(fEventCounter.addCounter("all events")),
     cTrigger(fEventCounter.addCounter("passed trigger")),
     fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -86,7 +86,7 @@ Hplus2hwAnalysisWithTop::Hplus2hwAnalysisWithTop(const ParameterSet& config, con
     cTauOSCounter(fEventCounter.addCounter("#tau OS")),
     cTauSFCounter(fEventCounter.addCounter("#tau SF")),
     cFakeTauSFCounter(fEventCounter.addCounter("Fake #tau SF")),
-    // cTauDMCounter(fEventCounter.addCounter("#tau DM")),
+    cTauDMCounter(fEventCounter.addCounter("#tau DM")),
     fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -224,6 +224,7 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
       else {} //std::cout << "=== Muon Selection: No SF support for muons with Pt = " << muData.getSelectedMuons()[0].pt() << " GeV and eta = " << muData.getSelectedMuons()[0].eta() << std::endl;
     }
 
+  if (0) std::cout << "=== Muon Selection-5" << std::endl;
   // Fill histos
   hMuon_Pt ->Fill(muData.getSelectedMuons()[0].pt());
   hMuon_Eta->Fill(muData.getSelectedMuons()[0].eta());  
@@ -237,27 +238,35 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   if (!tauData.hasIdentifiedTaus() ) return;
   if (0) std::cout << "=== Tau Selection: Has Identified taus" << std::endl;
     
-  // Require 2 taus
+  // -> Require 2 taus
   if(tauData.getSelectedTaus().size() != 2) return;
   cTauNCounter.increment(); 
   if (0) std::cout << "=== Tau Selection: 2 selected taus" << std::endl;
 
-  // Require 2 taus to have opposite sign (OS)
+  // -> Require 2 taus to have opposite sign (OS)
   if(tauData.getSelectedTaus()[0].charge() == tauData.getSelectedTaus()[1].charge()) return;
   cTauOSCounter.increment(); 
   if (0) std::cout << "=== Tau Selection: OS requirement" << std::endl;
 
-  // Uncomment to only perform Genuine #tau wit analysis (with fake #tau from data)
-  // if (fEvent.isMC() && !tauData.getSelectedTaus()[0].isGenuineTau()) return;
-  // if (fEvent.isMC() && !tauData.getSelectedTaus()[1].isGenuineTau()) return;
-  int isGenuineTau = false; 
-  if (fEvent.isMC()) isGenuineTau = tauData.getSelectedTaus()[0].isGenuineTau() && tauData.getSelectedTaus()[1].isGenuineTau();
-  if (0) std::cout << "=== Tau Selection: isGenuineTau = " << isGenuineTau << std::endl;
+  // -> Uncomment to only perform Genuine #tau with analysis (with fake #tau from data)
+  bool bGenuineLdgTau    = false;
+  bool bGenuineSubldgTau = false;
+  if ( fEvent.isMC() )
+    {
+      bGenuineLdgTau    = ( tauData.getSelectedTaus()[0].isGenuineTau() );
+      bGenuineSubldgTau = ( tauData.getSelectedTaus()[1].isGenuineTau() );
+    }
+  int isGenuineTau = (bGenuineLdgTau && bGenuineSubldgTau);
+  fCommonPlots.setGenuineBkgStatus(isGenuineTau);
+  if (0) std::cout << "=== Tau Selection: isGenuineTau = " << isGenuineTau << " (LdgTau = " << bGenuineLdgTau << ", SubldTau = " << bGenuineSubldgTau << ")" << std::endl;
+  
+  // Fake rates currently only available for three decay modes: 0, 1, 10 (https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV#Decay_Mode_Reconstruction)
+  // bool bFailsLdgTauDecayMode    = (tauData.getSelectedTaus()[0].decayMode()>1 && tauData.getSelectedTaus()[0].decayMode()<10);
+  // bool bFailsSubldgTauDecayMode = (tauData.getSelectedTaus()[1].decayMode()>1 && tauData.getSelectedTaus()[1].decayMode()<10);
+  // if (! (bFailsLdgTauDecayMode*bFailsSubldgTauDecayMode) return;
 
-  // Fake rates currently only available for three decay modes: 0, 1, 10 (only needed for the fake rate)
-  // if(tauData.getSelectedTaus()[0].decayMode()>1 && tauData.getSelectedTaus()[0].decayMode()<10) return;
   // if(tauData.getSelectedTaus()[1].decayMode()>1 && tauData.getSelectedTaus()[1].decayMode()<10) return;
-  // cTauDMCounter.increment(); 
+  cTauDMCounter.increment(); 
 
   // Tau ID SF
   if (fEvent.isMC()) 
@@ -289,7 +298,7 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   hTransverseMass_AfterTauSelection->Fill(mT);
 
   if (!jetData.passedSelection()) return;
-  fCommonPlots.fillControlPlotsAfterTopologicalSelections(fEvent, true);
+  fCommonPlots.fillControlPlotsAfterTopologicalSelections(fEvent, false, true);
   
   // Fill histos
   hTauTauMass_AfterJetSelection->Fill(mVis);
@@ -326,7 +335,7 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
 
   // Fill histos after StandardSelections
   const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData); // FIXME: causes counter to be wrongly placed?
-  fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, silentMetData, QuarkGluonLikelihoodRatio::Data(), topData, (isGenuineTau > 0));
+  fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, silentMetData, topData); //, (isGenuineTau > 0));
 
   //================================================================================================
   // - MET selection
@@ -372,13 +381,12 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
 
   //================================================================================================
   // All Selections
-  // https://github.com/mlotti/HplusHW/blob/master/NtupleAnalysis/src/Hplus2hwAnalysisWithTop/src/Hplus2hwAnalysisWithTop.cc#L339
   //================================================================================================
   if (0) std::cout << "=== All Selections" << std::endl;
   cSelected.increment();
 
   // Fill histos after AllSelections: (After top-selections and top-tag SF)
-  fCommonPlots.fillControlPlotsAfterAllSelections(fEvent, isGenuineTau);
+  fCommonPlots.fillControlPlotsAfterAllSelections(fEvent); // , isGenuineTau);
 
   // Fill histos
   hTauTauMass_AfterAllSelections->Fill(mVis);

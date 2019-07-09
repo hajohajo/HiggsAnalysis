@@ -21,7 +21,7 @@ public:
     kSignalAnalysis,
     kHplus2tbAnalysis,
     kHplus2hwAnalysis,
-    kHplus2hwAnalysisWithTopTag,
+    kHplus2hwAnalysisWithTop,
     kHplus2hw_ele_Analysis,
     kBTagEfficiencyAnalysis,
     kTauAnalysis,
@@ -124,7 +124,7 @@ public:
 					       const TopSelectionBDT::Data& topData);
   void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
   void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false);
-  void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineB);  //HToTB-specific
+  void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineBkg);  //HToTB-specific
   void fillControlPlotsAfterAllSelectionsWithProbabilisticBtag(const Event& event, const METSelection::Data& metData, double btagWeight);
   //void fillControlPlotsAfterAllSelectionsWithFullMass(const Event& event, FullHiggsMassCalculator::Data& data);
 
