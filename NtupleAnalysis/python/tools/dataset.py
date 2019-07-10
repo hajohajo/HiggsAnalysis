@@ -4646,7 +4646,6 @@ class DatasetManagerCreator:
     def createDatasetManager(self, **kwargs):
         _args = {}
         _args.update(kwargs)
-        print "creating datasetmanager"
         # First check that if some of these is not given, if there is
         # exactly one it available, use that.
         for arg, attr in [("analysisName", "getAnalyses"),
