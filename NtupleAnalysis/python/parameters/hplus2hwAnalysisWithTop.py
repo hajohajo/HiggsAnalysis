@@ -316,7 +316,7 @@ commonPlotsOptions = PSet(
     enableGenuineBHistograms   = False,
     enablePUDependencyPlots    = True,  # Enable/Disable some debug-level plots
     # Bin settings (final bin setting done in datacardGenerator, there also variable bin width is supported)
-    nVerticesBins     = PSet(nBins = 100, axisMin =  0.0, axisMax =  100.0),
+    nVerticesBins     = PSet(nBins = 100, axisMin =  0.0, axisMax =  200.0),
     ptBins            = PSet(nBins =  50, axisMin =  0.0, axisMax =  500.0),
     etaBins           = PSet(nBins =  50, axisMin = -5.0, axisMax =    5.0),
     phiBins           = PSet(nBins =  64, axisMin = -3.2, axisMax =    3.2),
