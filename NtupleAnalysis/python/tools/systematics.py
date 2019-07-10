@@ -608,6 +608,16 @@ _dataDrivenCtrlPlotBinning = {
     "MVA": [-1.0, -0.96, -0.92, -0.88, -0.84, -0.8, -0.76, -0.72, -0.64, -0.6, -0.52, -0.44, -0.36, -0.28, -0.20, -0.12, -0.04, 0.04, 0.15, 0.24, 0.32, 0.40, 0.48, 0.56, 0.64, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96, 1.0],
 ###############################################################
 
+
+###############################################################
+### HToHW specific binning settings
+###############################################################
+    "selectedJetsPt": [i for i in range(0, 100, 10)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 300, 25)] + [i for i in range(300, 600, 50)] + [600, 700, 800, 1000],
+    "MHT"     : [i for i in range(0, 100, 20)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 300, 25)] + [i for i in range(300, 600, 50)] + [600, 700, 800, 1000],
+    "HT"      : [i for i in range(0, 600, 50)] + [i for i in range(600, 800, 50)] + [i for i in range(800, 1100, 100)] + [i for i in range(1100, 1500, 200)],
+    "Vertices": [i for i in range(0, 40, 5)] + [i for i in range(40, 60, 10)] + [i for i in range(60, 100, 20)] + [i for i in range(100, 200, 50)],
+
+
 ###############################################################
 ### HToTB specific binning settings
 ###############################################################
@@ -705,7 +715,7 @@ _dataDrivenCtrlPlotBinning = {
     "BJet2Eta_AfterStandardSelections" : None,
     "BJet3Eta_AfterStandardSelections" : None,
     "MET_AfterStandardSelections"      : [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 250, 300], # tmp: clash with HToTauNu
-}
+    }
 
 
 # Add EWK fake tau shape definitions
