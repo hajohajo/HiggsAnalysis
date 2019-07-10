@@ -131,7 +131,7 @@ void MuonSelection::bookHistograms(TDirectory* dir) {
   TDirectory* subdir = fHistoWrapper.mkdir(HistoLevel::kDebug, dir, "muSelection_"+sPostfix);
 
   // Muons before any cuts
-  hMuonNAll       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "muonNAll", ";#mu multiplicity;Occur / %.0f", 20, 0.0, 20.0);
+  hMuonNAll       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "muonNAll", ";#mu multiplicity;Occur / %.0f", 30, 0.0, 30.0);
   hMuonPtAll      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "muonPtAll", ";p_{T} (GeV/c);Occur / %.0f", 100, 0.0, 1000.0);
   hMuonEtaAll     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "muonEtaAll", ";#eta;Occur / %.2f", 50, -2.5, 2.5);
   hMuonRelIsoAll  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "muonRelIsoAll", ";relative isolation;Occur / %.0f", 1000, 0.0, 200.0);
@@ -147,9 +147,9 @@ void MuonSelection::bookHistograms(TDirectory* dir) {
   hTriggerMatchDeltaR   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "triggerMatchDeltaR"  , "Trigger match #DeltaR;#DeltaR", 60, 0, 3.);
 
   // Resolutions
-  hPtResolution  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "ptResolution" , ";(p_{T}^{reco} - p_{T}^{gen})/p_{T}^{reco};Occur / %.2f", 200, -1.0, 1.0);
-  hEtaResolution = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "etaResolution", ";(#eta^{reco} - #eta^{gen})/#eta^{reco};Occur / %.2f"   , 200, -1.0, 1.0);
-  hPhiResolution = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "phiResolution", ";(#phi^{reco} - #phi^{gen})/#phi^{reco};Occur / %.2f"   , 200, -1.0, 1.0);
+  hPtResolution  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "ptResolution" , ";(p_{T}^{reco} - p_{T}^{gen})/p_{T}^{reco};Occur / %.2f", 400, -2.0, 2.0);
+  hEtaResolution = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "etaResolution", ";(#eta^{reco} - #eta^{gen})/#eta^{reco};Occur / %.2f"   , 400, -2.0, 2.0);
+  hPhiResolution = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "phiResolution", ";(#phi^{reco} - #phi^{gen})/#phi^{reco};Occur / %.2f"   , 400, -2.0, 2.0);
 
   // Isolation efficiency
   hIsolPtBefore      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "IsolPtBefore", ";p_{T} (GeV/c);Occur / %.0f", 100, 0.0, 1000.0);
