@@ -73,7 +73,9 @@ public:
     ~Data();
 
     // Status of passing event selection
-    bool passedSelection() const { return bPassedSelection; }    
+    bool passedMVACut() const { return bPassedMVACut; }
+    bool passedNTopsCut() const { return bPassedNTopsCut; }
+    bool passedSelection() const { return bPassedSelection; }
 
     // Trijet
     const float getTopMVA() const { return fTopMVA; }
@@ -128,7 +130,10 @@ public:
 
   private:
     /// Boolean for passing selection
+    bool bPassedMVACut;
+    bool bPassedNTopsCut;
     bool bPassedSelection;
+
     std::vector<Jet> fJetsUsedAsBJets;
     std::vector<Jet> fFailedBJetsUsedAsBJets;
     /// Trijet-1

@@ -44,15 +44,12 @@ private:
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
   // AngularCutsBackToBack fAngularCutsBackToBack;
-  Count cTopTaggingSFCounter;
   TopSelectionBDT fTopSelection;
+  Count cTopTaggingSFCounter;
   // FatJetSelection fFatJetSelection;
   Count cSelected;
     
   // Non-common histograms
-  WrappedTH1 *hMuon_Pt;
-  WrappedTH1 *hMuon_Eta;
-
   WrappedTH1 *hTauTauMass_AfterTauSelection;
   WrappedTH1 *hTauTauMass_AfterJetSelection;
   WrappedTH1 *hTauTauMass_AfterBjetSelection;
@@ -93,8 +90,8 @@ Hplus2hwAnalysisWithTop::Hplus2hwAnalysisWithTop(const ParameterSet& config, con
     cBTaggingSFCounter(fEventCounter.addCounter("b-tag SF")),
     fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
     fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events"))
 { }
@@ -120,20 +117,17 @@ void Hplus2hwAnalysisWithTop::book(TDirectory *dir) {
   // fFatJetSelection.bookHistograms(dir);
 
   // Get binning from cfg file
-  const int   ptN    = fCommonPlots.getPtBinSettings().bins();
-  const float ptMin  = fCommonPlots.getPtBinSettings().min();
-  const float ptMax  = fCommonPlots.getPtBinSettings().max();
-  const int   etaN   = fCommonPlots.getEtaBinSettings().bins();
-  const float etaMin = fCommonPlots.getEtaBinSettings().min();
-  const float etaMax = fCommonPlots.getEtaBinSettings().max();
+  // const int   ptN    = fCommonPlots.getPtBinSettings().bins();
+  // const float ptMin  = fCommonPlots.getPtBinSettings().min();
+  // const float ptMax  = fCommonPlots.getPtBinSettings().max();
+  // const int   etaN   = fCommonPlots.getEtaBinSettings().bins();
+  // const float etaMin = fCommonPlots.getEtaBinSettings().min();
+  // const float etaMax = fCommonPlots.getEtaBinSettings().max();
   const int   mtN    = fCommonPlots.getMtBinSettings().bins();
   const float mtMin  = fCommonPlots.getMtBinSettings().min();
   const float mtMax  = fCommonPlots.getMtBinSettings().max();
   
   // Book non-common histograms
-  hMuon_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "Muon_Pt" , ";p_{T} (GeV/c)", ptN , ptMin , ptMax);
-  hMuon_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "Muon_Eta", ";#eta"         , etaN, etaMin, etaMax);
-
   hTauTauMass_AfterTauSelection  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauTauMass_AfterTauSelection" , ";m_{vis} (GeV/c^{2})", mtN, mtMin, mtMax);
   hTauTauMass_AfterJetSelection  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauTauMass_AfterJetSelection" , ";m_{vis} (GeV/c^{2})", mtN, mtMin, mtMax);
   hTauTauMass_AfterBjetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauTauMass_AfterBjetSelection", ";m_{vis} (GeV/c^{2})", mtN, mtMin, mtMax);
@@ -191,6 +185,8 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   if (0) std::cout << "=== Vertices" << std::endl;
   if (nVertices < 1) return;
   cVertexSelection.increment();
+
+  // Fill histos
   fCommonPlots.fillControlPlotsAtVertexSelection(fEvent);
 
   
@@ -200,6 +196,9 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   if (0) std::cout << "=== Electron veto" << std::endl;
   const ElectronSelection::Data eData = fElectronSelection.analyze(fEvent);
   if (eData.hasIdentifiedElectrons()) return;
+
+  // Fill histos
+  fCommonPlots.fillControlPlotsAtElectronSelection(fEvent, eData);
 
 
   //================================================================================================
@@ -224,17 +223,30 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
       else {} //std::cout << "=== Muon Selection: No SF support for muons with Pt = " << muData.getSelectedMuons()[0].pt() << " GeV and eta = " << muData.getSelectedMuons()[0].eta() << std::endl;
     }
 
-  if (0) std::cout << "=== Muon Selection-5" << std::endl;
   // Fill histos
-  hMuon_Pt ->Fill(muData.getSelectedMuons()[0].pt());
-  hMuon_Eta->Fill(muData.getSelectedMuons()[0].eta());  
+  fCommonPlots.fillControlPlotsAtMuonSelection(fEvent, muData);
+
+
+  //================================================================================================
+  // - MET selection
+  //================================================================================================
+  if (0) std::cout << "=== MET selection" << std::endl;
+  const METSelection::Data metData = fMETSelection.silentAnalyze(fEvent, nVertices);
+  // const METSelection::Data metData = fMETSelection.analyze(fEvent, nVertices);
+  // if (!metData.passedSelection()) return;
+
+  // Fill Histos
+  fCommonPlots.fillControlPlotsAtMETSelection(fEvent, metData);
+  // hTauTauMass_AfterMetSelection->Fill(mVis);
+  // hTransverseMass_AfterMetSelection ->Fill(mT);
+
 
   //================================================================================================   
   // 6) Tau Selection
   //================================================================================================   
   if (0) std::cout << "=== Tau Selection" << std::endl;
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
-  const METSelection::Data silentMetData = fMETSelection.silentAnalyze(fEvent, nVertices);
+
   if (!tauData.hasIdentifiedTaus() ) return;
   if (0) std::cout << "=== Tau Selection: Has Identified taus" << std::endl;
     
@@ -257,7 +269,10 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
       bGenuineSubldgTau = ( tauData.getSelectedTaus()[1].isGenuineTau() );
     }
   int isGenuineTau = (bGenuineLdgTau && bGenuineSubldgTau);
-  fCommonPlots.setGenuineBkgStatus(isGenuineTau);
+
+  // Both are needed due to code structure
+  fCommonPlots.setGenuineTauStatus(isGenuineTau);
+
   if (0) std::cout << "=== Tau Selection: isGenuineTau = " << isGenuineTau << " (LdgTau = " << bGenuineLdgTau << ", SubldTau = " << bGenuineSubldgTau << ")" << std::endl;
   
   // Fake rates currently only available for three decay modes: 0, 1, 10 (https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV#Decay_Mode_Reconstruction)
@@ -281,8 +296,17 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
       fEventWeight.multiplyWeight(tauData.getTauMisIDSF());
       cFakeTauSFCounter.increment();
     }
-  fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, tauData);
   if (0) std::cout << "=== Tau Selection: SF applied" << std::endl;
+
+
+  // Calculate transverse mass
+  double mT   = TransverseMass::reconstruct(tauData.getSelectedTaus()[0], tauData.getSelectedTaus()[1], muData.getSelectedMuons()[0], metData.getMET());
+  double mVis = (tauData.getSelectedTaus()[0].p4()  + tauData.getSelectedTaus()[1].p4()).M();
+
+  // Fill histos
+  fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, tauData);
+  hTauTauMass_AfterTauSelection->Fill(mVis);
+  hTransverseMass_AfterTauSelection->Fill(mT);
 
 
   //================================================================================================
@@ -290,27 +314,21 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   //================================================================================================
   if (0) std::cout << "=== Jet selection" << std::endl;
   const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau()); // fixme (only 1 tau is returned)
+  if (!jetData.passedSelection()) return;  
 
-  // Calculate transverse mass using silentMetData (not MetData!)
-  double mT   = TransverseMass::reconstruct(tauData.getSelectedTaus()[0], tauData.getSelectedTaus()[1], muData.getSelectedMuons()[0], silentMetData.getMET());
-  double mVis = (tauData.getSelectedTaus()[0].p4()  + tauData.getSelectedTaus()[1].p4()).M();
-  hTauTauMass_AfterTauSelection->Fill(mVis);
-  hTransverseMass_AfterTauSelection->Fill(mT);
-
-  if (!jetData.passedSelection()) return;
-  fCommonPlots.fillControlPlotsAfterTopologicalSelections(fEvent, false, true);
-  
   // Fill histos
+  fCommonPlots.fillControlPlotsAtJetSelection(fEvent, jetData);
   hTauTauMass_AfterJetSelection->Fill(mVis);
   hTransverseMass_AfterJetSelection->Fill(mT);
- 
+
 
   //================================================================================================  
   // Collinear angular cuts
   //================================================================================================  
   // if (0) std::cout << "=== Angular Cuts (coll)" << std::endl;
-  // const AngularCutsCollinear::Data collinearData = fAngularCutsCollinear.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, silentMetData);
+  // const AngularCutsCollinear::Data collinearData = fAngularCutsCollinear.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, metData);
   // if (!collinearData.passedSelection()) return;
+
 
   //================================================================================================  
   // 8) BJet selection
@@ -318,6 +336,10 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   if (0) std::cout << "=== BJet selection" << std::endl;
   const BJetSelection::Data bjetData = fBJetSelection.analyze(fEvent, jetData);
   if (!bjetData.passedSelection()) return;
+
+  // Fill histos
+  fCommonPlots.fillControlPlotsAtBtagging(fEvent, bjetData);
+
 
   //================================================================================================  
   // 9) BJet SF  
@@ -328,31 +350,31 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
       fEventWeight.multiplyWeight(bjetData.getBTaggingScaleFactorEventWeight());
     }
   cBTaggingSFCounter.increment();
-  
+
   // Fill histos
+  fCommonPlots.fillControlPlotsAfterBtagSF(fEvent, jetData, bjetData);
   hTauTauMass_AfterBjetSelection->Fill(mVis);
   hTransverseMass_AfterBjetSelection->Fill(mT);
 
-  // Fill histos after StandardSelections
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData); // FIXME: causes counter to be wrongly placed?
-  fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, silentMetData, topData); //, (isGenuineTau > 0));
-
+  /*
   //================================================================================================
   // - MET selection
   //================================================================================================
   if (0) std::cout << "=== MET selection" << std::endl;
-  const METSelection::Data MetData = fMETSelection.analyze(fEvent, nVertices);
-  if (!MetData.passedSelection()) return;
+  // const METSelection::Data metData = fMETSelection.analyze(fEvent, nVertices);
+  if (!metData.passedSelection()) return;
 
   // Fill Histos
+  fCommonPlots.fillControlPlotsAtMETSelection(fEvent, metData);
   hTauTauMass_AfterMetSelection->Fill(mVis);
   hTransverseMass_AfterMetSelection ->Fill(mT);
+  */
 
   //================================================================================================
   // Back-to-back angular cuts
   //================================================================================================
   // if (0) std::cout << "=== Angular Cuts (b2b)" << std::endl;
-  // const AngularCutsBackToBack::Data backToBackData = fAngularCutsBackToBack.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, MetData);
+  // const AngularCutsBackToBack::Data backToBackData = fAngularCutsBackToBack.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, metData);
   // if (!backToBackData.passedSelection()) return;
 
 
@@ -360,7 +382,10 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   // 10) Top selection
   //================================================================================================
   if (0) std::cout << "=== Top (BDT) selection" << std::endl;
-  // const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+
+  // Fill histos after StandardSelections
+   fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, metData, topData);
 
   // Require at least 1 cleaned top candidate (no BDT threshold)
   if (topData.getAllCleanedTopsSize() < 1) return;
@@ -386,7 +411,7 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   cSelected.increment();
 
   // Fill histos after AllSelections: (After top-selections and top-tag SF)
-  fCommonPlots.fillControlPlotsAfterAllSelections(fEvent); // , isGenuineTau);
+  fCommonPlots.fillControlPlotsAfterAllSelections(fEvent);
 
   // Fill histos
   hTauTauMass_AfterAllSelections->Fill(mVis);

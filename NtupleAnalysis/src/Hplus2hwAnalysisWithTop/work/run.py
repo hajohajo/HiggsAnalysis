@@ -124,29 +124,9 @@ def main():
         Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=opts.excludeTasks)
     else:
-        myBlackList = ["QCD_b"
-                       "ChargedHiggs_HplusTB_HplusToTB_M_180_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_200_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_220_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_250_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_300_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_350_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_400_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_500_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_800_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_1000_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_1500_ext1",
-                       "ChargedHiggs_HplusTB_HplusToTB_M_2000_ext1",
-                       "ChargedHiggs_HplusTB_HplusToTB_M_2500_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_3000_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_1000",
-                       "ChargedHiggs_HplusTB_HplusToTB_M_1500",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_2000",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_2500",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_3000",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_5000",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_7000",   # Speeed things up  
-                       "ChargedHiggs_HplusTB_HplusToTB_M_10000",  # Speeed things up
+        myBlackList = ["DYJetsToLL_M_50_ext1",
+                       "DYJetsToLL_M_50_ext2",
+                       "WJetsToLNu_ext2"
                        ]
         #if opts.doSystematics:
         #    myBlackList.append("QCD")

@@ -57,8 +57,8 @@ eVeto = PSet(
 # Muon Selection
 #================================================================================================
 muonSelection = PSet(
-    applyTriggerMatching = False,
-    triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
+    applyTriggerMatching = False ,      # HLTMuon_Pt Missing from tree!
+    triggerMatchingCone  = 0.1,         # DeltaR for matching offline tau with trigger tau
     muonPtCut            = 26.0,        # [default: 10.0]
     muonEtaCut           = 2.4,         # [default: 2.4]
     muonID               = "muIDTight", # [default: "muIDTight"] ("muIDLoose", "muIDMedium", "muIDTight")
@@ -79,10 +79,10 @@ tauSelection = PSet(
     rtau                 =   0.0, # [default: 0.0] (to disable set to 0.0)
     againstElectronDiscr = "againstElectronTightMVA6",
     againstMuonDiscr     = "againstMuonLoose3",
-    isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
-    # isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
-    # isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Default
-    # isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Default
+    isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
     # isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits",
     # isolationDiscr       = "byMediumCombinedIsolationDeltaBetaCorr3Hits",
     )
@@ -218,11 +218,11 @@ topSelectionBDT = PSet(
     NumberOfTopsCutDirection = "==",  # [default: "=="] (==, !=, <, <=, >, >=)
     AnyTopMVACutValue      = -1.0,   # [default: -1.0]
     AnyTopMVACutDirection  =  ">",    # [default: ">"]
-    TopMVACutValue         = -0.00,   # [default: 0.40] NOTE: Only use numbers with 2 decimals
+    TopMVACutValue         = -0.60,   # [default: 0.40] NOTE: Only use numbers with 2 decimals
     TopMVACutDirection     =  ">=",   # [default: ">="]
     TopMassLowCutValue     =   0.0,   # [default: 0.0]
     TopMassLowCutDirection =  ">=",   # [default: ">="]
-    TopMassUppCutValue     = 1000.0,  # [default: 400.0]
+    TopMassUppCutValue     = 2000.0,  # [default: 1000.0]
     TopMassUppCutDirection =  "<=",   # [default: "<"]
     CSV_bDiscCutValue      = 0.8484,  # [default: 0.8484]
     CSV_bDiscCutDirection  = ">=",    # [default: ">="]

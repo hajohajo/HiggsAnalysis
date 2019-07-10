@@ -91,7 +91,6 @@ public:
    * (it is usually set through TauSelection via CommonPlots::fillControlPlotsAfterTauSelection)
    */
   void setGenuineTauStatus(const bool isGenuineTau) { bIsGenuineTau = isGenuineTau; };
-  void setGenuineBkgStatus(const bool isGenuineBkg) { bIsGenuineBkg = isGenuineBkg; };
   
   //===== unique filling methods (to be called inside the event selection routine only, i.e. (before a passing decision is done))
   void fillControlPlotsAtVertexSelection(const Event& event);
@@ -124,7 +123,7 @@ public:
 					       const TopSelectionBDT::Data& topData);
   void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
   void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false);
-  void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineBkg);  //HToTB-specific
+  void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineB);  //HToTB-specific
   void fillControlPlotsAfterAllSelectionsWithProbabilisticBtag(const Event& event, const METSelection::Data& metData, double btagWeight);
   //void fillControlPlotsAfterAllSelectionsWithFullMass(const Event& event, FullHiggsMassCalculator::Data& data);
 
@@ -365,7 +364,6 @@ private:
   TauSelection::Data fTauData;
   //FakeTauIdentifier::Data fFakeTauData;
   bool bIsGenuineTau;
-  bool bIsGenuineBkg;
   ElectronSelection::Data fElectronData;
   MuonSelection::Data fMuonData;
   JetSelection::Data fJetData;

@@ -13,6 +13,8 @@
 
 TopSelectionBDT::Data::Data()
 :
+  bPassedMVACut(false),
+  bPassedNTopsCut(false),
   bPassedSelection(false),
   fTopMVA(-1.0),
   fTopJet1(),
@@ -286,7 +288,7 @@ TopSelectionBDT::Data TopSelectionBDT::analyze(const Event& event, const JetSele
   TopSelectionBDT::Data data = privateAnalyze(event, jetData.getSelectedJets(), bjetData.getSelectedBJets());
 
   // Send data to CommonPlots
-  // if (fCommonPlots != nullptr) fCommonPlots->fillControlPlotsAtTopSelectionBDT(event, data);
+  // if (fCommonPlots != nullptr) fCommonPlots->fillControlPlotsAtTopSelectionBDT(event, data);// fixme - implement
   return data;
 }
 
@@ -733,8 +735,8 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
   if (0) std::cout << "=== TopSelectionBDT:: Fill output" << std::endl;
   if (fAllCleanedTops.MVA.size() > 0) 
     {
-      output.bPassedSelection = cfg_TopMVACut.passedCut( fAllCleanedTops.MVA.at(0) );
       
+      output.bPassedMVACut = cfg_TopMVACut.passedCut( fAllCleanedTops.MVA.at(0) );
       // Leading-in-MVA top
       output.fTopMVA      = fAllCleanedTops.MVA.at(0);
       output.fTopJet1     = fAllCleanedTops.Jet1.at(0);
@@ -788,25 +790,29 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
    //===============================================================================================
   // Increment counters
   //================================================================================================
-  if (0) std::cout << "=== TopSelectionBDT:: Increment counters" << std::endl;
+  output.bPassedNTopsCut  = cfg_NumberOfTopsCut.passedCut(output.fSelectedCleanedTopsMVA.size());
+  output.bPassedSelection = output.bPassedMVACut * output.bPassedNTopsCut;
 
-  //=== Apply cut on leading MVA top
-  if (!output.bPassedSelection) return output;
-  cSubPassedMVACut.increment();
+  if (0) std::cout << "=== TopSelectionBDT:: Increment counters" << std::endl;
+  //=== Apply cut on leading MVA top (at least 1 top with desired BDTG score)
+  // if (!output.bPassedSelection) return output;
+  if (output.bPassedMVACut) cSubPassedMVACut.increment();
   
-  //=== Apply cut on number of tops with MVA score above threshold
-  if (!cfg_NumberOfTopsCut.passedCut(output.fSelectedCleanedTopsMVA.size())) return output;
-  cSubPassedNTopsCut.increment();
+  //=== Apply cut on number of tops with MVA score above BDTG score threshold
+  // if (!cfg_NumberOfTopsCut.passedCut(output.fSelectedCleanedTopsMVA.size())) return output;
+  if (output.bPassedNTopsCut) cSubPassedNTopsCut.increment();
 
   //================================================================================================
-  // Fill histograms (only if all selections passed)
+  // Fill histograms
   //================================================================================================
   if (0) std::cout << "=== TopSelectionBDT:: Filling histograms" << std::endl;
-  if (!output.bPassedSelection) return output;
-  cPassedTopSelectionBDT.increment();
+  // if (!output.bPassedSelection) return output;
+  if (output.bPassedSelection) cPassedTopSelectionBDT.increment();
 
-  // Leading in pt top
+  // Get the top candidate with
   TrijetSelection myTops = fAllCleanedTops;
+  if (myTops.Jet1.size() < 1) return output;
+
   SelectedTrijets top;
   top.Jet1      = getLeadingSubleadingJet(myTops.Jet1.at(0), myTops.Jet2.at(0), "leading");
   top.Jet2      = getLeadingSubleadingJet(myTops.Jet1.at(0), myTops.Jet2.at(0), "subleading");
