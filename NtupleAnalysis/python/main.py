@@ -401,6 +401,25 @@ class Process:
     def setDatasets(self, datasets):
         self._datasets = datasets
 
+    def ordering(self,regexps):
+        orderedDatasets = []
+        for regexp in regexps:
+            select_re = re.compile(regexp)
+            for d in self._datasets:
+                match = select_re.search(d.getName())
+                if match and d not in orderedDatasets:
+                    orderedDatasets.append(d)
+        for d in self._datasets:
+            if d not in orderedDatasets:
+                orderedDatasets.append(d)
+        if not len(self._datasets) == len(orderedDatasets):
+            print "Problem with ordering, mismatch of the number of datasets"
+            print "    original length",len(self._datasets)
+            print "    ordered length ",len(orderedDatasets)
+            sys.exit()
+                                
+        self._datasets = orderedDatasets
+                                                                                                                                                                                                                                
     def getRuns(self):
         runmin = -1
         runmax = -1
