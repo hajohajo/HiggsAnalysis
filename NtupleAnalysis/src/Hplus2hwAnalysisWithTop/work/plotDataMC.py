@@ -209,14 +209,16 @@ def main(opts):
             msg   = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Histogram", "%i" % i, "/", "%s:" % (len(myHistos)), h)
             Print(ss + msg + ns, i==1)
             
-            if "_Vs_" in h or "etaphi" in h:
+            if "_Vs_" in h or "etaphi" in h or "EtaPhi" in h:
                 Print 
                 continue
 
             if opts.folder == "":
                 if h in skipList:
                     continue
-            DataMCHistograms(datasetsMgr, h)
+
+            Verbose(h, i==1)
+            PlotDataMCHistograms(datasetsMgr, h)
         
     Print("All plots saved under directory %s" % (ts + aux.convertToURL(opts.saveDir, opts.url) + ns), True)    
     return
@@ -238,7 +240,7 @@ def GetHistoKwargs(h, opts):
         _yMin = 1e-1
 
     if _logY:
-        _yMaxF = 20
+        _yMaxF = 10
     else:
         _yMaxF = 1.2
 
@@ -268,10 +270,11 @@ def GetHistoKwargs(h, opts):
     
     if "pt" in h.lower():
         kwargs["units"]      = "GeV"
-        kwargs["rebinX"]     = 1 #5
+        # kwargs["rebinX"]     = 5
+        kwargs["rebinX"]     = systematics._dataDrivenCtrlPlotBinning["selectedJetsPt"]
         kwargs["ylabel"]     = _yLabel + kwargs["units"]
         kwargs["moveLegend"] = _legNE
-        kwargs["cutBox"]     = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        # kwargs["cutBox"]     = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]       = {"xmax": +800.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "DeltaEta" in h:
@@ -326,7 +329,7 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["cutBox"] = {"cutValue": -0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": -1.0, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["rebinX"] = 2        
+        kwargs["rebinX"] = 2    
         kwargs["xlabel"] = "BDTG scrore"
         if "BDT_Selected" in h:
             kwargs["moveLegend"] = _legNW
@@ -529,14 +532,14 @@ def GetHistoKwargs(h, opts):
         kwargs["units"]  = "GeV"
         kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
         kwargs["ylabel"] = _yLabel + kwargs["units"]
-        kwargs["cutBox"] = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["selectedJetsPt"]
         kwargs["divideByBinWidth"] = True
-        kwargs["opts"] = {"xmin": 20.0, "xmax": +500.0}
+        kwargs["opts"] = {"xmin": 30.0, "xmax": +500.0}
         if "second" in h.lower():
-            kwargs["opts"] = {"xmin": 20.0, "xmax": +300.0}
+            kwargs["opts"] = {"xmin": 30.0, "xmax": +300.0}
         if "third" in h.lower() or "fourth" in h.lower():
-            kwargs["opts"] = {"xmin": 20.0, "xmax": +150.0}
+            kwargs["opts"] = {"xmin": 30.0, "xmax": +150.0}
 
     regex = re.compile('selectedBJets.*BDisc')
     if(regex.search(h)):
@@ -554,7 +557,7 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = "Events / %.2f "
         ROOT.gStyle.SetNdivisions(8, "X")
         kwargs["cutBox"] = {"cutValue": 0.8484, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": +1.0, "ymin": 1e0, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["moveLegend"] = _legRM
 
     if "toptagsf" in h.lower():
@@ -569,24 +572,27 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.5, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["rebinX"] = 5
 
-    if "met_" in h.lower():
+    if "met_" in h.lower() or h == "Met" or h == "MET":
         kwargs["units"]  = "GeV"
-        kwargs["rebinX"] =  systematics._dataDrivenCtrlPlotBinning["MET_AfterAllSelections"] #4
+        kwargs["rebinX"] =  systematics._dataDrivenCtrlPlotBinning["Met"]
         kwargs["xlabel"] = "E_{T}^{miss} (%s)" % (kwargs["units"])
         kwargs["ylabel"] = _yLabel + kwargs["units"]
-        kwargs["opts"]   = {"ymin": _yMin, "xmax": 500.0, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmax": 500.0, "ymaxfactor": _yMaxF}
+        kwargs["divideByBinWidth"] = True        
         if "METFilter" in h:
             kwargs["rebinX"] = 1
             kwargs["xlabel"] = ""
             kwargs["ylabel"] = "Events / %.0f "
             kwargs["opts"]   = {"xmin": 0.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
             
-        if "metphi" in h.lower():
-            kwargs["units"]  = "rads"
-            kwargs["rebinX"] =  2
-            kwargs["xlabel"] = "E_{T}^{miss} #phi (%s)" % (kwargs["units"])
-            kwargs["ylabel"] = _yLabel + kwargs["units"]
-            kwargs["opts"]   = {"xmin": -3.2, "xmax": 3.2, "ymin": _yMin, "ymaxfactor": _yMaxF}
+    if "metphi" in h.lower():
+        kwargs["units"]  = "rads"
+        kwargs["rebinX"] =  4
+        kwargs["xlabel"] = "E_{T}^{miss} #phi (%s)" % (kwargs["units"])
+        kwargs["ylabel"] = "Events / %.2f " + kwargs["units"]
+        kwargs["opts"]   = {"xmin": -3.2, "xmax": 3.2, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["moveLegend"] = _legRM #_legNE
+
 
     if "LdgTopBjetPt" in h:
         kwargs["units"]  = "GeV" #"GeV/c"
@@ -600,7 +606,7 @@ def GetHistoKwargs(h, opts):
 
     if "MHT" in h:
         kwargs["units"]  = "GeV"
-        kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["MHT"] #2 #systematics._dataDrivenCtrlPlotBinning["MET_AfterAllSelections"] #2
+        kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["MHT"]
         kwargs["xlabel"] = "MHT (%s)" % kwargs["units"]
         kwargs["ylabel"] = _yLabel + kwargs["units"]
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +500.0}#, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -632,19 +638,25 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 120.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "counters" in opts.folder.lower():
-        kwargs["moveLegend"] = _legSW
-        kwargs["opts"]       = {"ymin": 1e0, "ymax": 1e9}
+        kwargs["moveLegend"] = _legRM
+        kwargs["opts"]       = {"ymin": 1e-1, "ymaxfactor": 10}
         if h == "counter":
+            kwargs["moveLegend"] = _legSW
             xMin =  8.0
-            xMax = 25.0 # 27.0 is actual last. using 1 before because blinding fails there
+            xMax = 26.0 # using 1 before because blinding fails there
             #xMin =  8.0
             #xMax = 25.0 # 26.0 is actual last. using 1 before because blinding fails there
-            kwargs["opts"] = {"xmin": xMin, "xmax": xMax, "ymin": 1e0, "ymax": 5e9}
+            kwargs["opts"] = {"xmin": xMin, "xmax": xMax, "ymin": _yMin, "ymax": 5e9}
             kwargs["moveLegend"] = _legNE
             kwargs["blindingRangeString"] = "0-100"
             #kwargs["moveBlindedText"]     = {"dx": 0.0, "dy": 0.04, "dh": 0.0}
+        elif "jet selection" in h:
+            kwargs["opts"] = {"xmin": 0.0, "xmax": 6.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        elif "tau selection" in h:
+            kwargs["opts"] = {"xmin": 0.0, "xmax": 12.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         else:
-            kwargs["opts"]   = {"ymin": 1e0, "ymaxfactor": 10}
+            pass
+
 
     if "DR" in h:
         kwargs["rebinX"] = 4
@@ -750,7 +762,7 @@ def getHistos(datasetsMgr, histoName):
     h2.setName("EWK")
     return [h1, h2]
 
-def DataMCHistograms(datasetsMgr, histoName):
+def PlotDataMCHistograms(datasetsMgr, histoName):
     Verbose("Plotting Data-MC Histograms")
 
     # Skip 2-D plots
@@ -762,7 +774,9 @@ def DataMCHistograms(datasetsMgr, histoName):
                        "FakeInTopDir", "LdgTrijetFakeJJB_BDT", "LdgTrijetFake_BDT"]
 
     if opts.folder == "counters":
-        skipStrings = ["weighted"]
+        skipStrings = ["weighted", "METFilter selection ()"]
+    if opts.folder == "counters/weighted":
+        skipStrings = ["METFilter selection ()"]
     if opts.folder == "eSelection_Veto":
         skipStrings = ["Resolution"]
     if opts.folder == "muSelection":
@@ -776,19 +790,22 @@ def DataMCHistograms(datasetsMgr, histoName):
     if opts.folder == "bjetSelection_":
         skipStrings = ["MatchDeltaR", "btagSFRelUncert", "_dEta", "_dPhi", "_dPt", "_dR"]
     if opts.folder == "metSelection_":
-        skipStrings = [""]
+        skipStrings = []
     if opts.folder == "topologySelection_":
         skipStrings = ["_Vs_"]
     if opts.folder == "topSelectionBDT_":
         skipStrings = ["RelUncert"]
 
     if "ForDataDrivenCtrlPlots" in opts.folder:
-        skipStrings = ["_Vs_", "JetEtaPhi", "MinDeltaPhiJet", "MaxDeltaPhiJet", "MinDeltaRJet"]
+        skipStringOAs = ["_Vs_", "JetEtaPhi", "MinDeltaPhiJet", "MaxDeltaPhiJet", "MinDeltaRJet"]
 
     # Skip histograms if they contain a given string
     for keyword in skipStrings:
         if keyword in histoName:
+            Verbose("Skipping \"%s\" due to keyword \"%s\"" % (histoName, keyword), True)
             return
+        else:
+            pass
 
     # Get Histogram name and its kwargs
     saveName = histoName.rsplit("/")[-1]
@@ -812,42 +829,51 @@ def DataMCHistograms(datasetsMgr, histoName):
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
 
     # Replace bin labels
-    if "counter" in opts.folder:
-        p.getFrame().GetXaxis().LabelsOption("v") #vertical orientation of bin labels
-        if histoName.split("/")[-1] == "counter":
-            p.getFrame().GetXaxis().LabelsOption("v") #vertical orientation of bin labels
-            replaceBinLabels(p, saveName)
-        pass
+    if "counter" in opts.folder:        
+        replaceBinLabels(p, kwargs_, saveName)
 
     # Save the plots in custom list of saveFormats
     SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), opts.saveFormats)
     return
 
-def replaceBinLabels(p, histoName):
+def replaceBinLabels(p, kwargs, histoName):
     '''
     https://root.cern.ch/doc/master/classTAttText.html#T5
     '''
     myBinList = []
     if histoName == "counter" or histoName == "weighted/counter":
-        #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
-        #             "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
-        #             "b jets SF", "1 top" ]
-        #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "2 #tau jets", "genuine #tau",
-        #             "#tau N", "#tau OS", "#tau SF", "fake #tau", "#geq 3 jets", "#geq 1 b jets",
-        #             "b jets SF", "E_{T}^{miss}","1 top", "top SF", "selected"]
-        #myBinList = ["trigger", "filter", "pv", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
-        #             "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "R_{coll}^{min}", "#geq 1 b jets",
-        #             "b jets SF", "E_{T}^{miss}", "R_{bb}^{min}", "1 top", "selected"] # "top SF" = "selected"
+        #myBinList = ["trigger", "filter", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
+        #             "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "#geq 1 b jets",
+        #             "b jets SF", "E_{T}^{miss}", "1 top", "top SF", "selected"] # "top SF" = "selected"
         myBinList = ["trigger", "filter", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
                      "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "#geq 1 b jets",
                      "b jets SF", "E_{T}^{miss}", "1 top", "top SF", "selected"] # "top SF" = "selected"
+        p.getFrame().GetXaxis().LabelsOption("v") #vertical orientation of bin labels
     elif "bjet" in histoName:
-        myBinList = ["All", "#eta", "p_{T}", "CSVv2 (M)", "Trg Match", "#geq 3"]
+        myBinList = ["all", "#eta", "p_{T}", "b-discr.", "trg-match", "#geq 1 b jets"]
     elif "jet" in histoName:
-        myBinList = ["All", "jet ID", "PU ID", "#tau match", "#eta", "p_{T}", "#geq 7", "H_{T}", "J_{T}", "MHT"]
+        myBinList = ["all", "jet ID", "PU ID", "#tau match", "#eta", "p_{T}", "#geq 3 jets", "H_{T}", "J_{T}", "MHT"]
+    elif "top candidates" in histoName:
+        myBinList = ["all", "m_{t} low", "m_{t} upper", "b-discr.", "BDTG", "cleaning"]
+    elif "tau" in histoName:
+        myBinList = ["all", "trg-match", "DM", "discr.", "e discr.", "#mu discr.", "p_{T}", "#eta", "p_{T}^{ldg tk}", "n-prongs", "isolation", 
+                     "R_{#tau}", "anti-iso", "anti-iso R_{#tau}", "genuine #tau", "selected #tau", "anti-iso #tau", "anti-iso #tau's"]    
+        p.getFrame().GetXaxis().LabelsOption("v") #vertical orientation of bin labels
+    elif "e selection" in histoName:
+        myBinList = ["all", "trg-match", "p_{T}", "#eta", "ID", "isolation"]
+    elif "mu selection" in histoName:
+        myBinList = ["all", "trg-match", "p_{T}", "#eta", "ID", "isolation"]
+    elif "metfilter" in histoName.lower():
+        myBinList = ["HBHE", "HBHE-Iso", "ECAL TP", "EE Sc", "Good PV", "Halo", "PF #mu", "PF ch."]
+        p.getFrame().GetXaxis().LabelsOption("v") #vertical orientation of bin labels
     else:
         pass
-    for i in range(0, len(myBinList)-1):
+
+    # Replace all bins
+    for i in range(0, len(myBinList)):
+        if "xmax" in kwargs["opts"]:
+            if i >= kwargs["opts"]["xmax"]:
+                break
         p.getFrame().GetXaxis().SetBinLabel(i+1, myBinList[i])
     return
 
