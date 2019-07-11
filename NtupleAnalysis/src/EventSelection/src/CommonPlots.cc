@@ -1220,13 +1220,13 @@ void CommonPlots::fillControlPlotsAfterStandardSelections(const Event& event,
   // TopSelection histograms
   if (fAnalysisType == kHplus2hwAnalysisWithTop)
     {
-      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNAllCleanedTopsAfterStdSelections, bIsGenuineTau, fTopData.getAllCleanedTopsMVA().size() );
-      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNSelectedCleanedTopsAfterStdSelections, bIsGenuineTau, fTopData.getSelectedCleanedTopsMVA().size() );
+      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNAllCleanedTopsAfterStdSelections, bIsGenuineTau, fTopData.getAllCleanedTopsBDTG().size() );
+      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNSelectedCleanedTopsAfterStdSelections, bIsGenuineTau, fTopData.getSelectedCleanedTopsBDTG().size() );
       
       if (fTopData.getAllCleanedTopsSize() > 0)
 	{
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopPtAfterStdSelections        , bIsGenuineTau, fTopData.getTop().pt() );
-	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterStdSelections       , bIsGenuineTau, fTopData.getTopMVA() );
+	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterStdSelections       , bIsGenuineTau, fTopData.getTopBDTG() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetPtAfterStdSelections   , bIsGenuineTau, fTopData.getTopDijet().pt() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetMassAfterStdSelections , bIsGenuineTau, fTopData.getTopDijet().mass() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopMassAfterStdSelections      , bIsGenuineTau, fTopData.getTop().mass() );
@@ -1362,12 +1362,12 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, int isG
   // fHistoSplitter.fillShapeHistogramTriplet(hCtrlQGLRNGluonJetsAfterAllSelections,isGenuineB, fQGLRData.getNumberOfGluonJets());
 
   // TopSelection histograms
-  fHistoSplitter.fillShapeHistogramTriplet(hCtrlNAllCleanedTopsAfterAllSelections, isGenuineB, fTopData.getAllCleanedTopsMVA().size() );
-  fHistoSplitter.fillShapeHistogramTriplet(hCtrlNSelectedCleanedTopsAfterAllSelections, isGenuineB, fTopData.getSelectedCleanedTopsMVA().size() );
+  fHistoSplitter.fillShapeHistogramTriplet(hCtrlNAllCleanedTopsAfterAllSelections, isGenuineB, fTopData.getAllCleanedTopsBDTG().size() );
+  fHistoSplitter.fillShapeHistogramTriplet(hCtrlNSelectedCleanedTopsAfterAllSelections, isGenuineB, fTopData.getSelectedCleanedTopsBDTG().size() );
   if (fTopData.getAllCleanedTopsSize() > 0)
     {
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopPtAfterAllSelections        , isGenuineB, fTopData.getTop().pt() );
-      fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterAllSelections       , isGenuineB, fTopData.getTopMVA() );
+      fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterAllSelections       , isGenuineB, fTopData.getTopBDTG() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetPtAfterAllSelections   , isGenuineB, fTopData.getTopDijet().pt() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetMassAfterAllSelections , isGenuineB, fTopData.getTopDijet().mass() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopMassAfterAllSelections      , isGenuineB, fTopData.getTop().mass() );
@@ -1582,8 +1582,8 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
   // TopSelection histograms
   if (fAnalysisType == kHplus2hwAnalysisWithTop)
     {
-      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNAllCleanedTopsAfterAllSelections, bIsGenuineTau, fTopData.getAllCleanedTopsMVA().size() );
-      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNSelectedCleanedTopsAfterAllSelections, bIsGenuineTau, fTopData.getSelectedCleanedTopsMVA().size() );
+      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNAllCleanedTopsAfterAllSelections, bIsGenuineTau, fTopData.getAllCleanedTopsBDTG().size() );
+      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNSelectedCleanedTopsAfterAllSelections, bIsGenuineTau, fTopData.getSelectedCleanedTopsBDTG().size() );
       
       if (fTopData.getAllCleanedTopsSize() > 0)
 	{
