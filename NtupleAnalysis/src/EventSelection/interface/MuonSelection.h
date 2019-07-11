@@ -81,10 +81,10 @@ private:
   bool passTrgMatching(const Muon& muon, std::vector<math::LorentzVectorT<double>>& trgMuons) const;
 
   // Input parameters
-  const bool bApplyTriggerMatching;
-  const float fTriggerMuonMatchingCone;
-  const double fMuonPtCut;
-  const double fMuonEtaCut;
+  const bool cfg_ApplyTriggerMatching;
+  const float cfg_TriggerMuonMatchingCone;
+  const double cfg_MuonPtCut;
+  const double cfg_MuonEtaCut;
   float fRelIsoCut;
   float fMiniIsoCut;
   bool fVetoMode;
@@ -94,11 +94,14 @@ private:
   Count cPassedMuonSelection;
   // Sub counters
   Count cSubAll;
+  Count cSubPassedIsPresent;
   Count cSubPassedTriggerMatching;
   Count cSubPassedPt;
   Count cSubPassedEta;
   Count cSubPassedID;
   Count cSubPassedIsolation;
+  Count cSubPassedSelection;
+  Count cSubPassedVeto;
   
   // Histograms
   WrappedTH1 *hTriggerMatchDeltaR;

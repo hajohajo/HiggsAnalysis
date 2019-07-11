@@ -80,26 +80,29 @@ private:
   bool getMVADecision(const Electron& ele, const std::string mvaCut);
   
   // Input parameters
-  const bool bApplyTriggerMatching;
-  const float fTriggerElectronMatchingCone;
-  const double fElectronPtCut;
-  const double fElectronEtaCut;
+  const bool cfg_ApplyTriggerMatching;
+  const float cfg_TriggerElectronMatchingCone;
+  const double cfg_ElectronPtCut;
+  const double cfg_ElectronEtaCut;
+  const std::string cfg_ElectronMVACut;
   float fRelIsoCut;
   float fMiniIsoCut;
   bool fVetoMode;
   bool fMiniIsol;
   bool fElectronMVA;
-  const std::string fElectronMVACut;
   
   // Event counter for passing selection
   Count cPassedElectronSelection;
   // Sub counters
   Count cSubAll;
+  Count cSubPassedIsPresent;
   Count cSubPassedTriggerMatching;
   Count cSubPassedPt;
   Count cSubPassedEta;
   Count cSubPassedID;
   Count cSubPassedIsolation;
+  Count cSubPassedSelection;
+  Count cSubPassedVeto;
   
   // Histograms
   WrappedTH1 *hTriggerMatchDeltaR;
