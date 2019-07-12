@@ -22,6 +22,7 @@ blacklist = []
 whitelist = []
 #whitelist = ["Tau_Run2016C_","DY","ChargedHiggs_HplusTB_HplusToTauNu_IntermediateMassNoNeutral_M_175"]
 process.addDatasetsFromMulticrab(sys.argv[1],blacklist=blacklist,whitelist=whitelist)
+process.ordering(["^Tau_Run","^TT","^ST","^WJ","^DY"])
 
 # Add config
 from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import allSelections,applyAnalysisCommandLineOptions,setAngularCutsWorkingPoint
