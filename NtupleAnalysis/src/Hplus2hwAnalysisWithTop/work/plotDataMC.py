@@ -643,13 +643,10 @@ def GetHistoKwargs(h, opts):
         if h == "counter":
             kwargs["moveLegend"] = _legSW
             xMin =  8.0
-            xMax = 26.0 # using 1 before because blinding fails there
-            #xMin =  8.0
-            #xMax = 25.0 # 26.0 is actual last. using 1 before because blinding fails there
+            xMax = 25.0 # using 1 before because blinding fails there
             kwargs["opts"] = {"xmin": xMin, "xmax": xMax, "ymin": _yMin, "ymax": 5e9}
             kwargs["moveLegend"] = _legNE
             kwargs["blindingRangeString"] = "0-100"
-            #kwargs["moveBlindedText"]     = {"dx": 0.0, "dy": 0.04, "dh": 0.0}
         elif "jet selection" in h:
             kwargs["opts"] = {"xmin": 0.0, "xmax": 6.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         elif "tau selection" in h:
@@ -829,7 +826,7 @@ def PlotDataMCHistograms(datasetsMgr, histoName):
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
 
     # Replace bin labels
-    if "counter" in opts.folder:        
+    if "counter" in opts.folder:
         replaceBinLabels(p, kwargs_, saveName)
 
     # Save the plots in custom list of saveFormats
@@ -840,15 +837,17 @@ def replaceBinLabels(p, kwargs, histoName):
     '''
     https://root.cern.ch/doc/master/classTAttText.html#T5
     '''
-    myBinList = []
+    myBinList  = []
+    labelOrien = None # "v" or "h"
+
     if histoName == "counter" or histoName == "weighted/counter":
-        #myBinList = ["trigger", "filter", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
-        #             "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "#geq 1 b jets",
-        #             "b jets SF", "E_{T}^{miss}", "1 top", "top SF", "selected"] # "top SF" = "selected"
-        myBinList = ["trigger", "filter", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
-                     "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "#geq 1 b jets",
-                     "b jets SF", "E_{T}^{miss}", "1 top", "top SF", "selected"] # "top SF" = "selected"
-        p.getFrame().GetXaxis().LabelsOption("v") #vertical orientation of bin labels
+        labelOrien = "v"
+#        myBinList = ["before skim", "after skim", "base", "pu RW", "prescale", "top p_{T} RW", "exclusive RW", "all", "trigger", "filter", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
+#                     "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "#geq 1 b jets",
+#                     "b jets SF", "1 top", "top SF", "selected"] # "top SF" = "selected"
+        myBinList = ["trigger", "filters", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
+                     "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "DM", "#geq 3 jets", "#geq 1 b jets",
+                     "b jets SF", "1 top", "top SF", "selected"]
     elif "bjet" in histoName:
         myBinList = ["all", "#eta", "p_{T}", "b-discr.", "trg-match", "#geq 1 b jets"]
     elif "jet" in histoName:
@@ -856,18 +855,23 @@ def replaceBinLabels(p, kwargs, histoName):
     elif "top candidates" in histoName:
         myBinList = ["all", "m_{t} low", "m_{t} upper", "b-discr.", "BDTG", "cleaning"]
     elif "tau" in histoName:
-        myBinList = ["all", "trg-match", "DM", "discr.", "e discr.", "#mu discr.", "p_{T}", "#eta", "p_{T}^{ldg tk}", "n-prongs", "isolation", 
+        labelOrien = "v"
+        myBinList  = ["all", "trg-match", "DM", "discr.", "e discr.", "#mu discr.", "p_{T}", "#eta", "p_{T}^{ldg tk}", "n-prongs", "isolation", 
                      "R_{#tau}", "anti-iso", "anti-iso R_{#tau}", "genuine #tau", "selected #tau", "anti-iso #tau", "anti-iso #tau's"]    
-        p.getFrame().GetXaxis().LabelsOption("v") #vertical orientation of bin labels
     elif "e selection" in histoName:
-        myBinList = ["all", "trg-match", "p_{T}", "#eta", "ID", "isolation"]
+        labelOrien = "v"
+        myBinList  = ["all", "present", "trg-match", "p_{T}", "#eta", "ID", "isolation", "selected", "veto"]
     elif "mu selection" in histoName:
-        myBinList = ["all", "trg-match", "p_{T}", "#eta", "ID", "isolation"]
+        labelOrien = "v"
+        myBinList  = ["all", "present", "trg-match", "p_{T}", "#eta", "ID", "isolation", "selected", "veto"]
     elif "metfilter" in histoName.lower():
-        myBinList = ["HBHE", "HBHE-Iso", "ECAL TP", "EE Sc", "Good PV", "Halo", "PF #mu", "PF ch."]
-        p.getFrame().GetXaxis().LabelsOption("v") #vertical orientation of bin labels
+        labelOrien = "v"
+        myBinList  = ["HBHE", "HBHE-Iso", "ECAL TP", "EE Sc", "Good PV", "Halo", "PF #mu", "PF ch."]
     else:
         pass
+
+    if labelOrien != None:
+        p.getFrame().GetXaxis().LabelsOption(labelOrien)
 
     # Replace all bins
     for i in range(0, len(myBinList)):
