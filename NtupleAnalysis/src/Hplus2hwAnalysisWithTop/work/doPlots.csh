@@ -29,13 +29,13 @@ set DSETS = "#ZJetsToQQ_HT600toInf"
 # ./plotDataMC.py --folder tauSelection_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 # ./plotDataMC.py --folder jetSelection_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 # ./plotDataMC.py --folder bjetSelection_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
-# ./plotDataMC.py --folder topSelectionBDT_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
+./plotDataMC.py --folder topSelectionBDT_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 # ## ./plotDataMC.py --folder AngularCuts_Collinear -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 # ## ./plotDataMC.py --folder AngularCuts_BackToBack -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 # 
-./plotDataMC.py --folder ForDataDrivenCtrlPlots -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
-./plotDataMC.py --folder ForDataDrivenCtrlPlotsEWKFakeTaus -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
-./plotDataMC.py --folder ForDataDrivenCtrlPlotsEWKGenuineTaus -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
+# ./plotDataMC.py --folder ForDataDrivenCtrlPlots -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
+# ./plotDataMC.py --folder ForDataDrivenCtrlPlotsEWKFakeTaus -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
+# ./plotDataMC.py --folder ForDataDrivenCtrlPlotsEWKGenuineTaus -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 # ## ./plotDataMC.py --folder ForDataDrivenCtrlPlotsEWKFakeB -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 # ## ./plotDataMC.py --folder ForDataDrivenCtrlPlotsEWKGenuineB -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 

@@ -561,7 +561,7 @@ def GetHistoKwargs(h, opts):
         kwargs["moveLegend"] = _legRM
 
     if "toptagsf" in h.lower():
-        kwargs["rebinX"] = 5
+        kwargs["rebinX"] = 10
         kwargs["xlabel"] = "top-tag SF"
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
