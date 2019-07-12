@@ -164,6 +164,55 @@ enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
         cutValueJet4 = 40.0,   # Cut value in degrees (circular cut)
 )
 #====== Experimental
+
+
+#================================================================================================
+# Top selection BDT
+#================================================================================================
+topSelectionBDT = PSet(
+        AnyTopMVACutValue      = -0.95,   # [default: -1.0] NOTE: Defines StandardSelections
+        AnyTopMVACutDirection  =  ">",    # [default: ">"]
+        TopMVACutValue         =  0.40,   # [default: 0.40] NOTE: Only use numbers with 2 decimals (e.g 0.40, 0.30, 0.00)
+        TopMVACutDirection     =  ">=",   # [default: ">="]
+        TopMassLowCutValue     =   0.0,   # [default: 0.0]
+        TopMassLowCutDirection =  ">=",   # [default: ">="]
+        TopMassUppCutValue     =  400.0,  # [default: 400.0]  # Do not evaluate top candidate if top mass greater than this cut (600 takes TOO long!)
+        TopMassUppCutDirection =  "<=",   # [default: "<"]
+        CSV_bDiscCutValue      = 0.8484,  # [default: 0.8484] # Do not evaluate top candidate if b-jet assigned as b from top fails this cut
+        CSV_bDiscCutDirection  = ">=",    # [default: ">="]
+        WeightFile             = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml",  # Disabled top-pt reweighting
+)
+
+# top-tagging (json files available for: defaut, fatJet, ldgJet)
+MVAstring = "%.2f" % topSelectionBDT.TopMVACutValue
+# Determine which top JSON files to use depending on the BDT trainigh weightfile used
+if "noDeltaRqq_noTopPtRew" in topSelectionBDT.WeightFile:
+    # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)
+    topMisID     = "topMisID_BDT0p40_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"
+    topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"
+    topTagEffUnc = "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"
+elif "noDeltaRqq" in topSelectionBDT.WeightFile:
+    # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)
+    topMisID     = "topMisID_BDT0p40_TopMassCut400_BDTGnoDRqq.json"
+    topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq.json"
+    topTagEffUnc = "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq.json"
+elif "noTopPtRew" in topSelectionBDT.WeightFile:
+    # Disabled top-pt reweighting
+    topMisID     = "topMisID_BDT0p40_TopMassCut400_noTopPtRew.json"
+    topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json"
+    topTagEffUnc = "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json"
+else:
+    # Defaut
+    topMisID     = "topMisID_BDT%s_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
+    topTagEff    = "toptagEff_BDT%s_GenuineTT_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
+    topTagEffUnc = "toptagEffUncert_BDT%s_GenuineTT_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
+scaleFactors.setupToptagSFInformation(topTagPset                     = topSelectionBDT,
+                                      topTagMisidFilename            = topMisID,
+                                      topTagEfficiencyFilename       = topTagEff,
+                                      topTagEffUncertaintiesFilename = topTagEffUnc,
+                                      direction                      = "nominal",
+                                      variationInfo                  = None)
+
 jetCorrelations = PSet (
 
 )
@@ -240,6 +289,7 @@ allSelections = PSet(
   AngularCutsCollinear = angularCutsCollinear,
          BJetSelection = bjetSelection,
           METSelection = metSelection,
+       TopSelectionBDT = topSelectionBDT,
  AngularCutsBackToBack = angularCutsBackToBack,
        JetCorrelations = jetCorrelations,
            CommonPlots = commonPlotsOptions,
