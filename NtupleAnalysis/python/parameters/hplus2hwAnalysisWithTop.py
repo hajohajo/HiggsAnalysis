@@ -218,11 +218,11 @@ topSelectionBDT = PSet(
     NumberOfTopsCutDirection = "==",       # [default: "=="] (==, !=, <, <=, >, >=)
     AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
     AnyTopBDTGCutDirection   =  ">",       # [default: ">"]
-    TopBDTGCutValue          =    0.00,    # [default: -0.60] NOTE: Only use numbers with 2 decimals
+    TopBDTGCutValue          =    0.40,    # [default: -0.60] NOTE: Only use numbers with 2 decimals
     TopBDTGCutDirection      =  ">=",      # [default: ">="]
     TopMassLowCutValue       =    0.00,    # [default: 0.00]
     TopMassLowCutDirection   =  ">=",      # [default: ">="]
-    TopMassUppCutValue       = 2000.00,    # [default: 1000.0]
+    TopMassUppCutValue       =  400.00,    # [default: 2000.0]
     TopMassUppCutDirection   =  "<=",      # [default: "<"]
     CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
     CSV_bDiscCutDirection    = ">=",       # [default: ">="]
