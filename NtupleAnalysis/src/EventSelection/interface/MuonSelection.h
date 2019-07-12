@@ -81,8 +81,8 @@ private:
   bool passTrgMatching(const Muon& muon, std::vector<math::LorentzVectorT<double>>& trgMuons) const;
 
   // Input parameters
-  const bool cfg_ApplyTriggerMatching;
-  const float cfg_TriggerMuonMatchingCone;
+  bool cfg_ApplyTriggerMatching;
+  float cfg_TriggerMatchingCone;
   const double cfg_MuonPtCut;
   const double cfg_MuonEtaCut;
   float fRelIsoCut;

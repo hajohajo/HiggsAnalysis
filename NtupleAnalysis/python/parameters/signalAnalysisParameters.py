@@ -76,6 +76,7 @@ eVeto = PSet(
 
 #====== Muon veto
 muVeto = PSet(
+    applyTriggerMatching = False,
     muonPtCut = 10.0,
     muonEtaCut = 2.5,
     muonID = "muIDLoose", # loosest option for vetoing (options: muIDLoose, muIDMedium, muIDTight)
@@ -170,21 +171,23 @@ enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
 # Top selection BDT
 #================================================================================================
 topSelectionBDT = PSet(
-        AnyTopMVACutValue      = -0.95,   # [default: -1.0] NOTE: Defines StandardSelections
-        AnyTopMVACutDirection  =  ">",    # [default: ">"]
-        TopMVACutValue         =  0.40,   # [default: 0.40] NOTE: Only use numbers with 2 decimals (e.g 0.40, 0.30, 0.00)
-        TopMVACutDirection     =  ">=",   # [default: ">="]
-        TopMassLowCutValue     =   0.0,   # [default: 0.0]
-        TopMassLowCutDirection =  ">=",   # [default: ">="]
-        TopMassUppCutValue     =  400.0,  # [default: 400.0]  # Do not evaluate top candidate if top mass greater than this cut (600 takes TOO long!)
-        TopMassUppCutDirection =  "<=",   # [default: "<"]
-        CSV_bDiscCutValue      = 0.8484,  # [default: 0.8484] # Do not evaluate top candidate if b-jet assigned as b from top fails this cut
-        CSV_bDiscCutDirection  = ">=",    # [default: ">="]
-        WeightFile             = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml",  # Disabled top-pt reweighting
+        NumberOfTopsCutValue     =    1,       # [default: 3]
+        NumberOfTopsCutDirection = "==",       # [default: "=="] (==, !=, <, <=, >, >=)
+        AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
+        AnyTopBDTGCutDirection   =  ">",       # [default: ">"]
+        TopBDTGCutValue          =    0.00,    # [default: -0.60] NOTE: Only use numbers with 2 decimals
+        TopBDTGCutDirection      =  ">=",      # [default: ">="]
+        TopMassLowCutValue       =    0.00,    # [default: 0.00]
+        TopMassLowCutDirection   =  ">=",      # [default: ">="]
+        TopMassUppCutValue       = 2000.00,    # [default: 1000.0]
+        TopMassUppCutDirection   =  "<=",      # [default: "<"]
+        CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
+        CSV_bDiscCutDirection    = ">=",       # [default: ">="]
+        WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml",
 )
 
 # top-tagging (json files available for: defaut, fatJet, ldgJet)
-MVAstring = "%.2f" % topSelectionBDT.TopMVACutValue
+MVAstring = "%.2f" % topSelectionBDT.TopBDTGCutValue
 # Determine which top JSON files to use depending on the BDT trainigh weightfile used
 if "noDeltaRqq_noTopPtRew" in topSelectionBDT.WeightFile:
     # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)
