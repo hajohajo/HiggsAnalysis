@@ -80,9 +80,9 @@ tauSelection = PSet(
     againstElectronDiscr = "againstElectronTightMVA6",
     againstMuonDiscr     = "againstMuonLoose3",
     #isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
-    #isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
+    isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
     #isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Default
-    isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
     # isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits",
     # isolationDiscr       = "byMediumCombinedIsolationDeltaBetaCorr3Hits",
     )
@@ -214,19 +214,19 @@ metSelection = PSet(
 # Top selection BDT                                               
 #================================================================================================        
 topSelectionBDT = PSet(
-    NumberOfTopsCutValue     = 1,     # [default: 3]
-    NumberOfTopsCutDirection = "==",  # [default: "=="] (==, !=, <, <=, >, >=)
-    AnyTopMVACutValue      = -1.0,   # [default: -1.0]
-    AnyTopMVACutDirection  =  ">",    # [default: ">"]
-    TopMVACutValue         = -0.60,   # [default: 0.40] NOTE: Only use numbers with 2 decimals
-    TopMVACutDirection     =  ">=",   # [default: ">="]
-    TopMassLowCutValue     =   0.0,   # [default: 0.0]
-    TopMassLowCutDirection =  ">=",   # [default: ">="]
-    TopMassUppCutValue     = 2000.0,  # [default: 1000.0]
-    TopMassUppCutDirection =  "<=",   # [default: "<"]
-    CSV_bDiscCutValue      = 0.8484,  # [default: 0.8484]
-    CSV_bDiscCutDirection  = ">=",    # [default: ">="]
-    WeightFile             = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 
+    NumberOfTopsCutValue     =    1,       # [default: 3]
+    NumberOfTopsCutDirection = "==",       # [default: "=="] (==, !=, <, <=, >, >=)
+    AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
+    AnyTopBDTGCutDirection   =  ">",       # [default: ">"]
+    TopBDTGCutValue          =    0.00,    # [default: -0.60] NOTE: Only use numbers with 2 decimals
+    TopBDTGCutDirection      =  ">=",      # [default: ">="]
+    TopMassLowCutValue       =    0.00,    # [default: 0.00]
+    TopMassLowCutDirection   =  ">=",      # [default: ">="]
+    TopMassUppCutValue       = 2000.00,    # [default: 1000.0]
+    TopMassUppCutDirection   =  "<=",      # [default: "<"]
+    CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
+    CSV_bDiscCutDirection    = ">=",       # [default: ">="]
+    WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 
 )
 
 
@@ -255,9 +255,9 @@ fakeBMeasurement = PSet(
     baselineBJetsDiscr             = bjetSelection.bjetDiscr,
     baselineBJetsDiscrWP           = bjetSelection.bjetDiscrWorkingPoint,
     # Tops
-    LdgTopMVACutValue              = topSelectionBDT.TopMVACutValue,
-    LdgTopMVACutDirection          = topSelectionBDT.TopMVACutDirection, 
-    SubldgTopMVACutValue           = topSelectionBDT.TopMVACutValue,
+    LdgTopMVACutValue              = topSelectionBDT.TopBDTGCutValue,
+    LdgTopMVACutDirection          = topSelectionBDT.TopBDTGCutDirection, 
+    SubldgTopMVACutValue           = topSelectionBDT.TopBDTGCutValue,
     SubldgTopMVACutDirection       = "<", # [default: "<"]
     )
 
@@ -279,7 +279,7 @@ else:
     raise Exception("This should never be reached!")
 
 # top-tagging (json files available for: defaut, fatJet, ldgJet)
-MVAstring = "%.2f" % topSelectionBDT.TopMVACutValue
+MVAstring = "%.2f" % topSelectionBDT.TopBDTGCutValue
 # Determine which top JSON files to use depending on the BDT trainigh weightfile used
 if "noDeltaRqq_noTopPtRew" in topSelectionBDT.WeightFile:
     # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)    
