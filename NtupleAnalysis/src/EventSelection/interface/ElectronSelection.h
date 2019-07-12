@@ -80,8 +80,8 @@ private:
   bool getMVADecision(const Electron& ele, const std::string mvaCut);
   
   // Input parameters
-  const bool cfg_ApplyTriggerMatching;
-  const float cfg_TriggerElectronMatchingCone;
+  bool  cfg_ApplyTriggerMatching;
+  float cfg_TriggerMatchingCone;
   const double cfg_ElectronPtCut;
   const double cfg_ElectronEtaCut;
   const std::string cfg_ElectronMVACut;

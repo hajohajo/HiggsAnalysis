@@ -17,8 +17,6 @@ ElectronSelection::Data::~Data() { }
 
 ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
-  cfg_ApplyTriggerMatching(config.getParameter<bool>("applyTriggerMatching")),
-  cfg_TriggerElectronMatchingCone(config.getParameter<float>("triggerMatchingCone")),
   cfg_ElectronPtCut(config.getParameter<float>("electronPtCut")),
   cfg_ElectronEtaCut(config.getParameter<float>("electronEtaCut")),
   cfg_ElectronMVACut(config.getParameter<string>("electronMVACut")),
@@ -45,8 +43,6 @@ ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& e
 
 ElectronSelection::ElectronSelection(const ParameterSet& config, const std::string& postfix)
 : BaseSelection(),
-  cfg_ApplyTriggerMatching(config.getParameter<bool>("applyTriggerMatching")),
-  cfg_TriggerElectronMatchingCone(config.getParameter<float>("triggerMatchingCone")),
   cfg_ElectronPtCut(config.getParameter<float>("electronPtCut")),
   cfg_ElectronEtaCut(config.getParameter<float>("electronEtaCut")),
   cfg_ElectronMVACut(config.getParameter<string>("electronMVACut")),
@@ -104,6 +100,10 @@ ElectronSelection::~ElectronSelection() {
 }
 
 void ElectronSelection::initialize(const ParameterSet& config, const std::string& postfix) {
+  if(config.getParameterOptional<bool>("applyTriggerMatching")) cfg_ApplyTriggerMatching = config.getParameter<bool>("applyTriggerMatching");
+  else cfg_ApplyTriggerMatching = false;
+  if(config.getParameterOptional<float>("triggerMatchingCone")) cfg_TriggerMatchingCone = config.getParameter<float>("triggerMatchingCone");
+
   if (postfix.find("veto") != std::string::npos || postfix.find("Veto") != std::string::npos)
     {
     fVetoMode = true;
@@ -396,5 +396,5 @@ bool ElectronSelection::passTrgMatching(const Electron& electron, std::vector<ma
 
   // Fill histos
   hTriggerMatchDeltaR->Fill(myMinDeltaR);
-  return (myMinDeltaR < cfg_TriggerElectronMatchingCone);
+  return (myMinDeltaR < cfg_TriggerMatchingCone);
 }

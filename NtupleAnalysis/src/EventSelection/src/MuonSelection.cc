@@ -21,8 +21,6 @@ MuonSelection::Data::~Data() { }
 
 MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
-  cfg_ApplyTriggerMatching(config.getParameter<bool>("applyTriggerMatching")),
-  cfg_TriggerMuonMatchingCone(config.getParameter<float>("triggerMatchingCone")),
   cfg_MuonPtCut(config.getParameter<float>("muonPtCut")),
   cfg_MuonEtaCut(config.getParameter<float>("muonEtaCut")),
   fRelIsoCut(-1.0),
@@ -47,8 +45,6 @@ MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCoun
 
 MuonSelection::MuonSelection(const ParameterSet& config, const std::string& postfix)
 : BaseSelection(),
-  cfg_ApplyTriggerMatching(config.getParameter<bool>("applyTriggerMatching")),
-  cfg_TriggerMuonMatchingCone(config.getParameter<float>("triggerMatchingCone")),
   cfg_MuonPtCut(config.getParameter<float>("muonPtCut")),
   cfg_MuonEtaCut(config.getParameter<float>("muonEtaCut")),
   fRelIsoCut(-1.0),
@@ -104,11 +100,15 @@ MuonSelection::~MuonSelection() {
 }
 
 void MuonSelection::initialize(const ParameterSet& config, const std::string& postfix) {
+  if(config.getParameterOptional<bool>("applyTriggerMatching")) cfg_ApplyTriggerMatching = config.getParameter<bool>("applyTriggerMatching");
+  else cfg_ApplyTriggerMatching = false;
+  if(config.getParameterOptional<float>("triggerMatchingCone")) cfg_TriggerMatchingCone = config.getParameter<float>("triggerMatchingCone");
+
   if (postfix.find("veto") != std::string::npos || postfix.find("Veto") != std::string::npos)
     {
       fVetoMode = true;
     }
-  
+
   std::string isolString = config.getParameter<std::string>("muonIsolation");
   if (isolString == "veto" || isolString == "Veto") {
     fRelIsoCut  = 0.15; // Loose iso sync'ed with MIT
@@ -121,7 +121,7 @@ void MuonSelection::initialize(const ParameterSet& config, const std::string& po
   else {
     throw hplus::Exception("config") << "Invalid muonIsolation option '" << isolString << "'! Options: 'veto', 'tight'";
   } 
-  
+
   std::string isolTypeString = config.getParameter<std::string>("muonIsolType");
   if (isolTypeString == "default")  fMiniIsol = false;
   else if (isolTypeString == "mini") fMiniIsol = true;
@@ -129,7 +129,7 @@ void MuonSelection::initialize(const ParameterSet& config, const std::string& po
     {
       throw hplus::Exception("config") << "Invalid muonIsolType option '" << isolTypeString << "'! Options: 'default', 'mini'";
     }
-  
+
   return;
 }
 
@@ -346,5 +346,5 @@ bool MuonSelection::passTrgMatching(const Muon& muon, std::vector<math::LorentzV
     myMinDeltaR = std::min(myMinDeltaR, myDeltaR);
   }
   hTriggerMatchDeltaR->Fill(myMinDeltaR);
-  return (myMinDeltaR < cfg_TriggerMuonMatchingCone);
+  return (myMinDeltaR < cfg_TriggerMatchingCone);
 }
