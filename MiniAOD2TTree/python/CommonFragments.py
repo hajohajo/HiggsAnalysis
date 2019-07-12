@@ -26,6 +26,32 @@ def produceCustomisations(process, isData):
     produceJets(process, isData)
     print "=== Customisations done"
 
+def produceAK8Customisations(process, isData):
+    '''
+    AK8 Customisations
+    '''
+    process.AK8CustomisationsSequence = cms.Sequence()
+    produceAK8JEC(process, isData)
+    print "=== AK8 Customisations done"
+
+def produceAK8JEC(process, isData):
+    from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+    
+    JEC = ['L1FastJet','L2Relative','L3Absolute']
+    if isData:
+        JEC += ['L2L3Residual']
+        
+    updateJetCollection(
+        process,
+        labelName = 'AK8PFCHS',
+        jetSource = cms.InputTag("slimmedJetsAK8"),
+        rParam = 0.8,
+        jetCorrections = ('AK8PFchs', cms.vstring(JEC), 'None') 
+    )
+    
+    process.AK8CustomisationsSequence += process.patJetCorrFactorsAK8PFCHS
+    process.AK8CustomisationsSequence += process.updatedPatJetsAK8PFCHS
+    return
 
 def produceJets(process, isData):
     '''
