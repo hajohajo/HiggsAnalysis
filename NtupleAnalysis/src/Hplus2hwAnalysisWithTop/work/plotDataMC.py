@@ -230,14 +230,14 @@ def GetHistoKwargs(h, opts):
     _legNE  = {"dx": -0.23, "dy": -0.01, "dh": 0.1}
     _legNW  = {"dx": -0.52, "dy": -0.01, "dh": 0.1}
     _legSE  = {"dx": -0.23, "dy": -0.50, "dh": 0.1}
-    _legSW  = {"dx": -0.52, "dy": -0.50, "dh": 0.1}
+    _legSW  = {"dx": -0.52, "dy": -0.48, "dh": 0.1}
     _legCE  = {"dx": -0.08, "dy": -0.44, "dh": 0.1}
     _logY   = True
     _yLabel = "Events / %.0f "
     if "_AfterAllSelections" in h or "_AfterTopSelection" in h or "_AfterMetSelection" in h:
         _yMin = 1e-2
     else:
-        _yMin = 1e-1
+        _yMin = 1e-2
 
     if _logY:
         _yMaxF = 10
@@ -268,14 +268,21 @@ def GetHistoKwargs(h, opts):
 
     kwargs = copy.deepcopy(_kwargs)
     
-    if "pt" in h.lower():
+    if "mu_pt" in h.lower():
         kwargs["units"]      = "GeV"
-        # kwargs["rebinX"]     = 5
-        kwargs["rebinX"]     = systematics._dataDrivenCtrlPlotBinning["selectedJetsPt"]
+        kwargs["rebinX"]     = systematics.DataMCBinningHToHW["MuonPt"]
+        kwargs["xlabel"]     = "p_{T} (%s)" % kwargs["units"]
         kwargs["ylabel"]     = _yLabel + kwargs["units"]
         kwargs["moveLegend"] = _legNE
-        # kwargs["cutBox"]     = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["opts"]       = {"xmax": +800.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["divideByBinWidth"] = True
+
+    if "mu_eta" in h.lower():
+        kwargs["units"]      = ""
+        kwargs["rebinX"]     = 1 
+        kwargs["xlabel"]     = "#eta"
+        kwargs["ylabel"]     = _yLabel + kwargs["units"]
+        kwargs["moveLegend"] = _legRM
+        kwargs["divideByBinWidth"] = False
 
     if "DeltaEta" in h:
         kwargs["ylabel"] = "Events / %.2f "
@@ -327,7 +334,7 @@ def GetHistoKwargs(h, opts):
 
     if "BDT" in h or "topbdt" in h.lower():
         kwargs["ylabel"] = "Events / %.2f "
-        kwargs["cutBox"] = {"cutValue": -0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         kwargs["opts"]   = {"xmin": -1.0, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["rebinX"] = 2    
         kwargs["xlabel"] = "BDTG scrore"
@@ -338,17 +345,9 @@ def GetHistoKwargs(h, opts):
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "BDT discriminant"
         kwargs["ylabel"] = "Events / %.1f "
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": +1.0, "ymin": _yMin, "ymax": 3e5} #_yMaxF}
-        kwargs["cutBox"] = {"cutValue": 0.9, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": +1.0, "ymin": _yMin, "ymax": 3e5}
+        kwargs["cutBox"] = {"cutValue": 0.9, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         kwargs["moveLegend"] = {"dx": -0.49, "dy": -0.5, "dh": 0.0}
-
-    if h == "LdgBjetPt":
-        ROOT.gStyle.SetNdivisions(8, "X")
-        kwargs["units"]            = "GeV" #"GeV/c"
-        #kwargs["rebinX"] = 2
-        kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
-        kwargs["ylabel"] = _yLabel + kwargs["units"]
-        kwargs["cutBox"] = {"cutValue": 40.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
    
     if "bdisc" in h.lower():
         kwargs["rebinX"] = 2
@@ -356,14 +355,18 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["cutBox"] = {"cutValue": 0.8484, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0.4, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["moveLegend"] = {"dx": -0.49, "dy": -0.0, "dh": 0.1}
+        kwargs["moveLegend"] = _legSW
  
-    if "dgTrijetBJetPt" in h:
+    if "JetPt" in h or "jetPt" in h:        
+        if "BJetPt" in h or "BjetPt" in h:
+            kwargs["rebinX"] = systematics.DataMCBinningHToHW["BJetPt"]
+        else:
+            kwargs["rebinX"] = systematics.DataMCBinningHToHW["JetPt"]
         kwargs["units"]  = "GeV" #"GeV/c"
         kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
         kwargs["ylabel"] = _yLabel + kwargs["units"]
-        kwargs["cutBox"] = {"cutValue": 40.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": +600.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["divideByBinWidth"] = True
 
     if "DiJetEta" in h:
         kwargs["rebinX"] = 1
@@ -409,6 +412,8 @@ def GetHistoKwargs(h, opts):
     if "topmultiplicity" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +20.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        if "AfterStdSelections" in h or "AfterAllSelections" in h:
+            kwargs["opts"] = {"xmin": 0.0, "xmax": +8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     #if "topbdt_allcandidates" in h.lower():
     #    kwargs["rebinX"] = 10
@@ -485,13 +490,6 @@ def GetHistoKwargs(h, opts):
         kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
         kwargs["ylabel"] = _yLabel + kwargs["units"]
 
-    #if "jetPtAll" in h or "jetPtPassed" in h:
-    if "jetpt" in h.lower():
-        kwargs["units"]  = "GeV" #"GeV/c"
-        kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
-        kwargs["ylabel"] = _yLabel + kwargs["units"]
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": 700.0, "ymin": 1e-2, "ymaxfactor": _yMaxF}
-
     if h == "tauNpassed":
         kwargs["units"]  = "GeV" #"GeV/c"
         kwargs["xlabel"] = "#tau-jet multiplicity"
@@ -501,7 +499,7 @@ def GetHistoKwargs(h, opts):
     if "HT" in h or "JT" in h:
         ROOT.gStyle.SetNdivisions(8, "X")
         kwargs["units"]  = "GeV"
-        kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["HT"]
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["HT"]
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +1500.0}#, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["ylabel"] = "%s" % (_yLabel + kwargs["units"])
         kwargs["xlabel"] = "H_{T} (%s)" % (kwargs["units"])
@@ -516,7 +514,7 @@ def GetHistoKwargs(h, opts):
         kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
         kwargs["ylabel"] = _yLabel + kwargs["units"]
         kwargs["cutBox"] = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["selectedJetsPt"]
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["JetPt"]
         kwargs["divideByBinWidth"] = True
         kwargs["opts"] = {"xmin": 30.0, "xmax": +800.0}
         if "second" in h.lower():
@@ -533,7 +531,7 @@ def GetHistoKwargs(h, opts):
         kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
         kwargs["ylabel"] = _yLabel + kwargs["units"]
         kwargs["cutBox"] = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["selectedJetsPt"]
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["JetPt"]
         kwargs["divideByBinWidth"] = True
         kwargs["opts"] = {"xmin": 30.0, "xmax": +500.0}
         if "second" in h.lower():
@@ -549,10 +547,10 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["cutBox"] = {"cutValue": 0.8484, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0.7, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["moveLegend"] = _legNW
+        kwargs["moveLegend"] = _legSW
 
     if "btagdiscriminator" in h.lower():
-        kwargs["rebinX"] = 2
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["BtagDisc"]
         kwargs["xlabel"] = "b-jet discriminant"
         kwargs["ylabel"] = "Events / %.2f "
         ROOT.gStyle.SetNdivisions(8, "X")
@@ -573,19 +571,26 @@ def GetHistoKwargs(h, opts):
         kwargs["rebinX"] = 5
 
     if "met_" in h.lower() or h == "Met" or h == "MET":
-        kwargs["units"]  = "GeV"
-        kwargs["rebinX"] =  systematics._dataDrivenCtrlPlotBinning["Met"]
-        kwargs["xlabel"] = "E_{T}^{miss} (%s)" % (kwargs["units"])
+        if "deltaphitaumet_" in h.lower():
+            #kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaPhi"]
+            #kwargs["xlabel"] = "#Delta#phi(#tau_{h}, E_{T}^{miss})"
+            kwargs["ylabel"] = "Events / %.2f "
+            kwargs["units"]  = "#circ"
+        else:
+            kwargs["units"]  = "GeV"
+            kwargs["rebinX"] = systematics.DataMCBinningHToHW["Met"]
+            kwargs["xlabel"] = "E_{T}^{miss} (%s)" % (kwargs["units"])
+            # kwargs["opts"]   = {"xmax": 500.0, "ymaxfactor": _yMaxF}
+            kwargs["divideByBinWidth"] = True        
         kwargs["ylabel"] = _yLabel + kwargs["units"]
-        kwargs["opts"]   = {"xmax": 500.0, "ymaxfactor": _yMaxF}
-        kwargs["divideByBinWidth"] = True        
+
         if "METFilter" in h:
             kwargs["rebinX"] = 1
             kwargs["xlabel"] = ""
             kwargs["ylabel"] = "Events / %.0f "
             kwargs["opts"]   = {"xmin": 0.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-            
-    if "metphi" in h.lower():
+        
+    if "metphi" in h.lower():        
         kwargs["units"]  = "rads"
         kwargs["rebinX"] =  4
         kwargs["xlabel"] = "E_{T}^{miss} #phi (%s)" % (kwargs["units"])
@@ -593,27 +598,56 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": -3.2, "xmax": 3.2, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["moveLegend"] = _legRM #_legNE
 
+    if "DecayMode" in h:
+        kwargs["moveLegend"] = _legRM
 
-    if "LdgTopBjetPt" in h:
-        kwargs["units"]  = "GeV" #"GeV/c"
-        kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
-        kwargs["ylabel"] = _yLabel + kwargs["units"]
-        # kwargs["cutBox"] = {"cutValue": 40.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        if "AllSelections" in h:
-            kwargs["opts"]   = {"xmin": 0.0, "xmax": +600.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        else:
-            kwargs["opts"]   = {"xmin": 0.0, "xmax": +1000.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+    if "IPxy" in h:
+        kwargs["moveLegend"] = _legNE
+        kwargs["units"]  = "cm"
+        kwargs["rebinX"] =  5
+        kwargs["ylabel"] = "Events / %.2f " + kwargs["units"]
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.10, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "tau_pt" in h.lower() or "taus_pt" in h.lower():
+        kwargs["moveLegend"] = _legNE
+        kwargs["units"]      = "GeV"
+        kwargs["rebinX"]     = systematics.DataMCBinningHToHW["TauPt"]
+        kwargs["xlabel"]     = "p_{T} (%s)" % (kwargs["units"])
+        kwargs["ylabel"]     = _yLabel + kwargs["units"]
+        kwargs["divideByBinWidth"] = True
+
+    if "ldgTrkPt" in h:
+        kwargs["moveLegend"] = _legNE
+        kwargs["units"]      = "GeV"
+        kwargs["rebinX"]     = systematics.DataMCBinningHToHW["LdgTrkPt"]
+        kwargs["xlabel"]     = "p_{T}^{ldg tk}"
+        kwargs["ylabel"]     = "Events / %.1f " + kwargs["units"]
+        #kwargs["opts"]       = {"xmin": 0.0, "xmax": 1.0}
+        kwargs["divideByBinWidth"] = True
+
+    if "Rtau" in h:
+        kwargs["moveLegend"] = _legRM
+        kwargs["units"]  = ""
+        kwargs["rebinX"] =  5 #2
+        kwargs["ylabel"] = "Events / %.2f " + kwargs["units"]
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.0}
+
+    if "phi" in h.lower():        
+        kwargs["units"]  = "rads"
+        kwargs["rebinX"] =  4 #2
+        kwargs["ylabel"] = "Events / %.2f " + kwargs["units"]
+        kwargs["moveLegend"] = _legRM
 
     if "MHT" in h:
         kwargs["units"]  = "GeV"
-        kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["MHT"]
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["MHT"]
         kwargs["xlabel"] = "MHT (%s)" % kwargs["units"]
         kwargs["ylabel"] = _yLabel + kwargs["units"]
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +500.0}#, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["divideByBinWidth"] = True
 
     if "NBjets" in h:
-        kwargs["xlabel"] = "b-jet multiplicity"
+        kwargs["xlabel"] = "b jet multiplicity"
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
@@ -632,7 +666,7 @@ def GetHistoKwargs(h, opts):
     if "vtx" in h.lower() or "NVertices" in h:
         kwargs["units"]  = ""
         kwargs["xlabel"] = "vertex multiplicity"
-        kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["Vertices"]
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["Vertices"]
         kwargs["divideByBinWidth"] = True
         kwargs["ylabel"] = "%s" % (_yLabel + kwargs["units"])
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 120.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -654,7 +688,6 @@ def GetHistoKwargs(h, opts):
         else:
             pass
 
-
     if "DR" in h:
         kwargs["rebinX"] = 4
 
@@ -673,11 +706,15 @@ def GetHistoKwargs(h, opts):
             kwargs["rebinX"] = 5
             kwargs["opts"]   = {"xmax": 600.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
             kwargs["xlabel"] = "m_{vis} (%s)" % kwargs["units"]
-        elif "TopMassWMassRatio" in h:
+        elif "WMassRatio" in h:
             kwargs["units"]   = ""
             kwargs["rebinX"] = 2
             kwargs["ylabel"] = "Events / %.2f"
-            kwargs["opts"]   = {"xmin": 0.0, "xmax": +5.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+            if "AllSelections" in h:
+                kwargs["rebinX"] = 4
+                kwargs["opts"]   = {"xmin": 1.0, "xmax": +5.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+            else:
+                kwargs["opts"]   = {"xmin": 1.0, "xmax": +10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
             kwargs["cutBox"] = {"cutValue": (173.21/80.385), "fillColor": 16, "box": False, "line": True, "greaterThan": True} 
             #if "AfterStandardSelections" in h:
             #    kwargs["opts"]   = {"xmin": 0.0, "xmax": +10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -691,7 +728,10 @@ def GetHistoKwargs(h, opts):
             kwargs["rebinX"] = 4
             #kwargs["rebinX"] = systematics._dataDrivenCtrlPlotBinning["LdgTrijetDijetMass_AfterAllSelections"] #2
             kwargs["xlabel"] = "m_{jj} (%s)" % kwargs["units"]
-            kwargs["opts"]   = {"xmax": +300.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+            if "AllSelections" in h:
+                kwargs["opts"] = {"xmax": +300.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+            else:
+                kwargs["opts"] = {"xmax": +500.0, "ymin": _yMin, "ymaxfactor": _yMaxF}                
             kwargs["cutBox"] = {"cutValue": 80.385, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         else:
             kwargs["rebinX"] = 4
@@ -707,6 +747,21 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["moveLegend"] = _legRM #_legNE
 
+    if "DeltaPhiJetMHT" in h:
+        kwargs["units"]  = "#circ"
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaPhi"]
+        kwargs["xlabel"] = None
+        kwargs["opts"]   = {"ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["ylabel"] = _yLabel + kwargs["units"]
+        kwargs["divideByBinWidth"] = False
+
+    if "DeltaRJetMHT" in h:
+        kwargs["units"]  = ""
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaR"]
+        kwargs["xlabel"] = None
+        kwargs["opts"]   = {"ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["ylabel"] = "Events / %.2f "+ kwargs["units"]
+        kwargs["divideByBinWidth"] = False
 
     if "resolution" in h.lower():
         # -kwargs["moveLegend"] = _legCE
@@ -716,11 +771,12 @@ def GetHistoKwargs(h, opts):
 
     if "_AfterAllSelections" in h or "_AfterTopSelection" in h or "_AfterMetSelection" in h:
         if "blindingRangeString" not in kwargs:
-            kwargs["blindingRangeString"] = "0-%s" % (5000)
+            if "eta" not in h.lower():
+                kwargs["blindingRangeString"] = "0-%s" % (5000)
+
         #kwargs["ratio"] = False
 
     if kwargs["divideByBinWidth"]:
-        # kwargs["ylabel"] = "<" + kwargs["ylabel"] + ">"
         if kwargs["units"] != "":
             kwargs["ylabel"] = "< Events / %s  > " % kwargs["units"]
         else:

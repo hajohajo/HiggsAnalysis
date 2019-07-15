@@ -467,6 +467,26 @@ def getBinningForTetrajetMass(binLevel=0):
         raise Exception(ShellStyles.ErrorStyle() + "Please choose bin-level from -1 to 2" + ShellStyles.NormalStyle())
     return myBins
 
+
+###############################################################
+### HToHW specific binning settings
+###############################################################
+DataMCBinningHToHW = {
+    "JetPt"   : [i for i in range(0, 100, 10)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 300, 25)] + [i for i in range(300, 600, 50)] + [600, 700, 800, 1000],
+    "MHT"     : [i for i in range(0, 100, 20)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 300, 25)] + [i for i in range(300, 600, 50)] + [600, 700, 800, 1000],
+    "HT"      : [i for i in range(0, 600, 50)] + [i for i in range(600, 800, 50)] + [i for i in range(800, 1100, 100)] + [i for i in range(1100, 1500, 200)],
+    "Vertices": [i for i in range(0, 40, 5)] + [i for i in range(40, 60, 10)] + [i for i in range(60, 100, 20)] + [i for i in range(100, 200, 50)],
+    "Met"     : [i for i in range(0, 100, 20)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 400, 40)] + [i for i in range(400, 500, 50)] + [i for i in range(600, 800, 100)],
+    "JetPt"   : [30,50,70,90,110,130,150,200,250,300,350,400,500,600,800],
+    "BJetPt"  : [30,50,70,90,110,130,150,200,300,400,500],
+    "BtagDisc": [i*0.05 for i in range(0, 21, 1)],
+    "DeltaPhi": [i*5 for i in range(0, 37, 1)],
+    "DeltaR"  : [i*0.2 for i in range(0, 31, 1)],
+    "LdgTrkPt": [i for i in range(0, 40, 10)] + [i for i in range(40, 100, 20)] + [i for i in range(100, 200, 25)] + [i for i in range(200, 400, 50)],
+    "TauPt"   : [i for i in range(30, 50, 20)] + [i for i in range(50, 150, 25)] + [i for i in range(150, 200, 50)] + [i for i in range(200, 500, 50)],
+    "MuonPt"  : [i for i in range(20, 100, 20)] + [i for i in range(100, 200, 25)] + [i for i in range(200, 400, 50)] + [i for i in range(400, 500, 100)],
+    }
+
 # Binning for data-driven control plots and final shapes feeded to combine
 # Format: list of left bin edges; last entry is maximum value
 _dataDrivenCtrlPlotBinning = {
@@ -607,16 +627,6 @@ _dataDrivenCtrlPlotBinning = {
 # Automatic binning for MVA discriminator, 0.2 threshold, TT and DY inclusive
     "MVA": [-1.0, -0.96, -0.92, -0.88, -0.84, -0.8, -0.76, -0.72, -0.64, -0.6, -0.52, -0.44, -0.36, -0.28, -0.20, -0.12, -0.04, 0.04, 0.15, 0.24, 0.32, 0.40, 0.48, 0.56, 0.64, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96, 1.0],
 ###############################################################
-
-
-###############################################################
-### HToHW specific binning settings
-###############################################################
-    "selectedJetsPt": [i for i in range(0, 100, 10)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 300, 25)] + [i for i in range(300, 600, 50)] + [600, 700, 800, 1000],
-    "MHT"     : [i for i in range(0, 100, 20)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 300, 25)] + [i for i in range(300, 600, 50)] + [600, 700, 800, 1000],
-    "HT"      : [i for i in range(0, 600, 50)] + [i for i in range(600, 800, 50)] + [i for i in range(800, 1100, 100)] + [i for i in range(1100, 1500, 200)],
-    "Vertices": [i for i in range(0, 40, 5)] + [i for i in range(40, 60, 10)] + [i for i in range(60, 100, 20)] + [i for i in range(100, 200, 50)],
-    "Met"     : [i for i in range(0, 100, 10)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 400, 40)] + [i for i in range(400, 500, 50)] + [i for i in range(600, 800, 100)],
 
 ###############################################################
 ### HToTB specific binning settings
