@@ -588,15 +588,15 @@ _datasetMerge = {
 
     "ttbb_4FS2_ckm_amcatnlo_madspin_pythia8"     : "TTBB",
 
-#    "TTZToLLNuNu_M_10"   : "ttX",
-#    "TTZToQQ"            : "ttX",
-#    "TTWJetsToLNu"       : "ttX",
-#    "TTWJetsToQQ"        : "ttX",
-#    "ttHJetTobb_M125"    : "ttX",
-#    "ttHJetToNonbb_M125" : "ttX", 
-#    "ttHJetToGG_M125"    : "ttX",
-#    "ttHJetToTT_M125"    : "ttX",
-#
+    "TTZToLLNuNu_M_10"   : "ttX",
+    "TTZToQQ"            : "ttX",
+    "TTWJetsToLNu"       : "ttX",
+    "TTWJetsToQQ"        : "ttX",
+    "ttHJetTobb_M125"    : "ttX",
+    "ttHJetToNonbb_M125" : "ttX", 
+    "ttHJetToGG_M125"    : "ttX",
+    "ttHJetToTT_M125"    : "ttX",
+
     }
 
 for mass in _intermediateHplusMasses:
