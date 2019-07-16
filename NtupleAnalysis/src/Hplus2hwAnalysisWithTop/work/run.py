@@ -126,7 +126,7 @@ def main():
     else:
         myBlackList = ["DYJetsToLL_M_50_ext1",
                        "DYJetsToLL_M_50_ext2",
-                       "WJetsToLNu",
+                       #"WJetsToLNu",
                        "WJetsToLNu_ext2",
                        "QCD_Pt_15to30",
                        "QCD_Pt_30to50",
