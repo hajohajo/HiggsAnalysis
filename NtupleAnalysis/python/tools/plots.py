@@ -70,6 +70,31 @@ _physicalMcAdd = {
     "TTTT"      : "TTTT", 
     "TTTT_ext1" : "TTTT", 
 
+    "ttHJetTobb_M125"     : "ttHJetTobb_M125", 
+    "ttHJetTobb_M125_ext1": "ttHJetTobb_M125", 
+    "ttHJetTobb_M125_ext2": "ttHJetTobb_M125", 
+    "ttHJetTobb_M125_ext3": "ttHJetTobb_M125", 
+    "ttHJetTobb_M125_ext4": "ttHJetTobb_M125", 
+
+    "ttHJetToGG_M125"     : "ttHJetToGG_M125",
+
+    "ttHJetToTT_M125"     : "ttHJetToTT_M125",
+    "ttHJetToTT_M125_ext1": "ttHJetToTT_M125",
+    "ttHJetToTT_M125_ext2": "ttHJetToTT_M125",
+    "ttHJetToTT_M125_ext3": "ttHJetToTT_M125",
+    "ttHJetToTT_M125_ext4": "ttHJetToTT_M125",
+
+    "ttHJetToNonbb_M125"     : "ttHJetToNonbb_M125", 
+    "ttHJetToNonbb_M125_ext1": "ttHJetToNonbb_M125", 
+    "ttHJetToNonbb_M125_ext2": "ttHJetToNonbb_M125", 
+    "ttHJetToNonbb_M125_ext3": "ttHJetToNonbb_M125", 
+    "ttHJetToNonbb_M125_ext4": "ttHJetToNonbb_M125", 
+
+    "TTZToLLNuNu_M_10"     : "TTZToLLNuNu_M_10",
+    "TTZToLLNuNu_M_10_ext1": "TTZToLLNuNu_M_10",
+    "TTZToLLNuNu_M_10_ext2": "TTZToLLNuNu_M_10",
+    "TTZToLLNuNu_M_10_ext3": "TTZToLLNuNu_M_10",
+
     "WZ"     : "WZ",
     "WZ_ext" : "WZ",
     "WZ_ext1": "WZ",
@@ -294,7 +319,7 @@ _physicalMcAdd = {
     "TT_widthx2"   : "TT_widthx2",
     "TT_widthx4"   : "TT_widthx4",
     "TT_widthx8"   : "TT_widthx8",
-    
+   
 }
 
 ## Map the physical dataset names to logical names
@@ -563,22 +588,15 @@ _datasetMerge = {
 
     "ttbb_4FS2_ckm_amcatnlo_madspin_pythia8"     : "TTBB",
 
-    # Htb
-    # "TTWJetsToQQ"          : "ttX",
-    # "TTZToQQ"              : "ttX",
-    # "TTTT"                 : "ttX",
-    # "WJetsToQQ_HT_600ToInf": "noTop",
-    # "DYJetsToQQ_HT180"     : "noTop",
-    # #"Diboson_HT180"        : "noTop",
-    # "WWTo4Q"               : "noTop",
-    # "ZZTo4Q"               : "noTop",
-    # "WZ"                   : "noTop",
-
-    #"TTWJetsToQQ"          : "TTWJetsToQQ",
-    #"TTZToQQ"              : "TTZToQQ",
-    #"WWTo4Q"               : "WWTo4Q",
-    #"ZJetsToQQ_HT600toInf" : "ZJetsToQQ_HT600toInf",
-    #"ZZTo4Q"               : "ZZTo4Q",
+#    "TTZToLLNuNu_M_10"   : "ttX",
+#    "TTZToQQ"            : "ttX",
+#    "TTWJetsToLNu"       : "ttX",
+#    "TTWJetsToQQ"        : "ttX",
+#    "ttHJetTobb_M125"    : "ttX",
+#    "ttHJetToNonbb_M125" : "ttX", 
+#    "ttHJetToGG_M125"    : "ttX",
+#    "ttHJetToTT_M125"    : "ttX",
+#
     }
 
 for mass in _intermediateHplusMasses:
@@ -601,12 +619,12 @@ for mass in _heavyHplusToTBbarMasses:
     _datasetOrder.append("ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass)
 
 _datasetOrder.extend([
-    "FakeB", #Htb
+    "FakeB",
     "QCD",
     "QCDdata",
     "QCD-b",
     "QCD_Pt20_MuEnriched",
-    "EWK", #merged    
+    "EWK",
     "WJets",
     "W1Jets",
     "W2Jets",
@@ -623,32 +641,41 @@ _datasetOrder.extend([
     "TT",
     "TT_Mtt",
     "SingleTop",
-    "TTandSingleTop", #merged
+    "ttX",
+    "TTandSingleTop",
     "DYJetsToLL",
     "DYJetsToLLHT",
-    "DYJetsToQQHT",  # Htb
-    "noTop", #Htb
-    "ttX", # Htb
-    "WJetsToQQ_HT_600ToInf", # Htb
-    "TTZToQQ",     # Htb
-    "TTWJetsToQQ", # Htb
+    "DYJetsToQQHT",
+    "noTop",
+    "WJetsToQQ_HT_600ToInf",
+    "ttH"
+    "ttHJetToTT",
+    "ttHJetToGG",
+    "ttHJetTobb", 
+    "ttHJetToNonbb",
+    "TTZ",
+    "TTZToQQ",
+    "TTZToLL",
+    "TTWJets",
+    "TTWJetsToQQ",
+    "TTWJetsToLNu",
     "Diboson",
     "WW",
     "WZ",
     "ZZ"
-    "WWTo4Q",      # Htb
-    "TTBB",        # Htb
-    "TTTT",        # Htb
+    "WWTo4Q",
+    "TTBB",
+    "TTTT",
     "ZJetsToQQ_HT600toInf",
     ]) 
 
 # Map the logical dataset names to legend labels
 _legendLabels = {
-    "Data"     : "Data",
-    "EWK"      : "Electroweak",
-    "Diboson"  : "Diboson",
-    "ttX"      : "t, tW, t#bar{t} + X",
-    "noTop"    : "No t",
+    "Data"          : "Data",
+    "EWK"           : "Electroweak",
+    "Diboson"       : "Diboson",
+    "ttX"           : "t, tW, t#bar{t} + X",
+    "noTop"         : "No t",
     "SingleTop"     : "Single t",
     "QCD"           : "QCD multijet", #Mis-ID. #tau_{h} (data)",
     "FakeB"         : "Fake b (data)",
@@ -659,8 +686,17 @@ _legendLabels = {
     "TT"            : "t#bar{t}",
     "TTTT"          : "t#bar{t}t#bar{t}",
     "Rares"         : "Rares",
-    "TTWJetsToQQ"   : "t#bar{t}+W", # (W#rightarrowq#bar{q'})
-    "TTZToQQ"       : "t#bar{t}+Z", # (Z#rightarrowq#bar{q'})
+    "TTWJets"       : "t#bar{t}+W", # (W#rightarrowq#bar{q'})
+    "TTWJetsToQQ"   : "t#bar{t}+W (qq)", # (W#rightarrowq#bar{q'})
+    "TTWJetsToLNu"  : "t#bar{t}+W (l#nu)", # (W#rightarrowq#bar{q'})
+    "ttH"           : "t#bar{t}+H",
+    "ttHJetToTT"    : "t#bar{t}+H (#tau#bar{#tau})",
+    "ttHJetToGG"    : "t#bar{t}+H (gg",
+    "ttHJetTobb"    : "t#bar{t}+H (b#bar{b})",
+    "ttHJetToNonbb" : "t#bar{t}+H",
+    "TTZ"           : "t#bar{t}+Z",
+    "TTZToQQ"       : "t#bar{t}+Z (qq)", # (Z#rightarrowq#bar{q'})
+    "TTZToLL"       : "t#bar{t}+Z (ll)", 
     "WWTo4Q"        : "WW",         # (W#rightarrowq#bar{q'})
     'ZZTo4Q'        : "ZZ",         # (Z#rightarrowq#bar{q})
     "TTBB"          : "t#bar{t}b#bar{b}",
@@ -846,8 +882,6 @@ _plotStyles = {
     "HplusTBintermediate_withNeutral_M175": styles.mcStyle2,
     "HplusTBintermediate_M200": styles.mcStyle,
     "HplusTBintermediate_withNeutral_M200": styles.mcStyle2,
-
-
     "DYJetsToLL"    : styles.dyStyle,
     "DYJetsToLLHT"  : styles.dyStyle,
     "DYJetsToQQHT"  : styles.dyStyle,
@@ -867,7 +901,13 @@ _plotStyles = {
     "TTJets"        : styles.ttjetsStyle,
     "TTTT"          : styles.ttttStyle, 
     "TTWJetsToQQ"   : styles.ttwStyle, 
+    "TTZ"           : styles.ttzStyle, 
     "TTZToQQ"       : styles.ttzStyle, 
+    "TTZToLL"       : styles.ttzStyle, 
+    "ttHJetToGG"    : styles.ttHToGGStyle, 
+    "ttHJetToTT"    : styles.ttHToTTStyle, 
+    "ttHJetTobb"    : styles.ttHTobbStyle, 
+    "ttHJetToNonbb" : styles.ttHToNonbbStyle, 
     "TTandSingleTop": styles.ttStyle,
     "W3Jets"        : styles.wStyle,
     "WJets"         : styles.wStyle,
@@ -878,7 +918,6 @@ _plotStyles = {
     "WZ"            : styles.dibStyle,
     "ZZ"            : styles.dibStyle,
     "Rares"         : styles.raresStyle,
-
     "WJets_0bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+1),
     "WJets_1bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+4),
     "WJets_2bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+3),
