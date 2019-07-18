@@ -39,11 +39,11 @@ private:
   Count cFakeTauSFCounter;
   Count cTauDMCounter;
   JetSelection fJetSelection;
-  // AngularCutsCollinear fAngularCutsCollinear;
+  AngularCutsCollinear fAngularCutsCollinear;
   BJetSelection fBJetSelection;
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
-  // AngularCutsBackToBack fAngularCutsBackToBack;
+  AngularCutsBackToBack fAngularCutsBackToBack;
   TopSelectionBDT fTopSelection;
   Count cTopTaggingSFCounter;
   // FatJetSelection fFatJetSelection;
@@ -85,12 +85,12 @@ Hplus2hwAnalysisWithTop::Hplus2hwAnalysisWithTop(const ParameterSet& config, con
     cFakeTauSFCounter(fEventCounter.addCounter("Fake #tau SF")),
     cTauDMCounter(fEventCounter.addCounter("#tau DM")),
     fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    // fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cBTaggingSFCounter(fEventCounter.addCounter("b-tag SF")),
     // fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")),
-    // fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
@@ -110,10 +110,10 @@ void Hplus2hwAnalysisWithTop::book(TDirectory *dir) {
   fMuonSelection.bookHistograms(dir);
   fTauSelection.bookHistograms(dir);
   fJetSelection.bookHistograms(dir);
-  // fAngularCutsCollinear.bookHistograms(dir);
+  fAngularCutsCollinear.bookHistograms(dir);
   fBJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
-  // fAngularCutsBackToBack.bookHistograms(dir);
+  fAngularCutsBackToBack.bookHistograms(dir);
   fTopSelection.bookHistograms(dir);
   // fFatJetSelection.bookHistograms(dir);
 
@@ -324,14 +324,6 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
 
 
   //================================================================================================  
-  // Collinear angular cuts
-  //================================================================================================  
-  // if (0) std::cout << "=== Angular Cuts (coll)" << std::endl;
-  // const AngularCutsCollinear::Data collinearData = fAngularCutsCollinear.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, metData);
-  // if (!collinearData.passedSelection()) return;
-
-
-  //================================================================================================  
   // 8) BJet selection
   //================================================================================================
   if (0) std::cout << "=== BJet selection" << std::endl;
@@ -340,6 +332,23 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
 
   // Fill histos
   fCommonPlots.fillControlPlotsAtBtagging(fEvent, bjetData);
+
+
+  //================================================================================================  
+  // Collinear angular cuts
+  //================================================================================================  
+  if (0) std::cout << "=== Angular Cuts (coll)" << std::endl;
+  // const AngularCutsCollinear::Data collinearData = fAngularCutsCollinear.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, metData);
+  const AngularCutsCollinear::Data collinearData = fAngularCutsCollinear.analyze(fEvent, muData.getSelectedMuons()[0], tauData.getSelectedTaus(), jetData, bjetData, metData);
+  // if (!collinearData.passedSelection()) return;
+
+  //================================================================================================
+  // Back-to-back angular cuts
+  //================================================================================================
+  // if (0) std::cout << "=== Angular Cuts (b2b)" << std::endl;
+  // const AngularCutsBackToBack::Data backToBackData = fAngularCutsBackToBack.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, metData);
+  const AngularCutsBackToBack::Data backToBackData = fAngularCutsBackToBack.analyze(fEvent, muData.getSelectedMuons()[0], tauData.getSelectedTaus(), jetData, bjetData, metData);
+  // if (!backToBackData.passedSelection()) return;
 
 
   //================================================================================================  
@@ -371,13 +380,6 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   hTransverseMass_AfterMetSelection ->Fill(mT);
   */
 
-  //================================================================================================
-  // Back-to-back angular cuts
-  //================================================================================================
-  // if (0) std::cout << "=== Angular Cuts (b2b)" << std::endl;
-  // const AngularCutsBackToBack::Data backToBackData = fAngularCutsBackToBack.analyze(fEvent, tauData.getSelectedTaus()[0], jetData, metData);
-  // if (!backToBackData.passedSelection()) return;
-
 
   //================================================================================================
   // 10) Top selection
@@ -387,9 +389,6 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
 
   // Fill histos after StandardSelections
    fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, metData, topData);
-
-  // Require at least 1 cleaned top candidate (no BDT threshold)
-  if (topData.getAllCleanedTopsSize() < 1) return;
 
   // Apply top selection
   if (!topData.passedSelection()) return;  

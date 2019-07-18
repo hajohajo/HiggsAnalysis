@@ -214,18 +214,18 @@ metSelection = PSet(
 # Top selection BDT                                               
 #================================================================================================        
 topSelectionBDT = PSet(
-    NumberOfTopsCutValue     =    1,       # [default: 3]
-    NumberOfTopsCutDirection = "==",       # [default: "=="] (==, !=, <, <=, >, >=)
-    AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
+    NumberOfTopsCutDirection = ">=",       # [default: "=="] (==, !=, <, <=, >, >=)
+    NumberOfTopsCutValue     =    0,       # [default: 3]
     AnyTopBDTGCutDirection   =  ">",       # [default: ">"]
+    AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
+    TopBDTGCutDirection      = ">=",       # [default: ">="]
     TopBDTGCutValue          =    0.40,    # [default: -0.60] NOTE: Only use numbers with 2 decimals
-    TopBDTGCutDirection      =  ">=",      # [default: ">="]
+    TopMassLowCutDirection   = ">=",       # [default: ">="]
     TopMassLowCutValue       =    0.00,    # [default: 0.00]
-    TopMassLowCutDirection   =  ">=",      # [default: ">="]
-    TopMassUppCutValue       =  400.00,    # [default: 2000.0]
-    TopMassUppCutDirection   =  "<=",      # [default: "<"]
-    CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
+    TopMassUppCutDirection   = "<=",       # [default: "<"]
+    TopMassUppCutValue       =  500.00,    # [default: 2000.0]
     CSV_bDiscCutDirection    = ">=",       # [default: ">="]
+    CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
     WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 
 )
 
@@ -321,7 +321,8 @@ commonPlotsOptions = PSet(
     etaBins           = PSet(nBins =  50, axisMin = -5.0, axisMax =    5.0),
     phiBins           = PSet(nBins =  64, axisMin = -3.2, axisMax =    3.2),
     deltaEtaBins      = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
-    deltaPhiBins      = PSet(nBins =  32, axisMin =  0.0, axisMax =    3.2),
+    #deltaPhiBins      = PSet(nBins =  32, axisMin =  0.0, axisMax =    3.2),
+    deltaPhiBins      = PSet(nBins =  36, axisMin =  0.0, axisMax =  180.0), # 5 degress
     deltaRBins        = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
     rtauBins          = PSet(nBins =  55, axisMin =  0.0, axisMax =    1.1), # HToTauNu
     njetsBins         = PSet(nBins =  18, axisMin =  0.0, axisMax =   18.0),
