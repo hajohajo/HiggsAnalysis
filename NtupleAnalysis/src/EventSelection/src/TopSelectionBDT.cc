@@ -306,7 +306,8 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
 
   // Initialise variables
   output.fJetsUsedAsBJets = selectedBjets;
-  
+  output.bPassedSelection = true;// iro
+
   // Sanity check
   if (selectedJets.size() < 3) return output;
   cSubPassedJetsCut.increment();
@@ -813,53 +814,51 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
 
   if (0) std::cout << "=== TopSelectionBDT:: Increment counters" << std::endl;
   //=== Apply cut on leading BDTG top (at least 1 top with desired BDTG score)
-  // if (!output.bPassedSelection) return output;
   if (output.bPassedBDTGCut) cSubPassedBDTGCut.increment();
   
   //=== Apply cut on number of tops with BDTG score above BDTG score threshold
-  // if (!cfg_NumberOfTopsCut.passedCut(output.fSelectedCleanedTopsBDTG.size())) return output;
   if (output.bPassedNTopsCut) cSubPassedNTopsCut.increment();
 
   //================================================================================================
   // Fill histograms
   //================================================================================================
   if (0) std::cout << "=== TopSelectionBDT:: Filling histograms" << std::endl;
-  // if (!output.bPassedSelection) return output;
   if (output.bPassedSelection) cPassedTopSelectionBDT.increment();
 
-  // Get the top candidate with
+  // Get the top candidate with highest BDTG score
   TrijetSelection myTops = fAllCleanedTops;
-  if (myTops.Jet1.size() < 1) return output;
-
   SelectedTrijets top;
-  top.Jet1      = getLeadingSubleadingJet(myTops.Jet1.at(0), myTops.Jet2.at(0), "leading");
-  top.Jet2      = getLeadingSubleadingJet(myTops.Jet1.at(0), myTops.Jet2.at(0), "subleading");
-  top.BJet      = myTops.BJet.at(0);
-  top.DijetP4   = myTops.DijetP4.at(0);
-  top.TrijetP4  = myTops.TrijetP4.at(0);
-  top.BDTG       = myTops.BDTG.at(0);
-  top.isGenuine = myTops.isGenuine.at(0);
-  top.isTagged  = myTops.isTagged.at(0);
-
-  double dijetMass = (top.Jet1.p4() +  top.Jet2.p4()).M();
-  hTopPt          -> Fill(top.TrijetP4.Pt());
-  hTopMass        -> Fill(top.TrijetP4.M());
-  hTopJet1Pt      -> Fill(top.Jet1.pt());
-  hTopJet1Eta     -> Fill(top.Jet1.eta());
-  hTopJet1BDisc   -> Fill(top.Jet1.bjetDiscriminator());
-  hTopJet2Pt      -> Fill(top.Jet2.pt());
-  hTopJet2Eta     -> Fill(top.Jet2.eta());
-  hTopJet2BDisc   -> Fill(top.Jet2.bjetDiscriminator());
-  hTopBJetPt      -> Fill(top.BJet.pt());
-  hTopBJetEta     -> Fill(top.BJet.eta());
-  hTopBJetBDisc   -> Fill(top.BJet.bjetDiscriminator());
-  hTopDiJetPt     -> Fill(top.DijetP4.Pt());
-  hTopDiJetEta    -> Fill(top.DijetP4.Eta());
-  hTopDiJetMass   -> Fill(top.DijetP4.M());
-  hTopMassWMassRatio -> Fill(top.TrijetP4.M()/dijetMass);
-  hTopDijetDeltaR -> Fill(ROOT::Math::VectorUtil::DeltaR(top.Jet1.p4(), top.Jet2.p4()));
-  // double Top_Rapidity    = 0.5*log((top.TrijetP4.E() + top.TrijetP4.Pz())/(top.TrijetP4.E() - top.TrijetP4.Pz()));
-  
+  if (myTops.Jet1.size() > 0)
+    {
+      top.Jet1      = getLeadingSubleadingJet(myTops.Jet1.at(0), myTops.Jet2.at(0), "leading");
+      top.Jet2      = getLeadingSubleadingJet(myTops.Jet1.at(0), myTops.Jet2.at(0), "subleading");
+      top.BJet      = myTops.BJet.at(0);
+      top.DijetP4   = myTops.DijetP4.at(0);
+      top.TrijetP4  = myTops.TrijetP4.at(0);
+      top.BDTG       = myTops.BDTG.at(0);
+      top.isGenuine = myTops.isGenuine.at(0);
+      top.isTagged  = myTops.isTagged.at(0);
+      
+      double dijetMass = (top.Jet1.p4() +  top.Jet2.p4()).M();
+      hTopPt          -> Fill(top.TrijetP4.Pt());
+      hTopMass        -> Fill(top.TrijetP4.M());
+      hTopJet1Pt      -> Fill(top.Jet1.pt());
+      hTopJet1Eta     -> Fill(top.Jet1.eta());
+      hTopJet1BDisc   -> Fill(top.Jet1.bjetDiscriminator());
+      hTopJet2Pt      -> Fill(top.Jet2.pt());
+      hTopJet2Eta     -> Fill(top.Jet2.eta());
+      hTopJet2BDisc   -> Fill(top.Jet2.bjetDiscriminator());
+      hTopBJetPt      -> Fill(top.BJet.pt());
+      hTopBJetEta     -> Fill(top.BJet.eta());
+      hTopBJetBDisc   -> Fill(top.BJet.bjetDiscriminator());
+      hTopDiJetPt     -> Fill(top.DijetP4.Pt());
+      hTopDiJetEta    -> Fill(top.DijetP4.Eta());
+      hTopDiJetMass   -> Fill(top.DijetP4.M());
+      hTopMassWMassRatio -> Fill(top.TrijetP4.M()/dijetMass);
+      hTopDijetDeltaR -> Fill(ROOT::Math::VectorUtil::DeltaR(top.Jet1.p4(), top.Jet2.p4()));
+      // double Top_Rapidity    = 0.5*log((top.TrijetP4.E() + top.TrijetP4.Pz())/(top.TrijetP4.E() - top.TrijetP4.Pz()));
+    }
+      
   return output;
 }
 

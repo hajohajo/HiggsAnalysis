@@ -17,15 +17,16 @@ set INITIAL = `echo $USER | cut -c1-1`
 set PSEUDO_MCRAB_DIR = ${1}
 #set FORMATS = "png,pdf,C"
 set FORMATS = "png"
-set DSETS = " QCD_bEnriched|ttHJetToGG_M125|ttHJetToNonbb_M125"
+set DSETS = " QCD_bEnriched|ttHJetToGG|ttHJetToTT"
+#set DSETS = " QCD_bEnriched|ttHJetToGG_M125|ttHJetToNonbb_M125|ttHJetToTT_M125"
 #set DSETS = " QCD_bEnriched|ttHJetToGG_M125|ttHJetToNonbb_M125|ttHJetToTT_M125|ttHJetTobb_M125"
 
 ./plotDataMC.py --folder counters/weighted -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 ./plotDataMC.py --folder "" -e $DSETS -s $FORMATS -m $PSEUDO_MCRAB_DIR --ratio
 
- ./plotDataMC.py --folder PUDependency -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
- ./plotDataMC.py --folder eSelection_Veto -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
- ./plotDataMC.py --folder muSelection_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
+./plotDataMC.py --folder PUDependency -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
+./plotDataMC.py --folder eSelection_Veto -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
+./plotDataMC.py --folder muSelection_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 ###./plotDataMC.py --folder metSelection_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 ./plotDataMC.py --folder tauSelection_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 ./plotDataMC.py --folder jetSelection_ -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
