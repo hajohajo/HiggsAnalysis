@@ -180,20 +180,6 @@ private:
   // NOTE: the histograms with the prefix hShape are used as shape histograms
   // NOTE: histogram triplets contain the inclusive and events with fake tau histograms
   
-  // vertex
-
-  // tau selection
-
-  // tau trigger SF
-
-  // veto tau selection
-  
-  // electron veto
-  
-  // muon veto
-
-  // tau veto
- 
   // jet selection
   HistoSplitter::SplittedTripletTH1s hCtrlNjets;
   
@@ -206,6 +192,20 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlCollinearAngularCutsJet2;
   HistoSplitter::SplittedTripletTH1s hCtrlCollinearAngularCutsJet3;
   HistoSplitter::SplittedTripletTH1s hCtrlCollinearAngularCutsJet4;
+  // Collinear or B2B? Decide later
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiTaus;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiTauMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiLdgTauMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiSubldgTauMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiLdgJetMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiSubldgJetMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiMuonMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiLdgTauMuon;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiSubldgTauMuon;
+  HistoSplitter::SplittedTripletTH2s hCtrlAngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiSubldgTauMET;
+  HistoSplitter::SplittedTripletTH2s hCtrlAngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiMuonMET;
+  HistoSplitter::SplittedTripletTH2s hCtrlAngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiLdgBJetMET;
+  HistoSplitter::SplittedTripletTH2s hCtrlAngularCutsDeltaPhiLdgTauMuon_Vs_DeltaPhiSubldgTauMuon;
   
   // this is the point of "standard selections"
   HistoSplitter::SplittedTripletTH1s hCtrlNVerticesAfterStdSelections;  
@@ -233,7 +233,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlMETAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlMETPhiAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiTauMetAfterStdSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuMetAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlHTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlMHTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNAllCleanedTopsAfterStdSelections;
@@ -333,6 +333,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlBDiscriminatorAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlBackToBackAngularCutsMinimumAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiTauMetAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNAllCleanedTopsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNSelectedCleanedTopsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterAllSelections;
