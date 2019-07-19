@@ -195,31 +195,30 @@ void TopSelectionBDT::initialize(const ParameterSet& config) {
 }
 
 void TopSelectionBDT::bookHistograms(TDirectory* dir) {
-
   // Fixed binning  
-  const int nPtBins   = 2 * fCommonPlots->getPtBinSettings().bins();
-  const double fPtMin = 2 * fCommonPlots->getPtBinSettings().min();
-  const double fPtMax = 2 * fCommonPlots->getPtBinSettings().max();
+  const int nPtBins   = 100;  //2 * fCommonPlots->getPtBinSettings().bins();
+  const double fPtMin = 0;    //2 * fCommonPlots->getPtBinSettings().min();
+  const double fPtMax = 1000; //2 * fCommonPlots->getPtBinSettings().max();
 
-  const int  nEtaBins = fCommonPlots->getEtaBinSettings().bins();
-  const float fEtaMin = fCommonPlots->getEtaBinSettings().min();
-  const float fEtaMax = fCommonPlots->getEtaBinSettings().max();
+  const int  nEtaBins = 50;   //fCommonPlots->getEtaBinSettings().bins();
+  const float fEtaMin = -5.0; //fCommonPlots->getEtaBinSettings().min();
+  const float fEtaMax = 5.0;  //fCommonPlots->getEtaBinSettings().max();
 
-  const int nDRBins   = fCommonPlots->getDeltaRBinSettings().bins();
-  const double fDRMin = fCommonPlots->getDeltaRBinSettings().min();
-  const double fDRMax = fCommonPlots->getDeltaRBinSettings().max();
+  const int nDRBins   = 100;  //fCommonPlots->getDeltaRBinSettings().bins();
+  const double fDRMin = 0;    //fCommonPlots->getDeltaRBinSettings().min();
+  const double fDRMax = 10;   //fCommonPlots->getDeltaRBinSettings().max();
 
-  const int  nBDiscBins = fCommonPlots->getBJetDiscBinSettings().bins();
-  const float fBDiscMin = fCommonPlots->getBJetDiscBinSettings().min();
-  const float fBDiscMax = fCommonPlots->getBJetDiscBinSettings().max();
+  const int  nBDiscBins = 120; //fCommonPlots->getBJetDiscBinSettings().bins();
+  const float fBDiscMin = 0;   //fCommonPlots->getBJetDiscBinSettings().min();
+  const float fBDiscMax = 1.2; //fCommonPlots->getBJetDiscBinSettings().max();
 
-  const int nWMassBins  = fCommonPlots->getWMassBinSettings().bins();
-  const float fWMassMin = fCommonPlots->getWMassBinSettings().min();
-  const float fWMassMax = fCommonPlots->getWMassBinSettings().max();
+  const int nWMassBins  = 200; //fCommonPlots->getWMassBinSettings().bins();
+  const float fWMassMin = 0;   //fCommonPlots->getWMassBinSettings().min();
+  const float fWMassMax = 1000;//fCommonPlots->getWMassBinSettings().max();
 
-  const int nTopMassBins  = fCommonPlots->getTopMassBinSettings().bins();
-  const float fTopMassMin = fCommonPlots->getTopMassBinSettings().min();
-  const float fTopMassMax = fCommonPlots->getTopMassBinSettings().max();
+  const int nTopMassBins  = 200; //fCommonPlots->getTopMassBinSettings().bins();
+  const float fTopMassMin = 0;   //fCommonPlots->getTopMassBinSettings().min();
+  const float fTopMassMax = 1000;//fCommonPlots->getTopMassBinSettings().max();
 
   // Histograms
   TDirectory* subdir = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "topSelectionBDT_"    + sPostfix);
@@ -272,7 +271,7 @@ void TopSelectionBDT::bookHistograms(TDirectory* dir) {
   hTopDijetDeltaR    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "Top_DijetDR"   ,  ";#Delta R(j_{1},j_{2})", 2*nDRBins, fDRMin, fDRMax);
   hTopMassWMassRatio = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "Top_WMassRatio", ";R_{32}", 100 , 0.0, 10.0);
 
-  fTopTagSFCalculator.bookHistograms(subdir, fHistoWrapper); 
+  fTopTagSFCalculator.bookHistograms(subdir, fHistoWrapper);
   return;
 }
 

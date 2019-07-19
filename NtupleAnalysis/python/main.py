@@ -379,7 +379,9 @@ class Process:
             for dset in dsets:
                 isOnWhiteList = False
                 for item in whitelist:
-                    if item==dset.getName() or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
+                    wl_re = re.compile(item)
+                    match = wl_re.search(dset.getName())
+                    if match or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
                         isOnWhiteList = True
                 if not isOnWhiteList:
                     blacklist.append(dset.getName())
@@ -387,7 +389,9 @@ class Process:
         for dset in dsets:
             isOnBlackList = False
             for item in blacklist:
-                if item==dset.getName() or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
+                bl_re = re.compile(item)
+                match = bl_re.search(dset.getName())
+                if match or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
                     isOnBlackList = True
             if isOnBlackList:
                 self.Print("Ignoring dataset because of black/whitelist options: '%s' ..." % dset.getName(), True)
