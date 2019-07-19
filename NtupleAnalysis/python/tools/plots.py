@@ -59,96 +59,79 @@ _intermediateHplusMasses = [145,150,155,160,165,170,175,180,190,200]
 _heavyHplusToTBbarMasses = [180, 200, 220, 250, 300, 350, 400, 500, 650, 800, 1000, 1500, 2000, 2500, 3000, 5000, 7000, 10000]
 _heavyHplusMasses        = [180, 200, 220, 250, 300, 350, 400, 500, 600, 700, 750,  800, 1000, 1500, 2000, 2500, 3000] #HToTauNu
 
-## These MC datasets must be added together before any
-## merging/renaming. They are split to two datasets just for more
-## statistics. The mapping is used in the
-## mergeRenameReorderForDataMC() function.
+
+#================================================================================================
+# Dataset Merge
+#================================================================================================
+'''
+These MC datasets must be added together before any
+merging/renaming. They are split to two datasets just for more
+statistics. The mapping is used in the mergeRenameReorderForDataMC() function.
+'''
 _physicalMcAdd = {
-    "TT"    : "TT",
-    "TT_ext": "TT",
-
-    "TTTT"      : "TTTT", 
-    "TTTT_ext1" : "TTTT", 
-
-    "ttHJetTobb_M125"     : "ttHJetTobb_M125", 
-    "ttHJetTobb_M125_ext1": "ttHJetTobb_M125", 
-    "ttHJetTobb_M125_ext2": "ttHJetTobb_M125", 
-    "ttHJetTobb_M125_ext3": "ttHJetTobb_M125", 
-    "ttHJetTobb_M125_ext4": "ttHJetTobb_M125", 
-
-    "ttHJetToGG_M125"     : "ttHJetToGG_M125",
-
-    "ttHJetToTT_M125"     : "ttHJetToTT_M125",
-    "ttHJetToTT_M125_ext1": "ttHJetToTT_M125",
-    "ttHJetToTT_M125_ext2": "ttHJetToTT_M125",
-    "ttHJetToTT_M125_ext3": "ttHJetToTT_M125",
-    "ttHJetToTT_M125_ext4": "ttHJetToTT_M125",
-
+    "TT"                     : "TT",
+    "TT_ext"                 : "TT",
+    "TTTT"                   : "TTTT", 
+    "TTTT_ext1"              : "TTTT", 
+    "ttHJetTobb_M125"        : "ttHJetTobb_M125", 
+    "ttHJetTobb_M125_ext1"   : "ttHJetTobb_M125", 
+    "ttHJetTobb_M125_ext2"   : "ttHJetTobb_M125", 
+    "ttHJetTobb_M125_ext3"   : "ttHJetTobb_M125", 
+    "ttHJetTobb_M125_ext4"   : "ttHJetTobb_M125", 
+    "ttHJetToGG_M125"        : "ttHJetToGG_M125",
+    "ttHJetToTT_M125"        : "ttHJetToTT_M125",
+    "ttHJetToTT_M125_ext1"   : "ttHJetToTT_M125",
+    "ttHJetToTT_M125_ext2"   : "ttHJetToTT_M125",
+    "ttHJetToTT_M125_ext3"   : "ttHJetToTT_M125",
+    "ttHJetToTT_M125_ext4"   : "ttHJetToTT_M125",
     "ttHJetToNonbb_M125"     : "ttHJetToNonbb_M125", 
     "ttHJetToNonbb_M125_ext1": "ttHJetToNonbb_M125", 
     "ttHJetToNonbb_M125_ext2": "ttHJetToNonbb_M125", 
     "ttHJetToNonbb_M125_ext3": "ttHJetToNonbb_M125", 
     "ttHJetToNonbb_M125_ext4": "ttHJetToNonbb_M125", 
-
-    "TTZToLLNuNu_M_10"     : "TTZToLLNuNu_M_10",
-    "TTZToLLNuNu_M_10_ext1": "TTZToLLNuNu_M_10",
-    "TTZToLLNuNu_M_10_ext2": "TTZToLLNuNu_M_10",
-    "TTZToLLNuNu_M_10_ext3": "TTZToLLNuNu_M_10",
-
-    "WZ"     : "WZ",
-    "WZ_ext" : "WZ",
-    "WZ_ext1": "WZ",
-    "WW"     : "WW",
-    "WW_ext1": "WW",
-    "ZZ"     : "ZZ",
-    "ZZ_ext1": "ZZ",
-    "WWTo2L2Nu" : "WWTo2L2Nu",
-    "WWToLNuQQ" : "WWToLNuQQ",
-    "ST_tW_antitop_5f_inclusiveDecays"     : "ST_tW_antitop_5f_inclusiveDecays",
-    "ST_tW_antitop_5f_inclusiveDecays_ext" : "ST_tW_antitop_5f_inclusiveDecays",
-    "ST_tW_antitop_5f_inclusiveDecays_ext1": "ST_tW_antitop_5f_inclusiveDecays",
-
-    "ST_tW_top_5f_inclusiveDecays"      : "ST_tW_top_5f_inclusiveDecays",
-    "ST_tW_top_5f_inclusiveDecays_ext"  : "ST_tW_top_5f_inclusiveDecays",
-    "ST_tW_top_5f_inclusiveDecays_ext1" : "ST_tW_top_5f_inclusiveDecays",
-
-    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8"      : "TTBB",
-    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8_ext1" : "TTBB",
-
-    "WJetsToLNu"     : "WJetsToLNu",
-    "WJetsToLNu_ext" : "WJetsToLNu",
-    "WJetsToLNu_ext1": "WJetsToLNu",
-    "WJetsToLNu_ext2": "WJetsToLNu",
-
-    #"QCD_HT50to100"        : 
-    #"QCD_HT100to200"       : 
-    "QCD_HT200to300"       : "QCD_HT200to300",
-    "QCD_HT200to300_ext1"  : "QCD_HT200to300",
-    "QCD_HT300to500"       : "QCD_HT300to500",
-    "QCD_HT300to500_ext1"  : "QCD_HT300to500",
-    "QCD_HT500to700"       : "QCD_HT500to700",
-    "QCD_HT500to700_ext1"  : "QCD_HT500to700",
-    "QCD_HT700to1000"      : "QCD_HT700to1000",
-    "QCD_HT700to1000_ext1" : "QCD_HT700to1000",
-    "QCD_HT1000to1500"     : "QCD_HT1000to1500",
-    "QCD_HT1000to1500_ext1": "QCD_HT1000to1500",
-    "QCD_HT1500to2000"     : "QCD_HT1500to2000",
-    "QCD_HT1500to2000_ext1": "QCD_HT1500to2000",
-    "QCD_HT2000toInf"      : "QCD_HT2000toInf",
-    "QCD_HT2000toInf_ext1" : "QCD_HT2000toInf",
-
-    "QCD_Pt_80to120"         : "QCD_Pt_80to120"    , 
-    "QCD_Pt_80to120_ext1"    : "QCD_Pt_80to120"    ,
-    "QCD_Pt_80to120_ext2"    : "QCD_Pt_80to120"    ,
-    "QCD_Pt_120to170"        : "QCD_Pt_120to170"   ,
-    "QCD_Pt_120to170_ext1"   : "QCD_Pt_120to170"   ,
-    "QCD_Pt_170to300"        : "QCD_Pt_170to300"   ,
-    "QCD_Pt_170to300_ext1"   : "QCD_Pt_170to300"   ,
-    "QCD_Pt_300to470"        : "QCD_Pt_300to470"   ,
-    "QCD_Pt_300to470_ext1"   : "QCD_Pt_300to470"   ,
-    "QCD_Pt_600to800"        : "QCD_Pt_600to800"   ,
-    "QCD_Pt_600to800_ext1"   : "QCD_Pt_600to800"   ,
-    "QCD_Pt_800to1000"       : "QCD_Pt_800to1000"  ,
+    "TTZToLLNuNu_M_10"       : "TTZToLLNuNu_M_10",
+    "TTZToLLNuNu_M_10_ext1"  : "TTZToLLNuNu_M_10",
+    "TTZToLLNuNu_M_10_ext2"  : "TTZToLLNuNu_M_10",
+    "TTZToLLNuNu_M_10_ext3"  : "TTZToLLNuNu_M_10",
+    "WZ"                     : "WZ",
+    "WZ_ext"                 : "WZ",
+    "WZ_ext1"                : "WZ",
+    "WW"                     : "WW",
+    "WW_ext1"                : "WW",
+    "ZZ"                     : "ZZ",
+    "ZZ_ext1"                : "ZZ",
+    "WWTo2L2Nu"              : "WWTo2L2Nu",
+    "WWToLNuQQ"              : "WWToLNuQQ",
+    "WJetsToLNu"             : "WJetsToLNu",
+    "WJetsToLNu_ext"         : "WJetsToLNu",
+    "WJetsToLNu_ext1"        : "WJetsToLNu",
+    "WJetsToLNu_ext2"        : "WJetsToLNu",
+    "QCD_HT200to300"         : "QCD_HT200to300",
+    "QCD_HT200to300_ext1"    : "QCD_HT200to300",
+    "QCD_HT300to500"         : "QCD_HT300to500",
+    "QCD_HT300to500_ext1"    : "QCD_HT300to500",
+    "QCD_HT500to700"         : "QCD_HT500to700",
+    "QCD_HT500to700_ext1"    : "QCD_HT500to700",
+    "QCD_HT700to1000"        : "QCD_HT700to1000",
+    "QCD_HT700to1000_ext1"   : "QCD_HT700to1000",
+    "QCD_HT1000to1500"       : "QCD_HT1000to1500",
+    "QCD_HT1000to1500_ext1"  : "QCD_HT1000to1500",
+    "QCD_HT1500to2000"       : "QCD_HT1500to2000",
+    "QCD_HT1500to2000_ext1"  : "QCD_HT1500to2000",
+    "QCD_HT2000toInf"        : "QCD_HT2000toInf",
+    "QCD_HT2000toInf_ext1"   : "QCD_HT2000toInf",
+    "QCD_Pt_80to120"         : "QCD_Pt_80to120", 
+    "QCD_Pt_80to120_ext1"    : "QCD_Pt_80to120",
+    "QCD_Pt_80to120_ext2"    : "QCD_Pt_80to120",
+    "QCD_Pt_120to170"        : "QCD_Pt_120to170",
+    "QCD_Pt_120to170_ext1"   : "QCD_Pt_120to170",
+    "QCD_Pt_170to300"        : "QCD_Pt_170to300",
+    "QCD_Pt_170to300_ext1"   : "QCD_Pt_170to300",
+    "QCD_Pt_300to470"        : "QCD_Pt_300to470",
+    "QCD_Pt_300to470_ext1"   : "QCD_Pt_300to470",
+    "QCD_Pt_600to800"        : "QCD_Pt_600to800",
+    "QCD_Pt_600to800_ext1"   : "QCD_Pt_600to800",
+    "QCD_Pt_800to1000"       : "QCD_Pt_800to1000",
     "QCD_Pt_800to1000_ext1"  : "QCD_Pt_800to1000"  ,
     "QCD_Pt_1000to1400"      : "QCD_Pt_1000to1400" ,
     "QCD_Pt_1000to1400_ext1" : "QCD_Pt_1000to1400" ,
@@ -158,6 +141,15 @@ _physicalMcAdd = {
     "QCD_Pt_1800to2400_ext1" : "QCD_Pt_1800to2400" ,
     "QCD_Pt_2400to3200"      : "QCD_Pt_2400to3200" ,
     "QCD_Pt_2400to3200_ext1" : "QCD_Pt_2400to3200" ,
+
+    "ST_tW_antitop_5f_inclusiveDecays"           : "ST_tW_antitop_5f_inclusiveDecays",
+    "ST_tW_antitop_5f_inclusiveDecays_ext"       : "ST_tW_antitop_5f_inclusiveDecays",
+    "ST_tW_antitop_5f_inclusiveDecays_ext1"      : "ST_tW_antitop_5f_inclusiveDecays",
+    "ST_tW_top_5f_inclusiveDecays"               : "ST_tW_top_5f_inclusiveDecays",
+    "ST_tW_top_5f_inclusiveDecays_ext"           : "ST_tW_top_5f_inclusiveDecays",
+    "ST_tW_top_5f_inclusiveDecays_ext1"          : "ST_tW_top_5f_inclusiveDecays",
+    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8"      : "TTBB",
+    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8_ext1" : "TTBB",
 
     "QCD_Pt20_MuEnriched"                : "QCD_Pt20_MuEnriched",
     "QCD_Pt_15to20_MuEnrichedPt5"        : "QCD_Pt_15to20_MuEnrichedPt5",
@@ -180,25 +172,24 @@ _physicalMcAdd = {
     "QCD_Pt_800to1000_MuEnrichedPt5_ext1": "QCD_Pt_800to1000_MuEnrichedPt5",
     "QCD_Pt_800to1000_MuEnrichedPt5_ext2": "QCD_Pt_800to1000_MuEnrichedPt5",
     "QCD_Pt_1000toInf_MuEnrichedPt5"     : "QCD_Pt_1000toInf_MuEnrichedPt5",
-    
-    "WJetsToLNu_HT_0To70"          : "WJetsToLNu_HT_0To70",
-    "WJetsToLNu_HT_0To70_ext2"     : "WJetsToLNu_HT_0To70",
-    "WJetsToLNu_HT_100To200"       : "WJetsToLNu_HT_100To200",
-    "WJetsToLNu_HT_100To200_ext1"  : "WJetsToLNu_HT_100To200",
-    "WJetsToLNu_HT_100To200_ext2"  : "WJetsToLNu_HT_100To200",
-    "WJetsToLNu_HT_200To400"       : "WJetsToLNu_HT_200To400",
-    "WJetsToLNu_HT_200To400_ext1"  : "WJetsToLNu_HT_200To400",
-    "WJetsToLNu_HT_200To400_ext2"  : "WJetsToLNu_HT_200To400",
-    "WJetsToLNu_HT_400To600"       : "WJetsToLNu_HT_400To600",
-    "WJetsToLNu_HT_400To600_ext1"  : "WJetsToLNu_HT_400To600",
-    "WJetsToLNu_HT_600To800"       : "WJetsToLNu_HT_600To800",
-    "WJetsToLNu_HT_600To800_ext1"  : "WJetsToLNu_HT_600To800",
-    "WJetsToLNu_HT_800To1200"      : "WJetsToLNu_HT_800To1200",
-    "WJetsToLNu_HT_800To1200_ext1" : "WJetsToLNu_HT_800To1200",
-    "WJetsToLNu_HT_1200To2500"     : "WJetsToLNu_HT_1200To2500",
-    "WJetsToLNu_HT_1200To2500_ext1": "WJetsToLNu_HT_1200To2500",
-    "WJetsToLNu_HT_2500ToInf"      : "WJetsToLNu_HT_2500ToInf",
-    "WJetsToLNu_HT_2500ToInf_ext1" : "WJetsToLNu_HT_2500ToInf",
+    "WJetsToLNu_HT_0To70"                : "WJetsToLNu_HT_0To70",
+    "WJetsToLNu_HT_0To70_ext2"           : "WJetsToLNu_HT_0To70",
+    "WJetsToLNu_HT_100To200"             : "WJetsToLNu_HT_100To200",
+    "WJetsToLNu_HT_100To200_ext1"        : "WJetsToLNu_HT_100To200",
+    "WJetsToLNu_HT_100To200_ext2"        : "WJetsToLNu_HT_100To200",
+    "WJetsToLNu_HT_200To400"             : "WJetsToLNu_HT_200To400",
+    "WJetsToLNu_HT_200To400_ext1"        : "WJetsToLNu_HT_200To400",
+    "WJetsToLNu_HT_200To400_ext2"        : "WJetsToLNu_HT_200To400",
+    "WJetsToLNu_HT_400To600"             : "WJetsToLNu_HT_400To600",
+    "WJetsToLNu_HT_400To600_ext1"        : "WJetsToLNu_HT_400To600",
+    "WJetsToLNu_HT_600To800"             : "WJetsToLNu_HT_600To800",
+    "WJetsToLNu_HT_600To800_ext1"        : "WJetsToLNu_HT_600To800",
+    "WJetsToLNu_HT_800To1200"            : "WJetsToLNu_HT_800To1200",
+    "WJetsToLNu_HT_800To1200_ext1"       : "WJetsToLNu_HT_800To1200",
+    "WJetsToLNu_HT_1200To2500"           : "WJetsToLNu_HT_1200To2500",
+    "WJetsToLNu_HT_1200To2500_ext1"      : "WJetsToLNu_HT_1200To2500",
+    "WJetsToLNu_HT_2500ToInf"            : "WJetsToLNu_HT_2500ToInf",
+    "WJetsToLNu_HT_2500ToInf_ext1"       : "WJetsToLNu_HT_2500ToInf",
 
     "DYJetsToLL_M_50"            : "DYJetsToLL_M_50",
     "DYJetsToLL_M_50_ext"        : "DYJetsToLL_M_50",
@@ -212,10 +203,10 @@ _physicalMcAdd = {
     "DYJetsToLL_M_50_HT_400to600"      : "DYJetsToLL_M_50_HT_400to600",
     "DYJetsToLL_M_50_HT_400to600_ext1" : "DYJetsToLL_M_50_HT_400to600",
 
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_500" : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_500_ext1" : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_750_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_750",
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_800_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_800",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_500"        : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_500_ext1"   : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_750_reHLT"  : "ChargedHiggs_HplusTB_HplusToTauNu_M_750",
+    "ChargedHiggs_HplusTB_HplusToTauNu_M_800_reHLT"  : "ChargedHiggs_HplusTB_HplusToTauNu_M_800",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_1000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_1000",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_2000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_2000",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_3000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_3000",
@@ -243,21 +234,21 @@ _physicalMcAdd = {
     "ChargedHiggs_HplusTB_HplusToTB_M_2000_ext1": "ChargedHiggs_HplusTB_HplusToTB_M_2000",
     "ChargedHiggs_HplusTB_HplusToTB_M_2500_ext1": "ChargedHiggs_HplusTB_HplusToTB_M_2500",
     "ChargedHiggs_HplusTB_HplusToTB_M_3000_ext1": "ChargedHiggs_HplusTB_HplusToTB_M_3000",
-    "ChargedHiggs_HplusTB_HplusToTB_M_180" : "ChargedHiggs_HplusTB_HplusToTB_M_180",
-    "ChargedHiggs_HplusTB_HplusToTB_M_200" : "ChargedHiggs_HplusTB_HplusToTB_M_200",
-    "ChargedHiggs_HplusTB_HplusToTB_M_220" : "ChargedHiggs_HplusTB_HplusToTB_M_220", 
-    "ChargedHiggs_HplusTB_HplusToTB_M_250" : "ChargedHiggs_HplusTB_HplusToTB_M_250", 
-    "ChargedHiggs_HplusTB_HplusToTB_M_300" : "ChargedHiggs_HplusTB_HplusToTB_M_300", 
-    "ChargedHiggs_HplusTB_HplusToTB_M_350" : "ChargedHiggs_HplusTB_HplusToTB_M_350", 
-    "ChargedHiggs_HplusTB_HplusToTB_M_400" : "ChargedHiggs_HplusTB_HplusToTB_M_400", 
-    "ChargedHiggs_HplusTB_HplusToTB_M_500" : "ChargedHiggs_HplusTB_HplusToTB_M_500", 
-    "ChargedHiggs_HplusTB_HplusToTB_M_650" : "ChargedHiggs_HplusTB_HplusToTB_M_650", 
-    "ChargedHiggs_HplusTB_HplusToTB_M_800" : "ChargedHiggs_HplusTB_HplusToTB_M_800", 
-    "ChargedHiggs_HplusTB_HplusToTB_M_1000": "ChargedHiggs_HplusTB_HplusToTB_M_1000",
-    "ChargedHiggs_HplusTB_HplusToTB_M_1500": "ChargedHiggs_HplusTB_HplusToTB_M_1500",
-    "ChargedHiggs_HplusTB_HplusToTB_M_2000": "ChargedHiggs_HplusTB_HplusToTB_M_2000",
-    "ChargedHiggs_HplusTB_HplusToTB_M_2500": "ChargedHiggs_HplusTB_HplusToTB_M_2500",
-    "ChargedHiggs_HplusTB_HplusToTB_M_3000": "ChargedHiggs_HplusTB_HplusToTB_M_3000",
+    "ChargedHiggs_HplusTB_HplusToTB_M_180"      : "ChargedHiggs_HplusTB_HplusToTB_M_180",
+    "ChargedHiggs_HplusTB_HplusToTB_M_200"      : "ChargedHiggs_HplusTB_HplusToTB_M_200",
+    "ChargedHiggs_HplusTB_HplusToTB_M_220"      : "ChargedHiggs_HplusTB_HplusToTB_M_220", 
+    "ChargedHiggs_HplusTB_HplusToTB_M_250"      : "ChargedHiggs_HplusTB_HplusToTB_M_250", 
+    "ChargedHiggs_HplusTB_HplusToTB_M_300"      : "ChargedHiggs_HplusTB_HplusToTB_M_300", 
+    "ChargedHiggs_HplusTB_HplusToTB_M_350"      : "ChargedHiggs_HplusTB_HplusToTB_M_350", 
+    "ChargedHiggs_HplusTB_HplusToTB_M_400"      : "ChargedHiggs_HplusTB_HplusToTB_M_400", 
+    "ChargedHiggs_HplusTB_HplusToTB_M_500"      : "ChargedHiggs_HplusTB_HplusToTB_M_500", 
+    "ChargedHiggs_HplusTB_HplusToTB_M_650"      : "ChargedHiggs_HplusTB_HplusToTB_M_650", 
+    "ChargedHiggs_HplusTB_HplusToTB_M_800"      : "ChargedHiggs_HplusTB_HplusToTB_M_800", 
+    "ChargedHiggs_HplusTB_HplusToTB_M_1000"     : "ChargedHiggs_HplusTB_HplusToTB_M_1000",
+    "ChargedHiggs_HplusTB_HplusToTB_M_1500"     : "ChargedHiggs_HplusTB_HplusToTB_M_1500",
+    "ChargedHiggs_HplusTB_HplusToTB_M_2000"     : "ChargedHiggs_HplusTB_HplusToTB_M_2000",
+    "ChargedHiggs_HplusTB_HplusToTB_M_2500"     : "ChargedHiggs_HplusTB_HplusToTB_M_2500",
+    "ChargedHiggs_HplusTB_HplusToTB_M_3000"     : "ChargedHiggs_HplusTB_HplusToTB_M_3000",
 
 
     "TTJets_SingleLeptFromT_madgraph"               : "TTJets_SemiLept",
@@ -270,72 +261,69 @@ _physicalMcAdd = {
     "TTJets_SingleLeptFromTbar_amcatnlo"            : "TTJets_SemiLept",
     "TTGJets"      : "TTGJets",
     "TTGJets_ext1" : "TTGJets",
-    "TTToSemiLep_TuneCUETP8M2T4down" : "TTToSemiLep_TuneCUETP8M2T4down",
-    "TTToSemiLep_TuneCUETP8M2T4up"   : "TTToSemiLep_TuneCUETP8M2T4up",
-    "TTToSemiLep_hdampDOWN" : "TTToSemiLep_hdampDOWN",
-    "TTToSemiLep_hdampUP"   : "TTToSemiLep_hdampUP",
-    "TTWJetsToLNu_ext1" : "TTWJetsToLNu",
-    "TTWJetsToLNu_ext2" : "TTWJetsToLNu",
-    "TT_GluonMoveCRTune" : "TT_GluonMoveCRTune",
-    "TT_QCDbasedCRTune_erdON"      : "TT_QCDbasedCRTune_erdON",
-    "TT_QCDbasedCRTune_erdON_ext1" : "TT_QCDbasedCRTune_erdON",
-    "TT_TuneCUETP8M2T4down"      : "TT_TuneCUETP8M2T4down",
-    "TT_TuneCUETP8M2T4down_ext1" : "TT_TuneCUETP8M2T4down",
-    "TT_TuneCUETP8M2T4up"      : "TT_TuneCUETP8M2T4up",
-    "TT_TuneCUETP8M2T4up_ext1" : "TT_TuneCUETP8M2T4up",
-    "TT_TuneEE5C"      : "TT_TuneEE5C",
-    "TT_TuneEE5C_ext2" : "TT_TuneEE5C",
-    "TT_TuneEE5C_ext3" : "TT_TuneEE5C",
-    "TT_erdON"      : "TT_erdON",
-    "TT_erdON_ext1" : "TT_erdON",
-    "TT_evtgen" : "TT_evtgen",
-    "TT_fsrup"      : "TT_fsrup",
-    "TT_fsrup_ext1" : "TT_fsrup",
-    "TT_fsrup_ext2" : "TT_fsrup",
-    "TT_fsrdown"      : "TT_fsrdown",
-    "TT_fsrdown_ext1" : "TT_fsrdown",
-    "TT_fsrdown_ext2" : "TT_fsrdown",
+    "TTToSemiLep_TuneCUETP8M2T4down": "TTToSemiLep_TuneCUETP8M2T4down",
+    "TTToSemiLep_TuneCUETP8M2T4up"  : "TTToSemiLep_TuneCUETP8M2T4up",
+    "TTToSemiLep_hdampDOWN"         : "TTToSemiLep_hdampDOWN",
+    "TTToSemiLep_hdampUP"           : "TTToSemiLep_hdampUP",
+    "TTWJetsToLNu_ext1"             : "TTWJetsToLNu",
+    "TTWJetsToLNu_ext2"             : "TTWJetsToLNu",
+    "TT_GluonMoveCRTune"            : "TT_GluonMoveCRTune",
+    "TT_QCDbasedCRTune_erdON"       : "TT_QCDbasedCRTune_erdON",
+    "TT_QCDbasedCRTune_erdON_ext1"  : "TT_QCDbasedCRTune_erdON",
+    "TT_TuneCUETP8M2T4down"         : "TT_TuneCUETP8M2T4down",
+    "TT_TuneCUETP8M2T4down_ext1"    : "TT_TuneCUETP8M2T4down",
+    "TT_TuneCUETP8M2T4up"           : "TT_TuneCUETP8M2T4up",
+    "TT_TuneCUETP8M2T4up_ext1"      : "TT_TuneCUETP8M2T4up",
+    "TT_TuneEE5C"       : "TT_TuneEE5C",
+    "TT_TuneEE5C_ext2"  : "TT_TuneEE5C",
+    "TT_TuneEE5C_ext3"  : "TT_TuneEE5C",
+    "TT_erdON"          : "TT_erdON",
+    "TT_erdON_ext1"     : "TT_erdON",
+    "TT_evtgen"         : "TT_evtgen",
+    "TT_fsrup"          : "TT_fsrup",
+    "TT_fsrup_ext1"     : "TT_fsrup",
+    "TT_fsrup_ext2"     : "TT_fsrup",
+    "TT_fsrdown"        : "TT_fsrdown",
+    "TT_fsrdown_ext1"   : "TT_fsrdown",
+    "TT_fsrdown_ext2"   : "TT_fsrdown",
     "TT_hdampDOWN"      : "TT_hdampDOWN",
     "TT_hdampDOWN_ext1" : "TT_hdampDOWN",
-    "TT_hdampUP"      : "TT_hdampUP",
-    "TT_hdampUP_ext1" : "TT_hdampUP",
-    "TT_isrdown" : "TT_isrdown", 
-    "TT_isrdown_ext1" : "TT_isrdown",
-    "TT_isrdown_ext2" : "TT_isrdown",
-    "TT_isrup_ext1" : "TT_isrup",
-    "TT_isrup_ext2" : "TT_isrup",
-    "TT_mtop1665" : "TT_mtop1665",
-    "TT_mtop1695_ext1" : "TT_mtop1695",
-    "TT_mtop1695_ext2" : "TT_mtop1695",
-    "TT_mtop1715" : "TT_mtop1715",
-    "TT_mtop1735" : "TT_mtop1735",
-    "TT_mtop1755" : "TT_mtop1755",
-    "TT_mtop1755_ext1" : "TT_mtop1755",
-    "TT_mtop1755_ext2" : "TT_mtop1755",
-    "TT_mtop1785" : "TT_mtop1785",
-    "TT_widthx0p2" : "TT_widthx0p2",
-    "TT_widthx0p5" : "TT_widthx0p5",
-    "TT_widthx0p8" : "TT_widthx0p8",
-    "TT_widthx2"   : "TT_widthx2",
-    "TT_widthx4"   : "TT_widthx4",
-    "TT_widthx8"   : "TT_widthx8",
-   
+    "TT_hdampUP"        : "TT_hdampUP",
+    "TT_hdampUP_ext1"   : "TT_hdampUP",
+    "TT_isrdown"        : "TT_isrdown", 
+    "TT_isrdown_ext1"   : "TT_isrdown",
+    "TT_isrdown_ext2"   : "TT_isrdown",
+    "TT_isrup_ext1"     : "TT_isrup",
+    "TT_isrup_ext2"     : "TT_isrup",
+    "TT_mtop1665"       : "TT_mtop1665",
+    "TT_mtop1695_ext1"  : "TT_mtop1695",
+    "TT_mtop1695_ext2"  : "TT_mtop1695",
+    "TT_mtop1715"       : "TT_mtop1715",
+    "TT_mtop1735"       : "TT_mtop1735",
+    "TT_mtop1755"       : "TT_mtop1755",
+    "TT_mtop1755_ext1"  : "TT_mtop1755",
+    "TT_mtop1755_ext2"  : "TT_mtop1755",
+    "TT_mtop1785"       : "TT_mtop1785",
+    "TT_widthx0p2"      : "TT_widthx0p2",
+    "TT_widthx0p5"      : "TT_widthx0p5",
+    "TT_widthx0p8"      : "TT_widthx0p8",
+    "TT_widthx2"        : "TT_widthx2",
+    "TT_widthx4"        : "TT_widthx4",
+    "TT_widthx8"        : "TT_widthx8",  
 }
 
-## Map the physical dataset names to logical names
-#
-# Map the physical dataset names (in multicrab.cfg) to logical names
-# used in plots._legendLabels and plots._plotStyles. The mapping is
-# used in the mergeRenameReorderForDataMC() function.
-_physicalToLogical = {
-    #"TT_TuneZ2_Summer11": "TT",
 
-    #"WToTauNu_TuneZ2_Summer11": "WToTauNu",
+#================================================================================================
+# Dataset Merge
+#================================================================================================
+'''
+Map the physical dataset names to logical names.
+Map the physical dataset names (in multicrab.cfg) to logical names
+used in plots._legendLabels and plots._plotStyles. The mapping is
+used in the mergeRenameReorderForDataMC() function.
+'''
+_physicalToLogical = {}
 
-    #"W3Jets_TuneZ2_Summer11": "W3Jets",
-
-    #"W3Jets_TuneZ2_v2_Fall11": "W3Jets",
-}
 for mass in _lightHplusMasses:
     _physicalToLogical["ChargedHiggs_TTToHplusBWB_HplusToTauNu_M_%d"%(mass)] = "TTToHplusBWB_M%d"%mass
 
@@ -356,16 +344,11 @@ _physicalToLogical.update({
         "TTJets_SemiLept": "TTJets_SemiLept",
         "TTJets_Hadronic".replace("_", "_ext_"): "TTJets_Hadronic",
 
-        # powheg ttbar
         "TT": "TT",
         
         "WJetsToLNu": "WJetsToLNu",
-        # "W1Jets"    : "W1Jets",
-        # "W2Jets"    : "W2Jets",
-        # "W3Jets"    : "W3Jets",
-        # "W4Jets"    : "W4Jets",
-        "WJetsToLNu_HT_0To70"  : "WJetsToLNu_HT_0To70",
-        "WJetsToLNu_HT_70To100"  : "WJetsToLNu_HT_70To100",
+        "WJetsToLNu_HT_0To70"     : "WJetsToLNu_HT_0To70",
+        "WJetsToLNu_HT_70To100"   : "WJetsToLNu_HT_70To100",
         "WJetsToLNu_HT_100To200"  : "WJetsToLNu_HT_100To200",
         "WJetsToLNu_HT_200To400"  : "WJetsToLNu_HT_200To400",
         "WJetsToLNu_HT_400To600"  : "WJetsToLNu_HT_400To600",
@@ -418,7 +401,6 @@ _physicalToLogical.update({
         "QCD_HT2000toInf" : "QCD_HT2000toInf",
        
         "QCD_Pt20_MuEnriched"            : "QCD_Pt20_MuEnriched",
-        
         "QCD_Pt_15to20_MuEnrichedPt5"    : "QCD_Pt_15to20_MuEnrichedPt5",
         "QCD_Pt_20to30_MuEnrichedPt5"    : "QCD_Pt_20to30_MuEnrichedPt5",
         "QCD_Pt_30to50_MuEnrichedPt5"    : "QCD_Pt_30to50_MuEnrichedPt5",
@@ -435,7 +417,7 @@ _physicalToLogical.update({
         "ST_tW_top_5f_inclusiveDecays"             : "ST_tW_top_5f_inclusiveDecays",
         "ST_tW_antitop_5f_inclusiveDecays"         : "ST_tW_antitop_5f_inclusiveDecays",
         "ST_t_channel_antitop_4f_inclusiveDecays"  : "ST_t_channel_antitop_4f_inclusiveDecays",
-        "ST_t_channel_top_4f_inclusiveDecays"         : "ST_t_channel_top_4f_inclusiveDecays",
+        "ST_t_channel_top_4f_inclusiveDecays"      : "ST_t_channel_top_4f_inclusiveDecays",
 
         "WWTo2L2Nu" : "WWTo2L2Nu",
         "WWToLNuQQ" : "WWToLNuQQ",
@@ -537,23 +519,13 @@ _datasetMerge = {
     "ST_t_channel_antitop_4f_inclusiveDecays": "SingleTop",
     "ST_t_channel_top_4f_inclusiveDecays"    : "SingleTop",
 
-    # "TT"      : "TT",
-    "TTJets"  : "TTJets",    
-    # "TTTT"    : "TTTT",
-    #"TTJets_FullLept": "TTJets",
-    #"TTJets_SemiLept": "TTJets",
-    #"TTJets_Hadronic": "TTJets",
+    "TTJets"          : "TTJets",    
+    "TT_Mtt_0to700"   : "TT_Mtt",
+    "TT_Mtt_700to1000": "TT_Mtt",
+    "TT_Mtt_1000toInf": "TT_Mtt",
+    "WJetsToLNu"      : "WJets",
 
-    "TT_Mtt_0to700"      : "TT_Mtt",
-    "TT_Mtt_700to1000"      : "TT_Mtt",
-    "TT_Mtt_1000toInf"      : "TT_Mtt",
-
-    "WJetsToLNu": "WJets",
-    # "W1Jets"    : "WJets",
-    # "W2Jets"    : "WJets",
-    # "W3Jets"    : "WJets",
-    # "W4Jets"    : "WJets",
-    "WJetsToLNu_HT_0To70"   : "WJetsHT",
+    "WJetsToLNu_HT_0To70"     : "WJetsHT",
     "WJetsToLNu_HT_70To100"   : "WJetsHT",
     "WJetsToLNu_HT_100To200"  : "WJetsHT",
     "WJetsToLNu_HT_200To400"  : "WJetsHT",
@@ -562,31 +534,27 @@ _datasetMerge = {
     "WJetsToLNu_HT_800To1200" : "WJetsHT",
     "WJetsToLNu_HT_1200To2500": "WJetsHT",
     "WJetsToLNu_HT_2500ToInf" : "WJetsHT",
-    # "WJetsToQQ_HT_600ToInf"   : "WJetsToQQ",
 
-    "DYJetsToLL_M_10to50"        : "DYJetsToLLHT",
-    "DYJetsToLL_M_50"            : "DYJetsToLL",
-    "DYJetsToLL_M_50_HT_70to100": "DYJetsToLLHT",
-    "DYJetsToLL_M_50_HT_100to200": "DYJetsToLLHT",
-    "DYJetsToLL_M_50_HT_200to400": "DYJetsToLLHT",
-    "DYJetsToLL_M_50_HT_400to600": "DYJetsToLLHT",
-    "DYJetsToLL_M_50_HT_600to800": "DYJetsToLLHT",
-    "DYJetsToLL_M_50_HT_800to1200": "DYJetsToLLHT",
+    "DYJetsToLL_M_50"              : "DYJetsToLL",
+    "DYJetsToLL_M_10to50"          : "DYJetsToLLHT",
+    "DYJetsToLL_M_50_HT_70to100"   : "DYJetsToLLHT",
+    "DYJetsToLL_M_50_HT_100to200"  : "DYJetsToLLHT",
+    "DYJetsToLL_M_50_HT_200to400"  : "DYJetsToLLHT",
+    "DYJetsToLL_M_50_HT_400to600"  : "DYJetsToLLHT",
+    "DYJetsToLL_M_50_HT_600to800"  : "DYJetsToLLHT",
+    "DYJetsToLL_M_50_HT_800to1200" : "DYJetsToLLHT",
     "DYJetsToLL_M_50_HT_1200to2500": "DYJetsToLLHT",
-    "DYJetsToLL_M_50_HT_2500toInf": "DYJetsToLLHT",
-    "DYJetsToLL_M_50_HT_600toInf": "DYJetsToLLHT",
-    "DYJetsToQQ_HT180"           : "DYJetsToQQHT",
+    "DYJetsToLL_M_50_HT_2500toInf" : "DYJetsToLLHT",
+    "DYJetsToLL_M_50_HT_600toInf"  : "DYJetsToLLHT",
+    "DYJetsToQQ_HT180"             : "DYJetsToQQHT",
 
-    # Diboson merge, comment this away to keep WW, WZ, ZZ samples separate
-    "WWTo2L2Nu" : "Diboson",
-    "WWToLNuQQ" : "Diboson",
-    "WWTo4Q": "Diboson",
-    "ZZTo4Q": "Diboson",
-    "WW"    : "Diboson",
-    "WZ"    : "Diboson",
-    "ZZ"    : "Diboson",
-
-    "ttbb_4FS2_ckm_amcatnlo_madspin_pythia8"     : "TTBB",
+    "WWTo2L2Nu": "Diboson",
+    "WWToLNuQQ": "Diboson",
+    "WWTo4Q"   : "Diboson",
+    "ZZTo4Q"   : "Diboson",
+    "WW"       : "Diboson",
+    "WZ"       : "Diboson",
+    "ZZ"       : "Diboson",
 
     "TTZToLLNuNu_M_10"   : "ttX",
     "TTZToQQ"            : "ttX",
@@ -596,17 +564,23 @@ _datasetMerge = {
     "ttHJetToNonbb_M125" : "ttX", 
     "ttHJetToGG_M125"    : "ttX",
     "ttHJetToTT_M125"    : "ttX",
+    "TTTT"               : "ttX",
 
+    "ttbb_4FS2_ckm_amcatnlo_madspin_pythia8": "TTBB",
     }
 
 for mass in _intermediateHplusMasses:
-#    _datasetMerge["ChargedHiggs_HplusTB_HplusToTauNu_IntermediateMassNoNeutral_M_%d"%(mass)] = "HplusTB_M%d"%mass
     _datasetMerge["ChargedHiggs_HplusTB_HplusToTauNu_IntermediateMassNoNeutral_M_%d"%(mass)] = "HplusTBintermediate_M%d"%mass
-    _datasetMerge["ChargedHiggs_HplusTB_HplusToTauNu_IntermediateMassWithNeutral_M_%d"%(mass)] = "HplusTBintermediate_withNeutral_M%d"%mass # NB! Commented out to avoid merging of the WithNeutral samples that have been dropped out of the analysis
+    _datasetMerge["ChargedHiggs_HplusTB_HplusToTauNu_IntermediateMassWithNeutral_M_%d"%(mass)] = "HplusTBintermediate_withNeutral_M%d"%mass 
+# NB! Commented out to avoid merging of the WithNeutral samples that have been dropped out of the analysis
 
 #================================================================================================
 # Dataset ordering (default)
 #================================================================================================
+'''
+This defines the order in which the dataets will appear in the plots.
+The datasets high up in the _datasetOrder list will be plotted last in the MC stack.
+'''
 _datasetOrder = ["Data"]
 for process in ["TTToHplusBWB_M%d", "TTToHplusBHminusB_M%d", "TTToHplus_M%d", "Hplus_taunu_t-channel_M%d", "Hplus_taunu_tW-channel_M%d", "Hplus_taunu_s-channel_M%d", "Hplus_taunu_M%d", "TTOrTToHplus_M%d"]:
     for mass in _lightHplusMasses:
@@ -635,8 +609,8 @@ _datasetOrder.extend([
     "WJets_2bquark",
     "WJets_3bquark",
     "WJets",
-    "WJetsHT",
     "WToTauNu",
+    "WJetsHT",
     "TTJets",
     "TT",
     "TT_Mtt",
@@ -669,110 +643,104 @@ _datasetOrder.extend([
     "ZJetsToQQ_HT600toInf",
     ]) 
 
-# Map the logical dataset names to legend labels
+#================================================================================================
+# Mapping of logical dataset names  to legend labels (dataset->label)
+#================================================================================================
 _legendLabels = {
-    "Data"          : "Data",
-    "EWK"           : "Electroweak",
-    "Diboson"       : "Diboson",
-    "ttX"           : "t, tW, t#bar{t} + X",
-    "noTop"         : "No t",
-    "SingleTop"     : "Single t",
-    "QCD"           : "QCD multijet", #Mis-ID. #tau_{h} (data)",
-    "FakeB"         : "Fake b (data)",
-    "GenuineB"      : "Genuine b (MC)",
-    "QCD-b"         : "QCD (b enr.)",
-    "QCDdata"       : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
-    "TTJets"        : "t#bar{t}+jets",
-    "TT"            : "t#bar{t}",
-    "TTTT"          : "t#bar{t}t#bar{t}",
-    "Rares"         : "Rares",
-    "TTWJets"       : "t#bar{t}+W", # (W#rightarrowq#bar{q'})
-    "TTWJetsToQQ"   : "t#bar{t}+W (qq)", # (W#rightarrowq#bar{q'})
-    "TTWJetsToLNu"  : "t#bar{t}+W (l#nu)", # (W#rightarrowq#bar{q'})
-    "ttH"           : "t#bar{t}+H",
-    "ttHJetToTT"    : "t#bar{t}+H (#tau#bar{#tau})",
-    "ttHJetToGG"    : "t#bar{t}+H (gg",
-    "ttHJetTobb"    : "t#bar{t}+H (b#bar{b})",
-    "ttHJetToNonbb" : "t#bar{t}+H",
-    "TTZ"           : "t#bar{t}+Z",
-    "TTZToQQ"       : "t#bar{t}+Z (qq)", # (Z#rightarrowq#bar{q'})
-    "TTZToLL"       : "t#bar{t}+Z (ll)", 
-    "WWTo4Q"        : "WW",         # (W#rightarrowq#bar{q'})
-    'ZZTo4Q'        : "ZZ",         # (Z#rightarrowq#bar{q})
-    "TTBB"          : "t#bar{t}b#bar{b}",
-    "TTandSingleTop": "t#bar{t}+single top",
-    "DYJetsToLL"    : "Z/#gamma*+jets", #"DY+jets"
-    "DYJetsToLLHT"  : "Z/#gamma*+jets",
-    "DYJetsToQQHT"  : "Z/#gamma*+jets",
-
-    "WJetsToQQ_HT_600ToInf": "W+jets", #, 600 < H_{T} < Inf", # (W#rightarrowq#bar{q'})
-    "ZJetsToQQ_HT600toInf" : "Z+jets", #, 600 < H_{T} < Inf", # (Z#rightarrowq#bar{q})
-
-    "WJets"        : "W+jets",
-    "WJetsHT"      : "W+jets",
-    "WToTauNu"     : "W#rightarrow#tau#nu",
-    "W1Jets"       : "W+1 jets",
-    "W2Jets"       : "W+2 jets",
-    "W3Jets"       : "W+3 jets",
-    "W4Jets"       : "W+4 jets",
-    "WJets_0bquark": "W+jets (0 b)",
-    "WJets_1bquark": "W+jets (1 b)",
-    "WJets_2bquark": "W+jets (2 b)",
-    "WJets_3bquark": "W+jets (#geq3 b)",   
-
-    "QCD_Pt15to30"    : "QCD,   15 < #hat{p}_{T} <   30",
-    "QCD_Pt30to50"    : "QCD,   30 < #hat{p}_{T} <   50",
-    "QCD_Pt50to80"    : "QCD,   50 < #hat{p}_{T} <   80",
-    "QCD_Pt80to120"   : "QCD,   80 < #hat{p}_{T} <  120",
-    "QCD_Pt120to170"  : "QCD,  120 < #hat{p}_{T} <  170",
-    "QCD_Pt170to300"  : "QCD,  170 < #hat{p}_{T} <  300",
-    "QCD_Pt300to470"  : "QCD,  300 < #hat{p}_{T} <  470",
-    "QCD_Pt470to600"  : "QCD,  470 < #hat{p}_{T} <  600",
-    "QCD_Pt600to800"  : "QCD,  600 < #hat{p}_{T} <  800",
-    "QCD_Pt800to1000" : "QCD,  800 < #hat{p}_{T} < 1000",
-    "QCD_Pt1000to1400": "QCD, 1400 < #hat{p}_{T} < 1400",
-    "QCD_Pt1400to1800": "QCD, 1800 < #hat{p}_{T} < 1800",
-    "QCD_Pt1800to2400": "QCD, 2400 < #hat{p}_{T} < 2400",
-    "QCD_Pt2400to3200": "QCD, 3200 < #hat{p}_{T} < 3200",
-    "QCD_Pt3200toInf" : "QCD, #hat{p}_{T} > 3200",
-    
-    "QCD_Pt_15to30"    : "QCD,   15 < #hat{p}_{T} <   30",
-    "QCD_Pt_30to50"    : "QCD,   30 < #hat{p}_{T} <   50",
-    "QCD_Pt_50to80"    : "QCD,   50 < #hat{p}_{T} <   80",
-    "QCD_Pt_80to120"   : "QCD,   80 < #hat{p}_{T} <  120",
-    "QCD_Pt_120to170"  : "QCD,  120 < #hat{p}_{T} <  170",
-    "QCD_Pt_170to300"  : "QCD,  170 < #hat{p}_{T} <  300",
-    "QCD_Pt_300to470"  : "QCD,  300 < #hat{p}_{T} <  470",
-    "QCD_Pt_470to600"  : "QCD,  470 < #hat{p}_{T} <  600",
-    "QCD_Pt_600to800"  : "QCD,  600 < #hat{p}_{T} <  800",
-    "QCD_Pt_800to1000" : "QCD,  800 < #hat{p}_{T} < 1000",
-    "QCD_Pt_1000to1400": "QCD, 1400 < #hat{p}_{T} < 1400",
-    "QCD_Pt_1400to1800": "QCD, 1800 < #hat{p}_{T} < 1800",
-    "QCD_Pt_1800to2400": "QCD, 2400 < #hat{p}_{T} < 2400",
-    "QCD_Pt_2400to3200": "QCD, 3200 < #hat{p}_{T} < 3200",
-    "QCD_Pt_3200toInf" : "QCD, #hat{p}_{T} > 3200",
-
-    "QCD_bEnriched_HT100to200"   : "QCD-b,  100 < H_{T} <  200",
-    "QCD_bEnriched_HT200to300"   : "QCD-b,  200 < H_{T} <  300",
-    "QCD_bEnriched_HT300to500"   : "QCD-b,  300 < H_{T} <  500",
-    "QCD_bEnriched_HT500to700"   : "QCD-b,  500 < H_{T} <  700",
-    "QCD_bEnriched_HT700to1000"  : "QCD-b,  700 < H_{T} < 1500",
-    "QCD_bEnriched_HT1000to1500" : "QCD-b, 1000 < H_{T} < 1500",
-    "QCD_bEnriched_HT1500to2000" : "QCD-b, 1500 < H_{T} < 2000",
-    "QCD_bEnriched_HT2000toInf"  : "QCD-b, 2000 < H_{T} <  Inf",
-
-    "QCD_HT50to100"   : "QCD,   50 < H_{T} <   100",
-    "QCD_HT100to200"  : "QCD,  100 < H_{T} <   200",
-    "QCD_HT200to300"  : "QCD,  200 < H_{T} <   300",
-    "QCD_HT300to500"  : "QCD,  300 < H_{T} <   500",
-    "QCD_HT500to700"  : "QCD,  500 < H_{T} <   700",
-    "QCD_HT700to1000" : "QCD,  700 < H_{T} <  1000",
-    "QCD_HT1000to1500": "QCD, 1000 < H_{T} <  1500",
-    "QCD_HT1500to2000": "QCD, 1500 < H_{T} <  2000",
-    "QCD_HT2000toInf" : "QCD, 2000 < H_{T} <  Inf",
-
-    "QCD_Pt20_MuEnriched"          : "QCD (#mu enr.), #hat{p}_{T} >  20",
-
+    "Data"                 : "Data",
+    "EWK"                  : "Electroweak",
+    "Diboson"              : "Diboson",
+    "ttX"                  : "t, tW, t#bar{t} + X",
+    "noTop"                : "No t",
+    "SingleTop"            : "Single t",
+    "QCD"                  : "QCD multijet", #Mis-ID. #tau_{h} (data)",
+    "FakeB"                : "Fake b (data)",
+    "GenuineB"             : "Genuine b (MC)",
+    "QCD-b"                : "QCD (b enr.)",
+    "QCDdata"              : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
+    "TTJets"               : "t#bar{t}+jets",
+    "TT"                   : "t#bar{t}",
+    "TTTT"                 : "t#bar{t}t#bar{t}",
+    "Rares"                : "Rares",
+    "TTWJets"              : "t#bar{t}+W", # (W#rightarrowq#bar{q'})
+    "TTWJetsToQQ"          : "t#bar{t}+W (qq)", # (W#rightarrowq#bar{q'})
+    "TTWJetsToLNu"         : "t#bar{t}+W (l#nu)", # (W#rightarrowq#bar{q'})
+    "ttH"                  : "t#bar{t}+H",
+    "ttHJetToTT"           : "t#bar{t}+H (#tau#bar{#tau})",
+    "ttHJetToGG"           : "t#bar{t}+H (gg",
+    "ttHJetTobb"           : "t#bar{t}+H (b#bar{b})",
+    "ttHJetToNonbb"        : "t#bar{t}+H",
+    "TTZ"                  : "t#bar{t}+Z",
+    "TTZToQQ"              : "t#bar{t}+Z (qq)", # (Z#rightarrowq#bar{q'})
+    "TTZToLL"              : "t#bar{t}+Z (ll)", 
+    "WWTo4Q"               : "WW",         # (W#rightarrowq#bar{q'})
+    'ZZTo4Q'               : "ZZ",         # (Z#rightarrowq#bar{q})
+    "TTBB"                 : "t#bar{t}b#bar{b}",
+    "TTandSingleTop"       : "t#bar{t}+single top",
+    "DYJetsToLL"           : "Z/#gamma*+jets", #"DY+jets"
+    "DYJetsToLLHT"         : "Z/#gamma*+jets",
+    "DYJetsToQQHT"         : "Z/#gamma*+jets",
+    "WJets"                : "W+jets",
+    "WJetsHT"              : "W+jets",
+    "WToTauNu"             : "W#rightarrow#tau#nu",
+    "W1Jets"               : "W+1 jets",
+    "W2Jets"               : "W+2 jets",
+    "W3Jets"               : "W+3 jets",
+    "W4Jets"               : "W+4 jets",
+    "WJets_0bquark"        : "W+jets (0 b)",
+    "WJets_1bquark"        : "W+jets (1 b)",
+    "WJets_2bquark"        : "W+jets (2 b)",
+    "WJets_3bquark"        : "W+jets (#geq3 b)",   
+    "QCD_Pt15to30"         : "QCD,   15 < #hat{p}_{T} <   30",
+    "QCD_Pt30to50"         : "QCD,   30 < #hat{p}_{T} <   50",
+    "QCD_Pt50to80"         : "QCD,   50 < #hat{p}_{T} <   80",
+    "QCD_Pt80to120"        : "QCD,   80 < #hat{p}_{T} <  120",
+    "QCD_Pt120to170"       : "QCD,  120 < #hat{p}_{T} <  170",
+    "QCD_Pt170to300"       : "QCD,  170 < #hat{p}_{T} <  300",
+    "QCD_Pt300to470"       : "QCD,  300 < #hat{p}_{T} <  470",
+    "QCD_Pt470to600"       : "QCD,  470 < #hat{p}_{T} <  600",
+    "QCD_Pt600to800"       : "QCD,  600 < #hat{p}_{T} <  800",
+    "QCD_Pt800to1000"      : "QCD,  800 < #hat{p}_{T} < 1000",
+    "QCD_Pt1000to1400"     : "QCD, 1400 < #hat{p}_{T} < 1400",
+    "QCD_Pt1400to1800"     : "QCD, 1800 < #hat{p}_{T} < 1800",
+    "QCD_Pt1800to2400"     : "QCD, 2400 < #hat{p}_{T} < 2400",
+    "QCD_Pt2400to3200"     : "QCD, 3200 < #hat{p}_{T} < 3200",
+    "QCD_Pt3200toInf"      : "QCD, #hat{p}_{T} > 3200",
+    "WJetsToQQ_HT_600ToInf": "W+jets", 
+    "ZJetsToQQ_HT600toInf" : "Z+jets",
+    "QCD_Pt_15to30"        : "QCD,   15 < #hat{p}_{T} <   30",
+    "QCD_Pt_30to50"        : "QCD,   30 < #hat{p}_{T} <   50",
+    "QCD_Pt_50to80"        : "QCD,   50 < #hat{p}_{T} <   80",
+    "QCD_Pt_80to120"       : "QCD,   80 < #hat{p}_{T} <  120",
+    "QCD_Pt_120to170"      : "QCD,  120 < #hat{p}_{T} <  170",
+    "QCD_Pt_170to300"      : "QCD,  170 < #hat{p}_{T} <  300",
+    "QCD_Pt_300to470"      : "QCD,  300 < #hat{p}_{T} <  470",
+    "QCD_Pt_470to600"      : "QCD,  470 < #hat{p}_{T} <  600",
+    "QCD_Pt_600to800"      : "QCD,  600 < #hat{p}_{T} <  800",
+    "QCD_Pt_800to1000"     : "QCD,  800 < #hat{p}_{T} < 1000",
+    "QCD_Pt_1000to1400"    : "QCD, 1400 < #hat{p}_{T} < 1400",
+    "QCD_Pt_1400to1800"    : "QCD, 1800 < #hat{p}_{T} < 1800",
+    "QCD_Pt_1800to2400"    : "QCD, 2400 < #hat{p}_{T} < 2400",
+    "QCD_Pt_2400to3200"    : "QCD, 3200 < #hat{p}_{T} < 3200",
+    "QCD_Pt_3200toInf"     : "QCD, #hat{p}_{T} > 3200",
+    "QCD_bEnriched_HT100to200"       : "QCD-b,  100 < H_{T} <  200",
+    "QCD_bEnriched_HT200to300"       : "QCD-b,  200 < H_{T} <  300",
+    "QCD_bEnriched_HT300to500"       : "QCD-b,  300 < H_{T} <  500",
+    "QCD_bEnriched_HT500to700"       : "QCD-b,  500 < H_{T} <  700",
+    "QCD_bEnriched_HT700to1000"      : "QCD-b,  700 < H_{T} < 1500",
+    "QCD_bEnriched_HT1000to1500"     : "QCD-b, 1000 < H_{T} < 1500",
+    "QCD_bEnriched_HT1500to2000"     : "QCD-b, 1500 < H_{T} < 2000",
+    "QCD_bEnriched_HT2000toInf"      : "QCD-b, 2000 < H_{T} <  Inf",
+    "QCD_HT50to100"                  : "QCD,   50 < H_{T} <   100",
+    "QCD_HT100to200"                 : "QCD,  100 < H_{T} <   200",
+    "QCD_HT200to300"                 : "QCD,  200 < H_{T} <   300",
+    "QCD_HT300to500"                 : "QCD,  300 < H_{T} <   500",
+    "QCD_HT500to700"                 : "QCD,  500 < H_{T} <   700",
+    "QCD_HT700to1000"                : "QCD,  700 < H_{T} <  1000",
+    "QCD_HT1000to1500"               : "QCD, 1000 < H_{T} <  1500",
+    "QCD_HT1500to2000"               : "QCD, 1500 < H_{T} <  2000",
+    "QCD_HT2000toInf"                : "QCD, 2000 < H_{T} <  Inf",
+    "QCD_Pt20_MuEnriched"            : "QCD (#mu enr.), #hat{p}_{T} >  20",
     "QCD_Pt_15to20_MuEnrichedPt5"    : "QCD (#mu enr.), 15 < #hat{p}_{T} < 20",
     "QCD_Pt_20to30_MuEnrichedPt5"    : "QCD (#mu enr.), 20 < #hat{p}_{T} < 30",
     "QCD_Pt_30to50_MuEnrichedPt5"    : "QCD (#mu enr.), 30 < #hat{p}_{T} < 50",
@@ -785,39 +753,31 @@ _legendLabels = {
     "QCD_Pt_600to800_MuEnrichedPt5"  : "QCD (#mu enr.), 600 < #hat{p}_{T} < 800",
     "QCD_Pt_800to1000_MuEnrichedPt5" : "QCD (#mu enr.), 800 < #hat{p}_{T} < 1000",
     "QCD_Pt_1000toInf_MuEnrichedPt5" : "QCD (#mu enr.), 1000 < #hat{p}_{T} < Inf",
-    
-    "TToBLNu_s-channel" : "Single t (s channel)",
-    "TToBLNu_t-channel" : "Single t (t channel)",
-    "TToBLNu_tW-channel": "Single t (tW channel)",
-    "T_t-channel"       : "Single t (t channel)",
-    "Tbar_t-channel"    : "Single #ba_physicalMcAddr{t} (t channel)",
-    "T_tW-channel"      : "Single t (tW channel)",
-    "Tbar_tW-channel"   : "Single #bar{t} (tW channel)",
-    "T_s-channel"       : "Single t (s channel)",
-    "Tbar_s-channel"    : "Single #bar{t} (s channel)",
-
-    # Ratio uncertainties
-    "BackgroundStatError"    : "Stat. unc.",
-    "BackgroundSystError"    : "Syst. unc.",
-    "BackgroundStatSystError": "Stat.#oplussyst. unc.",
-    "MCStatError"            : "Sim. stat. unc.",
-    "MCSystError"            : "Sim. syst. unc.",
-    "MCStatSystError"        : "Sim. stat.#oplussyst. unc.",
-    "StatSystError"          : "Stat #oplus syst unc",
-    "PostFitError"           : "Post-fit unc."
+    "TToBLNu_s-channel"              : "Single t (s channel)",
+    "TToBLNu_t-channel"              : "Single t (t channel)",
+    "TToBLNu_tW-channel"             : "Single t (tW channel)",
+    "T_t-channel"                    : "Single t (t channel)",
+    "Tbar_t-channel"                 : "Single #ba_physicalMcAddr{t} (t channel)",
+    "T_tW-channel"                   : "Single t (tW channel)",
+    "Tbar_tW-channel"                : "Single #bar{t} (tW channel)",
+    "T_s-channel"                    : "Single t (s channel)",
+    "Tbar_s-channel"                 : "Single #bar{t} (s channel)",
+    "BackgroundStatError"            : "Stat. unc.",
+    "BackgroundSystError"            : "Syst. unc.",
+    "BackgroundStatSystError"        : "Stat.#oplussyst. unc.",
+    "MCStatError"                    : "Sim. stat. unc.",
+    "MCSystError"                    : "Sim. syst. unc.",
+    "MCStatSystError"                : "Sim. stat.#oplussyst. unc.",
+    "StatSystError"                  : "Stat #oplus syst unc",
+    "PostFitError"                   : "Post-fit unc."
     }
 
 for mass in _lightHplusMasses:
-    _legendLabels["TTToHplusBWB_M%d"%mass] = "H^{+}W^{-} m_{H^{#pm}}=%d GeV"%mass
+    _legendLabels["TTToHplusBWB_M%d"%mass]      = "H^{+}W^{-} m_{H^{#pm}}=%d GeV"%mass
     _legendLabels["TTToHplusBHminusB_M%d"%mass] = "H^{+}H^{-} m_{H^{#pm}}=%d GeV" % mass
-    _legendLabels["TTToHplus_M%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
-
-    #_legendLabels["Hplus_taunu_s-channel_M%d"%mass] = "t#rightarrowH^{+} (s) m_{H^{+}}=%d GeV" % mass
-    #_legendLabels["Hplus_taunu_t-channel_M%d"%mass] = "t#rightarrowH^{+} (t) m_{H^{+}}=%d GeV" % mass
-    #_legendLabels["Hplus_taunu_tW-channel_M%d"%mass] = "t#rightarrowH^{+} (tW) m_{H^{+}}=%d GeV" % mass
-    _legendLabels["Hplus_taunu_M%d"%mass] = "t#rightarrowH^{+} m_{H^{+}}=%d" % mass
-
-    _legendLabels["TTOrTToHplus_M%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
+    _legendLabels["TTToHplus_M%d"%mass]         = "H^{+} m_{H^{+}}=%d GeV" % mass
+    _legendLabels["Hplus_taunu_M%d"%mass]       = "t#rightarrowH^{+} m_{H^{+}}=%d" % mass
+    _legendLabels["TTOrTToHplus_M%d"%mass]      = "H^{+} m_{H^{+}}=%d GeV" % mass
 
 for mass in _intermediateHplusMasses:
     _legendLabels["TTToHplus_M%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
@@ -827,10 +787,8 @@ for mass in _heavyHplusMasses:
     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
 
 for mass in _heavyHplusToTBbarMasses:
-    #_legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} (%d GeV, #sigma = %.1f pb)" % (mass, xsect.getSignalCrossSection())
      _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{#pm} (%d GeV, #sigma#it{#Beta} = %.1f pb)" % (mass, xsect.getSignalCrossSection())
      _legendLabels["HplusToTBbar_M%d"%mass] = "H^{+}#rightarrowtb m_{H^{+}}=%d GeV" % mass
-
 
 _legendLabels["ChargedHiggs_HplusTB_HplusToHW_M1500_mH150_2ta_LO"] = "H^{+} (1500 GeV, #sigma#it{#Beta} = %.1f pb)" % (xsect.getSignalCrossSection())
 _legendLabels["ChargedHiggs_HplusTB_HplusToHW_M1500_mh125_2ta_LO"] = "H^{+} (1500 GeV, #sigma#it{#Beta} = %.1f pb)" % (xsect.getSignalCrossSection())
@@ -841,7 +799,12 @@ _legendLabels["ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO" ] = "H^{+} (350
 _legendLabels["ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO" ] = "H^{+} (350 GeV, #sigma#it{#Beta} = %.1f pb)"  % (xsect.getSignalCrossSection()) 
 
 
-## Map the logical dataset names to plot styles
+#================================================================================================
+# Dataset Styles
+#================================================================================================
+'''
+Map the logical dataset names to plot styles in a dataset->style dictionary
+'''
 _plotStyles = {
     "ChargedHiggs_HplusTB_HplusToTB_M_180"  : styles.signalStyleHToTB,
     "ChargedHiggs_HplusTB_HplusToTB_M_200"  : styles.signalStyleHToTB,
@@ -872,16 +835,17 @@ _plotStyles = {
     "ChargedHiggs_HplusTB_HplusToHW_M350_mH150_2ta_LO" : styles.signalStyleHToTB500,
     "ChargedHiggs_HplusTB_HplusToHW_M350_mh125_2ta_LO" : styles.signalStyleHToTB400,
 
-    "HplusTBintermediate_M145": styles.mcStyle,
+    "HplusTBintermediate_M145"            : styles.mcStyle,
     "HplusTBintermediate_withNeutral_M145": styles.mcStyle2,
-    "HplusTBintermediate_M165": styles.mcStyle,
+    "HplusTBintermediate_M165"            : styles.mcStyle,
     "HplusTBintermediate_withNeutral_M165": styles.mcStyle2,
-    "HplusTBintermediate_M170": styles.mcStyle,
+    "HplusTBintermediate_M170"            : styles.mcStyle,
     "HplusTBintermediate_withNeutral_M170": styles.mcStyle2,
-    "HplusTBintermediate_M175": styles.mcStyle,
+    "HplusTBintermediate_M175"            : styles.mcStyle,
     "HplusTBintermediate_withNeutral_M175": styles.mcStyle2,
-    "HplusTBintermediate_M200": styles.mcStyle,
+    "HplusTBintermediate_M200"            : styles.mcStyle,
     "HplusTBintermediate_withNeutral_M200": styles.mcStyle2,
+
     "DYJetsToLL"    : styles.dyStyle,
     "DYJetsToLLHT"  : styles.dyStyle,
     "DYJetsToQQHT"  : styles.dyStyle,
@@ -923,8 +887,7 @@ _plotStyles = {
     "WJets_2bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+3),
     "WJets_3bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed-7),
 
-    "QCD_Pt20_MuEnriched"          : styles.qcdStyle,
-    
+    "QCD_Pt20_MuEnriched"            : styles.qcdStyle,
     "QCD_Pt_15to20_MuEnrichedPt5"    : styles.qcdStyle,
     "QCD_Pt_20to30_MuEnrichedPt5"    : styles.qcdStyle,
     "QCD_Pt_30to50_MuEnrichedPt5"    : styles.qcdStyle,
@@ -938,9 +901,8 @@ _plotStyles = {
     "QCD_Pt_800to1000_MuEnrichedPt5" : styles.qcdStyle,
     "QCD_Pt_1000toInf_MuEnrichedPt5" : styles.qcdStyle,
     
-    "ZJetsToQQ_HT600toInf" : styles.zjetsStyle,
-    "WJetsToQQ_HT_600ToInf": styles.wjetsStyle,
-    
+    "ZJetsToQQ_HT600toInf"   : styles.zjetsStyle,
+    "WJetsToQQ_HT_600ToInf"  : styles.wjetsStyle,
     "Ratio"                  : styles.ratioStyle,
     "BackgroundStatError"    : styles.errorRatioStatStyle,
     "BackgroundSystError"    : styles.errorRatioSystStyle,
@@ -949,23 +911,20 @@ _plotStyles = {
     "RatioLine"              : styles.ratioLineStyle,
     }
 
-# Other
 _plotStyles["Embedding"] = _plotStyles["TTJets"].clone()
 for mass in _lightHplusMasses:
-    _plotStyles["TTToHplusBWB_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
-    _plotStyles["TTToHplusBHminusB_M%d"%mass] = getattr(styles, "signalHH%dStyle"%mass)
-    _plotStyles["TTToHplus_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
-
-    _plotStyles["Hplus_taunu_s-channel_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
-    _plotStyles["Hplus_taunu_t-channel_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
+    _plotStyles["TTToHplusBWB_M%d"%mass]           = getattr(styles, "signal%dStyle"%mass)
+    _plotStyles["TTToHplusBHminusB_M%d"%mass]      = getattr(styles, "signalHH%dStyle"%mass)
+    _plotStyles["TTToHplus_M%d"%mass]              = getattr(styles, "signal%dStyle"%mass)
+    _plotStyles["Hplus_taunu_s-channel_M%d"%mass]  = getattr(styles, "signal%dStyle"%mass)
+    _plotStyles["Hplus_taunu_t-channel_M%d"%mass]  = getattr(styles, "signal%dStyle"%mass)
     _plotStyles["Hplus_taunu_tW-channel_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
-    _plotStyles["Hplus_taunu_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
-
-    _plotStyles["TTOrTToHplus_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
+    _plotStyles["Hplus_taunu_M%d"%mass]            = getattr(styles, "signal%dStyle"%mass)
+    _plotStyles["TTOrTToHplus_M%d"%mass]           = getattr(styles, "signal%dStyle"%mass)
 
 for mass in _intermediateHplusMasses:
     _plotStyles["TTToHplus_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
-    _plotStyles["HplusTB_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
+    _plotStyles["HplusTB_M%d"%mass]   = getattr(styles, "signal%dStyle"%mass)
 
 for mass in _heavyHplusMasses:
     _plotStyles["HplusTB_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
@@ -1013,96 +972,106 @@ class SetProperty:
         self.properties = properties
         self.setter = setter
 
-    ## Set the property of a given object
-    #
-    # \param histoData   histograms.Histo object for which to set the property
-    #
-    # If there is no property to be set for a given histo, nothing is done to it
     def __call__(self, histoData):
+        '''
+        Set the property of a given object
+        
+        \param histoData   histograms.Histo object for which to set the property
+        
+        If there is no property to be set for a given histo, nothing is done to it
+        '''
         prop = self._getProperty(histoData.getName())
         if prop != None:
             self.setter(histoData, prop)
 
-    ## Get the property
-    #
-    # \param name  Name of the property
-    #
-    # \todo Replace this with self.properties.get(name, None)...
     def _getProperty(self, name):
+        '''
+        Get the property
+        
+        \param name  Name of the property
+        
+        \todo Replace this with self.properties.get(name, None)...
+        '''
         if name in self.properties:
             return self.properties[name]
         else:
             return None
 
-    ## \var properties
-    # Dictionary of properties (see __init__())
-    ## \var setter
-    # Function setting the property (see __init__())
-
-## Construct a "function" to set legend labels
-#
-# \param labels   Dictionary of labels (from the histo name to the legend label)
-#
-# \return   Object with implemented function call operator " to be used
-#           with histograms.HistoManagerImpl.forEachHisto().
 def SetLegendLabel(labels):
+    '''
+    Construct a "function" to set legend labels
+ 
+    \param labels   Dictionary of labels (from the histo name to the legend label)
+    
+    \return   Object with implemented function call operator " to be used
+    with histograms.HistoManagerImpl.forEachHisto().
+
+    '''
     return SetProperty(labels, lambda hd, label: hd.setLegendLabel(label))
 
-## Construct a "function" to set plot styles
-#
-# \param styleMap   Dictionary of styles (from the histo name to the style)
-#
-# \return   Object with implemented function call operator " to be used
-#           with histograms.HistoManagerImpl.forEachHisto().
 def SetPlotStyle(styleMap):
+    '''
+    Construct a "function" to set plot styles
+    
+    \param styleMap   Dictionary of styles (from the histo name to the style)
+    
+    \return   Object with implemented function call operator " to be used
+    with histograms.HistoManagerImpl.forEachHisto().
+    '''
     return SetProperty(styleMap, lambda hd, style: hd.call(style))
 
-## Construct a "function" to update some styles to filled
-#
-# \param styleMap       Dictionary of styles (from the histo name to the style)
-# \param namesToFilled  List of histogram names for which to apply the filled style
-#
-# \return   Object with implemented function call operator " to be used
-#           with histograms.HistoManagerImpl.forEachHisto().
-#
-# The filled style is implemented via style.StyleFill
 def UpdatePlotStyleFill(styleMap, namesToFilled):
+    '''
+    Construct a "function" to update some styles to filled
+    
+    \param styleMap       Dictionary of styles (from the histo name to the style)
+    \param namesToFilled  List of histogram names for which to apply the filled style
+    
+    \return   Object with implemented function call operator " to be used
+    with histograms.HistoManagerImpl.forEachHisto().
+
+    The filled style is implemented via style.StyleFill
+    '''
     def update(hd, style):
         if hd.getName() in namesToFilled:
             hd.call(styles.StyleFill(style))
 
     return SetProperty(styleMap, update)
 
-## Default dataset merging, naming and reordering for data/MC comparison
-#
-# \param datasetMgr     dataset.DatasetManager object
-# \param keepSourcesMC  If True, for MC keep also the merged dataset.Dataset objects in the dataset.DatasetManager (see dataset.DatasetManager.merge)
-#
-# Merges data datasets and the MC datasets as specified in
-# plots._datasetMerge. The intention is that the datasets to be merged
-# as one are kind of binned ones, and the final merged dataset forms a
-# logical entity. For example, data in multiple run periods, QCD in
-# pthat bins, single top in the separate channels, WW, WZ and ZZ for
-# diboson.
-#
-# Renames the datasets as specified in plots._physicalToLogical. The
-# intention is that the physical dataset names (i.e. the crab task
-# names in multicrab.cfg) can contain some rather specific information
-# (e.g. the pythia tune, MC production era) which is not that relevant
-# in actual plotting (i.e. TTJets in TuneZ2 and TuneD6T, and from
-# Fall10 and Winter10, all are logically TTJets sample). This choice
-# makes e.g. the plots._datasetMerge, plots._datasetOrder,
-# plots._legendLabels and plots._plotStyles shorter and more generic.
-#
-# Finally orders the datasets as specified in plots._datasetOrder. The
-# datasets not in the plots._datasetOrder list are left at the end in
-# the same order they were originally.
 def mergeRenameReorderForDataMC(datasetMgr, keepSourcesMC=False):
-    # print cross sections
-#    print "Merging data with mergeRenameReorderForDataMC method. The cross sections in use are:"
-#    datasetMgr.PrintCrossSections()
-    # merge data
+    '''
+    Default dataset merging, naming and reordering for data/MC comparison
+    
+    \param datasetMgr     dataset.DatasetManager object
+    \param keepSourcesMC  If True, for MC keep also the merged dataset.Dataset objects in the dataset.DatasetManager (see dataset.DatasetManager.merge)
+    
+    Merges data datasets and the MC datasets as specified in
+    plots._datasetMerge. The intention is that the datasets to be merged
+    as one are kind of binned ones, and the final merged dataset forms a
+    logical entity. For example, data in multiple run periods, QCD in
+    pthat bins, single top in the separate channels, WW, WZ and ZZ for
+    diboson.
+    
+    Renames the datasets as specified in plots._physicalToLogical. The
+    intention is that the physical dataset names (i.e. the crab task
+    names in multicrab.cfg) can contain some rather specific information
+    (e.g. the pythia tune, MC production era) which is not that relevant
+    in actual plotting (i.e. TTJets in TuneZ2 and TuneD6T, and from
+    Fall10 and Winter10, all are logically TTJets sample). This choice
+    makes e.g. the plots._datasetMerge, plots._datasetOrder,
+    plots._legendLabels and plots._plotStyles shorter and more generic.
+    
+    Finally orders the datasets as specified in plots._datasetOrder. The
+    datasets not in the plots._datasetOrder list are left at the end in
+    the same order they were originally.
+    '''
+    if 0:
+        print "Merging data with mergeRenameReorderForDataMC method. The cross sections in use are:"
+        datasetMgr.PrintCrossSections()
+
+    # Merge data
     datasetMgr.mergeData(allowMissingDatasets=True)
+
     # check that _ext* datasets are defined to be added in _physicalMcAdd
     for datasetName in datasetMgr.getAllDatasetNames():
         if "_ext" in datasetName and datasetName not in _physicalMcAdd.keys():
@@ -1110,15 +1079,15 @@ def mergeRenameReorderForDataMC(datasetMgr, keepSourcesMC=False):
 in _physicalMcAdd (see python/tools/plots.py). This may lead to incorrect \
 normalization of background! \033[00m"""%datasetName
             raw_input("Press Enter to continue...")
+
     # merge XX_ext* datasets into XX datasets according to (_physicalMcAdd)
-#    print "DEBUG: Datasets before _physicalMcAdd:"
-#    print datasetMgr.getAllDatasetNames()
-#    print "\n"
+    if 0:
+        print "Datasets before _physicalMcAdd:", datasetMgr.getAllDatasetNames()
     datasetMgr.mergeMany(_physicalMcAdd, addition=True)
-#    print "DEBUG: Datasets after _physicalMcAdd:"
-#    print datasetMgr.getAllDatasetNames()
-#    print "\n"
-    # rename the datasets (according to _physicalToLogical and _physicalToLogical)
+    if 0:
+        print "Datasets after _physicalMcAdd:", datasetMgr.getAllDatasetNames()
+
+    # Rename the datasets (according to _physicalToLogical and _physicalToLogical)
     datasetMgr.renameMany(_physicalToLogical, silent=True)
     datasetMgr.mergeMany(_datasetMerge, keepSources=keepSourcesMC)
 
@@ -1133,21 +1102,26 @@ normalization of background! \033[00m"""%datasetName
             pass
     newOrder.extend(mcNames)
     datasetMgr.selectAndReorder(newOrder)
+    return
 
-
-## Merge WH and HH datasets for each mass point
-#
-# The dataset names to be merged are defined in plots._ttSignalMerge list
 def mergeWHandHH(datasetMgr):
+    '''
+    Merge WH and HH datasets for each mass point
+
+    The dataset names to be merged are defined in plots._ttSignalMerge list
+    '''
     datasetMgr.mergeMany(_ttSignalMerge)
+    return
 
 def mergeSingleTopHplus(datasetMgr):
     datasetMgr.mergeMany(_tSignalMerge)
+    return
 
 def mergeLightHplus(datasetMgr):
     mergeWHandHH(datasetMgr)
     mergeSingleTopHplus(datasetMgr)
     datasetMgr.mergeMany(_lightSignalMerge)    
+    return
 
 def replaceLightHplusWithSignalPlusBackground(datasetMgr, backgroundsWithoutTT=None):
     if backgroundsWithoutTT is None:
@@ -1156,7 +1130,7 @@ def replaceLightHplusWithSignalPlusBackground(datasetMgr, backgroundsWithoutTT=N
     signalDatasetNames = filter(lambda name: "TTToHplus_M" in name, datasetMgr.getAllDatasetNames())
     if len(signalDatasetNames) == 0:
         raise Exception("Did not find any light H+ signal dataset (containing 'TTToHplus_M' string), maybe something is wrong in your datasets? List of available datasets: %s" % ", ".join(datasetMgr.getAllDatasetNames()))
-
+    
     def extractBR(dset):
         try:
             tmp = dset.getProperty("BRtH")
@@ -1190,7 +1164,7 @@ def replaceLightHplusWithSignalPlusBackground(datasetMgr, backgroundsWithoutTT=N
             datasetMgr.remove(name, close=False)
         datasetMgr.rename(name+"Tmp", name)
         _legendLabels[name] = "with H^{+}#rightarrowH_{SM}W"
-
+    return
 
 def replaceQCDFromData(datasetMgr, datasetQCDdata):
     names = datasetMgr.getAllDatasetNames()
@@ -1200,20 +1174,24 @@ def replaceQCDFromData(datasetMgr, datasetQCDdata):
     datasetMgr.remove("QCD")
     datasetMgr.append(datasetQCDdata)
     datasetMgr.selectAndReorder(names)
+    return
 
-## Creates a ratio histogram
-#
-# \param rootHisto1  TH1/TGraph dividend
-# \param rootHisto2  TH1/TGraph divisor
-# \param ytitle      Y axis title of the final ratio histogram
-# \param isBinomial  True if the division has a binomial nature (e.g. efficnecy). Supported only for TH1s
-#
-# \return TH1 of rootHisto1/rootHisto2
-#
-# If the ratio has a binomial nature, the uncertainty estimation is
-# done via TGraphAsymmErrors and Clopper-Pearson method (one of the
-# methods recommended by statistics committee).
 def _createRatio(rootHisto1, rootHisto2, ytitle, isBinomial=False):
+    '''
+    Creates a ratio histogram
+    
+    \param rootHisto1  TH1/TGraph dividend
+    \param rootHisto2  TH1/TGraph divisor
+    \param ytitle      Y axis title of the final ratio histogram
+    \param isBinomial  True if the division has a binomial nature (e.g. efficnecy). Supported only for TH1s
+    
+    \return TH1 of rootHisto1/rootHisto2
+    
+    If the ratio has a binomial nature, the uncertainty estimation is
+    done via TGraphAsymmErrors and Clopper-Pearson method (one of the
+    methods recommended by statistics committee).
+    '''
+
     if isBinomial:
         function = _createRatioBinomial
     else:
@@ -1241,17 +1219,19 @@ def _createRatioHistos(histo1, histo2, ytitle, ratioType=None, ratioErrorOptions
         raise Exception("Invalid value for argument ratioType '%s', valid are 'errorPropagation', 'binomial', 'errorScale', 'errorScalePaper'")
     return ret        
 
-## Creates a ratio histogram by propagating the uncertainties to the ratio
-#
-# \param histo1  TH1/TGraph/RootHistoWithUncertainties dividend
-# \param histo2  TH1/TGraph/RootHistoWithUncertainties divisor
-# \param ytitle  Y axis title of the final ratio histogram/graph
-#
-# \return TH1 or TGraphAsymmErrors of histo1/histo2
-#
-# In case of asymmetric uncertainties, the uncertainties are added in
-# quadrature for both sides separately (a rather crude approximation).
 def _createRatioErrorPropagation(histo1, histo2, ytitle, returnHisto=False):
+    '''
+    Creates a ratio histogram by propagating the uncertainties to the ratio
+    
+    \param histo1  TH1/TGraph/RootHistoWithUncertainties dividend
+    \param histo2  TH1/TGraph/RootHistoWithUncertainties divisor
+    \param ytitle  Y axis title of the final ratio histogram/graph
+    
+    \return TH1 or TGraphAsymmErrors of histo1/histo2
+    
+    In case of asymmetric uncertainties, the uncertainties are added in
+    quadrature for both sides separately (a rather crude approximation).
+    '''
     if isinstance(histo1, ROOT.TH1) and isinstance(histo2, ROOT.TH1):
         ratio = histo1.Clone()
         ratio.SetDirectory(0)
@@ -1351,10 +1331,13 @@ def _createRatioErrorPropagation(histo1, histo2, ytitle, returnHisto=False):
         raise Exception("Arguments are of unsupported type, histo1 is %s and histo2 is %s" % (histo1.__class__.__name__, histo2.__class__.__name__))
 
 
-## Removes non-common points of two graph
-#
-# Non-commonality is defined with the X value.
 def _graphRemoveNoncommonPoints(graph1, graph2):
+    '''
+    Removes non-common points of two graph
+    
+    Non-commonality is defined with the X value.
+    '''
+
     ret1 = graph1.Clone()
     ret2 = graph2.Clone()
     xfound = []
@@ -1388,18 +1371,20 @@ def _graphRemoveNoncommonPoints(graph1, graph2):
 
     return (ret1, ret2)
 
-## Creates a ratio histogram by binomial assumption
-#
-# \param histo1  TH1 dividend
-# \param histo2  TH1 divisor
-# \param ytitle  Y axis title
-#
-# \return TGraphAsymmErrors of histo1/histo2
-#
-# The uncertainty estimation is done via TGraphAsymmErrors and
-# Clopper-Pearson method (one of the methods recommended by statistics
-# committee).
 def _createRatioBinomial(histo1, histo2, ytitle):
+    '''
+    Creates a ratio histogram by binomial assumption
+    
+    \param histo1  TH1 dividend
+    \param histo2  TH1 divisor
+    \param ytitle  Y axis title
+    
+    \return TGraphAsymmErrors of histo1/histo2
+    
+    The uncertainty estimation is done via TGraphAsymmErrors and
+    Clopper-Pearson method (one of the methods recommended by statistics
+    committee).
+    '''
     if isinstance(histo1, ROOT.TH1) and isinstance(histo2, ROOT.TH1):
         if histograms.uncertaintyNode != histograms.Uncertainty.StatOnly:
             print >>sys.stderr, "Warning: uncertainty mode is not 'StatOnly' (but %s). Nevertheless, the binomial uncertainty is calculated incorporating the uncertainty from the number of events in the input histograms" % (histograms.uncertaintyMode.getName())
@@ -1413,23 +1398,23 @@ def _createRatioBinomial(histo1, histo2, ytitle):
     else:
         raise Exception("Arguments are of unsupported type, histo1 is %s and histo2 is %s" % (histo1.__class__.__name__, histo2.__class__.__name__))
 
-## Creates ratio histograms by scaling everything to the divisor value
-#
-# \param histo1  TH1 dividend
-# \param histo2  TH1 divisor
-# \param ytitle  Y axis title
-# \param numeratorStatSyst   Include stat.+syst. to numerator (if syst globally enabled)
-# \param denominatorStatSyst Include stat.+syst. to denominator (if syst globally enabled)
-#
-# \return list of histograms.Histo objects for histo1/histo2
-#
-# Scales the histo1 values+uncertainties, and histo2 uncertainties by
-# histo2 values. Creates separate entries for histo2 statistical and
-# stat+syst uncertainties, if systematic uncertainties exist.
 def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True, denominatorStatSyst=True, numeratorOriginatesFromTH1=False, paperStyle=False):
+    '''
+    Creates ratio histograms by scaling everything to the divisor value
+    
+    \param histo1  TH1 dividend
+    \param histo2  TH1 divisor
+    \param ytitle  Y axis title
+    \param numeratorStatSyst   Include stat.+syst. to numerator (if syst globally enabled)
+    \param denominatorStatSyst Include stat.+syst. to denominator (if syst globally enabled)
+    
+    \return list of histograms.Histo objects for histo1/histo2
+    
+    Scales the histo1 values+uncertainties, and histo2 uncertainties by
+    histo2 values. Creates separate entries for histo2 statistical and
+    stat+syst uncertainties, if systematic uncertainties exist.
+    '''
     addAlsoHatchedUncertaintyHisto = False
-    #addAlsoHatchedUncertaintyHisto = True
-
     ret = []
 
     if (isinstance(histo1, ROOT.TH1) or isinstance(histo1, ROOT.TGraph)) and \
@@ -1553,12 +1538,12 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         # For numerator (foreground)
         ratioWrapped.asRatio()
         # For denominator (background)
-        xvalues = []
+        xvalues  = []
         xerrhigh = []
-        xerrlow = []
-        yvalues = []
+        xerrlow  = []
+        yvalues  = []
         yerrhigh = []
-        yerrlow = []
+        yerrlow  = []
         for bin in xrange(h2.begin(), h2.end()): # important to use h2 because of TGraph logic
             (scale, ylow, yhigh) = h2.yvalues(bin)
             (xval, xlow, xhigh) = h2.xvalues(bin)
@@ -1662,56 +1647,62 @@ def _divideOrZero(numerator, denominator):
         return 0
     return numerator/denominator
 
-## Creates a horizontal line
-#
-# \param xmin    Minimum x value
-# \param xmax    Maximum x value
-# \param yvalue  Y value
-#
-# \return TGraph of line from (xmin, yvalue) to (xmax, yvalue)
-#
-# First use case: 1-line for ratio plots
 def _createRatioLine(xmin, xmax, yvalue=1.0):
+    '''
+    Creates a horizontal line
+    
+    \param xmin    Minimum x value
+    \param xmax    Maximum x value
+    \param yvalue  Y value
+    
+    \return TGraph of line from (xmin, yvalue) to (xmax, yvalue)
+    
+    First use case: 1-line for ratio plots
+    '''
     line = ROOT.TGraph(2, array.array("d", [xmin, xmax]), array.array("d", [yvalue, yvalue]))
     _plotStyles["RatioLine"].apply(line)
     return line
 
-## Creates a cover pad
-#
-# \param xmin  X left coordinate
-# \param ymin  Y lower coordinate
-# \param xmax  X right coordinate
-# \param ymax  Y upper coordinate
-#
-# If distributions and data/MC ratios are plotted on the same TCanvas
-# such that the lower X axis of distributions TPad and the upper X
-# axis of the ratio TPad coincide, the Y axis labels of the two TPads
-# go on top of each others and it may happen that the greatest Y axis
-# value of the lower TPad is directly on top of the smallest Y axis
-# value of the upper TPad.
-#
-# This function can be used to create a blank TPad which is drawn
-# after the lower TPad Y axis and before the upper TPad Y axis. Then
-# only the smallest Y axis value of the upper TPad is drawn.
-#
-# See plots.DataMCPlot.draw() and plots.ComparisonPlot.draw() for
-# examples.
-#
-# \return TPad 
 def _createCoverPad(xmin=0.065, ymin=0.285, xmax=0.158, ymax=0.33):
+    '''
+    Creates a cover pad
+    
+    \param xmin  X left coordinate
+    \param ymin  Y lower coordinate
+    \param xmax  X right coordinate
+    \param ymax  Y upper coordinate
+    
+    If distributions and data/MC ratios are plotted on the same TCanvas
+    such that the lower X axis of distributions TPad and the upper X
+    axis of the ratio TPad coincide, the Y axis labels of the two TPads
+    go on top of each others and it may happen that the greatest Y axis
+    value of the lower TPad is directly on top of the smallest Y axis
+    value of the upper TPad.
+    
+    This function can be used to create a blank TPad which is drawn
+    after the lower TPad Y axis and before the upper TPad Y axis. Then
+    only the smallest Y axis value of the upper TPad is drawn.
+    
+    See plots.DataMCPlot.draw() and plots.ComparisonPlot.draw() for
+    examples.
+    
+    \return TPad 
+    '''
     coverPad = ROOT.TPad("coverpad", "coverpad", xmin, ymin, xmax, ymax)
     coverPad.SetBorderMode(0)
     return coverPad
 
-## Create cut box and/or line
-#
-# \param frame      TH1 representing the frame
-# \param cutValue   Value of the cut
-# \param fillColor  Fill color for the box
-# \param box        If true, draw cut box
-# \param line       If true, draw cut line
-# \param kwargs     Keyword arguments (\a lessThan or \a greaterThan, forwarded to histograms.isLessThan())
 def _createCutBoxAndLine(frame, cutValue, fillColor=18, box=True, line=True, **kwargs):
+    '''
+    Create cut box and/or line
+    
+    \param frame      TH1 representing the frame
+    \param cutValue   Value of the cut
+    \param fillColor  Fill color for the box
+    \param box        If true, draw cut box
+    \param line       If true, draw cut line
+    \param kwargs     Keyword arguments (\a lessThan or \a greaterThan, forwarded to histograms.isLessThan())
+    '''
     xmin = frame.GetXaxis().GetXmin()
     xmax = frame.GetXaxis().GetXmax()
     ymin = frame.GetYaxis().GetXmin()
@@ -1738,15 +1729,17 @@ def _createCutBoxAndLine(frame, cutValue, fillColor=18, box=True, line=True, **k
 
     return ret
 
-## Create cut box and/or line
-#
-# \param frame      TH1 representing the frame
-# \param cutValue   Value of the cut
-# \param fillColor  Fill color for the box
-# \param box        If true, draw cut box
-# \param line       If true, draw cut line
-# \param kwargs     Keyword arguments (\a lessThan or \a greaterThan, forwarded to histograms.isLessThan())
 def _createCutBoxAndLineY(frame, cutValue, fillColor=18, fillStyle=3001, box=True, line=True, mirror=False, **kwargs):
+    '''
+    Create cut box and/or line
+    
+    \param frame      TH1 representing the frame
+    \param cutValue   Value of the cut
+    \param fillColor  Fill color for the box
+    \param box        If true, draw cut box
+    \param line       If true, draw cut line
+    \param kwargs     Keyword arguments (\a lessThan or \a greaterThan, forwarded to histograms.isLessThan())
+    '''
     xmin = frame.GetXaxis().GetXmin()
     xmax = frame.GetXaxis().GetXmax()
     ymin = cutValue
@@ -1784,11 +1777,13 @@ def _createCutBoxAndLineY(frame, cutValue, fillColor=18, fillStyle=3001, box=Tru
         
     return ret
 
-## Helper function for creating a histograms.Histo object from a ROOT object based on the ROOT object type
-#
-# \param rootObject   ROOT object (TH1 or TGraph)
-# \param kwargs       Keyword arguments (forwarded to histograms.Histo.__init__() or histograms.HistoGraph.__init__())
 def _createHisto(rootObject, **kwargs):
+    '''
+    Helper function for creating a histograms.Histo object from a ROOT object based on the ROOT object type
+    
+    \param rootObject   ROOT object (TH1 or TGraph)
+    \param kwargs       Keyword arguments (forwarded to histograms.Histo.__init__() or histograms.HistoGraph.__init__())
+    '''
     if isinstance(rootObject, ROOT.TH1) or isinstance(rootObject, dataset.RootHistoWithUncertainties):
         return histograms.Histo(rootObject, rootObject.GetName(), **kwargs)
     elif isinstance(rootObject, ROOT.TGraph):
@@ -1800,14 +1795,16 @@ def _createHisto(rootObject, **kwargs):
 
     return rootObject
 
-## Helper function for partially blinding a plot
-#
-# \param plot              PlotBase (or derived) object
-# \param maxShownValue     If not None, the maximum value to be shown
-# \param minShownValue     If not None, the minimum value to be shown
-# \param invert            Invert the selection (from [min, max] to [-inf, min], [max, inf])
-# \param moveBlinededText  Dictionary for movinge the blinding text (forwarded to histograms.PlotTextBox.move())
 def partiallyBlind(plot, maxShownValue=None, minShownValue=None, invert=False, moveBlindedText={}):
+    '''
+    Helper function for partially blinding a plot
+    
+    \param plot              PlotBase (or derived) object
+    \param maxShownValue     If not None, the maximum value to be shown
+    \param minShownValue     If not None, the minimum value to be shown
+    \param invert            Invert the selection (from [min, max] to [-inf, min], [max, inf])
+    \param moveBlinededText  Dictionary for movinge the blinding text (forwarded to histograms.PlotTextBox.move())
+    '''
     if not plot.histoMgr.hasHisto("Data"):
         return
 
@@ -1840,24 +1837,29 @@ def partiallyBlind(plot, maxShownValue=None, minShownValue=None, invert=False, m
     tb.addText("signal region")
     tb.move(**moveBlindedText)
     plot.appendPlotObject(tb)
+    return
 
 
-## Base class for plots
-#
-# This class can also be used as for plots which don't need the
-# features provided by the derived classes. E.g. for plots without the
-# need for ratio pad, or stacking of MC histograms, this class is perfect.
-#
-# In addition of the plot histograms/graphs, the class also provides
-# hooks for other objects (lines, arrows, text, whatever implementing
-# Draw() method) to be drawn before and after the plot
-# histograms/graphs.
 class PlotBase:
-    ## Construct plot from DatasetManager and histogram name
-    #
-    # \param datasetRootHistos  List of dataset.DatasetRootHistoBase or histograms.Histo or TH1/TGraph objects to plot
-    # \param saveFormats        List of suffixes for formats for which to save the plot
+    '''
+    Base class for plots
+    
+    This class can also be used as for plots which don't need the
+    features provided by the derived classes. E.g. for plots without the
+    need for ratio pad, or stacking of MC histograms, this class is perfect.
+    
+    In addition of the plot histograms/graphs, the class also provides
+    hooks for other objects (lines, arrows, text, whatever implementing
+    Draw() method) to be drawn before and after the plot
+    histograms/graphs.
+    '''
     def __init__(self, datasetRootHistos=[], saveFormats=[".png", ".pdf", ".C"]):
+        '''
+        Construct plot from DatasetManager and histogram name
+        
+        \param datasetRootHistos  List of dataset.DatasetRootHistoBase or histograms.Histo or TH1/TGraph objects to plot
+        \param saveFormats        List of suffixes for formats for which to save the plot
+        '''
         # Create the histogram manager
         if len(datasetRootHistos) > 0:
             if isinstance(datasetRootHistos[0], dataset.DatasetRootHistoBase):
@@ -1890,18 +1892,18 @@ class PlotBase:
 
         # Save the format
         self.saveFormats = saveFormats
-
         self.plotObjectsBefore = []
-        self.plotObjectsAfter = []
-
+        self.plotObjectsAfter  = []
         self.drawOptions = {}
 
-    ## Set the default legend styles
-    #
-    # Default is "F", except for data "PLE" and for signal MC "L"
-    # 
-    # Intended to be called from the deriving classes
     def _setLegendStyles(self):
+        '''
+        Set the default legend styles
+        
+        Default is "F", except for data "PLE" and for signal MC "L"
+         
+        Intended to be called from the deriving classes
+        '''
         self.histoMgr.setHistoLegendStyleAll("F")
         for h in self.histoMgr.getHistos():
             if h.isData():
@@ -1909,20 +1911,24 @@ class PlotBase:
             elif isSignal(h.getName()):
                 h.setLegendStyle("L")
 
-    ## Set the default legend labels
-    #
-    # Labels are taken from the plots._legendLabels dictionary
-    #
-    # Intended to be called from the deriving classes
     def _setLegendLabels(self):
+        '''
+        Set the default legend labels
+        
+        Labels are taken from the plots._legendLabels dictionary
+        
+        Intended to be called from the deriving classes
+        '''
         self.histoMgr.forEachHisto(SetLegendLabel(_legendLabels))
 
-    ## Set the default plot styles
-    #
-    # Styles are taken from the plots._plotStyles dictionary
-    #
-    # Intended to be called from the deriving classes
     def _setPlotStyles(self):
+        '''
+        Set the default plot styles
+        
+        Styles are taken from the plots._plotStyles dictionary
+    
+        Intended to be called from the deriving classes
+        '''
         self.histoMgr.forEachHisto(SetPlotStyle(_plotStyles))
         if self.histoMgr.hasHisto("Data"):
             self.histoMgr.setHistoDrawStyle("Data", "EP")
