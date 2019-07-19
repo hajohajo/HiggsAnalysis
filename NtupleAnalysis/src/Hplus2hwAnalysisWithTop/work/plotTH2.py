@@ -12,9 +12,10 @@ EXAMPLES:
 ./plotTH2.py -m Hplus2tbAnalysis_3bjets40_MVA0p80_MVA0p80_TopMassCutOff600GeV_180112_023556 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeToLumi --logZ 
 ./plotTH2.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeToLumi --logZ 
 
+
 LAST USED:
-./plotTH2.py -m Hplus2hwAnalysis_AngularCuts_No2016B_02July2019 --folder AngularCuts_Collinear --gridX --gridY --dataset TT --normalizeToOne --logZ
-./plotTH2.py -m Hplus2hwAnalysis_AngularCuts_No2016B_02July2019 --folder AngularCuts_BackToBack --gridX --gridY --dataset TT --normalizeToOne --logZ
+./plotTH2.py --folder AngularCuts_Collinear --gridX --gridY --dataset TT --normalizeToOne --logZ -s png -m Hplus2hwAnalysisWithTop_LooseTauID_NoBDTGm1p0_19July2019
+./plotTH2.py --folder AngularCuts_BackToBack --gridX --gridY --dataset TT --normalizeToOne --logZ -s png -m Hplus2hwAnalysisWithTop_LooseTauID_NoBDTGm1p0_19July2019
 
 '''
 
@@ -39,6 +40,7 @@ import HiggsAnalysis.NtupleAnalysis.tools.counter as counter
 import HiggsAnalysis.NtupleAnalysis.tools.tdrstyle as tdrstyle
 import HiggsAnalysis.NtupleAnalysis.tools.styles as styles
 import HiggsAnalysis.NtupleAnalysis.tools.plots as plots
+import HiggsAnalysis.NtupleAnalysis.tools.systematics as systematics
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
 import HiggsAnalysis.NtupleAnalysis.tools.crosssection as xsect
 import HiggsAnalysis.NtupleAnalysis.tools.multicrabConsistencyCheck as consistencyCheck
@@ -214,8 +216,9 @@ def GetHistoKwargs(h, opts):
         yMin    =  1
     yMaxF       = 10
     zMin        =  0
-    zMax        = None
+    zMax        = 0.1 #None
     zLabel      = "z-axis"
+
     if opts.normalizeToLumi:
         zLabel  = "Events"
         zMin    = 1e0
@@ -227,8 +230,13 @@ def GetHistoKwargs(h, opts):
     else:
         zLabel = "Unknown"
     cutBox      = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True} #box = True works
-    cutBoxY     = {"cutValue": 200.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True,
-                   "mainCanvas": True, "ratioCanvas": False} # box = True not working
+    cutBoxY     = {"cutValue": 200.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
+    if "_vs_" not in h.lower():
+        yLabel = zLabel
+    else:
+        yLabel = None
+                   
     kwargs = {
         "stackMCHistograms": False,
         "addMCUncertainty" : False,
@@ -243,8 +251,23 @@ def GetHistoKwargs(h, opts):
         "cutBox"           : cutBox,
         "cutBoxY"          : cutBoxY,
         "moveLegend"       : {"dx": -2.0, "dy": 0.0, "dh": -100.0}, #hack to remove legend (tmp)
-        "zlabel"           : zLabel
+        "ylabel"           : yLabel,
+        "zlabel"           : zLabel,
         }
+
+
+
+    if "transversemass" in h.lower():
+        kwargs["rebinX"]  = 4 #systematics._dataDrivenCtrlPlotBinning["TransverseMass*"] 
+        ROOT.gStyle.SetNdivisions(6, "X")
+        
+    if "AngularCutsDeltaPhi" in h and "_Vs_" in h:
+        kwargs["rebinX"]  = 4
+        kwargs["rebinY"]  = 4
+        kwargs["opts"]    = {"xmax": +180.0, "ymax": 180}
+        #ROOT.gStyle.SetNdivisions(8, "X")
+        #ROOT.gStyle.SetNdivisions(8, "Y")
+
 
     if "Collinear" in h:
         units             = "#circ"
@@ -271,7 +294,7 @@ def GetHistoKwargs(h, opts):
         #ROOT.gStyle.SetNdivisions(8, "Y")        
 
 
-    if "LdgTrijetPt_Vs_LdgTrijetDijetPt" in h:
+    if "LdgTopPt_Vs_LdgTopDijetPt" in h:
         units             = "(GeV/c)"
         kwargs["xlabel"]  = "p_{T}^{jjb} " + units
         kwargs["ylabel"]  = "p_{T}^{jj} " + units
@@ -285,7 +308,7 @@ def GetHistoKwargs(h, opts):
         ROOT.gStyle.SetNdivisions(8, "X")
         ROOT.gStyle.SetNdivisions(8, "Y")
         
-    if "SubldgTrijetPt_Vs_SubldgTrijetDijetPt" in h:
+    if "SubldgTopPt_Vs_SubldgTopDijetPt" in h:
         units             = "(GeV/c)"
         kwargs["xlabel"]  = "p_{T}^{jjb} " + units
         kwargs["ylabel"]  = "p_{T}^{jj} " + units
@@ -325,6 +348,8 @@ def Plot2dHistograms(datasetsMgr, histoName):
     # Customise z-axis
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitle(kwargs["zlabel"]))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitleOffset(1.3))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(1.2))
+
     if kwargs.get("zmin") != None:
         zMin = float(kwargs.get("zmin"))
         p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMinimum(zMin))
@@ -342,31 +367,50 @@ def Plot2dHistograms(datasetsMgr, histoName):
     plots.drawPlot(p, saveName, **kwargs) #the "**" unpacks the kwargs_ dictionary
 
     # Save the plots in custom list of saveFormats
-    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder, opts.dataset), [".png", ".pdf"] )
+    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder, opts.dataset), opts.saveFormats)
     return
 
 
-def SavePlot(plot, plotName, saveDir, saveFormats = [".png", ".pdf"]):
-    Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
-
-    # Check that path exists
+def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
     if not os.path.exists(saveDir):
         os.makedirs(saveDir)
 
     # Create the name under which plot will be saved
-    name = plotName.replace("/", "_").replace(" ", "").replace("(", "").replace(")", "") 
-    saveName = os.path.join(saveDir, name)
+    saveName = os.path.join(saveDir, plotName.replace("/", "_"))
+    saveName = saveName.replace(" ", "_")
+    saveName = saveName.replace(")", "")
+    saveName = saveName.replace("(", "")
 
     # For-loop: All save formats
     for i, ext in enumerate(saveFormats):
         saveNameURL = saveName + ext
         saveNameURL = aux.convertToURL(saveNameURL, opts.url)
-        if opts.url:
-            Verbose(saveNameURL, i==0)
-        else:
-            Verbose(saveName + ext, i==0)
+        Verbose(saveNameURL, i==0)
         plot.saveAs(saveName, formats=saveFormats)
     return
+
+
+# def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
+#     Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
+# 
+#     # Check that path exists
+#     if not os.path.exists(saveDir):
+#         os.makedirs(saveDir)
+# 
+#     # Create the name under which plot will be saved
+#     name = plotName.replace("/", "_").replace(" ", "").replace("(", "").replace(")", "") 
+#     saveName = os.path.join(saveDir, name)
+# 
+#     # For-loop: All save formats
+#     for i, ext in enumerate(saveFormats):
+#         saveNameURL = saveName + ext
+#         saveNameURL = aux.convertToURL(saveNameURL, opts.url)
+#         if opts.url:
+#             Verbose(saveNameURL, i==0)
+#         else:
+#             Verbose(saveName + ext, i==0)
+#         plot.saveAs(saveName, formats=saveFormats)
+#     return
 
 
 #================================================================================================ 
@@ -409,6 +453,7 @@ if __name__ == "__main__":
     NORM2ONE     = False
     NORM2XSEC    = False
     NORM2LUMI    = False
+    SAVEFORMATS  = "pdf,png,C"
 
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -479,6 +524,10 @@ if __name__ == "__main__":
     parser.add_option("--normalizeToLumi", dest="normalizeToLumi", action="store_true", default=NORM2LUMI,
                       help="Normalise plot to luminosity [default: %s]" % NORM2LUMI)
 
+    parser.add_option("-s", "--saveFormats", dest="saveFormats", default = SAVEFORMATS,
+                      help="Save formats for all plots [default: %s]" % SAVEFORMATS)
+
+
     (opts, parseArgs) = parser.parse_args()
 
     # Require at least two arguments (script-name, path to multicrab)
@@ -512,6 +561,13 @@ if __name__ == "__main__":
         for m in allowedFolders:
             Print(m, False)
         sys.exit()
+
+    # Create save formats
+    if "," in opts.saveFormats:
+        opts.saveFormats = opts.saveFormats.split(",")
+    else:
+        opts.saveFormats = [opts.saveFormats]
+    opts.saveFormats = ["." + s for s in opts.saveFormats]          
 
     # Call the main function
     main(opts)

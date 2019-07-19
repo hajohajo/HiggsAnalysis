@@ -219,7 +219,7 @@ topSelectionBDT = PSet(
     AnyTopBDTGCutDirection   =  ">",       # [default: ">"]
     AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
     TopBDTGCutDirection      = ">=",       # [default: ">="]
-    TopBDTGCutValue          =    0.40,    # [default: -0.60] NOTE: Only use numbers with 2 decimals
+    TopBDTGCutValue          =   -1.00,    # [default: 0.40] NOTE: Only use numbers with 2 decimals
     TopMassLowCutDirection   = ">=",       # [default: ">="]
     TopMassLowCutValue       =    0.00,    # [default: 0.00]
     TopMassUppCutDirection   = "<=",       # [default: "<"]

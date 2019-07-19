@@ -385,7 +385,7 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
 						       fDeltaPhiBinSettings.bins(), fDeltaPhiBinSettings.min(), fDeltaPhiBinSettings.max());
 
       fHistoSplitter.createShapeHistogramTriplet<TH2F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlAngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiMuonMET,
-						       "AngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiMuonMET" , ";#Delta#phi(#tau_{1}, MET) (^{#circ});#Delta#phi(#mu}, MET) (^{#circ})",
+						       "AngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiMuonMET" , ";#Delta#phi(#tau_{1}, MET) (^{#circ});#Delta#phi(#mu, MET) (^{#circ})",
 						       fDeltaPhiBinSettings.bins(), fDeltaPhiBinSettings.min(), fDeltaPhiBinSettings.max(),
 						       fDeltaPhiBinSettings.bins(), fDeltaPhiBinSettings.min(), fDeltaPhiBinSettings.max());
 
