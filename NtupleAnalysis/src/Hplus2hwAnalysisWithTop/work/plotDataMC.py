@@ -297,9 +297,9 @@ def GetHistoKwargs(h, opts):
             kwargs["xlabel"] = "R_{coll}^{min} (%s)" % kwargs["units"]                
             kwargs["moveLegend"] = _legNE
         kwargs["ylabel"] = _yLabel + kwargs["units"]
-        #kwargs["cutBox"] = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["rebinX"] = 4
+        kwargs["rebinX"] = 2
         kwargs["opts"]   = {"ymin": _yMin, "ymaxfactor": _yMaxF*2.0}
+        kwargs["moveLegend"] = _legRM
 
     if "BackToBackAngularCuts" in h:
         kwargs["units"] = "#circ" #^{#circ}"
@@ -307,12 +307,12 @@ def GetHistoKwargs(h, opts):
             kwargs["xlabel"] = "R_{bb}^{jet} (%s)" % kwargs["units"]
             kwargs["moveLegend"] = _legNW
         if "Minimum" in h:
-            kwargs["xlabel"] = "R_{bb}^{min} (%s)" % kwargs["units"]                
+            kwargs["xlabel"] = "R_{bb}^{min} (%s)" % kwargs["units"]
             kwargs["moveLegend"] = _legNE
         kwargs["ylabel"] = _yLabel + kwargs["units"]
-        #kwargs["cutBox"] = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["rebinX"] = 4
+        kwargs["rebinX"] = 2
         kwargs["opts"]   = {"ymin": _yMin, "ymaxfactor": _yMaxF*2.0}
+        kwargs["moveLegend"] = _legRM
 
     if "DeltaR" in h or "DeltaY" in h or "DR" in h:
         kwargs["ylabel"] = "Events / %.2f "
@@ -633,9 +633,9 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.0}
 
     if "phi" in h.lower():        
-        kwargs["units"]  = "rads"
-        kwargs["rebinX"] =  4 #2
-        kwargs["ylabel"] = "Events / %.2f " + kwargs["units"]
+        kwargs["units"]  = "#circ" #"rads"
+        kwargs["rebinX"] =  1 #4
+        kwargs["ylabel"] = "Events / %.1f " + kwargs["units"]
         kwargs["moveLegend"] = _legRM
 
     if "MHT" in h:
@@ -749,10 +749,10 @@ def GetHistoKwargs(h, opts):
 
     if "DeltaPhiJetMHT" in h:
         kwargs["units"]  = "#circ"
-        kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaPhi"]
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaPhiRads"]
         kwargs["xlabel"] = None
         kwargs["opts"]   = {"ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["ylabel"] = _yLabel + kwargs["units"]
+        kwargs["ylabel"] = "Events / %.2f "  + kwargs["units"]
         kwargs["divideByBinWidth"] = False
 
     if "DeltaRJetMHT" in h:
@@ -854,7 +854,8 @@ def PlotDataMCHistograms(datasetsMgr, histoName):
         skipStrings = ["RelUncert"]
 
     if "ForDataDrivenCtrlPlots" in opts.folder:
-        skipStringOAs = ["_Vs_", "JetEtaPhi", "MinDeltaPhiJet", "MaxDeltaPhiJet", "MinDeltaRJet"]
+        #skipStrings = ["_Vs_", "JetEtaPhi", "MinDeltaPhiJet", "MaxDeltaPhiJet", "MinDeltaRJet"]
+        skipStrings = ["_Vs_", "JetEtaPhi"]
 
     # Skip histograms if they contain a given string
     for keyword in skipStrings:
