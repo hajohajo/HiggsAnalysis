@@ -601,6 +601,10 @@ def GetHistoKwargs(h, opts):
     if "DecayMode" in h:
         kwargs["moveLegend"] = _legRM
 
+    if "Nprong" in h:
+        kwargs["moveLegend"] = _legNE
+        kwargs["xlabel"]     = "charged particle multiplicity" # "N_{prongs}"
+
     if "IPxy" in h:
         kwargs["moveLegend"] = _legNE
         kwargs["units"]  = "cm"
