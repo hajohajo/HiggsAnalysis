@@ -16,7 +16,7 @@ endif
 set INITIAL = `echo $USER | cut -c1-1`
 set PSEUDO_MCRAB_DIR = ${1}
 #set FORMATS = "png,pdf,C"
-set FORMATS = "png, pdf"
+set FORMATS = "png,pdf"
 set DSETS = " QCD_bEnriched|ttHJetToGG|ttHJetToTT"
 #set DSETS = " QCD_bEnriched|ttHJetToGG_M125|ttHJetToNonbb_M125|ttHJetToTT_M125"
 #set DSETS = " QCD_bEnriched|ttHJetToGG_M125|ttHJetToNonbb_M125|ttHJetToTT_M125|ttHJetTobb_M125"
@@ -59,6 +59,7 @@ set DSETS = " QCD_bEnriched|ttHJetToGG|ttHJetToTT"
 ###./plotTH2.py --folder AngularCuts_BackToBack --gridX --gridY --dataset QCD --normalizeToOne --logZ -s png -m $PSEUDO_MCRAB_DIR
 ###./plotTH2.py --folder AngularCuts_BackToBack --gridX --gridY --dataset QCD-b --normalizeToOne --logZ -s png -m $PSEUDO_MCRAB_DIR
 
-./plotTH2.py --folder AngularCuts_Collinear --gridX --gridY --dataset TT --normalizeToOne --logZ -s png -m $PSEUDO_MCRAB_DIR
-./plotTH2.py --folder AngularCuts_Collinear --gridX --gridY --dataset ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO --normalizeToOne --logZ -s png -m $PSEUDO_MCRAB_DIR
-./plotTH2.py --folder AngularCuts_Collinear --gridX --gridY --dataset ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO --normalizeToOne --logZ -s png -m $PSEUDO_MCRAB_DIR
+### Identical to AngularCuts_BackToBack folder
+# ./plotTH2.py --folder AngularCuts_Collinear --gridX --gridY --dataset TT --normalizeToOne --logZ -s png -m $PSEUDO_MCRAB_DIR
+# ./plotTH2.py --folder AngularCuts_Collinear --gridX --gridY --dataset ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO --normalizeToOne --logZ -s png -m $PSEUDO_MCRAB_DIR
+# ./plotTH2.py --folder AngularCuts_Collinear --gridX --gridY --dataset ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO --normalizeToOne --logZ -s png -m $PSEUDO_MCRAB_DIR
