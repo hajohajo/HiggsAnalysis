@@ -218,6 +218,13 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauNProngsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauRtauAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauSourceAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauPtAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauEtaAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauPhiAfterStdSelections;
+  HistoSplitter::SplittedTripletTH2s hCtrlSubldgTauEtaPhiAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauLdgTrkPtAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauDecayModeAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauNProngsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPtAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonEtaAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPhiAfterStdSelections;
@@ -236,8 +243,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlHTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlMHTAfterStdSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlNAllCleanedTopsAfterStdSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlNSelectedCleanedTopsAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterStdSelections;
@@ -286,6 +292,14 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauRtauAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauSourceAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauIPxyAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauPtAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauEtaAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauPhiAfterAllSelections;
+  HistoSplitter::SplittedTripletTH2s hCtrlSubldgTauEtaPhiAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauLdgTrkPtAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauDecayModeAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauNProngsAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauIPxyAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPtAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonEtaAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPhiAfterAllSelections;
@@ -334,8 +348,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlBackToBackAngularCutsMinimumAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiTauMetAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterAllSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlNAllCleanedTopsAfterAllSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlNSelectedCleanedTopsAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterAllSelections;

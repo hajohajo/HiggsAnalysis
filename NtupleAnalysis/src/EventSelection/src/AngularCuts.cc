@@ -245,18 +245,18 @@ AngularCutsBase::Data AngularCutsBase::privateAnalyze(const Muon& muon, const st
     }
 
   // Calculate delta phi between MET and tau
-  output.fDeltaPhiLdgBJetMET = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(bjetData.getSelectedBJets()[0].p4(), metData.getMET())*57.29578);
-  output.fDeltaPhiLdgJetMET = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(jetData.getSelectedJets()[0].p4(), metData.getMET())*57.29578);
-  output.fDeltaPhiSubldgJetMET = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(jetData.getSelectedJets()[1].p4(), metData.getMET())*57.29578);
-  output.fDeltaPhiMuonMET = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(muon.p4(), metData.getMET())*57.29578);
-  output.fDeltaPhiTauMET = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4() + taus[1].p4(), metData.getMET())*57.29578); // treat 2 taus as a single 4-vector 
-  output.fDeltaPhiLdgTauMET = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4(), metData.getMET())*57.29578);
-  output.fDeltaPhiSubldgTauMET = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[1].p4(), metData.getMET())*57.29578);
-  output.fDeltaPhiLdgTauMuon = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4(), muon.p4())*57.29578);
-  output.fDeltaPhiSubldgTauMuon = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[1].p4(), muon.p4())*57.29578);
-  output.fDeltaPhiLdgTauLdgJet = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4(), jetData.getSelectedJets()[0].p4())*57.29578);
+  output.fDeltaPhiLdgBJetMET      = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(bjetData.getSelectedBJets()[0].p4(), metData.getMET())*57.29578);
+  output.fDeltaPhiLdgJetMET       = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(jetData.getSelectedJets()[0].p4(), metData.getMET())*57.29578);
+  output.fDeltaPhiSubldgJetMET    = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(jetData.getSelectedJets()[1].p4(), metData.getMET())*57.29578);
+  output.fDeltaPhiMuonMET         = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(muon.p4(), metData.getMET())*57.29578);
+  output.fDeltaPhiTauMET          = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4() + taus[1].p4(), metData.getMET())*57.29578); // treat 2 taus as a single 4-vector 
+  output.fDeltaPhiLdgTauMET       = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4(), metData.getMET())*57.29578);
+  output.fDeltaPhiSubldgTauMET    = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[1].p4(), metData.getMET())*57.29578);
+  output.fDeltaPhiLdgTauMuon      = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4(), muon.p4())*57.29578);
+  output.fDeltaPhiSubldgTauMuon   = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[1].p4(), muon.p4())*57.29578);
+  output.fDeltaPhiLdgTauLdgJet    = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4(), jetData.getSelectedJets()[0].p4())*57.29578);
   output.fDeltaPhiSubldgTauLdgJet = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[1].p4(), jetData.getSelectedJets()[0].p4())*57.29578);
-  output.fDeltaPhiTaus = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4(), taus[1].p4())*57.29578);
+  output.fDeltaPhiTaus            = std::fabs(ROOT::Math::VectorUtil::DeltaPhi(taus[0].p4(), taus[1].p4())*57.29578);
 
   if (0)
     {
@@ -291,12 +291,14 @@ AngularCutsBase::Data AngularCutsBase::privateAnalyze(const Muon& muon, const st
     // Determine status
     if (fType == kCollinear)
       {
-       // The method doCollinear only differs from doBackToBack by interchanging the x and y axes so that the corner of the 2d plots
-       // changes meaning (back-to-back becomes collinear)
+	// The method doCollinear only differs from doBackToBack by interchanging the x and y axes 
+	// so that the corner of the 2d plots changes meaning (back-to-back becomes collinear)
+	// FIXME: Currently using P4(tau) = P4(LdgTau) + p4(SubldgTau)
 	passedStatus = doCollinearCuts(output.fDeltaPhiTauMET, dphi,  fCutValue[i], output.f1DCutVariables);
       }
     else if (fType == kBackToBack)
       {
+	// FIXME: Currently using P4(tau) = P4(LdgTau) + p4(SubldgTau)
 	passedStatus = doBackToBackCuts(output.fDeltaPhiTauMET, dphi, fCutValue[i], output.f1DCutVariables);
       }
     else
