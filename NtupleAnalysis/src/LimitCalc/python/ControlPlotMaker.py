@@ -18,10 +18,6 @@ import sys
 import ROOT
 
 
-print "-----"
-print "nyt tehdaan controlliplotteja jee!"
-print "-----"
-
 _legendLabelQCD = "QCD" 
 _legendLabelQCDdata = "Mis-ID. #tau_{h} (data)"
 _legendLabelEmbedding = "EWK+t#bar{t} with #tau_{h} (data)"

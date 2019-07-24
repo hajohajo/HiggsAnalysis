@@ -27,6 +27,19 @@ from array import array
 
 _fineBinningSuffix = "_fineBinning"
 
+
+#================================================================================================
+# Shell Types  
+#================================================================================================
+sh_e = ShellStyles.ErrorStyle()
+sh_s = ShellStyles.SuccessStyle()
+sh_h = ShellStyles.HighlightStyle()
+sh_a = ShellStyles.HighlightAltStyle()
+sh_t = ShellStyles.NoteStyle()
+sh_n = ShellStyles.NormalStyle()
+sh_w = ShellStyles.WarningStyle()
+
+
 #================================================================================================
 # Class definition
 #================================================================================================
@@ -193,6 +206,7 @@ class DatacardColumn():
                  verbose=False):
         self._verbose = verbose
         self._opts = opts
+        self._analysisType = opts.analysisType
         self._label = label
         self._landsProcess = landsProcess
         self._enabledForMassPoints = enabledForMassPoints
@@ -233,6 +247,7 @@ class DatacardColumn():
         elif datasetType == "None":
             dsetType = MulticrabDirectoryDataType.DUMMY
         else:
+            #print "dsetType = ", dsetType
             dsetType = MulticrabDirectoryDataType.UNKNOWN
         return dsetType
 
@@ -263,6 +278,13 @@ class DatacardColumn():
         self._cachedShapeRootHistogramWithUncertainties.delete()
         self._cachedShapeRootHistogramWithUncertainties = None
         self._datasetMgrColumn = None
+
+    def type(self):
+        '''
+        Return dataset type
+        '''
+        return self._datasetType
+
 
     def typeIsObservation(self):
         '''
@@ -560,7 +582,9 @@ class DatacardColumn():
                     oldKey = dset
                     dset += "_ext1"
                     if not dsetMgr.hasDataset(dset):
-                        msg = "Cannot find merged dataset by key '%s' or '%s' in multicrab dir! Did you forget to merge the root files with hplusMergeHistograms.py?" % (oldKey,dset)
+                        msg  = "Cannot find merged dataset by key '%s' or '%s' in multicrab dir! " % (oldKey,dset)
+                        msg += "Did you forget to merge the root files with hplusMergeHistograms.py ?"
+                        msg += "Did you misspell the dataset name? You must use the exact name given in \"_datasetMerge\" dictionary defined in \"plots.py\""
                         dsetMgr.PrintInfo()
                         raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle())
 
@@ -603,7 +627,7 @@ class DatacardColumn():
                          print ShellStyles.WarningLabel()+"Forcing light H+ xsection to 13 TeV ttbar cross section %f in DatacardColumn.py"%ttbarxsect
                          dsetMgr.getDataset(self.getDatasetMgrColumn()).setCrossSection(ttbarxsect)
                          myDatasetRootHisto = dsetMgr.getDataset(self.getDatasetMgrColumn()).getDatasetRootHisto(mySystematics.histogram(self.getFullShapeHistoName()))
-
+                     
                 # Normalize to luminosity
                 myDatasetRootHisto.normalizeToLuminosity(luminosity)
 
@@ -755,6 +779,7 @@ class DatacardColumn():
 
         # Obtain results for control plots
         if config.OptionDoControlPlots:
+
             for index, c in enumerate(controlPlotExtractors, 1):
                 if dsetMgr != None and not self.typeIsEmptyColumn():
                     if self._verbose:
@@ -779,12 +804,21 @@ class DatacardColumn():
                         h = myCtrlDsetRootHisto.getHistogramWithUncertainties()
                         # Remove any variations not active for the column
                         h.keepOnlySpecifiedShapeUncertainties(myShapeVariationList)
+
                         # Rebin and move under/overflow bins to visible bins
                         if not isinstance(h.getRootHisto(), ROOT.TH2):
-                            if getBinningForPlot(c._histoTitle) != None:
-                                myArray = array("d",getBinningForPlot(c._histoTitle))
-                                h.Rebin(len(myArray)-1,"",myArray)
+                            if getBinningForPlot(c._histoTitle, self._analysisType) != None:
+                                # Safety precaution to avoid "TH1F::Rebin:0: RuntimeWarning: overflow entries will not be used when rebinning"
+                                xMax   = h.getRootHisto().GetXaxis().GetXmax()
+                                newBins = getBinningForPlot(c._histoTitle, self._analysisType)
+                                newBinsSafe = [b for b in newBins if b <= xMax]
+                                myArray = array("d", newBinsSafe)
+                                msg  = "Rebinning histogram %s with binning scheme %s:" % (sh_h + c._histoName + sh_n, c._histoTitle)
+                                msg += "\nNew binning: %s" % (newBins)
+                                self.Verbose(msg, True)
+                                h.Rebin(len(myArray)-1,"", myArray)
                             h.makeFlowBinsVisible()
+
                         # Apply any further scaling (only necessary for the unceratainties from variation)
                         for nid in self._nuisanceIds:
                             for e in extractors:
@@ -792,6 +826,7 @@ class DatacardColumn():
                                     if e.getDistribution() == "shapeQ" and abs(e.getScaleFactor() - 1.0) > 0.0:
                                         if not isinstance(h.getRootHisto(),ROOT.TH2):
                                             h.ScaleVariationUncertainty(e._systVariation, e.getScaleFactor())
+
                         # Add to RootHistogramWithUncertainties non-shape uncertainties
                         for n in self._nuisanceResults:
                             if not n.resultIsStatUncertainty() and len(n.getHistograms()) == 0: # systematic uncert., but not shapeQ
@@ -903,7 +938,7 @@ class DatacardColumn():
             if binRate < minStatUncert: # FIXME: is this correct?
                 # Treat zero or sightly positive rates
                 if binRate < 0.000000001 and binError > 0.5:
-                    msg  = "Rate value is zero and it has large uncertainty of %.3f in bin %d for column '%s', you need to rebin for more statistics! " % (binError, k, self.getLabel())
+                    msg  = "Rate value for %s is zero and it has large uncertainty of %.3f in bin %d for column '%s', you need to rebin for more statistics! " % (myTitle, binError, k, self.getLabel())
                     msg += "Compensating up stat uncertainty to %f!" % (minStatUncert)
                     print ShellStyles.WarningLabel() + msg
                     self._rateResult._histograms[0].SetBinError(k, minStatUncert)                   

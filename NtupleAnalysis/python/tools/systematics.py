@@ -1,11 +1,38 @@
-## Package for fetching systematic uncertainties used in the datacards
+'''
+DESCRIPTION:
+Package for fetching systematic uncertainties used in the datacards
+This can be imported in any plotting script but it is mainly used in the creation
+of the control plots through DatacardColumn.py and  DataCardGenerator.py which are called
+inside the dcardGenerator_v3.py script.
 
+'''
+
+#================================================================================================ 
+# Imports
+#================================================================================================ 
 from math import sqrt
 
 import ShellStyles
 
-## Helper class for a scalar uncertainty
+
+#================================================================================================ 
+# Shell Types
+#================================================================================================ 
+sh_e = ShellStyles.ErrorStyle()
+sh_s = ShellStyles.SuccessStyle()
+sh_h = ShellStyles.HighlightStyle()
+sh_a = ShellStyles.HighlightAltStyle()
+sh_t = ShellStyles.NoteStyle()
+sh_n = ShellStyles.NormalStyle()
+sh_w = ShellStyles.WarningStyle()
+
+#================================================================================================ 
+# Class definition
+#================================================================================================ 
 class ScalarUncertaintyItem:
+    '''
+    Helper class for a scalar uncertaint
+    '''
     def __init__(self, uncertaintyName, *args, **kwargs):
         self._name = uncertaintyName
         self._uncertUp = 0.0 # relative uncertainty squared
@@ -63,9 +90,9 @@ class ScalarUncertaintyItem:
 _crossSectionUncertainty = {
     # TTJets, based on arxiv:1303.6254 and https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
     "TTJets_scale": ScalarUncertaintyItem("xsect", plus=19.77/831.76, minus=29.20/831.76),
-    "TTJets_pdf": ScalarUncertaintyItem("xsect", 35.06/831.76),
-    "TTJets_mass": ScalarUncertaintyItem("xsect", plus=23.18/831.76, minus=22.45/831.76),    
-    "TTJets": ScalarUncertaintyItem("xsect", plus=0.062, minus=0.066), # scale, pdf and mass combined (quadratically)
+    "TTJets_pdf"  : ScalarUncertaintyItem("xsect", 35.06/831.76),
+    "TTJets_mass" : ScalarUncertaintyItem("xsect", plus=23.18/831.76, minus=22.45/831.76),    
+    "TTJets"      : ScalarUncertaintyItem("xsect", plus=0.062, minus=0.066), # scale, pdf and mass combined (quadratically)
 
     # Light H+ signal, normalized to TTJets --> use combined TTJets uncertainty
     "TTToHplus": ScalarUncertaintyItem("xsect", plus=0.062, minus=0.066),
@@ -478,6 +505,7 @@ DataMCBinningHToHW = {
     "Vertices"    : [i for i in range(0, 40, 5)] + [i for i in range(40, 60, 10)] + [i for i in range(60, 100, 20)] + [i for i in range(100, 200, 50)],
     "Met"         : [i for i in range(0, 100, 20)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 400, 40)] + [i for i in range(400, 500, 50)]  + [i for i in range(600, 800, 100)],
     "JetPt"       : [30,50,70,90,110,130,150,200,250,300,350,400,500,600,800],
+    "JetEta"      : [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5],
     "BJetPt"      : [30,50,70,90,110,130,150,200,300,400,500],
     "BtagDisc"    : [i*0.05 for i in range(0, 21, 1)],
     "DeltaPhi"    : [i for i in range(0, 185, 5)],
@@ -486,6 +514,13 @@ DataMCBinningHToHW = {
     "LdgTrkPt"    : [i for i in range(0, 40, 10)] + [i for i in range(40, 100, 20)] + [i for i in range(100, 200, 25)] + [i for i in range(200, 400, 50)],
     "TauPt"       : [i for i in range(30, 50, 20)] + [i for i in range(50, 150, 25)] + [i for i in range(150, 200, 50)] + [i for i in range(200, 500, 50)],
     "MuonPt"      : [i for i in range(20, 100, 20)] + [i for i in range(100, 200, 25)] + [i for i in range(200, 400, 50)] + [i for i in range(400, 500, 100)],
+    "TopPt"       : [0,50,100,150,200,300,500,600,800],
+    "TopMass"     : [0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,350,400,500],
+    "DijetPt"     : [30,50,70,90,110,130,150,200,250,300,350,400,500,600,800],
+    "DijetMass"   : [0,50,100,150,200,300,500,600,800],
+    "NJets"       : [i for i in range(3, 10, 1)],
+    "NBjets"      : [i for i in range(1, 8, 1)],
+    "Mt"          : [0,100,200,300,400,500,600,700,800,900,1600],
     }
 
 # Binning for data-driven control plots and final shapes feeded to combine
@@ -744,3 +779,28 @@ def getBinningForPlot(plotName):
     if shortName in _dataDrivenCtrlPlotBinning.keys():
         return _dataDrivenCtrlPlotBinning[shortName]
     raise Exception("Cannot find bin specifications for plotname %s! (implemented are: %s)"%(shortName,', '.join(map(str, _dataDrivenCtrlPlotBinning.keys()))))
+
+def getBinningForPlot(plotName, analysisType):
+    s = plotName.split("/")
+    shortName = s[len(s)-1]
+        
+    binDict = {}
+    if analysisType in ["HToTauNu", "HToTB"]:
+        binDict = _dataDrivenCtrlPlotBinning
+    elif analysisType in ["HToHW"]:
+        binDict = DataMCBinningHToHW
+    else:
+        binDict = _dataDrivenCtrlPlotBinning
+        
+    for plot in binDict:
+        if plot[len(plot)-1] == "*" and plot[:(len(plot)-1)] == shortName[:(len(plot)-1)]:
+            return binDict[plot]
+
+    if shortName in binDict.keys():
+        return binDict[shortName]
+
+    # This should never be reahed
+    hList = [sh_s + k + sh_n for k in sorted(binDict)]
+    msg   = "Cannot find bin specifications for histogram with title %s! " % (sh_t + shortName + sh_n)     
+    msg  += "Binning has only been implemented for the following histograms:\n\t%s" % ("\n\t".join(hList) )
+    raise Exception(msg)
