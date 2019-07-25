@@ -76,7 +76,8 @@ drawPlot2D = plots.PlotDrawer(opts2={"ymin": 0.5, "ymax": 1.5},
 #================================================================================================ 
 # Definitions
 #================================================================================================ 
-class ControlPlotMakerHToHW:
+#class ControlPlotMakerHToHW:
+class ControlPlotMaker:
     def __init__(self, opts, config, dirname, luminosity, observation, datasetGroups, verbose=False):
         self._validateDatacard(config)
         self._config  = config
@@ -152,15 +153,17 @@ class ControlPlotMakerHToHW:
 
                 # For-loop: All dataset columns (to find histograms)
                 for i, c in enumerate(self._datasetGroups, 1):
+                    msg = "DatasetGroup %d/%d) %s" % (i, len(self._datasetGroups), c.getLabel())
+                    self.PrintFlushed(sh_l + msg + sh_n, False)                    
                     self.Verbose("Dataset is %s for plot %s. The title is \"%s\" (Serves as dictionary key to get binning from systematics.py)" % (sh_h + c.getLabel() + sh_n, myCtrlPlot.histoName, myCtrlPlot.title), True)
 
                     # Skip plot?
-                    bIsValidMass = (m < 0 or c.isActiveForMass(m, self._config))
-                    bIsEmptyCol  = (not c.typeIsEmptyColumn())
-                    bIsValidPlot = (c.getControlPlotByIndex(i) != None)
-                    bDoPlot      = (bIsValidMass and not bIsEmptyCol and bIsValidPlot)
-                    if not bDoPlot:
-                        self.Print("Skipping plot %s (bIsValidMass=%s, bIsEmptyCol=%s, bIsValidPlot=%s)" % (sh_h + c.getLabel() + sh_n, bIsValidMass, bIsEmptyCol, bIsValidPlot), True)
+                    bValidMass   = (m < 0 or c.isActiveForMass(m, self._config))
+                    bEmptyCol    = (c.typeIsEmptyColumn())
+                    bInvalidPlot = (c.getControlPlotByIndex(i) == None)
+                    bSkipPlot    = (not bValidMass or bEmptyCol or bInvalidPlot)
+                    if bSkipPlot:
+                        self.Print("Skipping plot %s (bValidMass=%s, bEmptyCol=%s, bInvalidPlot=%s)" % (sh_h + c.getLabel() + sh_n, bValidMass, bEmptyCol, bInvalidPlot), False)
                         continue
 
                     # Clone histo
@@ -196,7 +199,7 @@ class ControlPlotMakerHToHW:
                             hQCDMC.Add(h)
                     elif c.typeIsEWKMC() or c.typeIsGenuineB():
                         msg += ". EWKMC"
-                        self.Print(msg, True)
+                        self.Print(msg, False)
                         myHisto = histograms.Histo(h, c._datasetMgrColumn)
                         myHisto.setIsDataMC(isData=False, isMC=True)
                         stackList.append(myHisto)

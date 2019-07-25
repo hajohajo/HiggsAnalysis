@@ -125,6 +125,8 @@ ToleranceForLuminosityDifference       = 0.05             # [default: 0.05]   (T
 ToleranceForMinimumRate                = 0.0              # [default: 0.0]    (Tolerance for almost zero rate columns with smaller rate are suppressed) 
 labelPrefix                            = ""               # [default: ""]     (Prefix for the labels of datacard columns; e.g. "CMS_Hptntj_", "CMS_H2tb_")
 labelPostfix                           = ""               # [default: "_GenuineTau"] (Postfix for the labels of datacard columns; e.g. "TT" --> "TT_GenuineTau")
+if OptionTest:
+    MassPoints = [300, 700]
 
 #================================================================================================  
 # File-specific settings
@@ -757,7 +759,6 @@ ControlPlots.append(hBJetEta)
 ControlPlots.append(hTransverseMass)
 
 if OptionTest:
-    MassPoints   = [700]
     ControlPlots = []
     #ControlPlots.append(hTopPt)
     ControlPlots.append(hTopMass)

@@ -26,10 +26,11 @@ USAGE:
 EXAMPLES:
 ./dcardGenerator_v2.py -x dcardDefault_h2tb_2016.py --dir limits2016/ --analysisType HToHW
 ./dcardGenerator_v3.py --dir limits2019/ --analysisType HToHW --datacard datacard_HToHW.py
+./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/ --dir limits2016/
 
 
 LAST USED:
-./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/ --dir limits2016/
+./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/
 
 
 '''
@@ -57,7 +58,7 @@ import HiggsAnalysis.NtupleAnalysis.tools.dataset as dataset
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
 import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 import HiggsAnalysis.NtupleAnalysis.tools.multicrab as multicrab
-
+import HiggsAnalysis.NtupleAnalysis.tools.plots as plots
 
 #===============================================================================================
 # Shell Types
@@ -198,7 +199,7 @@ def getBkgDsetCreator(multicrabPaths, bkgLabel, fakesFromData, mcrabInfoOutput):
     return bkgDsetCreator
 
 def GetDatasetLabels(config, fakesFromData, opts):
-    #iro Print(sh_w + "GetDatasetLabels() is too specific. Must be made more generic" + sh_n, True)
+    # Print(sh_w + "GetDatasetLabels() is too specific. Must be made more generic" + sh_n, True) #iro fixme
     signalLabels = ["Signal Analysis"]
     bkgLabels    = []
 
