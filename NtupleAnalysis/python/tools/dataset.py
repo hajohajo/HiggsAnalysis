@@ -26,8 +26,20 @@ import HiggsAnalysis.NtupleAnalysis.tools.histogramsExtras as histogramsExtras
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
 import HiggsAnalysis.NtupleAnalysis.tools.pileupReweightedAllEvents as pileupReweightedAllEvents
 import HiggsAnalysis.NtupleAnalysis.tools.crosssection as crosssection
+import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 
 from sys import platform as _platform
+
+#================================================================================================
+# Shell Types
+#================================================================================================
+sh_e = ShellStyles.ErrorStyle()
+sh_s = ShellStyles.SuccessStyle()
+sh_h = ShellStyles.HighlightStyle()
+sh_a = ShellStyles.HighlightAltStyle()
+sh_t = ShellStyles.NoteStyle()
+sh_n = ShellStyles.NormalStyle()
+sh_w = ShellStyles.WarningStyle()
 
 
 #================================================================================================
@@ -1279,14 +1291,22 @@ class SystematicsHelper:
             rootHistoWithUncertainties.printUncertainties()
 
         
-
-## Class to encapsulate a ROOT histogram with a bunch of uncertainties
-#
-# Looks almost as TH1, except holds bunch of uncertainties; the histograms contained are clones and therefore owned by the class
+#================================================================================================ 
+# Class Definition
+#================================================================================================ 
 class RootHistoWithUncertainties:
-    def __init__(self, rootHisto):
+    '''
+    Class to encapsulate a ROOT histogram with a bunch of uncertainties
+    
+    Looks almost as TH1, except holds bunch of uncertainties; the histograms contained are clones and therefore owned by the class
+    '''
+    def __init__(self, rootHisto, verbose=False):
+        ''' 
+        The constructor
+        '''
         self._rootHisto = None
-        
+        self._verbose   = verbose
+
         # dictionary of name -> (th1Plus, th1Minus)
         # This dictionary contains the variation uncertainties
         # Laterally (i.e. for combining same uncertainty between bins or samples, i.e. relative uncertainty is constant), linear sum is used
@@ -1301,6 +1321,18 @@ class RootHistoWithUncertainties:
 
         # Boolean to save the status if the under- and overflow bins have been made visible (i.e. summed to the first and last bin)
         self._flowBinsVisibleStatus = False
+        return
+
+    def Print(self, msg, printHeader=True):
+        '''
+        Simple print function. If verbose option is enabled prints, otherwise does nothing
+        '''
+        fName = __file__.split("/")[-1]
+        fName = fName.replace(".pyc", ".py")
+        if printHeader:
+            print "=== ", fName
+        print "\t", msg
+        return
 
     def _checkConsistency(self, name, th1):
         # I can't use this since it's private/protected :(
@@ -1661,8 +1693,10 @@ class RootHistoWithUncertainties:
                                       array.array("d", xerrlow), array.array("d", xerrhigh),
                                       array.array("d", yerrlow), array.array("d", yerrhigh))
 
-    ## Print associated systematic uncertainties
     def printUncertainties(self):
+        '''
+        Print associated systematic uncertainties
+        '''
         print "Shape uncertainties (%d):" % len(self._shapeUncertainties)
         keys = self._shapeUncertainties.keys()
         keys.sort()
@@ -1670,9 +1704,10 @@ class RootHistoWithUncertainties:
             print "  %s" % key
 
     #### Below are methods for "better" implementation for some ROOT TH1 methods
-
-    ## Calculate integral including under/overflow bins
     def integral(self):
+        '''
+        Calculate integral including under/overflow bins
+        '''
         if isinstance(self._rootHisto, ROOT.TH3):
             return self._rootHisto.Integral(0, self._rootHisto.GetNbinsX()+2, 0, self._rootHisto.GetNbinsY()+2, 0, self._rootHisto.GetNbinsZ()+2)
         elif isinstance(self._rootHisto, ROOT.TH2):
@@ -1680,16 +1715,22 @@ class RootHistoWithUncertainties:
         else:
             return self._rootHisto.Integral(0, self._rootHisto.GetNbinsX()+2)
 
-    ## Get minimum of X axis
     def getXmin(self):
+        '''
+         Get minimum of X axis
+         '''
         return aux.th1Xmin(self._rootHisto)
 
-    ## Get maximum of X axis
     def getXmax(self):
+        '''
+        Get maximum of X axis
+        '''
         return aux.th1Xmax(self._rootHisto)
 
-    ## Get minimum if Y axis
     def getYmin(self):
+        '''
+        Get minimum if Y axis
+        '''
         if self._rootHisto is None:
             return None
         if isinstance(self._rootHisto, ROOT.TH2):
@@ -1697,8 +1738,10 @@ class RootHistoWithUncertainties:
         else:
             return self._rootHisto.GetMinimum()
 
-    ## Get maximum of Y axis
     def getYmax(self):
+        '''
+        Get maximum of Y axis
+        '''
         if self._rootHisto is None:
             return None
         if isinstance(self._rootHisto, ROOT.TH2):
@@ -1706,59 +1749,77 @@ class RootHistoWithUncertainties:
         else:
             return self._rootHisto.GetMaximum()
 
-    ## Get X axis title
     def getXtitle(self):
+        '''
+        Get X axis title
+        '''
         if self._rootHisto is None:
             return None
         return self._rootHisto.GetXaxis().GetTitle()
 
-    ## Get Y axis title
     def getYtitle(self):
+        '''
+        Get Y axis title
+        '''
         if self._rootHisto is None:
             return None
         return self._rootHisto.GetYaxis().GetTitle()
 
-    ## Get the width of a bin
-    #
-    # \param bin  Bin number
     def getBinWidth(self, bin):
+        '''
+        Get the width of a bin
+        
+        \param bin  Bin number
+        '''
         if self._rootHisto is None:
             return None
         return self._rootHisto.GetBinWidth(bin)
 
-    ## Get list of bin widths
     def getBinWidths(self):
+        '''
+        Get list of bin widths
+        '''
         if self._rootHisto is None:
             return None
         return [self._rootHisto.GetBinWidth(i) for i in xrange(1, self._rootHisto.GetNbinsX()+1)]
 
     #### Below are methods for ROOT TH1 compatibility (only selected methods are implemented)
-
-    ## Get the number of X axis bins
     def GetNbinsX(self):
+        '''
+        Get the number of X axis bins
+        '''
         return self._rootHisto.GetNbinsX()
 
-    ## Get the name
     def GetName(self):
+        '''
+        Get the name
+        '''
         return self._rootHisto.GetName()
 
-    ## Set the name
-    #
-    # \param args   Positional arguments, forwarded to TH1.SetName()
     def SetName(self, *args):
+        '''
+        Set the name
+        
+         \param args   Positional arguments, forwarded to TH1.SetName()
+        '''
         self._rootHisto.SetName(*args)
 
-    ## Sumw2
-    #
-    # It is enough to propagate the call rot self._rootHisto, because
-    # from the uncertainty histograms we are only interested of the values
     def Sumw2(self):
+        '''
+        Sumw2
+        
+        It is enough to propagate the call rot self._rootHisto, because
+        from the uncertainty histograms we are only interested of the values
+        '''
         self._rootHisto.Sumw2()
+        return
 
-    ## Rebin histogram
-    #
-    # \param args  Positional arguments, forwarded to TH1.Rebin()
     def Rebin(self, *args):
+        '''
+        Rebin histogram
+        
+        \param args  Positional arguments, forwarded to TH1.Rebin()
+        '''
         if self._rootHisto == None:
             raise Exception("Tried to call Rebin for a histogram which has been deleted")
         htmp = self._rootHisto.Rebin(*args)
@@ -1787,11 +1848,14 @@ class RootHistoWithUncertainties:
             minustmp.SetDirectory(0)
             self._shapeUncertainties[key] = (plustmp, minustmp)
         self.makeFlowBinsVisible()
+        return
 
-    ## Rebin histogram
-    #
-    # \param args  Positional arguments, forwarded to TH1.Rebin()
     def Rebin2D(self, *args):
+        '''
+        Rebin histogram
+        
+         \param args  Positional arguments, forwarded to TH1.Rebin()
+        '''
         htmp = self._rootHisto.Rebin2D(*args)
         if len(args) > 2: # If more than 2 arguments are given, ROOT creates a clone of the histogram
             self._rootHisto.Delete()
@@ -1812,12 +1876,15 @@ class RootHistoWithUncertainties:
             minustmp.SetDirectory(0)
             self._shapeUncertainties[key] = (plustmp, minustmp)
         self.makeFlowBinsVisible()
+        return
 
-    ## Add another RootHistoWithUncertainties object
-    #
-    # \param other   RootHistoWithUncertainties object
-    # \param args  Positional arguments, forwarded to TH1.Add()
     def Add(self, other, *args):
+        '''
+        Add another RootHistoWithUncertainties object
+        
+        \param other   RootHistoWithUncertainties object
+        \param args  Positional arguments, forwarded to TH1.Add()
+        '''
         # Make sure the flow bins are handled in the same way before adding
         if self._flowBinsVisibleStatus and not other._flowBinsVisibleStatus:
             other.makeFlowBinsVisible()
@@ -1852,26 +1919,32 @@ class RootHistoWithUncertainties:
 
         # Add shape uncertainties treated as stat
         self._treatShapesAsStat.update(other._treatShapesAsStat)
-
-    ## Scale the histogram
-    #
-    # It is enough to forward the call to self._rootHisto and
-    # self._shapeUncertainties, because it does not affect the
-    # relative uncertainties.
+        return
+    
     def Scale(self, *args):
+        '''
+        Scale the histogram
+    
+        It is enough to forward the call to self._rootHisto and
+        self._shapeUncertainties, because it does not affect the
+        relative uncertainties.
+        '''
         self._rootHisto.Scale(*args)
         i = 0
         for (plus, minus) in self._shapeUncertainties.itervalues():
             plus.Scale(*args)
             minus.Scale(*args)
             i += 1
+        return
 
-    ## Scale a variation uncertainty
-    #
-    # It is enough to forward the call to self._rootHisto and
-    # self._shapeUncertainties, because it does not affect the
-    # relative uncertainties.
     def ScaleVariationUncertainty(self, name, value):
+        '''
+        Scale a variation uncertainty
+        
+        It is enough to forward the call to self._rootHisto and
+        self._shapeUncertainties, because it does not affect the
+        relative uncertainties.
+        '''
         if name not in self._shapeUncertainties.keys():
             raise Exception("Error: Cannot find '%s' in list of variation uncertainties (%s)!"%(name, ", ".join(map(str, self._shapeUncertainties.keys()))))
         (plus, minus) = self._shapeUncertainties[name]
@@ -1885,11 +1958,13 @@ class RootHistoWithUncertainties:
                 #print oldValue, plus.GetBinContent(i)
         self._shapeUncertainties[name] = (plus, minus)
 
-    ## Clone the histogram
-    #
-    # All contained histograms are also cloned. For all cloned
-    # histograms, th1.SetDirectory(0) is called.
     def Clone(self):
+        '''
+        Clone the histogram
+    
+        All contained histograms are also cloned. For all cloned
+        histograms, th1.SetDirectory(0) is called.
+        '''
         clone = RootHistoWithUncertainties(aux.Clone(self._rootHisto))
         for key, value in self._shapeUncertainties.iteritems():
             (plus, minus) = (aux.Clone(value[0]), aux.Clone(value[1]))
@@ -1898,8 +1973,10 @@ class RootHistoWithUncertainties:
         clone._flowBinsVisibleStatus = self._flowBinsVisibleStatus
         return clone
 
-    ## Delete all contained histograms
     def Delete(self):
+        '''
+        Delete all contained histograms
+        '''
         if self._rootHisto != None:
             self._rootHisto.Delete()
         if self._shapeUncertainties != None:
@@ -1908,65 +1985,125 @@ class RootHistoWithUncertainties:
                 minus.Delete()
         self._rootHisto = None
         self._shapeUncertainties = None
+        return
 
-    ## "Eats" SetDirectory() call for interface compatibility, i.e. do nothing
     def SetDirectory(self, *args):
+        '''
+        "Eats" SetDirectory() call for interface compatibility, i.e. do nothing
+        '''
         pass
 
-    ## Print a lot of comma separated info for debugging
+
     def Debug(self):
-        def histoContentsHelper(h):
-            s = ""
+        '''
+        Print a lot information  for this RootHistoWithUncertainties object.
+        Extremely useful for debugging
+        '''
+        def histoContents(h,):
+            cList = []
             for i in range(0, h.GetNbinsX()+2):
-                s += ", %f"%h.GetBinContent(i)
-            return s
-        def histoErrorHelper(h):
-            s = ""
-            for i in range(0, h.GetNbinsX()+2):
-                s += ", %f"%h.GetBinError(i)
-            return s
+                num = "%.2f" %  h.GetBinContent(i)
+                if num.startswith("-"):
+                    cList.append(num)
+                else:
+                    cList.append("+" +  num) #to help with aligning columns in table!
+            return cList
 
-        print "*** Debug info for RootHistoWithUncertainties:"
-        print "histogram %s"%(self.GetName())
-        print "nominal%s"%histoContentsHelper(self._rootHisto)
-        print "nominal_error%s"%histoErrorHelper(self._rootHisto)
-        keys = self._shapeUncertainties.keys()
-        for key in keys:
+        def graphErrors(g, High=False):
+            eList = []
+
+            # For-loop: All TGraph entries
+            for i in range(0, g.GetN()):
+                if High:
+                    num = "%.2f" % g.GetErrorYhigh(i)
+                else:
+                    num = "%.2f" % g.GetErrorYlow(i)
+                if num.startswith("-"):
+                    eList.append(num)
+                else:
+                    eList.append("+" + num) #to help with aligning columns in table!
+            return eList
+
+        def histoErrors(h):
+            eList = []
+            for i in range(0, h.GetNbinsX()+2):
+                num = "%.2f" %  h.GetBinError(i)
+                if num.startswith("-"):
+                    eList.append(nu,)
+                else:
+                    eList.append("+" + num) #to help with aligning columns in table!
+            return eList
+
+        
+        # Definitions
+        rows  = []
+        align = "{:<40} {:<100}"
+        hLine = 140*"="
+        rows.append(hLine)
+        rows.append( "{:^140}".format( sh_h + self.GetName() + sh_n) )
+        rows.append(hLine)
+        rows.append( align.format("Rate", "%.2f" % (self.getRate()) ) )
+        rows.append( align.format("Rate_stat_uncert", "%.2f" % self.getRateStatUncertainty()) )
+        rows.append( align.format("Rate_syst_uncert", "+%.2f -%.2f" % self.getRateSystUncertainty()) )
+        rows.append( align.format("Nominal", histoContents(self._rootHisto)) )
+        rows.append( align.format("Nominal_Error", histoErrors(self._rootHisto)) )
+        
+        # For-loop: All nuisances
+        for key in self._shapeUncertainties.keys():
             (hPlus, hMinus) = self._shapeUncertainties[key]
-            print "uncert_%s_up%s"%(key,histoContentsHelper(hPlus))
-            print "uncert_%s_down%s"%(key,histoContentsHelper(hMinus))
-        print "rate, %f"%self.getRate()
-        print "rate_stat_uncert, %f"%self.getRateStatUncertainty()
-        print "rate_syst_uncert, +%f, -%f"%self.getRateSystUncertainty()
-        g = self.getSystematicUncertaintyGraph()
-        sUp = ""
-        sDown = ""
-        for i in range(0, g.GetN()):
-            sUp += ", %f"%g.GetErrorYhigh(i)
-            sDown += ", %f"%g.GetErrorYlow(i)
-        print "rate_syst_uncert_up,%s"%sUp
-        print "rate_syst_uncert_down,%s\n"%sDown
+            nuisUp   = "Uncert_%s_up"  % (key)
+            contUp   = histoContents(hPlus)
+            nuisDown = "Uncert_%s_down"% (key, )
+            contDown = histoContents(hMinus)
+            rows.append( align.format("%s" % (nuisUp), "%s" % (contUp)) )
+            rows.append( align.format("%s" % (nuisDown), "%s" % (contDown)) )
 
-## Base class for DatasetRootHisto classes (wrapper for TH1 histogram and the originating Dataset)
-# 
-# The derived class must implement
-# _normalizedHistogram()
-# which should return the cloned and normalized TH1
-#
-# The wrapper holds the normalization of the histogram. User should
-# set the current normalization scheme with the normalize* methods,
-# and then get a clone of the original histogram, which is then
-# normalized according to the current scheme.
-#
-# This makes the class very flexible with respect to the many
-# possible normalizations user could want to apply within a plot
-# script. The first use case was MC counters, which could be printed
-# first normalized to the luminosity of the data, and also
-# normalized to the cross section.
-#
-# The histogram wrapper classes also abstract the signel histogram, and
-# mergeddata and MC histograms behind a common interface.
+#         # Now get the systematics
+#         g     = graphErrors(self.getSystematicUncertaintyGraph())
+#         sUp   = []
+#         sDown = []
+#         # For-loop: All TGraph entries
+#         for i in range(0, g.GetN()):
+#             sUp.append("%.2f" % g.GetErrorYhigh(i))
+#             sDown.append("%.2f" % g.GetErrorYlow(i))
+        rows.append( align.format("Rate_syst_uncert_up"  , graphErrors(self.getSystematicUncertaintyGraph(), True)) )
+        rows.append( align.format("Rate_syst_uncert_down", graphErrors(self.getSystematicUncertaintyGraph(), False)) )
+
+        #print ",%s"%sUp
+        #print "rate_syst_uncert_down,%s\n"%sDown
+
+        # Print all rows in a loop to get the table
+        rows.append(hLine)
+        for i, r in enumerate(rows, 1):
+            self.Print(r, i==1)
+
+        return
+
+#================================================================================================ 
+# Class Definition
+#================================================================================================ 
 class DatasetRootHistoBase:
+    '''
+    Base class for DatasetRootHisto classes (wrapper for TH1 histogram and the originating Dataset)
+    
+    The derived class must implement
+    _normalizedHistogram()
+    which should return the cloned and normalized TH1
+    
+    The wrapper holds the normalization of the histogram. User should
+    set the current normalization scheme with the normalize* methods,
+    and then get a clone of the original histogram, which is then
+    normalized according to the current scheme.
+    
+    This makes the class very flexible with respect to the many
+    possible normalizations user could want to apply within a plot
+    script. The first use case was MC counters, which could be printed
+    first normalized to the luminosity of the data, and also
+    normalized to the cross section.
+    
+    The histogram wrapper classes also abstract the signel histogram, and
+    mergeddata and MC histograms behind a common interface.
+    '''
     def __init__(self, dataset):
         self.dataset = dataset
         self.name = dataset.getName()

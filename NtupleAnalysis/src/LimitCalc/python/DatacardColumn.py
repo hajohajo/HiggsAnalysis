@@ -690,7 +690,6 @@ class DatacardColumn():
                         # print ShellStyles.WarningLabel()+"Forcing heavy H+ signal sample %s to normalization of 1 pb xsect in DatacardColumn.py"%self._label
 
                         #myDatasetRootHisto.Delete()
-			print "DEBUG: taallanain"
                         dsetMgr.getDataset(self.getDatasetMgrColumn()).setCrossSection(0.001)
                         myDatasetRootHisto = dsetMgr.getDataset(self.getDatasetMgrColumn()).getDatasetRootHisto(mySystematics.histogram(self.getFullShapeHistoName()))
                         if self._verbose:
@@ -851,7 +850,10 @@ class DatacardColumn():
         if dsetMgr != None and not self.typeIsEmptyColumn():
             msg = "Has shape variation syst. uncertainties: %s" % ( ", ".join(map(str,self._cachedShapeRootHistogramWithUncertainties.getShapeUncertainties().keys())) )
             self.Verbose(msg, True)
-        #self._cachedShapeRootHistogramWithUncertainties.Debug()
+
+        # Print Rate, Stat, Syst, Nuisances for this DatasetGroup and all bins! (awesome)
+        if 0:
+            self._cachedShapeRootHistogramWithUncertainties.Debug()
 
         # Obtain results for control plots
         if config.OptionDoControlPlots:
@@ -948,7 +950,7 @@ class DatacardColumn():
                         myDictionary["purity"] = hCtrlPlotPurity
                         myDictionary["averagePurity"] = myAverageCtrlPlotPurity
 
-                        # Debug ?
+                        # Debug
                         self.Verbose("%s.Integral() = %.1f" % (h.getRootHisto().GetName(), h.getRootHisto().Integral()), False)
 
                         for item in dir(self):
@@ -1045,11 +1047,11 @@ class DatacardColumn():
         
         # Print summarty of warnings/errors (if any)
         if nNegativeRate >0:
-            msg = "Rate value for \"%s\" was negative (hence forced to zero) in %d bins" % (myTitle, nNegativeRate)
+            msg = "Rate value for %s (%s) was negative (hence forced to zero) in %d bins" % (sh_h + myTitle + sh_e, myName, nNegativeRate)
             self.Print(sh_e + msg + sh_n, True)
 
         if nBelowMinStatUncert > 0:
-            msg = "Rate value for \"%s\" was below minimum statistical uncertainty (hence set to default min of %f) in %d bins" % (myTitle, config.MinimumStatUncertainty, nBelowMinStatUncert)
+            msg = "Rate value for %s (%s) was below minimum statistical uncertainty (hence set to default min of %f) in %d bins" % (sh_h + myTitle + sh_e, myName, config.MinimumStatUncertainty, nBelowMinStatUncert)
             self.Print(sh_e + msg + sh_n, True)
 
         # Convert bin content to integers for signal injection
@@ -1073,7 +1075,7 @@ class DatacardColumn():
                 myNewHistograms.append(h)
             self._nuisanceResults[j]._histograms.extend(myNewHistograms)
 
-	# Treat QCD MET shape nuisance
+	# Treat QCD MET shape nuisance #fixme - this is too specific!
 	myQCDMetshapeFoundStatus = False
 	for j in range(0,len(self._nuisanceResults)):
 	    if "CMS_Hptntj_fake_t_shape" in self._nuisanceResults[j].getId():
@@ -1104,12 +1106,15 @@ class DatacardColumn():
 
         # Update root histo with uncertainties to contain the binned version
         if self._cachedShapeRootHistogramWithUncertainties != None:
-            #self._cachedShapeRootHistogramWithUncertainties.Debug()
+            # Print Rate, Stat, Syst, Nuisances for this DatasetGroup and all bins! (awesome)
+            if 0:
+                self._cachedShapeRootHistogramWithUncertainties.Debug()
+
             self._cachedShapeRootHistogramWithUncertainties.delete()
             self._cachedShapeRootHistogramWithUncertainties.setRootHisto(self._rateResult._histograms[0])
             for j in range(0,len(self._nuisanceResults)):
                 # shape nuisance
-                hUp = None
+                hUp   = None
                 hDown = None
                 for i in range(0,len(self._nuisanceResults[j]._histograms)):
                     myTitle = self._nuisanceResults[j]._histograms[i].GetTitle()
@@ -1124,7 +1129,10 @@ class DatacardColumn():
                     self._cachedShapeRootHistogramWithUncertainties.addNormalizationUncertaintyRelative(self._nuisanceResults[j].getId(), myResult.getUncertaintyUp(), myResult.getUncertaintyDown())
                 else:
                     self._cachedShapeRootHistogramWithUncertainties.addShapeUncertaintyFromVariation(self._nuisanceResults[j].getId(), hUp, hDown)
-            #self._cachedShapeRootHistogramWithUncertainties.Debug()
+
+            # Print Rate, Stat, Syst, Nuisances for this DatasetGroup and all bins! (awesome)
+            if 1: #opts.verbose #iro xenios -here
+                self._cachedShapeRootHistogramWithUncertainties.Debug()
         return
 
     def getRateResult(self):

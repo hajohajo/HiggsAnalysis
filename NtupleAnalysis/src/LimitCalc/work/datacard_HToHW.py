@@ -126,7 +126,7 @@ ToleranceForMinimumRate                = 0.0              # [default: 0.0]    (T
 labelPrefix                            = ""               # [default: ""]     (Prefix for the labels of datacard columns; e.g. "CMS_Hptntj_", "CMS_H2tb_")
 labelPostfix                           = ""               # [default: "_GenuineTau"] (Postfix for the labels of datacard columns; e.g. "TT" --> "TT_GenuineTau")
 if OptionTest:
-    MassPoints = [300, 700]
+    MassPoints = [700]
 
 #================================================================================================  
 # File-specific settings
@@ -761,7 +761,7 @@ ControlPlots.append(hTransverseMass)
 if OptionTest:
     ControlPlots = []
     #ControlPlots.append(hTopPt)
-    ControlPlots.append(hTopMass)
-    ControlPlots.append(hMET)
+    #ControlPlots.append(hTopMass)
+    #ControlPlots.append(hMET)
     ControlPlots.append(hHT)
     #ControlPlots.append(hTransverseMass)
