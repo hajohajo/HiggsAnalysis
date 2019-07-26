@@ -109,6 +109,7 @@ OptionNumberOfDecimalsInSummaries      = 1     # [defaul: 1]       (Self explana
 OptionConvertFromShapeToConstantList   = []    # [default: []]     (Convert these nuisances from shape to constant; Makes limits run faster & converge more easily)
 OptionSeparateShapeAndNormFromSystList = []    # [default: []]     (Separate in the following shape nuisances the shape and normalization components)
 OptionMassShape                        = "shapeTransverseMass"
+OptionPlotNamePrefix                   = None  #"Results" #[default: None] (Prefix for plots: "<Prefix>_M<mass>_<ControlPlotInput.Title>.<ext>". Default prefix is "DataDrivenCtrlPlot")
 
 #================================================================================================  
 # Definitions

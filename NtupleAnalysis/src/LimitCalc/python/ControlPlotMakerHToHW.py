@@ -133,10 +133,10 @@ class ControlPlotMaker:
 
                 # The case m < 0 is for plotting hitograms without any signal
                 if m > 0:
-                    saveName = "%s/DataDrivenCtrlPlot_M%d_%s" % (self._dirname, m, myCtrlPlot.title) #xenios - iro
-                    msg      = "Control Plot %d/%d: m=%s GeV"  % (counter, nMasses*nPlots, str(m))
+                    saveName = "%s/%s_M%d_%s" % (self._dirname, self._config.OptionPlotNamePrefix, m, myCtrlPlot.title) #xenios - iro
+                    msg      = "Control Plot %d/%d: mH=%s GeV"  % (counter, nMasses*nPlots, str(m))
                 else:
-                    saveName = "%s/DataDrivenCtrlPlot_%s" % (self._dirname, myCtrlPlot.title)
+                    saveName = "%s/%s_%s" % (self._dirname, self._config.OptionPlotNamePrefix, myCtrlPlot.title)
                     msg      = "Control Plot %d/%d: no signal"  % (counter, nMasses*nPlots)
 
                 # Initialize histograms
@@ -754,5 +754,5 @@ class SelectionFlowPlotMaker:
         myParams["opts2"] = {"ymin": 0.3, "ymax":1.7}
         myParams["moveLegend"] = {"dx": -0.53, "dy": -0.52, "dh":0.05} # for data-driven
         myParams["ratioMoveLegend"] = {"dx": -0.51, "dy": 0.03}
-        drawPlot(stackPlot, "%s/DataDrivenCtrlPlot_M%d_%02d_SelectionFlow"%(dirname,m,index), **myParams) #xenios
+        drawPlot(stackPlot, "%s/%s_M%d_%02d_SelectionFlow"%(dirname, self._config.OptionPlotNamePrefix, m, index), **myParams) #xenios
         return

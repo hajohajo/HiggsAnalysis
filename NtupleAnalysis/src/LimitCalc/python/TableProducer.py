@@ -429,7 +429,7 @@ class TableProducer:
         for index, m in enumerate(self._config.MassPoints, 1):
             
             # Print progress 
-            msg = "Datacard %s/%s (mH=%s)" % (index, len(self._config.MassPoints), str(m)) 
+            msg = "Datacard %s/%s: mH=%s GeV" % (index, len(self._config.MassPoints), str(m)) 
             PrintFlushed(sh_l + msg + sh_n, index==1)
             if index == len(self._config.MassPoints):
                 print 

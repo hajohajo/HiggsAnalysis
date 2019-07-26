@@ -141,7 +141,6 @@ def CheckOptions(config):
         msgs.append(msg)
 
     if config.OptionDoControlPlots:
-
         # Sanity check: Ensure no two control plots have the same title
         cList = [c.getTitle() for c in config.ControlPlots]
         for i, c in enumerate(config.ControlPlots, 1):
@@ -154,6 +153,9 @@ def CheckOptions(config):
         msg = sh_t + "Skipping of data-driven control plot generation" + sh_n + " (flag \"OptionDoControlPlots\" in the datacard file)"
         msgs.append(msg)
 
+
+    if not config.OptionPlotNamePrefix or (config.OptionPlotNamePrefix == None):
+        config.OptionPlotNamePrefix = "DataDrivenCtrlPlot"
 
     if not config.BlindAnalysis:
         msg = sh_e + "Unblinding analysis results!" + sh_n + " (flag \"BlindAnalysis\" in the datacard file)"
