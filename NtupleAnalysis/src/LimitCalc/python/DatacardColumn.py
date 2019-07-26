@@ -893,7 +893,7 @@ class DatacardColumn():
 
                     if myCtrlDsetRootHisto == None:
                         msg = "Could not find control plot \"%s\", skipping..." % (c._histoTitle)
-                        self.Print(sh_r + msg + sh_n, index==1)
+                        self.Print(sh_e + msg + sh_n, True)
                         self._controlPlots.append(None)
                     else:
                         # Obtain overall purity for QCD
