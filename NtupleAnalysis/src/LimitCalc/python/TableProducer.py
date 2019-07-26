@@ -263,7 +263,7 @@ class TableProducer:
                 import HiggsAnalysis.LimitCalc.ControlPlotMakerHToTB as cp
             else:
                 raise Exception(sh_e + msg + sh_n)
-            self.Print("Control plots will be created using the %s module" % (sh_t + os.path.basename(cp.__file__) + sh_n), True)
+            self.Verbose("Control plots will be created using the %s module" % (sh_h + os.path.basename(cp.__file__) + sh_n), True)
             # Assumption is that the constructors of all 3 classes take the exact same arguments (currently holds)
             cp.ControlPlotMaker(self._opts, self._config, self._ctrlPlotDirname, self._luminosity, self._observation, self._datasetGroups)
         else:

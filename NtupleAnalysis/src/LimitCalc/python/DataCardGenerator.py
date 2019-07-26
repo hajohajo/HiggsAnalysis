@@ -510,13 +510,13 @@ class DataCardGenerator:
                 addColumnList      = item["mergeList"][1:]
                 self.separateMCEWKTausAndFakes(targetColumn, targetColumnNewName, addColumnList, mySubtractColumnList)
         
-        # Do rebinning of results, store a fine binned copy of all histograms as well
+        # Do rebinning of results, store a fine binned copy of all histograms as well (all datasets but not observation data)
         for i, c in enumerate(self._columns, 1):
             self.Verbose("Rebinning cached results for column %s with %d nuisances" % (sh_h + c.getLabel() + sh_n, len(c.getNuisanceIds())), i==1)
             c.doRebinningOfCachedResults(self._config)
 
-        # Rebin cached results for data (observation)
-        self.Verbose("Rebinning cached results observation", True)
+        # Do rebinning of results, store a fine binned copy of all histograms as well (observation data)
+        self.Verbose("Rebinning cached results (observation)", True)
         self._observation.doRebinningOfCachedResults(self._config)
 
         # Separate nuisances with additional information into an individual nuisance (horror!)
@@ -546,7 +546,8 @@ class DataCardGenerator:
         datasetGroups   = self._columns
         extractors      = self._extractors
         mcrabInfoOutput = mcrabInfoOutput
-        self.Verbose("Calling the TableProducer constructor", True)
+
+        self.Verbose("Calling the TableProducer constructor", True)#iro
         myProducer = TableProducer.TableProducer(opts, config, outputPrefix, luminosity, observation, datasetGroups, extractors, mcrabInfoOutput)
 
         # Close files

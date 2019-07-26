@@ -552,25 +552,53 @@ class DatacardColumn():
         '''        
         Get control plots
         '''
-        if index >= len(self._controlPlots):
+        nPlots = len(self._controlPlots)
+        if index >= nPlots:
+            self.Print("Invalid self._controPlots index %d (max is %d). Returning None" % (index, nPlots-1), True)
             return None
         return self._controlPlots[index]
 
-    def getControlPlotByTitle(self, title):
+    def getControlPlotByTitle(self, title, myKey="shape"):
         '''
-        Get correct control plot
+        Get correct control plot using its title
         '''
         for h in self._controlPlots:
-            if title in h.getRootHisto().GetTitle():
-                return h
+            if not isinstance(h , dict):
+                continue
+            else:
+                if title in h[myKey].getRootHisto().GetTitle():
+                    return h[myKey]
+                elif title in h[myKey].getRootHisto().GetName():
+                    return h[myKey]
+                else:
+                    pass
 
-        self.Print("Available control plot names:", True)
-        for h in self._controlPlots:
-            print "  " + h.getRootHisto().GetTitle()
-
-        msg = "Could not find control plot by title '%s' in column %s!" % (title, self._label)
-        raise Exception(ErrorLabel() + msg)
+        if self._verbose:
+            msg = "Could not find control plot by title '%s' in column %s!" % (title, self._label)
+            #raise Exception(sh_e + msg + sh_n)
+            self.Print(sh_e + msg + sh_n, True)
+            print 
+            self.PrintControlPlotTitles()
+        return None
     
+    def PrintControlPlotTitles(self, myKey="shape"):
+        self.Print("The available control plot are:", True)
+        
+        for c in self._controlPlots:
+            if isinstance(c, dict):
+                if myKey not in c.keys():
+                    msg = "Invalid key %s. Please select one of the following:\n\t%s" % (sh_h + myKey + sh_n, "\n\t".join(c.keys()))
+                    raise Exception(sh_e + msg + sh_n)
+                for i, k in enumerate(c.keys(), 1):
+                    if not isinstance(c[k], dataset.RootHistoWithUncertainties):
+                        # self.Print( "type = %s" % type(c[k]), False)
+                        pass
+                    else:
+                        self.Print("key = \"%s\", Name = \"%s\", Title = \"%s\"" % (k, c[k].getRootHisto().GetName(), c[k].getRootHisto().GetTitle()), False)
+            else:
+                pass
+        return
+
     def _createShapeNuisanceFromConstant(self, hRate, uncertaintyUp, uncertaintyDown, suffix=""):
         '''
         Creates an up and down variation histogram from a constant nuisance parameters
@@ -829,12 +857,6 @@ class DatacardColumn():
                             self._cachedShapeRootHistogramWithUncertainties.addNormalizationUncertaintyRelative(e.getId(), myResult, myResult)
 
                     # Cache result
-                    if 0:
-                        print #iro xenios
-                        print e.getId()
-                        print len(myHistograms)
-                        print myHistograms
-                        print #iro xenios
                     self._nuisanceResults.append(ExtractorResult(e.getId(), 
                                                                  e.getMasterId(), 
                                                                  myResult, 
@@ -858,7 +880,7 @@ class DatacardColumn():
         # Obtain results for control plots
         if config.OptionDoControlPlots:
             msg = "Creating control plots for DataGroup %s (\"OptionDoControlPlots\" = %s in %s)" % (sh_h + self._label + sh_n, config.OptionDoControlPlots, config.__file__)
-            self.Verbose(msg, True) #iro
+            self.Verbose(msg, True)
 
             # For-loop: All control plots extractors
             for index, c in enumerate(controlPlotExtractors, 1):
@@ -944,15 +966,19 @@ class DatacardColumn():
                         # Scale if asked
                         if self._landsProcess > 0 and config.OptionLimitOnSigmaBr:
                             h.Scale(self._additionalNormalisationFactor)
-                        # Store RootHistogramWithUncertainties
-                        myDictionary = {}
-                        myDictionary["shape"] = h
-                        myDictionary["purity"] = hCtrlPlotPurity
-                        myDictionary["averagePurity"] = myAverageCtrlPlotPurity
+
 
                         # Debug
                         self.Verbose("%s.Integral() = %.1f" % (h.getRootHisto().GetName(), h.getRootHisto().Integral()), False)
 
+                        # Store RootHistogramWithUncertainties
+                        myDictionary = {}
+                        self.Verbose("Adding \"shape\" (%s), \"purity\", \"averagePurity\" to dictionary for %s (will be appended to control plots list) " % (h.getRootHisto().GetName(), self._label), True)
+                        myDictionary["shape"] = h
+                        myDictionary["purity"] = hCtrlPlotPurity
+                        myDictionary["averagePurity"] = myAverageCtrlPlotPurity                        
+
+                        # For-loop: All self directories #iro
                         for item in dir(self):
                             if item.startswith("typeIs"):
                                 try:
@@ -960,6 +986,7 @@ class DatacardColumn():
                                     myDictionary[item] = myStatus
                                 except TypeError:
                                     pass
+                        # Append dictionary to control plots
                         self._controlPlots.append(myDictionary)
 
     def doRebinningOfCachedResults(self, config):
@@ -1047,8 +1074,8 @@ class DatacardColumn():
         
         # Print summarty of warnings/errors (if any)
         if nNegativeRate >0:
-            msg = "Rate value for %s (%s) was negative (hence forced to zero) in %d bins" % (sh_h + myTitle + sh_e, myName, nNegativeRate)
-            self.Print(sh_e + msg + sh_n, True)
+            msg = "Rate value for %s (%s) was negative (hence forced to zero) in %d bins" % (sh_h + myTitle + sh_n, sh_a + myName + sh_n, nNegativeRate)
+            self.Print(msg, True)
 
         if nBelowMinStatUncert > 0:
             msg = "Rate value for %s (%s) was below minimum statistical uncertainty (hence set to default min of %f) in %d bins" % (sh_h + myTitle + sh_e, myName, config.MinimumStatUncertainty, nBelowMinStatUncert)
@@ -1131,7 +1158,8 @@ class DatacardColumn():
                     self._cachedShapeRootHistogramWithUncertainties.addShapeUncertaintyFromVariation(self._nuisanceResults[j].getId(), hUp, hDown)
 
             # Print Rate, Stat, Syst, Nuisances for this DatasetGroup and all bins! (awesome)
-            if 1: #opts.verbose #iro xenios -here
+            if self._verbose:
+                self.Print("Printing debugging info for ROOT histos with uncertainties for columns %s" % (sh_h + self.getLabel() + sh_n), True)
                 self._cachedShapeRootHistogramWithUncertainties.Debug()
         return
 

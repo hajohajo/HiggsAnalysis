@@ -91,7 +91,7 @@ def PrintNuisancesTable(Nuisances, DataGroups):
 #================================================================================================  
 # Options
 #================================================================================================  
-OptionTest                             = True  # [default: False]
+OptionTest                             = False # [default: False]
 OptionPaper                            = True  # [default: True]   (Changes figure style to paper style)
 OptionIncludeSystematics               = True  # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
 OptionShapeSystematics                 = False # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
@@ -760,8 +760,8 @@ ControlPlots.append(hTransverseMass)
 
 if OptionTest:
     ControlPlots = []
-    #ControlPlots.append(hTopPt)
-    #ControlPlots.append(hTopMass)
-    #ControlPlots.append(hMET)
+    ControlPlots.append(hTopPt)
+    ControlPlots.append(hTopMass)
+    ControlPlots.append(hMET)
     ControlPlots.append(hHT)
-    #ControlPlots.append(hTransverseMass)
+    ControlPlots.append(hTransverseMass)

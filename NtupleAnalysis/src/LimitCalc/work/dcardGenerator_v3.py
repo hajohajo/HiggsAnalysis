@@ -67,6 +67,7 @@ sh_e = ShellStyles.ErrorStyle()
 sh_s = ShellStyles.SuccessStyle()
 sh_h = ShellStyles.HighlightStyle()
 sh_a = ShellStyles.HighlightAltStyle()
+sh_l = ShellStyles.AltStyle()
 sh_t = ShellStyles.NoteStyle()
 sh_n = ShellStyles.NormalStyle()
 sh_w = ShellStyles.WarningStyle()
@@ -319,7 +320,7 @@ def main(opts, moduleSelector, multipleDirs):
         os.system("cat tmp_validate.txt")
     else:
         msg = "Datacard %s is valid" % (sh_h + opts.datacard + sh_n)
-        Print(msg, True)
+        Verbose(msg, True)
         os.system("rm -f tmp_validate.txt")
         
     # Load the datacard
@@ -406,19 +407,19 @@ def main(opts, moduleSelector, multipleDirs):
     # For-loop: Data eras
     for i, era in enumerate(moduleSelector.getSelectedEras(), 1):        
         msg  = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Era", "%i" % i, "/", "%s:" % (nEras), era)
-        Print(sh_a + msg + sh_n, i==1)
+        Print(sh_l + msg + sh_n, i==1)
 
         # For-loop: Search modes
         for j, searchMode in enumerate(moduleSelector.getSelectedSearchModes(), 1):
             msg = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Mode", "%i" % j, "/", "%s:" % (nModes), searchMode)
-            Print(sh_a + msg + sh_n, False)
+            Print(sh_l + msg + sh_n, False)
 
             # For-loop: Optimization modes            
             for k, optimizationMode in enumerate(moduleSelector.getSelectedOptimizationModes(), 1):
                 nDatacards +=1
 
                 msg = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Opt", "%i" % k, "/", "%s:" % (nOpts), optimizationMode)
-                Print(sh_a + msg + sh_n, False)
+                Print(sh_l + msg + sh_n, False)
                 
                 Verbose("Create the datacard generator & check config file contents", True)
                 dcgen = DataCard.DataCardGenerator(opts, config)
@@ -587,7 +588,7 @@ if __name__ == "__main__":
 
         # Print progress
         msg   = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Directory", "%i" % i, "/", "%s:" % (nDirs), d)
-        Print(sh_t + msg + sh_n, i==1)
+        Print(sh_l + msg + sh_n, i==1)
 
         # Sanity check (directory is located under current working directory)
         if d not in myDirs:
