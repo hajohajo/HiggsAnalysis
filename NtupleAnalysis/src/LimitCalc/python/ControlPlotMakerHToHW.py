@@ -154,21 +154,22 @@ class ControlPlotMaker:
                 # For-loop: All dataset columns (to find histograms)
                 for i, c in enumerate(self._datasetGroups, 1):
                     msg = "DatasetGroup %d/%d) %s" % (i, len(self._datasetGroups), c.getLabel())
-                    #self.PrintFlushed(sh_l + msg + sh_n, False)
+                    if 0:
+                        self.PrintFlushed(sh_l + msg + sh_n, False)
 
                     msg  = "Dataset is %s for plot %s. " % (sh_h + c.getLabel() + sh_n, sh_a + myCtrlPlot.histoName + sh_n)
                     msg += "The title is \"%s\" (Serves as dictionary key to get binning from systematics.py)" % (myCtrlPlot.title)
                     self.Verbose(msg, True)
 
-                    # Skip plot?
-                    bValidMass   = (m < 0 or c.isActiveForMass(m, self._config))
+                    # Skip plot (NOTE! DatasetGroup is signal then all other mass points should be disabled. This concerns bValidMass)
+                    bValidMass   = (m < 0 or c.isActiveForMass(m, self._config)) 
                     bEmptyCol    = (c.typeIsEmptyColumn())
                     #bInvalidPlot = (c.getControlPlotByIndex(i) == None) # broken (for unknown reason)
                     bInvalidPlot = (c.getControlPlotByTitle(myCtrlPlot.histoName, myKey="shape") == None) 
                     bSkipPlot    = (not bValidMass or bEmptyCol or bInvalidPlot)
 
                     if bSkipPlot:
-                        self.Print("Skipping plot %s (bValidMass=%s, bEmptyCol=%s, bInvalidPlot=%s)" % (sh_h + c.getLabel() + sh_n, bValidMass, bEmptyCol, bInvalidPlot), False)
+                        self.Verbose("Skipping plot %s (%s): bValidMass=%s, bEmptyCol=%s, bInvalidPlot=%s" % (sh_h + c.getLabel() + sh_n, myCtrlPlot.histoName, bValidMass, bEmptyCol, bInvalidPlot), False)
                         continue
 
                     # Print available control plots?
@@ -176,8 +177,8 @@ class ControlPlotMaker:
                         c.PrintControlPlotTitles(myKey="shape")
 
                     # Clone histo
-                    #h = c.getControlPlotByIndex(i)["shape"].Clone() # broken (for unknown reason)
                     h = c.getControlPlotByTitle(myCtrlPlot.histoName, myKey="shape").Clone()
+                    #h = c.getControlPlotByIndex(i)["shape"].Clone() # broken (for unknown reason)
                     
                     if bSkipPlot:
                         self.Print("Skipping plot %s (bValidMass=%s, bEmptyCol=%s, bInvalidPlot=%s)" % (sh_h + c.getLabel() + sh_n, bValidMass, bEmptyCol, bInvalidPlot), False)

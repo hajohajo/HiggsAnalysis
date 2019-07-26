@@ -29,6 +29,7 @@ sh_e = ShellStyles.ErrorStyle()
 sh_s = ShellStyles.SuccessStyle()
 sh_h = ShellStyles.HighlightStyle()
 sh_a = ShellStyles.HighlightAltStyle()
+sh_l = ShellStyles.AltStyle()
 sh_t = ShellStyles.NoteStyle()
 sh_n = ShellStyles.NormalStyle()
 sh_w = ShellStyles.WarningStyle()
@@ -429,7 +430,7 @@ class TableProducer:
             
             # Print progress 
             msg = "Datacard %s/%s (mH=%s)" % (index, len(self._config.MassPoints), str(m)) 
-            PrintFlushed(ShellStyles.HighlightStyle() + msg + sh_n, index==1)
+            PrintFlushed(sh_l + msg + sh_n, index==1)
             if index == len(self._config.MassPoints):
                 print 
 

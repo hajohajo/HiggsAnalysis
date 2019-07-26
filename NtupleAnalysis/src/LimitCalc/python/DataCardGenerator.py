@@ -654,10 +654,9 @@ class DataCardGenerator:
             for validMass in dg.validMassPoints:
                 if validMass in self._config.MassPoints:
                     myMassIsConsideredStatus = True
-#            if not myIngoreOtherQCDMeasurementStatus and myMassIsConsideredStatus:
+
             if myMassIsConsideredStatus:
-                if self.verbose:
-                    print "Constructing datacard column for data group %s%s" % (ShellStyles.NoteStyle() + dg.label, sh_n)
+                self.Verbose("Constructing datacard column for data group %s and mass point %d (%s)" % (sh_t + dg.label + sh_n, validMass, self._config.MassPoints), True)
 
                 # Construct datacard column object
                 myColumn = None

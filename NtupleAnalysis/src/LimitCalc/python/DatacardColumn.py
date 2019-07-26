@@ -38,6 +38,7 @@ sh_e = ShellStyles.ErrorStyle()
 sh_s = ShellStyles.SuccessStyle()
 sh_h = ShellStyles.HighlightStyle()
 sh_a = ShellStyles.HighlightAltStyle()
+sh_l = ShellStyles.AltStyle()
 sh_t = ShellStyles.NoteStyle()
 sh_n = ShellStyles.NormalStyle()
 sh_w = ShellStyles.WarningStyle()
@@ -424,9 +425,11 @@ class DatacardColumn():
         Returns true if column is enabled for given mass point
         '''
         myResult = (mass in self._enabledForMassPoints) and self._isPrintable
+        #self.Print("(%s in %s) = %s" % (mass, self._enabledForMassPoints, mass in self._enabledForMassPoints), True)
+
         # Ignore empty column for heavy H+
         myMassStatus = not (self.typeIsEmptyColumn() and (mass > 179 or config.OptionLimitOnSigmaBr))
-        #print self._label,myResult,myMassStatus
+
         return myResult and myMassStatus and self.getLandsProcess != None
 
     def disable(self):
@@ -978,7 +981,7 @@ class DatacardColumn():
                         myDictionary["purity"] = hCtrlPlotPurity
                         myDictionary["averagePurity"] = myAverageCtrlPlotPurity                        
 
-                        # For-loop: All self directories #iro
+                        # For-loop: All self directories
                         for item in dir(self):
                             if item.startswith("typeIs"):
                                 try:
@@ -1074,12 +1077,13 @@ class DatacardColumn():
         
         # Print summarty of warnings/errors (if any)
         if nNegativeRate >0:
-            msg = "Rate value for %s (%s) was negative (hence forced to zero) in %d bins" % (sh_h + myTitle + sh_n, sh_a + myName + sh_n, nNegativeRate)
+            msg = "Rate value for %s (%s) was negative in %d bin(s). Forced to zero." % (sh_h + myTitle + sh_n, sh_a + myName + sh_n, nNegativeRate)
             self.Print(msg, True)
 
         if nBelowMinStatUncert > 0:
-            msg = "Rate value for %s (%s) was below minimum statistical uncertainty (hence set to default min of %f) in %d bins" % (sh_h + myTitle + sh_e, myName, config.MinimumStatUncertainty, nBelowMinStatUncert)
-            self.Print(sh_e + msg + sh_n, True)
+            msg  = "Rate value for %s (%s) was below minimum statistical uncertainty in %d bin(s) " % (sh_h + myTitle + sh_n, sh_a + myName + sh_n, nBelowMinStatUncert)
+            msg += " Forced set to default minimum value of %f" % (config.MinimumStatUncertainty)
+            self.Print(msg, True)
 
         # Convert bin content to integers for signal injection
         if self.typeIsObservation() and hasattr(config, "OptionSignalInjection"):
@@ -1202,8 +1206,10 @@ class DatacardColumn():
                 return True
         return False
 
-    ## Returns nuisance for column (as string)
     def getNuisanceResultByMasterId(self, id):
+        '''
+        #Returns nuisance for column (as string)
+        '''
         if self._nuisanceResults == None:
             raise Exception(ErrorStyle()+"Error (data group ='"+self._label+"'):"+sh_n+" Nuisance values have not been cached! (did you forget to call doDataMining()?)")
         if len(self._nuisanceResults) == 0:
@@ -1213,8 +1219,10 @@ class DatacardColumn():
                 return result.getResult()
         raise Exception("Nuisance with id='"+id+"' not found in data group '"+self._label+"'! Check first with hasNuisance(id) that data group has the nuisance.")
 
-    ## Returns full nuisance for column (as string)
     def getFullNuisanceResultByMasterId(self, id):
+        '''
+        Returns full nuisance for column (as string)
+        '''
         if self._nuisanceResults == None:
             raise Exception(ErrorStyle()+"Error (data group ='"+self._label+"'):"+sh_n+" Nuisance values have not been cached! (did you forget to call doDataMining()?)")
         if len(self._nuisanceResults) == 0:
@@ -1224,8 +1232,10 @@ class DatacardColumn():
                 return result
         raise Exception("Nuisance with id='"+id+"' not found in data group '"+self._label+"'! Check first with hasNuisance(id) that data group has the nuisance.")
 
-    ## Stores the cached result histograms to root file
     def setResultHistogramsToRootFile(self, rootfile):
+        '''
+        Stores the cached result histograms to root file
+        '''
         if self._rateResult == None:
             raise Exception(ErrorStyle()+"Error (data group ='"+self._label+"'):"+sh_n+" Rate value has not been cached! (did you forget to call doDataMining()?)")
         if self._rateResult.getResult() == None:
@@ -1235,9 +1245,12 @@ class DatacardColumn():
         # Set nuisance histograms
         for result in self._nuisanceResults:
             result.linkHistogramsToRootFile(rootfile)
+        return
 
-    ## Print debugging information
     def printDebug(self):
+        '''
+        Print debugging information
+        '''
         print "Datagroup '"+self._label+"':"
         if self._landsProcess > -999:
             print "  process:", self._landsProcess
@@ -1245,6 +1258,7 @@ class DatacardColumn():
         if len(self._nuisanceIds) > 0:
             print "  nuisances:", self._nuisanceIds
         print "  shape histogram:", self.getFullShapeHistoName()
+        return
 
     def doSeparateAdditionalResults(self):
         myNewNuisancesList = []
@@ -1263,17 +1277,3 @@ class DatacardColumn():
         self._nuisanceResults.extend(myNewNuisancesList)
         self._nuisanceIds.extend(myNewNuisanceIdsList)
         return myNewNuisanceIdsList
-
-    ## \var _additionalNormalisationFactor
-    # Normalisation factor is multiplied by this factor (needed for EWK)
-    ## \var _label
-    # Label of column to be printed in datacard
-    ## \var _enabledForMassPoints
-    # List of mass points for which the column is enabled
-    ## \var _rateId
-    # Id of rate object
-    ## \var _nuisances
-    # List of nuisance Id's
-    ## \var _datasetMgr
-    # Path to files
-    # FIXME continue doc

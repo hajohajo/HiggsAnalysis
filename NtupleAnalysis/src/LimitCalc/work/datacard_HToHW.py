@@ -100,7 +100,7 @@ OptionGenuineTauBackgroundSource       = "MC"  # [Options: "DataDriven", "MC"]
 OptionFakeTauMeasurementSource         = "MC"  # [default: "DataDriven"] (options: "DataDriven", "MC")
 OptionBr                               = 1.0   # [default: 1.0]    (The Br(t->bH+) used in figures and tables)
 OptionSqrtS                            = 13    # [default: 13]     (The sqrt(s) used in figures and tables)
-OptionBlindThreshold                   = None  # [default: None]   (If signal exceeds this fraction of expected events, data is blinded)
+OptionBlindThreshold                   = 0.30  # [default: None]   (If signal exceeds this fraction of expected events, data is blinded in a given bin)
 OptionCombineSingleColumnUncertainties = False # [default: False]  (Merge nuisances with quadratic sum using the TableProducer.py Only applied to nuisances with one column)
 OptionDisplayEventYieldSummary         = False # [default: False]  (Print "Event yield summary", using the TableProducer.py. A bit messy at the moment)
 OptionDoWithoutSignal                  = False # [default: False]  (Do the control plots without any signal present)
@@ -119,7 +119,7 @@ PlotLegendHeader                       = "H^{#pm}#rightarrowW^{#pm}H^{0}, H^{0}#
 SignalName                             = "ChargedHiggs_HplusTB_HplusToHW_M%s_mH200_2ta_NLO"
 DataCardName                           = "HToHW"          # [default: Hplus2hw_13TeV]  (Used by TableProducer.py)
 BlindAnalysis                          = True             # [default: True]   (Change only if "green light" for unblinding)
-MinimumStatUncertainty                 = 0.5              # [default: 0.5]    (min. stat. uncert. to set to bins with zero events)
+MinimumStatUncertainty                 = 0.5              # [default: 0.5]    (Minimum stat. uncert. to set to bins with zero events)
 UseAutomaticMinimumStatUncertainty     = False            # [default: False]  (Do NOT use the MinimumStatUncertainty; determine value from lowest non-zero rate for each dataset   )
 ToleranceForLuminosityDifference       = 0.05             # [default: 0.05]   (Tolerance for throwing error on luminosity difference; "0.01" means that a 1% is required) 
 ToleranceForMinimumRate                = 0.0              # [default: 0.0]    (Tolerance for almost zero rate columns with smaller rate are suppressed) 
@@ -176,11 +176,10 @@ signalTemplate   = DataGroup(datasetType="Signal", histoPath=histoPathInclusive,
 signalDataGroups =  []
 # For-loop: All mass points
 for mass in MassPoints:
-    myMassList=[mass]
     hx=signalTemplate.clone()
     hx.setLabel("Hp" + str(mass) )
     hx.setLandSProcess(1)
-    hx.setValidMassPoints(myMassList)
+    hx.setValidMassPoints([mass])
     hx.setNuisances(mySystematics["Signal"])
     #hx.setDatasetDefinition("ChargedHiggs_HplusTB_HplusToHW_M%s_mH200_2ta_NLO" % (mass))
     hx.setDatasetDefinition(SignalName % (mass))
@@ -518,7 +517,7 @@ hTopMass = ControlPlotInput(
     )
 
 hTopBjetPt = ControlPlotInput(
-    title     = "BJetPt",
+    title     = "TopBJetPt",
     histoName = "TopBjetPt_AfterAllSelections",
     details   = { "xlabel"             : "p_{T}",
                   "ylabel"             : "Events",
@@ -532,7 +531,7 @@ hTopBjetPt = ControlPlotInput(
     )
 
 hTopBjetEta = ControlPlotInput(
-    title     = "JetEta",
+    title     = "TopBJetEta",
     histoName = "TopBjetEta_AfterAllSelections",
     details   = { "xlabel"             : "#eta",
                   "ylabel"             : "Events",
@@ -546,7 +545,7 @@ hTopBjetEta = ControlPlotInput(
     )
 
 hTopBjetBdisc = ControlPlotInput(
-    title     = "BtagDisc",
+    title     = "TopBJetBdisc",
     histoName = "TopBjetBdisc_AfterAllSelections",
     details   = { "xlabel"             : "CSVv2 discriminator",
                   "ylabel"             : "Events",
@@ -708,7 +707,7 @@ hBJetPt = ControlPlotInput(
     )
 
 hBJetEta = ControlPlotInput(
-    title     = "JetEta",
+    title     = "BJetEta",
     histoName = "BJetEta_AfterAllSelections",
     details   = { "xlabel"             : "#eta",
                   "ylabel"             : "Events",

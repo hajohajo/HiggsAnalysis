@@ -134,14 +134,26 @@ def CheckOptions(config):
     Check various options defined in the config (=opts.datacard) and warns user if some flags
     are disabled
     '''
+    Verbose("Checking options defined in imported module %s" % (sh_h + config.__file__ + sh_n), True)
     msgs = []
     if not config.OptionIncludeSystematics:
         msg = sh_t + "Skipping of systematic uncertainties and will only use statistical uncertainties"  + sh_n + " (flag \"OptionIncludeSystematics\" in the datacard file)"
         msgs.append(msg)
 
-    if not config.OptionDoControlPlots:
+    if config.OptionDoControlPlots:
+
+        # Sanity check: Ensure no two control plots have the same title
+        cList = [c.getTitle() for c in config.ControlPlots]
+        for i, c in enumerate(config.ControlPlots, 1):
+            if c.getTitle() in cList[i:]: 
+                msg  = "Found control plots with the same title %s! " % (sh_a + c.getTitle() + sh_n)
+                msg += "This will result in ROOT creating 2 canvases with same name. "
+                msg += "Please check all ControlPlotInput() definitions in the file %s" % (sh_h + config.__file__ + sh_n)
+                raise Exception(msg)
+    else:
         msg = sh_t + "Skipping of data-driven control plot generation" + sh_n + " (flag \"OptionDoControlPlots\" in the datacard file)"
         msgs.append(msg)
+
 
     if not config.BlindAnalysis:
         msg = sh_e + "Unblinding analysis results!" + sh_n + " (flag \"BlindAnalysis\" in the datacard file)"
