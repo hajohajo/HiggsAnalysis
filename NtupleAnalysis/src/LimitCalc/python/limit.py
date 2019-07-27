@@ -21,7 +21,21 @@ import HiggsAnalysis.NtupleAnalysis.tools.statisticalFunctions as statisticalFun
 import HiggsAnalysis.LimitCalc.BRdataInterface as BRdataInterface
 import HiggsAnalysis.NtupleAnalysis.tools.plots as plots
 import HiggsAnalysis.NtupleAnalysis.tools.histograms as histograms
+import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
+
+
+#================================================================================================ 
+# Shell Type
+#================================================================================================ 
+sh_e = ShellStyles.ErrorStyle()
+sh_s = ShellStyles.SuccessStyle()
+sh_h = ShellStyles.HighlightStyle()
+sh_a = ShellStyles.HighlightAltStyle()
+sh_l = ShellStyles.AltStyle()
+sh_t = ShellStyles.NoteStyle()
+sh_n = ShellStyles.NormalStyle()
+sh_w = ShellStyles.WarningStyle()
 
 
 #================================================================================================ 
@@ -126,8 +140,6 @@ def useParentheses():
     '''
     global BRlimit, sigmaBRlimit
     
-    #BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
-    #sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
     BRlimit      = "%s(t#rightarrowH^{+}b)#times%s(%s)" % (BR, BR, hplusDecayMode)
     sigmaBRlimit = "#sigma(H^{+})#times%s(%s) (fb)" % (BR, hplusDecayMode)
     return
@@ -141,23 +153,15 @@ def useSubscript(HToTB=False):
     if HToTB:
         BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
         sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
-#    else:
-#        BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayMode)
-#        sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayMode)
-#        BRlimit      = " %s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayModeHtb)
-#        sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (fb)" % (BR, hplusDecayModeHtb)
     else:
         BRlimit      = "%s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayMode)
         sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (fb)" % (BR, hplusDecayMode)
     return
 
-useSubscript()
-
 def mHplus():
     '''
-    Label for m(H+)
+    Label for m(H+). Normally used as x-axis label
     '''
-    #label = "m_{H^{+}} (%s)" % massUnit()
     label = "m_{H^{#pm}} (%s)" % massUnit()
     return label
 
@@ -253,7 +257,7 @@ class BRLimits:
     Class for reading the BR limits from the JSON file produced by
     landsMergeHistograms.py
     '''
-    def __init__(self, directory=".", excludeMassPoints=[], limitsfile="limits.json", configfile="configuration.json"):
+    def __init__(self, directory=".", analysisType="HToTauNu", excludeMassPoints=[], limitsfile="limits.json", configfile="configuration.json"):
         '''
         Constructor
 
@@ -262,7 +266,7 @@ class BRLimits:
         \param excludeMassPoints  List of strings for mass points to exclude
         '''
         resultfile="limits.json"
-        #configfile="configuration.json"
+        configfile="configuration.json" #unknown purpose
 
         # Open limits file
         msg = "Opening file '%s'" % (limitsfile)
@@ -277,7 +281,15 @@ class BRLimits:
         f = open(os.path.join(directory, configfile), "r")
         config = json.load(f)
         f.close()
-        
+
+        self.analysisType = analysisType
+        myAnalyses = ["HToTauNu", "HToTB", "HToHW"]
+        if analysisType in myAnalyses:
+            self.analysisType = analysisType
+        else:
+            msg = "Invalid analysis type \"%s\". Please selected one of the following: \"%s" % (self.analysisType, "\", \"".join(myAnalyses) + "\"")
+            raise Exception(sh_e + msg + sh_n)
+
         self.lumi = float(limits["luminosity"])
         self.mass = config["masspoints"]
         self.isHeavyStatus = False
@@ -301,7 +313,6 @@ class BRLimits:
         # Print("self.mass[0] = %s. Is this key in limits[\"masspoints\"]? Answer: %s " % (self.mass[0], self.mass[0] in limits["masspoints"]), True)
         firstMassPoint = limits["masspoints"][self.mass[0]]
         
-
         if "observed" in firstMassPoint:
             self.observed = [limits["masspoints"][m]["observed"] for m in self.mass]
             members.append("observed")
@@ -328,7 +339,6 @@ class BRLimits:
             setattr(self, attr+"_string", [m for m in getattr(self, attr)])
             setattr(self, attr, [float(m) for m in getattr(self, attr)])
 
-       
         self.finalstates = []
         def hasDatacard(name):
             for datacard in config["datacards"]:
@@ -346,6 +356,23 @@ class BRLimits:
             self.finalstates.append("emu")
         return
 
+    def getSigmaBRlimitText(self):
+        
+        sigmaBRlimits = {}
+
+        br = "#sigma_{H^{#pm}} #bf{#it{#Beta}} (%s) (pb)"
+        sigmaBRlimits["HToTauNu"] = br % ( "H^{#pm} #rightarrow #tau^{pm}_{h} #nu_{#tau}")
+        sigmaBRlimits["HToHW"]    = br % ( "H^{#pm} #rightarrow H^{0}_{SM} W^{#pm}")
+        sigmaBRlimits["HToTB"]    = br % ( "H^{#pm} #rightarrow tb" )
+        return sigmaBRlimits[self.analysisType]
+
+    def getFinalStateText(self):
+        
+        finalStates = {}
+        finalStates["HToTauNu"] = "#tau_{h}+jets final state"
+        finalStates["HToHW"]    = "#mu#tau_{h} and e#tau_{h} final states"
+        finalStates["HToTB"]    = "fully hadronic final state"
+        return finalStates[self.analysisType]
 
     def getLuminosity(self):
         '''
@@ -480,8 +507,8 @@ class BRLimits:
         '''
         table = self.getLimitsTable(unblindedStatus, nDigits)
         # Print limits (row by row)
-        for row in table:
-            print row
+        for i, row in enumerate(table,1):
+            Print(row, i==1)
         return
 
         
