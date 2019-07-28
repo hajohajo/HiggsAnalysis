@@ -2142,11 +2142,13 @@ class PlotBase:
                 s += " TeV"
         histograms.addEnergyText(x, y, s)
 
-    ## Add standard CMS texts
-    #
-    # \param addLuminosityText  If True, add luminosity text (use stored luminosity)
-    # \param kwargs             Keyword arguments, forwarded to histograms.addStandardTexts()
     def addStandardTexts(self, addLuminosityText=False, **kwargs):
+        '''
+        Add standard CMS texts
+        
+        \param addLuminosityText  If True, add luminosity text (use stored luminosity)
+        \param kwargs             Keyword arguments, forwarded to histograms.addStandardTexts()
+        '''
         lumi = None
         if hasattr(self, "luminosity") and addLuminosityText:
             lumi = self.luminosity
@@ -2162,21 +2164,27 @@ class PlotBase:
                 s += " TeV"
 
         histograms.addStandardTexts(lumi=lumi, sqrts=s, **kwargs)
+        return
 
-    ## Update drawing options
-    #
-    # \param kwargs   Keyword arguments (see plots.PlotDrawer())
     def setDrawOptions(self, **kwargs):
+        '''
+        Update drawing options
+        
+        \param kwargs   Keyword arguments (see plots.PlotDrawer())
+        '''
         # kwargs may contain dictionaries, we want to take a copy of
         # all of them
         self.drawOptions.update(copy.deepcopy(kwargs))
+        return
 
-    ## Save the plot to file(s)
-    #
-    # \param formats   Save to these formats (if not given, the values
-    #                  given in the constructor and in
-    #                  appendSaveFormat() are used
     def save(self, formats=None):
+        '''
+        Save the plot to file(s)
+        
+        \param formats   Save to these formats (if not given, the values
+                         given in the constructor and in
+                         appendSaveFormat() are used
+        '''
         if formats == None:
             formats = self.saveFormats
 
@@ -2187,14 +2195,17 @@ class PlotBase:
             self.cf.canvas.SaveAs(self.cf.canvas.GetName()+f)
 
         ROOT.gErrorIgnoreLevel = backup
-        
-    ## Save the plot to file(s)
-    #
-    # \param formats   Save to these formats (if not given, the values
-    #                  given in the constructor and in
-    #                  appendSaveFormat() are used
-    # \param saveName  Alternative name for saving
+        return
+
     def saveAs(self, saveName, formats=None):
+        '''
+        Save the plot to file(s)
+        
+        \param formats   Save to these formats (if not given, the values
+        given in the constructor and in
+        appendSaveFormat() are used
+        \param saveName  Alternative name for saving
+        '''
         if formats == None:
             formats = self.saveFormats
 

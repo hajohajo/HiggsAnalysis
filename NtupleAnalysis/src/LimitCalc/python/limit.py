@@ -357,11 +357,13 @@ class BRLimits:
         return
 
     def getSigmaBRlimitText(self):
-        
+        '''
+        https://twiki.cern.ch/twiki/bin/viewauth/CMS/Internal/FigGuidelines (10 Sep 2018) 
+        '''
         sigmaBRlimits = {}
 
         br = "#sigma_{H^{#pm}} #bf{#it{#Beta}} (%s) (pb)"
-        sigmaBRlimits["HToTauNu"] = br % ( "H^{#pm} #rightarrow #tau^{pm}_{h} #nu_{#tau}")
+        sigmaBRlimits["HToTauNu"] = br % ( "H^{#pm} #rightarrow #tau^{#pm} #nu_{#tau}")
         sigmaBRlimits["HToHW"]    = br % ( "H^{#pm} #rightarrow H^{0}_{SM} W^{#pm}")
         sigmaBRlimits["HToTB"]    = br % ( "H^{#pm} #rightarrow tb" )
         return sigmaBRlimits[self.analysisType]
@@ -374,12 +376,28 @@ class BRLimits:
         finalStates["HToTB"]    = "fully hadronic final state"
         return finalStates[self.analysisType]
 
+    def getHardProcessText(self):
+        
+        processes = {}
+        processes["HToTauNu"] = "pp #rightarrow t(b)H^{#pm} #rightarrow #tau^{#pm}#nu_{#tau}"
+        processes["HToHW"]    = "pp #rightarrow t(b)H^{#pm} #rightarrow t(b)"
+        processes["HToTB"]    = "pp #rightarrow t(b)H^{#pm} #rightarrow t(b)"
+        return processes[self.analysisType]
+
+
+    def getBRassumptionText(self):
+
+        assumptions = {}
+        assumptions["HToTauNu"] = "#bf{#it{#Beta}}(H^{#pm} #rightarrow #tau^{#pm}#nu_{#tau}) = 1"
+        assumptions["HToHW"]    = ""
+        assumptions["HToTB"]    = ""
+        return assumptions[self.analysisType]
+
     def getLuminosity(self):
         '''
         Get the integrated luminosity in 1/pb
         '''
         return self.lumi
-
 
     def getFinalstates(self):
         '''
@@ -1694,9 +1712,6 @@ def doTanBetaPlotGeneric(name, graphs, luminosity, finalstateText, xlabel, scena
     plot.createFrame(name, opts={"ymin": tanbMin, "ymax": tanbMax, "xmin": frameXmin, "xmax": frameXmax})
     plot.frame.GetXaxis().SetTitle(xlabel)
     plot.frame.GetYaxis().SetTitle(tanblimit)
-
-####    plot.getPad().SetLogy(True)
-
     plot.draw()
     
     plot.setLuminosity(luminosity)
@@ -1706,8 +1721,6 @@ def doTanBetaPlotGeneric(name, graphs, luminosity, finalstateText, xlabel, scena
         plot.addStandardTexts(cmsTextPosition="left",addLuminosityText=True)
     else:
         plot.addStandardTexts(cmsTextPosition="right",addLuminosityText=True)
-#    histograms.addLuminosityText(x=None, y=None, lumi="2.3-4.9")
-#    histograms.addLuminosityText(x=None, y=None, lumi="%s pb^{-1}"%luminosity)
 
     size = 20
     if regime == "light":

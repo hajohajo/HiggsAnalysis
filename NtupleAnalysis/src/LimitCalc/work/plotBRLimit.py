@@ -18,8 +18,9 @@ EXAMPLES:
 ../../../plotBRLimit.py --opaqueLegend --yMin 0.1 --yMax 30 --subdir BDT0p40_Binning12_28Apr2018
 /plotBRLimit_Hplus2tb.py --dir datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_190726_150229_autoMCStats/CombineResults_taujets_190726_171059/ --saveDir /publicweb/a/aattikis/Combine/ --cutLineX 300,500,600,700 --opaqueLegend--url --gridX --gridY --yMin 1e-2 --yMax 1
 
+
 LAST USED:
-./plotBRLimit_Hplus2tb.py --dir datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_190726_150229_autoMCStats/CombineResults_taujets_190726_171059/ --saveDir /publicweb/a/aattikis/Combine/ --opaqueLegend --yMin 1e-2 --yMax 10
+./plotBRLimit.py --dir datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_190726_150229_autoMCStats/CombineResults_taujets_190726_171059/ --saveDir /publicweb/a/aattikis/Combine/ --opaqueLegend --yMin 1e-2 --yMax 10 --analysisType "HToHW"
 
 '''
 
@@ -109,17 +110,9 @@ def main(opts):
     # Set the paper mode
     if opts.paper:
         histograms.cmsTextMode = histograms.CMSMode.PAPER
-    # Set the paper mode
-    if opts.unpublished:
-        histograms.cmsTextMode = histograms.CMSMode.UNPUBLISHED
-    # Use BR symbol for H+ decay channel with subscript or parentheses?
-
-    if opts.parentheses: #fixme - unneeded
-        limit.useParentheses()
     else:
-        limit.useSubscript(True)
-    
-    # Do the limit plots
+        histograms.cmsTextMode = histograms.CMSMode.UNPUBLISHED
+
     Verbose("Doing the limits plots (linear scale)", True)
     doBRlimit(limits, opts.unblinded, opts, logy=False)
 
@@ -167,20 +160,21 @@ def doBRlimit(limits, unblindedStatus, opts, logy=False):
             ])
 
     # Plot the TGraphs
-    plot = plots.PlotBase(graphs, saveFormats=opts.saveFormats)
+    plot = plots.PlotBase(graphs, saveFormats=[])
     plot.setLuminosity(limits.getLuminosity())
-    plot.setLegendHeader("95% CL upper limits")
 
-    # Customise legend entries
+    # Customise legend (NOTE: font[42]{} needed to remove bold style)
+    # https://root.cern.ch/doc/master/classTAttText.html#T4)
+    plot.setLegendHeader("#font[42]{95% CL upper limits}") 
     plot.histoMgr.setHistoLegendLabelMany({
-            "Expected": "Median expected",
-            "Expected1": "68% expected",
-            "Expected2": "95% expected"
+            "Expected" : "#font[42]{Median expected}",
+            "Expected1": "#font[42]{68% expected}",
+            "Expected2": "#font[42]{95% expected}"
             })
 
     # Create legend
     xPos   = 0.53
-    legend = getLegend(limit, opts, xPos)
+    legend = getLegend(opts, xPos)
     plot.setLegend(legend)
 
     # Get y-min, y-max, and histogram name to be saved as
@@ -189,7 +183,7 @@ def doBRlimit(limits, unblindedStatus, opts, logy=False):
         ymin = opts.yMin
     if opts.yMax != -1:
         ymax = opts.yMax
-
+    
     if len(limits.mass) == 1:
         plot.createFrame(saveName, opts={"xmin": limits.mass[0]-5.0, "xmax": limits.mass[0]+5.0, "ymin": ymin, "ymax": ymax})
     else:
@@ -216,18 +210,19 @@ def doBRlimit(limits, unblindedStatus, opts, logy=False):
     plot.getPad().SetGridy(opts.gridY)
 
     # Draw the plot with standard texts
-    plot.draw()
-    plot.addStandardTexts()
-    
+    plot.draw()    
+
+    # Add standard CMS/Lumi/Preliminary text on canvas
+    plot.addStandardTexts(addLuminosityText=True)
+
     # Add physics-related text on canvas
-    addPhysicsText(histograms, limit, limits, x=xPos) #fixme
+    addPhysicsText(histograms, limits, x=xPos)
     
     # Save the canvas
     plot.save()
 
     # Save the plots
     SavePlot(plot, saveName, os.path.join(opts.saveDir, opts.subdir), opts.saveFormats)
-
     return
 
 
@@ -257,13 +252,10 @@ def SavePlot(plot, plotName, saveDir, saveFormats = [".png", ".pdf", ".C"]):
     return
 
 
-def getLegend(limit, opts, xLeg1=0.53):
-    dy = -0.10
-    if limit.BRassumption != "":
-        dy -= 0.05
+def getLegend(opts, xLeg1=0.53):
+    dy = -0.14
 
     # Create customised legend
-    #xLeg1 = 0.53
     xLeg2 = 0.93
     yLeg1 = 0.70 + dy
     yLeg2 = 0.91 + dy
@@ -296,23 +288,21 @@ def getYMinMaxAndName(limits, name, logy, opts):
     return ymin, ymax, name
 
 
-def addPhysicsText(histograms, limit, limits, x=0.45, y=0.84, size=20):
+def addPhysicsText(histograms, limits, x=0.45, y=0.84, size=20):
     '''
     Add physics-process text on canvas
     '''
     # Add process text on canvas
-    histograms.addText(x, y+0.04, limit.processHeavyHtb, size=size)  #fixme iro xenios
+    histograms.addText(x, y+0.04, limits.getHardProcessText(), size=size)
 
     # Add final-state text
     histograms.addText(x, y, limits.getFinalStateText(), size=size)
 
-    if 0:
-        histograms.addText(x, y, "#tau_{h}+jets and #mu#tau_{h} final states", size=size)
-        histograms.addText(x, y, "#tau_{h}+jets final state", size=size)
-        histograms.addText(x, y, "#tau_{h}+jets, #mu#tau_{h}, ee, e#mu, #mu#mu final states", size=size)
+    #lumi="%s" % limits.getLuminosity(), sqrts="13 TeV", addCmsText=True)#, cmsTextPosition=None, cmsExtraTextPosition=None, cmsText=Non)
 
-    if limit.BRassumption != "":
-        histograms.addText(x, y-0.05, limit.BRassumption, size=size)
+    # Add BR assumption (if applicaple)
+    if len(limits.getBRassumptionText()) >0:
+        histograms.addText(x, y-0.05, limits.getBRassumptionText(), size=size)
     return
 
 
@@ -343,6 +333,7 @@ def doLimitError(limits, unblindedStatus):
                 obsRelErrors = [(limit.divideGraph(obsErr, obs), "ObsRelErr")]
                 obsLabels = {"ObsRelErr": "Observed"}
 
+
     if len(expRelErrors) == 0 and len(obsRelErrors) == 0:
         return
 
@@ -371,26 +362,27 @@ def doLimitError(limits, unblindedStatus):
         plot.createFrame("limitsBrRelativeUncertainty", opts={"xmin": limits.mass[0]-5.0, "xmax": limits.mass[0]+5.0,  "ymin": 0, "ymaxfactor": 1.5})
     else:
         plot.createFrame("limitsBrRelativeUncertainty", opts={"ymin": 0, "ymaxfactor": 1.5})
-    plot.frame.GetXaxis().SetTitle(limit.mHplus())
+    plot.frame.GetXaxis().SetTitle(limits.mHplus())
     plot.frame.GetYaxis().SetTitle("Uncertainty/limit")
 
+    # Draw the plot
     plot.draw()
-
     plot.setLuminosity(limits.getLuminosity())
-    plot.addStandardTexts()
-
-    size = 20
-    x = 0.2
-    histograms.addText(x, 0.88, limit.process, size=size)
-    histograms.addText(x, 0.84, limits.getFinalstateText(), size=size)
-    histograms.addText(x, 0.79, limit.BRassumption, size=size)
-
-    size = 22
-    x = 0.55
-    histograms.addText(x, 0.88, "Toy MC relative", size=size)
-    histograms.addText(x, 0.84, "statistical uncertainty", size=size)
+    plot.addStandardTexts(addLuminosityText=True)
+    
+    # Add auxiliary text
+    histograms.addText(0.20, 0.88, limits.getHardProcessText() , size=20)
+    histograms.addText(0.20, 0.84, limits.getFinalStateText()  , size=20)
+    histograms.addText(0.20, 0.79, limits.getBRassumptionText(), size=20)
+    histograms.addText(0.55, 0.88, "Toy MC relative"           , size=22)
+    histograms.addText(0.55, 0.84, "statistical uncertainty"   , size=22)
 
     plot.save()
+
+    # Save the plots
+    SavePlot(plot, "limitError", os.path.join(opts.saveDir, opts.subdir), opts.saveFormats)
+
+    return
 
 
 if __name__ == "__main__":
@@ -415,7 +407,6 @@ if __name__ == "__main__":
     SAVEFORMATS  = "pdf,png,C"
     SUBDIR       = ""
     UNBLINDED    = False
-    UNPUBLISHED  = False
     URL          = False
     VERBOSE      = False
     ANALYSISTYPE = "HToTauNu"
@@ -449,12 +440,6 @@ if __name__ == "__main__":
     parser.add_option("--url", dest="url", action="store_true", default=URL,
                       help="Don't print the actual save path the plots are saved, but print the URL instead [default: %s]" % URL)
     
-    parser.add_option("--unpub", dest="unpublished", default=UNPUBLISHED, action="store_true",
-                      help="Unpublished mode [default: %s]" % (UNPUBLISHED) )
-
-    parser.add_option("--parentheses", dest="parentheses", default=PARENTHESES, action="store_true",
-                      help="Use parentheses for sigma and BR [default: %s]" % (PARENTHESES) )
-
     parser.add_option("--opaqueLegend", dest="opaqueLegend", default=EXCLUDEAREA, action="store_true",
                       help="Add excluded area as in MSSM exclusion plots [default: %s]" % (EXCLUDEAREA) )
 
