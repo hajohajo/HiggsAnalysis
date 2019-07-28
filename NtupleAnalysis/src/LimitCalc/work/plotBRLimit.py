@@ -3,9 +3,11 @@
 DESCRIPTION:
 This is the swiss pocket knife for running Lands/Combine on large array of datacards
 
+
 INSTRUCTIONS:
 Produce limits using the Combine tool. The limits.json file will be the input of this
 script to produced the plot
+
 
 USAGE:
 cd datacards_test4b/CombineResults_taujets_170913_192047
@@ -17,10 +19,11 @@ EXAMPLES:
 ../../../plotBRLimit.py --opaqueLegend --gridX --gridY --yMin 1e-1 --yMax 50 --subdir StatOnly --url
 ../../../plotBRLimit.py --opaqueLegend --yMin 0.1 --yMax 30 --subdir BDT0p40_Binning12_28Apr2018
 /plotBRLimit_Hplus2tb.py --dir datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_190726_150229_autoMCStats/CombineResults_taujets_190726_171059/ --saveDir /publicweb/a/aattikis/Combine/ --cutLineX 300,500,600,700 --opaqueLegend--url --gridX --gridY --yMin 1e-2 --yMax 1
+./plotBRLimit.py --dir datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_190726_150229_autoMCStats/CombineResults_taujets_190726_171059/ --saveDir /publicweb/a/aattikis/Combine/ --yMin 1e-2 --yMax 10 --analysisType "HToHW" --unblinded
 
 
 LAST USED:
-./plotBRLimit.py --dir datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_190726_150229_autoMCStats/CombineResults_taujets_190726_171059/ --saveDir /publicweb/a/aattikis/Combine/ --opaqueLegend --yMin 1e-2 --yMax 10 --analysisType "HToHW"
+./plotBRLimit.py --dir datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_190726_150229_autoMCStats/CombineResults_taujets_190726_171059/ --saveDir /publicweb/a/aattikis/Combine/ --yMin 1e-2 --yMax 10 --analysisType "HToHW"
 
 '''
 
@@ -102,7 +105,7 @@ def main(opts):
 
     # Apply TDR style
     style = tdrstyle.TDRStyle()
-    if not limits.isHeavyStatus:
+    if not limits.getIsHeavy():
         # Give more space for four digits on the y axis labels
         style.tdrStyle.SetPadLeftMargin(0.19)
         style.tdrStyle.SetTitleYOffset(1.6)
@@ -165,12 +168,20 @@ def doBRlimit(limits, unblindedStatus, opts, logy=False):
 
     # Customise legend (NOTE: font[42]{} needed to remove bold style)
     # https://root.cern.ch/doc/master/classTAttText.html#T4)
-    plot.setLegendHeader("#font[42]{95% CL upper limits}") 
-    plot.histoMgr.setHistoLegendLabelMany({
-            "Expected" : "#font[42]{Median expected}",
-            "Expected1": "#font[42]{68% expected}",
-            "Expected2": "#font[42]{95% expected}"
-            })
+    if opts.boldText:
+        plot.setLegendHeader("95% CL upper limits")
+        plot.histoMgr.setHistoLegendLabelMany({
+                "Expected" : "Median expected",
+                "Expected1": "68% expected",
+                "Expected2": "95% expected"
+                })
+    else:
+        plot.setLegendHeader("#font[42]{95% CL upper limits}") 
+        plot.histoMgr.setHistoLegendLabelMany({
+                "Expected" : "#font[42]{Median expected}",
+                "Expected1": "#font[42]{68% expected}",
+                "Expected2": "#font[42]{95% expected}"
+                })
 
     # Create legend
     xPos   = 0.53
@@ -293,16 +304,14 @@ def addPhysicsText(histograms, limits, x=0.45, y=0.84, size=20):
     Add physics-process text on canvas
     '''
     # Add process text on canvas
-    histograms.addText(x, y+0.04, limits.getHardProcessText(), size=size)
+    histograms.addText(x, y+0.04, limits.getHardProcessText(), size=size, bold=opts.boldText)
 
     # Add final-state text
-    histograms.addText(x, y, limits.getFinalStateText(), size=size)
-
-    #lumi="%s" % limits.getLuminosity(), sqrts="13 TeV", addCmsText=True)#, cmsTextPosition=None, cmsExtraTextPosition=None, cmsText=Non)
+    histograms.addText(x, y, limits.getFinalStateText(), size=size, bold=opts.boldText)
 
     # Add BR assumption (if applicaple)
     if len(limits.getBRassumptionText()) >0:
-        histograms.addText(x, y-0.05, limits.getBRassumptionText(), size=size)
+        histograms.addText(x, y-0.05, limits.getBRassumptionText(), size=size, bold=opts.boldText)
     return
 
 
@@ -325,6 +334,7 @@ def doLimitError(limits, unblindedStatus):
             "ExpRelErr4": "Expected -2#sigma",
             }
 
+
     if unblindedStatus:
         obsErr = limits.observedErrorGraph()
         if obsErr != None:
@@ -332,12 +342,17 @@ def doLimitError(limits, unblindedStatus):
             if obs != None:
                 obsRelErrors = [(limit.divideGraph(obsErr, obs), "ObsRelErr")]
                 obsLabels = {"ObsRelErr": "Observed"}
+    else:
+        Verbose("Blinded mode. Doing nothing", True)
 
-
+    
     if len(expRelErrors) == 0 and len(obsRelErrors) == 0:
+        Print("Will not create the plot: len(expRelErrors) == %d,  len(obsRelErrors) == %d" % (len(expRelErrors), len(obsRelErrors)), True)
         return
+    else:
+        Print("Creating the plot", True)
 
-    # Create the plot
+
     plot = plots.PlotBase()
     if len(expRelErrors) > 0:
         plot.histoMgr.extendHistos([histograms.HistoGraph(x[0], x[1], drawStyle="PL", legendStyle="lp") for x in expRelErrors])
@@ -371,11 +386,11 @@ def doLimitError(limits, unblindedStatus):
     plot.addStandardTexts(addLuminosityText=True)
     
     # Add auxiliary text
-    histograms.addText(0.20, 0.88, limits.getHardProcessText() , size=20)
-    histograms.addText(0.20, 0.84, limits.getFinalStateText()  , size=20)
-    histograms.addText(0.20, 0.79, limits.getBRassumptionText(), size=20)
-    histograms.addText(0.55, 0.88, "Toy MC relative"           , size=22)
-    histograms.addText(0.55, 0.84, "statistical uncertainty"   , size=22)
+    histograms.addText(0.20, 0.88, limits.getHardProcessText() , size=20, bold=opts.boldText)
+    histograms.addText(0.20, 0.84, limits.getFinalStateText()  , size=20, bold=opts.boldText)
+    histograms.addText(0.20, 0.79, limits.getBRassumptionText(), size=20, bold=opts.boldText)
+    histograms.addText(0.55, 0.88, "Toy MC relative"           , size=22, bold=opts.boldText)
+    histograms.addText(0.55, 0.84, "statistical uncertainty"   , size=22, bold=opts.boldText)
 
     plot.save()
 
@@ -402,6 +417,7 @@ if __name__ == "__main__":
     MAXY         = -1
     MINY         = -1
     PAPER        = False
+    BOLDTEXT     = False
     PARENTHESES  = False
     SAVEDIR      = None
     SAVEFORMATS  = "pdf,png,C"
@@ -415,6 +431,9 @@ if __name__ == "__main__":
 
     parser.add_option("-v", "--verbose", dest="verbose", default=VERBOSE, action="store_true",
                       help="Verbose mode for debugging purposes [default: %s]" % (VERBOSE))
+
+    parser.add_option("--boldText", dest="boldText", default=BOLDTEXT, action="store_true",
+                      help="Use bold text printed on canvas? [default: %s]" % (BOLDTEXT))
 
     parser.add_option("--dir", dest="directory", default=DIRECTORY,
                       help=" Path to the multicrab task directory with the JSON files [default: %s]" % (DIRECTORY))

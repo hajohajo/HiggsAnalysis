@@ -199,7 +199,7 @@ def addText(x, y, text, *args, **kwargs):
 
 #================================================================================================   
 # Class definition
-#================================================================================================   
+#=====================1===========================================================================   
 class PlotText:
     '''
     Class for drawing text to current TPad with TLaTeX
@@ -433,8 +433,6 @@ def addLuminosityText(x, y, lumi, unit="fb^{-1}"):
     lumiStr += " "+unit
 
     addText(x, y, lumiStr, textDefaults.getSize("lumi"), bold=False)
-#    l.DrawLatex(x, y, "#intL=%.0f %s" % (lumi, unit))
-#    l.DrawLatex(x, y, "L=%.0f %s" % (lumi, unit))
     return
 
 def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=None, cmsExtraTextPosition=None, cmsText=None, cmsExtraText=None):

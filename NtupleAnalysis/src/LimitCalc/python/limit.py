@@ -43,39 +43,6 @@ sh_w = ShellStyles.WarningStyle()
 #================================================================================================ 
 verbose = False
 
-# Flag for stating if the plots are for paper (True) or not (False)
-forPaper = True
-
-# Label for branching fraction
-BR = "#it{B}"
-
-# Label for H+ decay mode
-hplusDecayMode    = "H^{+} #rightarrow H_{SM}W#rightarrow#tau#tau#mu#nu"
-hplusDecayModeHtb = "H^{+} #rightarrow t#bar{b}"
-
-# The label for the physics process
-process            = "t #rightarrow H^{+}b, %s" % hplusDecayMode
-processHeavy       = "pp #rightarrow #bar{t}(b)H^{+}, %s" % hplusDecayMode
-processHeavyHtb    = "pp #rightarrow #bar{t}(b)H^{+}, %s" % hplusDecayModeHtb
-processCombination = "pp #rightarrow #bar{t}(b)H^{+}"
-process            = "H^{#pm} #rightarrow #tau#nu"
-processHeavy       = process
-processCombination = process
-
-# Label for the H+->tau BR assumption. fixme: alexandros (does not seem to work!)
-BRassumption = ""
-#BRassumption = "%s(H^{+} #rightarrow #tau#nu) = 1" % BR
-
-# Y axis label for the BR
-BRlimit = None
-
-# Y axis label for the sigma x BR
-sigmaBRlimit = None
-
-# Y axis label for the tanbeta
-tanblimit = "tan #beta"
-#tanblimit = "95 % CL limit on tan #beta"
-
 # Labels for the final states
 _finalstateLabels = {
     "taujets": "^{}#tau_{h}+jets",
@@ -94,12 +61,11 @@ _finalstateYmaxBR = {
 
 # Default y axis maximum values for sigma x BR limit for the final states
 _finalstateYmaxSigmaBR = {
-    "etau"   : 10.0, # FIXME
-    "mutau"  : 10.0, # FIXME
-    "emu"    : 10.0, # FIXME
+    "etau"   : 10.0, 
+    "mutau"  : 10.0, 
+    "emu"    : 10.0, 
     "default":  1.0,
 }
-
 
 #================================================================================================ 
 # Function Definitions
@@ -125,13 +91,14 @@ def Print(msg, printHeader=True):
     return
 
 
-def massUnit():
+def massUnit(natural=True):
     '''
     Unit for mass (GeV vs. GeV/c^2
     '''
-    if forPaper:
+    if natural:
         return "GeV"
-    return "GeV/c^{2}"
+    else:
+        return "GeV/c^{2}"
 
 
 def useParentheses():
@@ -356,6 +323,12 @@ class BRLimits:
             self.finalstates.append("emu")
         return
 
+    def getIsHeavy(self):
+        return self.isHeavyStatus
+
+    def getIsLight(self):
+        return not self.isHeavyStatus
+
     def getSigmaBRlimitText(self):
         '''
         https://twiki.cern.ch/twiki/bin/viewauth/CMS/Internal/FigGuidelines (10 Sep 2018) 
@@ -503,7 +476,8 @@ class BRLimits:
         for i in xrange(len(self.mass_string)):
             mass = self.mass_string[i]
             if unblindedStatus:
-                observed = self.observed_string[i]
+                #observed = self.observed_string[i]
+                observed = precision % (self.observed_string[i])
             else:
                 observed = "BLINDED"
             median       = precision % (self.expectedMedian_string[i])
@@ -975,7 +949,6 @@ class SignificanceData:
 
     def isHeavyStatus(self):
         return self._isHeavyStatus
-
 
     def massPoints(self):
         return self._masses
@@ -1451,18 +1424,7 @@ def doTanBetaPlotGeneric(name, graphs, luminosity, finalstateText, xlabel, scena
     # Enable OpenGL for transparency
     #if opts.excludedArea:
     ROOT.gEnv.SetValue("OpenGL.CanvasPreferGL", 1)
-    
-#    isHeavy = regime != "light"
     tanbMax = 65
-
-#    if forPaper:
-#        if scenario in ["mhmaxup", "mhmodp", "mhmodm"] and not "_mA" in name:
-#            histograms.cmsTextMode = histograms.CMSMode.PAPER
-#        else:
-#            histograms.cmsTextMode = histograms.CMSMode.UNPUBLISHED
-#    else:
-#        histograms.cmsTextMode = histograms.CMSMode.PRELIMINARY
-
     blinded = True
     if "obs" in graphs.keys():
         blinded = False
@@ -1711,7 +1673,7 @@ def doTanBetaPlotGeneric(name, graphs, luminosity, finalstateText, xlabel, scena
 
     plot.createFrame(name, opts={"ymin": tanbMin, "ymax": tanbMax, "xmin": frameXmin, "xmax": frameXmax})
     plot.frame.GetXaxis().SetTitle(xlabel)
-    plot.frame.GetYaxis().SetTitle(tanblimit)
+    plot.frame.GetYaxis().SetTitle("tan#beta")
     plot.draw()
     
     plot.setLuminosity(luminosity)
