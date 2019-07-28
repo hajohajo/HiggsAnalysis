@@ -153,7 +153,10 @@ def doBRlimit(limits, unblindedStatus, opts, logy=False):
                 limit.setExcludedStyle(excluded)
                 graphs.append(histograms.HistoGraph(excluded, "Excluded", drawStyle="F", legendStyle="lpf", legendLabel="Observed"))
             else:
-                graphs.append(histograms.HistoGraph(gr, "Observed", drawStyle="PL", legendStyle="lp"))
+                if opts.boldText:
+                    graphs.append(histograms.HistoGraph(gr, "Observed", drawStyle="PL", legendStyle="lp"))
+                else:
+                    graphs.append(histograms.HistoGraph(gr, "#font[42]{Observed}", drawStyle="PL", legendStyle="lp"))
 
     # Add the expected lines
     graphs.extend([
@@ -341,7 +344,10 @@ def doLimitError(limits, unblindedStatus):
             obs = limits.observedGraph()
             if obs != None:
                 obsRelErrors = [(limit.divideGraph(obsErr, obs), "ObsRelErr")]
-                obsLabels = {"ObsRelErr": "Observed"}
+                if opts.boldText:
+                    obsLabels = {"ObsRelErr": "Observed"}
+                else:
+                    obsLabels = {"ObsRelErr": "#font[42]{Observed}"}
     else:
         Verbose("Blinded mode. Doing nothing", True)
 
