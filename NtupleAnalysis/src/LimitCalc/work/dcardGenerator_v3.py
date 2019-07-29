@@ -30,7 +30,7 @@ EXAMPLES:
 
 
 LAST USED:
-./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/
+./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/ --barlowBeeston
 
 
 '''
@@ -327,7 +327,7 @@ def main(opts, moduleSelector, multipleDirs):
     # Catch any errors in the input datacard (options added to avoid double printouts from the template card; if there are any!)
     msg = "Checking the syntax of the datacard file %s by compiling it." % (opts.datacard) 
     Verbose(sh_a + msg + sh_n, True)
-    os.system("python -m py_compile \"%s\" >& tmp_validate.txt" % opts.datacard)
+    os.system("python -m py_compile \"%s\" >& tmp_validate.txt" % opts.datacard)# FIXME: " >& " which might not be supported by bash. find alternative
     if os.stat("tmp_validate.txt").st_size != 0:
         msg = "Datacard \"%s\" is invalid." % (opts.datacard)
         Print(sh_e + msg + sh_n, True)
@@ -459,8 +459,13 @@ def main(opts, moduleSelector, multipleDirs):
 
     # Inform user
     for d in myOutputDirectories:
-        msg = "Created results dir %s" % (sh_s + d + sh_n)
+        msg = "Results (bin-by-bin uncertainties) stored in director %s" % (sh_s + d + sh_n)
         Print(msg)
+        
+        # Create BarlowBeeston version of the datacard
+        if opts.barlowBeeston:
+            os.system("./dcardCreateBarlowBeestonDatacards.py %s" % d)
+
 
     # Optionally, create a tarball with all the results
     CreateTarball(myOutputDirectories, opts)
@@ -488,13 +493,12 @@ if __name__ == "__main__":
     CTRLPLOTDEBUG = False
     VERBOSE       = False    
     TARBALL       = False
-    # New
     ANALYSISTYPE  = "HToTauNu"
     DATACARD      = None
     PROFILER      = False
     DIRECTORIES   = None
-
-
+    BARLOWBEESTON = False
+    
     # Object for selecting data eras, search modes, and optimization modes
     myModuleSelector = analysisModuleSelector.AnalysisModuleSelector() 
 
@@ -513,6 +517,9 @@ if __name__ == "__main__":
 
     parser.add_option("--combine", dest="combine", action="store_true", default=COMBINE,
                       help="Generate datacards for Combine [default=%s]" % (COMBINE) )
+
+    parser.add_option("--barlowBeeston", dest="barlowBeeston", action="store_true", default=BARLOWBEESTON,
+                      help="Replace bin-by-bin uncertainties by Barlow-Beeston (autoMCStats) uncertainties  [default=%s]" % (BARLOWBEESTON) )
 
     parser.add_option("--tarball", dest="tarball", action="store_true", default=TARBALL,
                       help="In addition to a dir with all the output, create also a tarball for easy transfer of results to other machines [default=%s]" % (TARBALL) )

@@ -69,7 +69,7 @@ class MulticrabPathFinder:
 
     def _GetPaths(self):
         
-        self._signal_path    = self.signalfind(self._multicrabpaths)
+        self._signal_path = self.signalfind(self._multicrabpaths)
         if self._analysisType in ["HToTB", "HToTauNu"]:
             self._ewk_path       = self.ewkfind(self._multicrabpaths)
             self._qcdfact_path   = self.qcdfactfind(self._multicrabpaths)
@@ -230,6 +230,12 @@ class MulticrabPathFinder:
         if (self._analysisType == "HToTB"):
             myWord = "Hplus2tbAnalysis"
             myFile = "multicrab.cfg"
+        elif (self._analysisType == "HToTauNu"):
+            myWord = "SignalAnalysis"
+            myFile = "multicrab.cfg"
+        elif (self._analysisType == "HToHW"):
+            myWord = "Hplus2hwAnalysis"
+            myFile = "multicrab.cfg"
         else:
             myWord = "SignalAnalysis"
             myFile = "multicrab.cfg"
@@ -302,7 +308,8 @@ class MulticrabPathFinder:
         if len(dirs) == 0:
             return ""
         if len(dirs) > 1:
-            self.Print("More than 1 path found! Will take the most recent one:")
+            msg = "More than 1 path found! Will take the most recent one:"
+            self.Print(sh_a + msg + sh_n, True)
             latest = dirs[0]
             for dir in dirs:
                 if os.path.getmtime(dir) > os.path.getmtime(latest):
@@ -314,6 +321,8 @@ class MulticrabPathFinder:
                     self.Print(sh_s + latest + sh_n, False)
                 else:
                     self.Print(d, False)            
+            msg = "=== %s\n\t%s" % (__file__.split("/")[-1],  sh_w + "Press any key to continue..." + sh_n)
+            raw_input(msg)
             return latest
         else:
             msg = "Will search for signal and backgound datasets under directory %s" % (sh_h + dirs[0] + sh_n)
