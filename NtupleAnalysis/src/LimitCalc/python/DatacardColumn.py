@@ -615,7 +615,6 @@ class DatacardColumn():
                         # print ShellStyles.WarningLabel()+"Forcing heavy H+ signal sample %s to normalization of 1 pb xsect in DatacardColumn.py"%self._label
 
                         #myDatasetRootHisto.Delete()
-			print "DEBUG: taallanain"
                         dsetMgr.getDataset(self.getDatasetMgrColumn()).setCrossSection(0.001)
                         myDatasetRootHisto = dsetMgr.getDataset(self.getDatasetMgrColumn()).getDatasetRootHisto(mySystematics.histogram(self.getFullShapeHistoName()))
                         if self._verbose:

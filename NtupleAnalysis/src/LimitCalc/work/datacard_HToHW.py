@@ -97,7 +97,7 @@ OptionIncludeSystematics               = True  # [default: True]   (Shape system
 OptionShapeSystematics                 = False # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
 OptionDoControlPlots                   = True  # [default: True]   (Produce control plots defined at end of this file)
 OptionGenuineTauBackgroundSource       = "MC"  # [Options: "DataDriven", "MC"]
-OptionFakeTauMeasurementSource         = "MC"  # [default: "DataDriven"] (options: "DataDriven", "MC")
+OptionFakeTauMeasurementSource         = "DataDriven"  # [default: "DataDriven"] (options: "DataDriven", "MC")
 OptionBr                               = 1.0   # [default: 1.0]    (The Br(t->bH+) used in figures and tables)
 OptionSqrtS                            = 13    # [default: 13]     (The sqrt(s) used in figures and tables)
 OptionBlindThreshold                   = None  # [default: None]   (If signal exceeds this fraction of expected events, data is blinded)
@@ -149,8 +149,10 @@ myLeptonVetoSystematics = ["CMS_eff_e_veto", "CMS_eff_m", "CMS_eff_tau"]
 myJetSystematics        = ["CMS_scale_j", "CMS_res_j"]
 myBtagSystematics       = ["CMS_eff_b"]
 
+
 # Define systematics dictionary (easier access)
 mySystematics = {}
+mySystematics["QCD"]    = ["CMS_FakeRate"]
 mySystematics["MC"]     = myLumiSystematics + myPileupSystematics + myTrgEffSystematics + myLeptonVetoSystematics + myJetSystematics + myBtagSystematics + myTopTagSystematics
 mySystematics["Signal"] = mySystematics["MC"] + ["CMS_HPTB_mu_RF_HPTB","CMS_HPTB_pdf_HPTB"]
 mySystematics["TT"]     = mySystematics["MC"] + ["QCDscale_ttbar", "pdf_ttbar", "mass_top"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
@@ -177,16 +179,27 @@ for mass in MassPoints:
     myMassList=[mass]
     hx=signalTemplate.clone()
     hx.setLabel("Hp" + str(mass) )
-    hx.setLandSProcess(1)
+    hx.setLandSProcess(0)
     hx.setValidMassPoints(myMassList)
     hx.setNuisances(mySystematics["Signal"])
     #hx.setDatasetDefinition("ChargedHiggs_HplusTB_HplusToHW_M%s_mH200_2ta_NLO" % (mass))
     hx.setDatasetDefinition(SignalName % (mass))
     signalDataGroups.append(hx)
 
+
 # Define all the background datasets
+myQCD = DataGroup(label			= labelPrefix+"QCDandFakeTau" + labelPostfix,
+		landsProcess		= 1,
+		shapeHistoName		= OptionMassShape,
+		histoPath		= histoPathInclusive,
+		datasetType		= "QCD inverted",
+		datasetDefinition	= "QCDMeasurementMT",
+		validMassPoints		= MassPoints,
+                nuisances		= mySystematics["QCD"]
+		)
+
 TT = DataGroup(label             = labelPrefix + "TT" + labelPostfix, #
-               landsProcess      = 2,
+               landsProcess      = 3,
                shapeHistoName    = OptionMassShape, 
                histoPath         = histoPathInclusive,
                datasetType       = "EWKMC",
@@ -196,7 +209,7 @@ TT = DataGroup(label             = labelPrefix + "TT" + labelPostfix, #
                )
 
 TTX = DataGroup(label                   = labelPrefix + "ttX" + labelPostfix,
-                      landsProcess      = 3,
+                      landsProcess      = 4,
                       shapeHistoName    = OptionMassShape,
                       histoPath         = histoPathInclusive,
                       datasetType       = "EWKMC",
@@ -205,15 +218,15 @@ TTX = DataGroup(label                   = labelPrefix + "ttX" + labelPostfix,
                       nuisances         = mySystematics["ttX"]
                       )
 
-DYJets = DataGroup(label             = labelPrefix + "DYJets" + labelPostfix,
-                   landsProcess      = 4,
-                   shapeHistoName    = OptionMassShape,
-                   histoPath         = histoPathInclusive,
-                   datasetType       = "EWKMC",
-                   datasetDefinition = "DYJetsToLLHT", # You must use the exact name given in plots.py
-                   validMassPoints   = MassPoints,
-                   nuisances         = mySystematics["MC"]
-                   )
+#DYJets = DataGroup(label             = labelPrefix + "DYJets" + labelPostfix,
+#                   landsProcess      = 4,
+#                   shapeHistoName    = OptionMassShape,
+#                   histoPath         = histoPathInclusive,
+#                   datasetType       = "EWKMC",
+#                   datasetDefinition = "DYJetsToLLHT", # You must use the exact name given in plots.py
+#                   validMassPoints   = MassPoints,
+#                   nuisances         = mySystematics["MC"]
+#                   )
 
 Diboson = DataGroup(label             = labelPrefix + "Diboson" + labelPostfix,
                     landsProcess      = 5,
@@ -229,9 +242,10 @@ Diboson = DataGroup(label             = labelPrefix + "Diboson" + labelPostfix,
 # The list \"DataGroups\" is required by the DataCardGenerator.py module
 DataGroups = []
 DataGroups.extend(signalDataGroups)
+DataGroups.append(myQCD)
 DataGroups.append(TT)
 DataGroups.append(TTX)
-DataGroups.append(DYJets)
+#DataGroups.append(DYJets)
 DataGroups.append(Diboson)
 
 #================================================================================================  
@@ -246,6 +260,7 @@ bTagSF_Shape     = Nuisance(id="CMS_eff_b"      , label="b tagging", distr="shap
 topPt_Shape      = Nuisance(id="CMS_topreweight", label="Top pT reweighting", distr="shapeQ", function="ShapeVariation", systVariation="TopPt")
 PU_Shape         = Nuisance(id="CMS_pileup"     , label="Pileup", distr="shapeQ", function="ShapeVariation", systVariation="PUWeight")
 topTag_Shape     = Nuisance(id="CMS_HPTB_toptagging", label="TopTag", distr="shapeQ", function="ShapeVariation", systVariation="TopTagSF")
+FakeRate_Shape   = Nuisance(id="CMS_FakeRate", label="FR weight uncertainty",distr="shapeQ", function="ShapeVariation", systVariation="FakeWeighting")
 # NOTE: systVariation key is first declared in HiggsAnalysis/NtupleAnalysis/python/AnalysisBuilder.py
 
 #================================================================================================  
@@ -269,7 +284,7 @@ lumi_2016            = systematics.getLuminosityUncertainty("2016")
 lumi13TeV_Const = Nuisance(id="lumi_13TeV"         , label="Luminosity 13 TeV uncertainty", distr="lnN", function="Constant", value=lumi_2016)
 trgMC_Const     = Nuisance(id="CMS_eff_trg_MC"     , label="Trigger MC efficiency (Approx.)", distr="lnN", function="Constant", value=0.05)
 PU_Const        = Nuisance(id="CMS_pileup"         , label="Pileup (Approx.)", distr="lnN", function="Constant", value=0.05)
-eVeto_Const     = Nuisance(id="CMS_eff_e_veto"     , label="e veto", distr="lnN", function="Ratio", numerator="passed e selection (Veto)", denominator="passed PV", scaling=0.02)
+eVeto_Const     = Nuisance(id="CMS_eff_e_veto"     , label="e veto", distr="lnN", function="Ratio", numerator="passed e selection (Veto)", denominator="Fake tau SF", scaling=0.02)
 muVeto_Const    = Nuisance(id="CMS_eff_m"          , label="mu ID (Approx.)" , distr="lnN", function="Constant", value=0.10)
 tauVeto_Const   = Nuisance(id="CMS_eff_tau"        , label="tau ID (Approx.)", distr="lnN", function="Constant", value=0.10)
 bTagSF_Const    = Nuisance(id="CMS_eff_b"          , label="b tagging (Approx.)", distr="lnN", function="Constant", value=0.05)
@@ -277,6 +292,7 @@ JES_Const       = Nuisance(id="CMS_scale_j"        , label="Jet Energy Scale (JE
 JER_Const       = Nuisance(id="CMS_res_j"          , label="Jet Energy Resolution (JER) (Approx.)", distr="lnN", function="Constant", value=0.04)
 topPt_Const     = Nuisance(id="CMS_topreweight"    , label="Top pT reweighting (Approx.)", distr="lnN", function="Constant", value=0.25)
 topTag_Const    = Nuisance(id="CMS_HPTB_toptagging", label="Top tagging (Approx.)", distr="lnN", function="Constant", value=0.10)
+FakeRate_Const  = Nuisance(id="CMS_FakeRate", label="dummy FR uncertainty", distr="lnN", function="Constant", value=0.3)
 
 # Cross section uncertainties
 ttbar_scale_Const    = Nuisance(id="QCDscale_ttbar"       , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=tt_scale_down, upperValue=tt_scale_up)
@@ -332,6 +348,7 @@ if OptionShapeSystematics:
     Nuisances.append(bTagSF_Shape) 
     Nuisances.append(topTag_Shape)
     Nuisances.append(tf_FakeTau_Shape)
+    Nuisances.append(FakeRate_Shape)
 else:
     Nuisances.append(PU_Const)
     Nuisances.append(PU_FakeTau_Const)
@@ -344,6 +361,7 @@ else:
     Nuisances.append(tf_FakeTau_Const)
     Nuisances.append(topTag_Const)
     Nuisances.append(topTag_FakeTau_Const)
+    Nuisances.append(FakeRate_Const)
 
 # Common in Shapes/Constants
 Nuisances.append(lumi13TeV_FakeTau_Const)

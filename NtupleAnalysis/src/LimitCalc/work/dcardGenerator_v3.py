@@ -178,6 +178,10 @@ def getBkgDsetCreator(multicrabPaths, bkgLabel, fakesFromData, mcrabInfoOutput):
     myPaths["Fake-tau"]        = multicrabPaths.getQCDInvertedPath()
     myPaths["MC"]              = multicrabPaths.getSignalPath()
 
+
+    print myPaths
+    print bkgLabel
+
     if bkgLabel in myPaths.keys():
         multicrabPath = myPaths[bkgLabel]
     else:
@@ -310,17 +314,19 @@ def main(opts, moduleSelector, multipleDirs):
 
     # Catch any errors in the input datacard (options added to avoid double printouts from the template card; if there are any!)
     msg = "Checking the syntax of the datacard file %s by compiling it." % (opts.datacard) 
+
     Verbose(sh_a + msg + sh_n, True)
-    os.system("python -m py_compile \"%s\" >& tmp_validate.txt" % opts.datacard)
-    if os.stat("tmp_validate.txt").st_size != 0:
-        msg = "Datacard \"%s\" is invalid." % (opts.datacard)
-        Print(sh_e + msg + sh_n, True)
-        os.system("cat tmp_validate.txt")
-    else:
-        msg = "Datacard %s is valid" % (sh_h + opts.datacard + sh_n)
-        Print(msg, True)
-        os.system("rm -f tmp_validate.txt")
+#    os.system("python -m py_compile \"%s\" >& tmp_validate.txt" % opts.datacard)
+#    if os.stat("tmp_validate.txt").st_size != 0:
+#        msg = "Datacard \"%s\" is invalid." % (opts.datacard)
+#        Print(sh_e + msg + sh_n, True)
+#        os.system("cat tmp_validate.txt")
+#    else:
+#        msg = "Datacard %s is valid" % (sh_h + opts.datacard + sh_n)
+#        Print(msg, True)
+#        os.system("rm -f tmp_validate.txt")
         
+
     # Load the datacard
     Verbose("Loading datacard \"%s\"." % (opts.datacard), True)
     config = aux.load_module(opts.datacard)
@@ -355,7 +361,9 @@ def main(opts, moduleSelector, multipleDirs):
             raise AttributeError(msg, True)
     elif opts.analysisType in ["HToTauNu", "HToHW"]:
         try:
-            fakesFromData = (config.OptionGenuineTauBackgroundSource == "DataDriven")
+#            fakesFromData = (config.OptionGenuineTauBackgroundSource == "DataDriven")
+#            fakesFromData = (config.OptionFakeTauMeasurementSource == "DataDriven")
+	     fakesFromData = True
         except AttributeError:
             msg = "The imported file \"%s\" has no attribute \"OptionGenuineTauBackgroundSource\". Please define this parameter in the imported module." % (config.__file__)
             raise AttributeError(msg, True)

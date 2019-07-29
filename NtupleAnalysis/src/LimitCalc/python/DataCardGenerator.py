@@ -415,6 +415,7 @@ class DataCardGenerator:
         for s in signalDsetCreators:
             dirList.append(s.getBaseDirectory())
         for bkg in bkgDsetCreators:
+	    print bkg.getBaseDirectory()
             dirList.append(bkg.getBaseDirectory())
 
         self.Verbose("Objects passed using as input the following directories:\n\t%s" % ("\n\t".join(dirList)), True)
