@@ -415,7 +415,7 @@ if __name__ == "__main__":
     DIGITS       = 5
     DIRECTORY    = "."
     EXCLUDE      = ""
-    EXCLUDEAREA  = False
+    OPAQUELEGEND = False
     GRIDX        = False
     GRIDY        = False
     LIMITSFILE   = "limits.json"
@@ -465,8 +465,8 @@ if __name__ == "__main__":
     parser.add_option("--url", dest="url", action="store_true", default=URL,
                       help="Don't print the actual save path the plots are saved, but print the URL instead [default: %s]" % URL)
     
-    parser.add_option("--opaqueLegend", dest="opaqueLegend", default=EXCLUDEAREA, action="store_true",
-                      help="Add excluded area as in MSSM exclusion plots [default: %s]" % (EXCLUDEAREA) )
+    parser.add_option("--opaqueLegend", dest="opaqueLegend", default=OPAQUELEGEND, action="store_true",
+                      help="Add excluded area as in MSSM exclusion plots [default: %s]" % (OPAQUELEGEND) )
 
     parser.add_option("--logx", dest="logx", action="store_true", default=LOGX, 
                       help="Plot x-axis (H+ mass) as logarithmic [default: %s]" % (LOGX) )
