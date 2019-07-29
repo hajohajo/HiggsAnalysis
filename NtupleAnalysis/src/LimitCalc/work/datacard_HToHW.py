@@ -91,7 +91,7 @@ def PrintNuisancesTable(Nuisances, DataGroups):
 #================================================================================================  
 # Options
 #================================================================================================  
-OptionTest                             = True  # [default: False]
+OptionTest                             = False # [default: False]
 OptionPaper                            = True  # [default: True]   (Changes figure style to paper style)
 OptionIncludeSystematics               = True  # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
 OptionShapeSystematics                 = False # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
@@ -100,7 +100,7 @@ OptionGenuineTauBackgroundSource       = "MC"  # [Options: "DataDriven", "MC"]
 OptionFakeTauMeasurementSource         = "DataDriven"  # [default: "DataDriven"] (options: "DataDriven", "MC")
 OptionBr                               = 1.0   # [default: 1.0]    (The Br(t->bH+) used in figures and tables)
 OptionSqrtS                            = 13    # [default: 13]     (The sqrt(s) used in figures and tables)
-OptionBlindThreshold                   = None  # [default: None]   (If signal exceeds this fraction of expected events, data is blinded)
+OptionBlindThreshold                   = 0.10  # [default: None]   (If signal exceeds this fraction of expected events, data is blinded in a given bin)
 OptionCombineSingleColumnUncertainties = False # [default: False]  (Merge nuisances with quadratic sum using the TableProducer.py Only applied to nuisances with one column)
 OptionDisplayEventYieldSummary         = False # [default: False]  (Print "Event yield summary", using the TableProducer.py. A bit messy at the moment)
 OptionDoWithoutSignal                  = False # [default: False]  (Do the control plots without any signal present)
@@ -109,6 +109,7 @@ OptionNumberOfDecimalsInSummaries      = 1     # [defaul: 1]       (Self explana
 OptionConvertFromShapeToConstantList   = []    # [default: []]     (Convert these nuisances from shape to constant; Makes limits run faster & converge more easily)
 OptionSeparateShapeAndNormFromSystList = []    # [default: []]     (Separate in the following shape nuisances the shape and normalization components)
 OptionMassShape                        = "shapeTransverseMass"
+OptionPlotNamePrefix                   = None  #"Results" #[default: None] (Prefix for plots: "<Prefix>_M<mass>_<ControlPlotInput.Title>.<ext>". Default prefix is "DataDrivenCtrlPlot")
 
 #================================================================================================  
 # Definitions
@@ -119,12 +120,14 @@ PlotLegendHeader                       = "H^{#pm}#rightarrowW^{#pm}H^{0}, H^{0}#
 SignalName                             = "ChargedHiggs_HplusTB_HplusToHW_M%s_mH200_2ta_NLO"
 DataCardName                           = "HToHW"          # [default: Hplus2hw_13TeV]  (Used by TableProducer.py)
 BlindAnalysis                          = True             # [default: True]   (Change only if "green light" for unblinding)
-MinimumStatUncertainty                 = 0.5              # [default: 0.5]    (min. stat. uncert. to set to bins with zero events)
+MinimumStatUncertainty                 = 0.5              # [default: 0.5]    (Minimum stat. uncert. to set to bins with zero events)
 UseAutomaticMinimumStatUncertainty     = False            # [default: False]  (Do NOT use the MinimumStatUncertainty; determine value from lowest non-zero rate for each dataset   )
 ToleranceForLuminosityDifference       = 0.05             # [default: 0.05]   (Tolerance for throwing error on luminosity difference; "0.01" means that a 1% is required) 
 ToleranceForMinimumRate                = 0.0              # [default: 0.0]    (Tolerance for almost zero rate columns with smaller rate are suppressed) 
 labelPrefix                            = ""               # [default: ""]     (Prefix for the labels of datacard columns; e.g. "CMS_Hptntj_", "CMS_H2tb_")
 labelPostfix                           = ""               # [default: "_GenuineTau"] (Postfix for the labels of datacard columns; e.g. "TT" --> "TT_GenuineTau")
+if OptionTest:
+    MassPoints = [700]
 
 #================================================================================================  
 # File-specific settings
@@ -176,7 +179,6 @@ signalTemplate   = DataGroup(datasetType="Signal", histoPath=histoPathInclusive,
 signalDataGroups =  []
 # For-loop: All mass points
 for mass in MassPoints:
-    myMassList=[mass]
     hx=signalTemplate.clone()
     hx.setLabel("Hp" + str(mass) )
     hx.setLandSProcess(0)
@@ -452,8 +454,9 @@ if (nSysShapeComponents>0):
 # Control plots
 #================================================================================================ 
 # https://twiki.cern.ch/twiki/bin/view/CMS/Internal/PubGuidelines#Figures_and_tables
-uPt   = "GeV/c"
-uMass = "GeV/c^{2}"
+uPt     = "GeV/c"
+uMass   = "GeV/c^{2}"
+uEnergy = "GeV"
 if OptionPaper:
     uPt   = "GeV"
     uMass = "GeV"
@@ -465,28 +468,28 @@ hMET = ControlPlotInput(
     title     = "Met", # MET_AfterAllSelections" (Used in determining binning from systematics.py)
     histoName = "MET_AfterAllSelections",
     details   = { "xlabel"             : "E_{T}^{miss}",
-                  "ylabel"             : "< Events / GeV >", #"Events / #DeltaE_{T}^{miss}",
+                  "ylabel"             : "< Events / %s >" % (uEnergy),
                   "divideByBinWidth"   : True,
                   "unit"               : "GeV",
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmax": 300.0}
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmax": 300.0}
                   },
     blindedRange=[100.0, 1000.0], # specify range min,max if blinding applies to this control plot      
     )
 
 hHT = ControlPlotInput(
-    title     = "HT", #HT_AfterAllSelections" (Used in determining binning from systematics.py)
+    title     = "HT", # (Used in determining binning from systematics.py)
     histoName = "HT_AfterAllSelections",
     details   = { "xlabel"             : "H_{T}",
-                  "ylabel"             : "< Events / GeV >", # "Events / #DeltaH_{T}",
+                  "ylabel"             : "< Events / %s >" % (uEnergy),
                   "divideByBinWidth"   : True,
                   "unit"               : "GeV",
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 3000.0} },
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 3000.0} },
                   },
     blindedRange=[200.0, 1500.0], # specify range min,max if blinding applies to this control plot      
     )
@@ -495,13 +498,13 @@ hMHT = ControlPlotInput(
     title      = "MHT",
     histoName  = "MHT_AfterAllSelections",
     details    = { "xlabel"             : "MHT",                  
-                   "ylabel"             : "< Events / GeV >", # "Events / #DeltaMHT",
+                   "ylabel"             : "< Events / %s >" % (uEnergy),
                    "divideByBinWidth"   : True,
                    "unit"               : "GeV",
                    "log"                : True,
                    "legendPosition"     : "NE",
                    "ratioLegendPosition": "right",
-                   "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 400.0} }
+                   "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 400.0} }
                    },
     )
 
@@ -515,7 +518,7 @@ hTopPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "SE", #"right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmax": 800.0}
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmax": 800.0}
                          },
     )
 
@@ -523,46 +526,46 @@ hTopMass = ControlPlotInput(
     title     = "TopMass",
     histoName = "TopMass_AfterAllSelections",
     details   = { "xlabel"             : "m_{jjb}",
-                  "ylabel"             : "Events",
-                  "divideByBinWidth"   : False,
+                  "ylabel"             : "<Events / %s>" % (uMass),
+                  "divideByBinWidth"   : True,
                   "unit"               : "%s" % (uMass),
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 350.0} 
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 350.0} 
                   },
     )
 
 hTopBjetPt = ControlPlotInput(
-    title     = "BJetPt",
+    title     = "TopBJetPt",
     histoName = "TopBjetPt_AfterAllSelections",
     details   = { "xlabel"             : "p_{T}",
-                  "ylabel"             : "Events",
-                  "divideByBinWidth"   : False,
+                  "ylabel"             : "< Events / %s>" % (uPt),
+                  "divideByBinWidth"   : True,
                   "unit"               : "%s" % (uPt),
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 700.0} }
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 700.0} }
                   },
     )
 
 hTopBjetEta = ControlPlotInput(
-    title     = "JetEta",
+    title     = "TopBJetEta",
     histoName = "TopBjetEta_AfterAllSelections",
     details   = { "xlabel"             : "#eta",
                   "ylabel"             : "Events",
                   "divideByBinWidth"   : False,
                   "unit"               : "",
                   "log"                : True,
-                  "legendPosition"     : "NE",
+                  "legendPosition"     : "RM",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmin": -2.5, "xmax": 2.5} 
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmin": -2.5, "xmax": 2.5} 
                   },
     )
 
 hTopBjetBdisc = ControlPlotInput(
-    title     = "BtagDisc",
+    title     = "TopBJetBdisc",
     histoName = "TopBjetBdisc_AfterAllSelections",
     details   = { "xlabel"             : "CSVv2 discriminator",
                   "ylabel"             : "Events",
@@ -571,7 +574,7 @@ hTopBjetBdisc = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NW",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmin": 0.78, "xmax": 1.0} 
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmin": 0.7}
                   },
     )
 
@@ -586,7 +589,7 @@ hTopDijetPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 700.0} 
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 700.0} 
                   },
     )
 
@@ -594,33 +597,20 @@ hTopDijetMass = ControlPlotInput(
     title     = "DijetMass",
     histoName = "TopDijetMass_AfterAllSelections",
     details   = { "xlabel"             : "m_{jj}",
-                  "ylabel"             : "Events",
-                  "divideByBinWidth"   : False,
+                  "ylabel"             : "< Events / %s>" % (uMass),
+                  "divideByBinWidth"   : True,
                   "unit"               : "%s" % (uMass),
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmin": 40.0, "xmax": 200.0} 
+                  "opts"               : {"ymin": 0.5e-2}
                          },
-    )
-
-hTopR32  = ControlPlotInput(
-    title            = "TopTopMassWMassRatioAfterAllSelections",
-    histoName        = "TopTopMassWMassRatioAfterAllSelections",
-    details          = { "xlabel"             : "R_{32}^{ldg}",
-                         "ylabel"             : "Events",
-                         "divideByBinWidth"   : False,
-                         "unit"               : "",
-                         "log"                : True,
-                         "legendPosition"     : "NE",
-                         "ratioLegendPosition": "right",
-                         "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmin": 0.5, "xmax": 4.0} }
     )
 
 hTransverseMass = ControlPlotInput(
     title       = "Mt",
     histoName   = OptionMassShape,
-    details     = { "xlabel"             : "m_{jjbb}",
+    details     = { "xlabel"             : "m_{T}",
                     "ylabel"             : "< Events / %s >" % (uMass),
                     "divideByBinWidth"   : True,
                     "unit"               : "%s" % (uMass),
@@ -644,7 +634,7 @@ hVertices = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmax": 80.0} 
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmax": 80.0} 
                   },
     flowPlotCaption  = "", # Leave blank if you don't want to include the item to the selection flow plot    
     )
@@ -659,7 +649,7 @@ hNjets = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmin": 7.0, "xmax": 20.0} 
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
                   },
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
@@ -674,7 +664,7 @@ hNBjets = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmin": 3.0,"xmax": 10.0} 
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
                   },
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
@@ -689,7 +679,7 @@ hJetPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"xmin": 40.0, "ymin": 1e-2, "ymaxfactor": 10}
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
                   },
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot
     )
@@ -702,9 +692,9 @@ hJetEta = ControlPlotInput(
                   "divideByBinWidth"   : False,
                   "unit"               : "",
                   "log"                : True,
-                  "legendPosition"     : "SE",
+                  "legendPosition"     : "RM",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}}#,
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}}#,
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
 
@@ -719,12 +709,12 @@ hBJetPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"xmin": 40.0, "ymin": 1e-2, "ymaxfactor": 10}}#,
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}}#,
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
 
 hBJetEta = ControlPlotInput(
-    title     = "JetEta",
+    title     = "BJetEta",
     histoName = "BJetEta_AfterAllSelections",
     details   = { "xlabel"             : "#eta",
                   "ylabel"             : "Events",
@@ -733,7 +723,7 @@ hBJetEta = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "RM",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}}#,
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}}#,
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
 
@@ -745,9 +735,9 @@ hBtagDiscriminator = ControlPlotInput(
                   "divideByBinWidth"   : False,
                   "unit"               : "",
                   "log"                : True,
-                  "legendPosition"     : "NE",
+                  "legendPosition"     : "NW",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}}#,
+                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10,  "xmin": 0.7}}
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
 
@@ -775,10 +765,9 @@ ControlPlots.append(hBJetEta)
 ControlPlots.append(hTransverseMass)
 
 if OptionTest:
-    MassPoints   = [700]
     ControlPlots = []
-    #ControlPlots.append(hTopPt)
+    ControlPlots.append(hTopPt)
     ControlPlots.append(hTopMass)
     ControlPlots.append(hMET)
     ControlPlots.append(hHT)
-    #ControlPlots.append(hTransverseMass)
+    ControlPlots.append(hTransverseMass)

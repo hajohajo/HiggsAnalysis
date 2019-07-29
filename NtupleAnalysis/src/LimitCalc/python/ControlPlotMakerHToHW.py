@@ -76,7 +76,8 @@ drawPlot2D = plots.PlotDrawer(opts2={"ymin": 0.5, "ymax": 1.5},
 #================================================================================================ 
 # Definitions
 #================================================================================================ 
-class ControlPlotMakerHToHW:
+#class ControlPlotMakerHToHW:
+class ControlPlotMaker:
     def __init__(self, opts, config, dirname, luminosity, observation, datasetGroups, verbose=False):
         self._validateDatacard(config)
         self._config  = config
@@ -132,11 +133,11 @@ class ControlPlotMakerHToHW:
 
                 # The case m < 0 is for plotting hitograms without any signal
                 if m > 0:
-                    saveName = "%s/DataDrivenCtrlPlot_M%d_%s" % (self._dirname, m, myCtrlPlot.title)
-                    msg      = "Control Plot %d/%d (m=%s GeV)"  % (counter, nMasses*nPlots, str(m))
+                    saveName = "%s/%s_M%d_%s" % (self._dirname, self._config.OptionPlotNamePrefix, m, myCtrlPlot.title) #xenios - iro
+                    msg      = "Control Plot %d/%d: mH=%s GeV"  % (counter, nMasses*nPlots, str(m))
                 else:
-                    saveName = "%s/DataDrivenCtrlPlot_%s" % (self._dirname, myCtrlPlot.title)
-                    msg      = "Control Plot %d/%d (no signal)"  % (counter, nMasses*nPlots)
+                    saveName = "%s/%s_%s" % (self._dirname, self._config.OptionPlotNamePrefix, myCtrlPlot.title)
+                    msg      = "Control Plot %d/%d: no signal"  % (counter, nMasses*nPlots)
 
                 # Initialize histograms
                 hData     = None
@@ -152,19 +153,36 @@ class ControlPlotMakerHToHW:
 
                 # For-loop: All dataset columns (to find histograms)
                 for i, c in enumerate(self._datasetGroups, 1):
-                    self.Verbose("Dataset is %s for plot %s. The title is \"%s\" (Serves as dictionary key to get binning from systematics.py)" % (sh_h + c.getLabel() + sh_n, myCtrlPlot.histoName, myCtrlPlot.title), True)
+                    msg = "DatasetGroup %d/%d) %s" % (i, len(self._datasetGroups), c.getLabel())
+                    if 0:
+                        self.PrintFlushed(sh_l + msg + sh_n, False)
 
-                    # Skip plot?
-                    bIsValidMass = (m < 0 or c.isActiveForMass(m, self._config))
-                    bIsEmptyCol  = (not c.typeIsEmptyColumn())
-                    bIsValidPlot = (c.getControlPlotByIndex(i) != None)
-                    bDoPlot      = (bIsValidMass and not bIsEmptyCol and bIsValidPlot)
-                    if not bDoPlot:
-                        self.Print("Skipping plot %s (bIsValidMass=%s, bIsEmptyCol=%s, bIsValidPlot=%s)" % (sh_h + c.getLabel() + sh_n, bIsValidMass, bIsEmptyCol, bIsValidPlot), True)
+                    msg  = "Dataset is %s for plot %s. " % (sh_h + c.getLabel() + sh_n, sh_a + myCtrlPlot.histoName + sh_n)
+                    msg += "The title is \"%s\" (Serves as dictionary key to get binning from systematics.py)" % (myCtrlPlot.title)
+                    self.Verbose(msg, True)
+
+                    # Skip plot (NOTE! DatasetGroup is signal then all other mass points should be disabled. This concerns bValidMass)
+                    bValidMass   = (m < 0 or c.isActiveForMass(m, self._config)) 
+                    bEmptyCol    = (c.typeIsEmptyColumn())
+                    #bInvalidPlot = (c.getControlPlotByIndex(i) == None) # broken (for unknown reason)
+                    bInvalidPlot = (c.getControlPlotByTitle(myCtrlPlot.histoName, myKey="shape") == None) 
+                    bSkipPlot    = (not bValidMass or bEmptyCol or bInvalidPlot)
+
+                    if bSkipPlot:
+                        self.Verbose("Skipping plot %s (%s): bValidMass=%s, bEmptyCol=%s, bInvalidPlot=%s" % (sh_h + c.getLabel() + sh_n, myCtrlPlot.histoName, bValidMass, bEmptyCol, bInvalidPlot), False)
                         continue
 
+                    # Print available control plots?
+                    if 0:
+                        c.PrintControlPlotTitles(myKey="shape")
+
                     # Clone histo
-                    h = c.getControlPlotByIndex(i)["shape"].Clone()
+                    h = c.getControlPlotByTitle(myCtrlPlot.histoName, myKey="shape").Clone()
+                    #h = c.getControlPlotByIndex(i)["shape"].Clone() # broken (for unknown reason)
+                    
+                    if bSkipPlot:
+                        self.Print("Skipping plot %s (bValidMass=%s, bEmptyCol=%s, bInvalidPlot=%s)" % (sh_h + c.getLabel() + sh_n, bValidMass, bEmptyCol, bInvalidPlot), False)
+                        continue
 
                     msg = "Histogram %s is of type %s" % (sh_h + c.getLabel() + sh_n, c.type())
                     if c.typeIsSignal():
@@ -196,7 +214,7 @@ class ControlPlotMakerHToHW:
                             hQCDMC.Add(h)
                     elif c.typeIsEWKMC() or c.typeIsGenuineB():
                         msg += ". EWKMC"
-                        self.Print(msg, True)
+                        self.Verbose(msg, False)
                         myHisto = histograms.Histo(h, c._datasetMgrColumn)
                         myHisto.setIsDataMC(isData=False, isMC=True)
                         stackList.append(myHisto)
@@ -210,24 +228,25 @@ class ControlPlotMakerHToHW:
 
                 # Stack all the histograms
                 if hFakeB != None:
-                    self.Print("Stacking FakeB", True)
+                    self.Verbose("Stacking FakeB", True)
                     myHisto = histograms.Histo(hFakeB, "FakeB", legendLabel=_legendLabelFakeB)
                     myHisto.setIsDataMC(isData=False, isMC=True)
                     stackList.insert(0, myHisto)
                 elif hQCDMC != None:
-                    self.Print("Stacking QCDMC", True)
+                    self.Verbose("Stacking QCDMC", True)
                     myHisto = histograms.Histo(hQCDMC,"QCDMC",legendLabel=_legendLabelQCDMC)
                     myHisto.setIsDataMC(isData=False, isMC=True)
                     stackList.insert(0, myHisto)
                 else:
-                    self.Print("The stack list has %d datasets" % len(stackList), True)
+                    self.Verbose("The stack list has %d datasets" % len(stackList), True)
                     for i, s in enumerate(stackList, 1):
-                        self.Print(s.getName(), False)                        
+                        self.Verbose(s.getName(), False)                        
 
                     msg = "This should never be reached (type=%s)" % (c.type())
                     #raise Exception(sh_e + msg + sh_n)
 
-                hData = observation.getControlPlotByIndex(i)["shape"].Clone()
+                #hData = observation.getControlPlotByIndex(i)["shape"].Clone() # broken (for unknown reason)
+                hData = observation.getControlPlotByTitle(myCtrlPlot.histoName, myKey="shape").Clone()
                 hDataUnblinded = hData.Clone()
 
                 # Apply blinding & Get blinding string
@@ -258,16 +277,13 @@ class ControlPlotMakerHToHW:
                 # Make plot
                 stackPlot = None
                 myParams  = myCtrlPlot.details.copy()
-                self.Print("Creating DataMCPlot2 object using stackList of length %d: %s" % ( len(stackList), ", ".join([s.getName() for s in stackList])), True)
+                self.Verbose("Creating DataMCPlot2 object using stackList of length %d: %s" % ( len(stackList), ", ".join([s.getName() for s in stackList])), True)
                 stackPlot = plots.DataMCPlot2(stackList)
-                sys.exit()
-
 
                 self.Verbose("Setting stack plot values to: luminosity = %s, energy = %s" % ( self._luminosity, self._config.OptionSqrtS), True)
                 stackPlot.setLuminosity(self._luminosity)
                 stackPlot.setEnergy("%d" % self._config.OptionSqrtS)
                 stackPlot.setDefaultStyles(paperStyle=self._config.OptionPaper)
-                sys.exit()
                 try:
                     stackPlot.setLegendHeader(self._config.PlotLegendHeader)
                 except AttributeError:
@@ -311,7 +327,6 @@ class ControlPlotMakerHToHW:
                 
             # Do selection flow plot
             selectionFlow.makePlot(self._dirname, m, len(self._config.ControlPlots), self._luminosity)
-
         return
     
     def GetFName(self):
@@ -336,7 +351,6 @@ class ControlPlotMakerHToHW:
         return
 
     def _setYlabelWidthSuffix(self, histo, myParams):
-        # self.Print(histo.GetName(), True)
 
         ylabelBinInfo = True
         if "ylabelBinInfo" in myParams:
@@ -740,5 +754,5 @@ class SelectionFlowPlotMaker:
         myParams["opts2"] = {"ymin": 0.3, "ymax":1.7}
         myParams["moveLegend"] = {"dx": -0.53, "dy": -0.52, "dh":0.05} # for data-driven
         myParams["ratioMoveLegend"] = {"dx": -0.51, "dy": 0.03}
-        drawPlot(stackPlot, "%s/DataDrivenCtrlPlot_M%d_%02d_SelectionFlow"%(dirname,m,index), **myParams)
+        drawPlot(stackPlot, "%s/%s_M%d_%02d_SelectionFlow"%(dirname, self._config.OptionPlotNamePrefix, m, index), **myParams) #xenios
         return

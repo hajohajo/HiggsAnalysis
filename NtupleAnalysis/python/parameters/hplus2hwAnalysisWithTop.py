@@ -74,14 +74,14 @@ tauSelection = PSet(
     triggerMatchingCone  =   0.1, # [default: False]
     tauPtCut             =  20.0, # [default: 20.0]
     tauEtaCut            =   2.3, # [default: 2.3]
-    tauLdgTrkPtCut       =   1.0, # [default: 0.0]
+    tauLdgTrkPtCut       =  20.0, # [default: 0.0]
     prongs               =  -1,   # [default: -1] (1, 2, 3, 12, 13, 23, 123 or -1 (all))
     rtau                 =   0.0, # [default: 0.0] (to disable set to 0.0)
     againstElectronDiscr = "againstElectronTightMVA6",
     againstMuonDiscr     = "againstMuonLoose3",
     #isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
-    isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
-    #isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Default
+    #isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
+    isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Default
     #isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
     # isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits",
     # isolationDiscr       = "byMediumCombinedIsolationDeltaBetaCorr3Hits",
@@ -214,16 +214,16 @@ metSelection = PSet(
 # Top selection BDT                                               
 #================================================================================================        
 topSelectionBDT = PSet(
-    NumberOfTopsCutDirection = ">=",       # [default: "=="] (==, !=, <, <=, >, >=)
-    NumberOfTopsCutValue     =    0,       # [default: 3]
+    NumberOfTopsCutDirection = "==",       # [default: "="] (==, !=, <, <=, >, >=)
+    NumberOfTopsCutValue     =    1,       # [default: 0]
     AnyTopBDTGCutDirection   =  ">",       # [default: ">"]
     AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
     TopBDTGCutDirection      = ">=",       # [default: ">="]
-    TopBDTGCutValue          =   -1.00,    # [default: 0.40] NOTE: Only use numbers with 2 decimals
+    TopBDTGCutValue          =   0.40,     # [default: 0.40] NOTE: Only use numbers with 2 decimals
     TopMassLowCutDirection   = ">=",       # [default: ">="]
     TopMassLowCutValue       =    0.00,    # [default: 0.00]
     TopMassUppCutDirection   = "<=",       # [default: "<"]
-    TopMassUppCutValue       =  500.00,    # [default: 2000.0]
+    TopMassUppCutValue       = 2000.00,    # [default: 2000.0]
     CSV_bDiscCutDirection    = ">=",       # [default: ">="]
     CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
     WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 

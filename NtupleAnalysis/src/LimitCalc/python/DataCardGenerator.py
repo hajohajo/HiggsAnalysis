@@ -149,7 +149,7 @@ class DatasetMgrCreatorManager:
             # Store DatasetManager
             self._dsetMgrs.append(myDsetMgr)
 
-            # For embedding. fixme: Santeri (is this needed?) #fixme: santeri. Is this needed?
+            # For embedding. fixme: Santeri (is this needed?)
             #if i == DatacardDatasetMgrSourceType.EMBEDDING:
             #    myProperty = myDsetMgr.getAllDatasets()[0].getProperty("analysisName")
 
@@ -189,6 +189,10 @@ class DatasetMgrCreatorManager:
                 else:
                     raise Exception("This should never be reached")
         else:
+
+            if 0:
+                myDsetMgr.PrintInfo()
+
             # For-loop: All datasets looking for the pseudo-dataset (smoking gun for data-driven pseudo-dataset)
             for d in myDsetMgr.getAllDatasets():
                 if d.isMC() or d.isPseudo():
@@ -276,6 +280,9 @@ class DatasetMgrCreatorManager:
         '''
         if self.getDatasetMgr(i) == None:
             return
+
+        self.Print("Merge the list of datasets (if they exist) into one object. The merged group is then used to access counters and histograms", True)
+        raw_input("Press any key to continue ...")
 
         # Obtain all dataset names
         myAllDatasetNames = self.getDatasetMgr(i).getAllDatasetNames()
@@ -504,13 +511,13 @@ class DataCardGenerator:
                 addColumnList      = item["mergeList"][1:]
                 self.separateMCEWKTausAndFakes(targetColumn, targetColumnNewName, addColumnList, mySubtractColumnList)
         
-        # Do rebinning of results, store a fine binned copy of all histograms as well
+        # Do rebinning of results, store a fine binned copy of all histograms as well (all datasets but not observation data)
         for i, c in enumerate(self._columns, 1):
             self.Verbose("Rebinning cached results for column %s with %d nuisances" % (sh_h + c.getLabel() + sh_n, len(c.getNuisanceIds())), i==1)
             c.doRebinningOfCachedResults(self._config)
 
-        # Rebin cached results for data (observation)
-        self.Verbose("Rebinning cached results observation", True)
+        # Do rebinning of results, store a fine binned copy of all histograms as well (observation data)
+        self.Verbose("Rebinning cached results (observation)", True)
         self._observation.doRebinningOfCachedResults(self._config)
 
         # Separate nuisances with additional information into an individual nuisance (horror!)
@@ -540,7 +547,8 @@ class DataCardGenerator:
         datasetGroups   = self._columns
         extractors      = self._extractors
         mcrabInfoOutput = mcrabInfoOutput
-        self.Verbose("Calling the TableProducer constructor", True)
+
+        self.Verbose("Calling the TableProducer constructor", True)#iro
         myProducer = TableProducer.TableProducer(opts, config, outputPrefix, luminosity, observation, datasetGroups, extractors, mcrabInfoOutput)
 
         # Close files
@@ -643,15 +651,13 @@ class DataCardGenerator:
 
         # Loop over data groups to create datacard columns
         for dg in self._config.DataGroups:
-#            myIngoreOtherQCDMeasurementStatus = (dg.datasetType == "QCD factorised" and self._QCDMethod == DatacardQCDMethod.INVERTED) or (dg.datasetType == "QCD inverted" and self._QCDMethod == DatacardQCDMethod.FACTORISED)
             myMassIsConsideredStatus = False
             for validMass in dg.validMassPoints:
                 if validMass in self._config.MassPoints:
                     myMassIsConsideredStatus = True
-#            if not myIngoreOtherQCDMeasurementStatus and myMassIsConsideredStatus:
+
             if myMassIsConsideredStatus:
-                if self.verbose:
-                    print "Constructing datacard column for data group %s%s" % (ShellStyles.NoteStyle() + dg.label, sh_n)
+                self.Verbose("Constructing datacard column for data group %s and mass point %d (%s)" % (sh_t + dg.label + sh_n, validMass, self._config.MassPoints), True)
 
                 # Construct datacard column object
                 myColumn = None
@@ -746,13 +752,14 @@ class DataCardGenerator:
         '''
         Do data mining and cache the results
         '''
-        self.Verbose("Starting data mining")
-        if self._dsetMgrManager.getDatasetMgr(DatacardDatasetMgrSourceType.SIGNALANALYSIS) != None:
+        srcType = DatacardDatasetMgrSourceType.SIGNALANALYSIS
+        self.Verbose("Starting data mining (source type = %s)" % (srcType) )
+        if self._dsetMgrManager.getDatasetMgr(srcType) != None:
             # Handle observation separately
-            myDsetMgr    = self._dsetMgrManager.getDatasetMgr(DatacardDatasetMgrSourceType.SIGNALANALYSIS)
-            myLuminosity = self._dsetMgrManager.getLuminosity(DatacardDatasetMgrSourceType.SIGNALANALYSIS)
+            myDsetMgr    = self._dsetMgrManager.getDatasetMgr(srcType)
+            myLuminosity = self._dsetMgrManager.getLuminosity(srcType)
 
-            myMainCounterTable = self._dsetMgrManager.getMainCounterTable(DatacardDatasetMgrSourceType.SIGNALANALYSIS)
+            myMainCounterTable = self._dsetMgrManager.getMainCounterTable(srcType)
             self._observation.doDataMining(self._config, myDsetMgr, myLuminosity, myMainCounterTable, self._extractors, self._controlPlotExtractors)
 
         # For-loop: All columns
@@ -767,7 +774,8 @@ class DataCardGenerator:
             myLuminosity       = self._dsetMgrManager.getLuminosity(dsetMgrIndex)
             myMainCounterTable = self._dsetMgrManager.getMainCounterTable(dsetMgrIndex)
             c.doDataMining(self._config, myDsetMgr, myLuminosity, myMainCounterTable, self._extractors, self._controlPlotExtractors)
-        self.Verbose("Data mining has been finished, results (and histograms) have been ingeniously cached")
+
+        self.Verbose("Data mining has finished, results (and histograms) have been ingeniously cached")
         return
 
     def separateMCEWKTausAndFakes(self, targetColumn, targetColumnNewName, addColumnList, subtractColumnList):
@@ -881,14 +889,14 @@ class DataCardGenerator:
                                                               [myModUp,myModDown],
                                                               "Stat." in e.getDescription() or "stat." in e.getDescription() or e.getDistribution()=="shapeStat")
                 else:
-                    myUpInt = hUp.Integral()
+                    myUpInt   = hUp.Integral()
                     myDownInt = hDown.Integral()
                     myRateInt = myEmbColumn._cachedShapeRootHistogramWithUncertainties.getRate()
-                    myPlus = 0.0
-                    myMinus = 0.0
+                    myPlus    = 0.0
+                    myMinus   = 0.0
                     if abs(myRateInt) > 0.000001:
-                        myPlus = (myUpInt)/myRateInt
-                        myMinus = (myDownInt)/myRateInt
+                        myPlus   = (myUpInt)/myRateInt
+                        myMinus  = (myDownInt)/myRateInt
                     myResultItem = None
                     if abs(abs(myPlus)-abs(myMinus)) < 0.0001:
                         myResultItem = ScalarUncertaintyItem(e.getId(), abs(myPlus))

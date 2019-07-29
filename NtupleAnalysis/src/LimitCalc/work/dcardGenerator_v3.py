@@ -26,10 +26,11 @@ USAGE:
 EXAMPLES:
 ./dcardGenerator_v2.py -x dcardDefault_h2tb_2016.py --dir limits2016/ --analysisType HToHW
 ./dcardGenerator_v3.py --dir limits2019/ --analysisType HToHW --datacard datacard_HToHW.py
+./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/ --dir limits2016/
 
 
 LAST USED:
-./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/ --dir limits2016/
+./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/ --barlowBeeston
 
 
 '''
@@ -57,7 +58,7 @@ import HiggsAnalysis.NtupleAnalysis.tools.dataset as dataset
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
 import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 import HiggsAnalysis.NtupleAnalysis.tools.multicrab as multicrab
-
+import HiggsAnalysis.NtupleAnalysis.tools.plots as plots
 
 #===============================================================================================
 # Shell Types
@@ -66,6 +67,7 @@ sh_e = ShellStyles.ErrorStyle()
 sh_s = ShellStyles.SuccessStyle()
 sh_h = ShellStyles.HighlightStyle()
 sh_a = ShellStyles.HighlightAltStyle()
+sh_l = ShellStyles.AltStyle()
 sh_t = ShellStyles.NoteStyle()
 sh_n = ShellStyles.NormalStyle()
 sh_w = ShellStyles.WarningStyle()
@@ -132,14 +134,28 @@ def CheckOptions(config):
     Check various options defined in the config (=opts.datacard) and warns user if some flags
     are disabled
     '''
+    Verbose("Checking options defined in imported module %s" % (sh_h + config.__file__ + sh_n), True)
     msgs = []
     if not config.OptionIncludeSystematics:
         msg = sh_t + "Skipping of systematic uncertainties and will only use statistical uncertainties"  + sh_n + " (flag \"OptionIncludeSystematics\" in the datacard file)"
         msgs.append(msg)
 
-    if not config.OptionDoControlPlots:
+    if config.OptionDoControlPlots:
+        # Sanity check: Ensure no two control plots have the same title
+        cList = [c.getTitle() for c in config.ControlPlots]
+        for i, c in enumerate(config.ControlPlots, 1):
+            if c.getTitle() in cList[i:]: 
+                msg  = "Found control plots with the same title %s! " % (sh_a + c.getTitle() + sh_n)
+                msg += "This will result in ROOT creating 2 canvases with same name. "
+                msg += "Please check all ControlPlotInput() definitions in the file %s" % (sh_h + config.__file__ + sh_n)
+                raise Exception(msg)
+    else:
         msg = sh_t + "Skipping of data-driven control plot generation" + sh_n + " (flag \"OptionDoControlPlots\" in the datacard file)"
         msgs.append(msg)
+
+
+    if not config.OptionPlotNamePrefix or (config.OptionPlotNamePrefix == None):
+        config.OptionPlotNamePrefix = "DataDrivenCtrlPlot"
 
     if not config.BlindAnalysis:
         msg = sh_e + "Unblinding analysis results!" + sh_n + " (flag \"BlindAnalysis\" in the datacard file)"
@@ -202,7 +218,7 @@ def getBkgDsetCreator(multicrabPaths, bkgLabel, fakesFromData, mcrabInfoOutput):
     return bkgDsetCreator
 
 def GetDatasetLabels(config, fakesFromData, opts):
-    #iro Print(sh_w + "GetDatasetLabels() is too specific. Must be made more generic" + sh_n, True)
+    # Print(sh_w + "GetDatasetLabels() is too specific. Must be made more generic" + sh_n, True) #iro fixme
     signalLabels = ["Signal Analysis"]
     bkgLabels    = []
 
@@ -325,7 +341,6 @@ def main(opts, moduleSelector, multipleDirs):
 #        msg = "Datacard %s is valid" % (sh_h + opts.datacard + sh_n)
 #        Print(msg, True)
 #        os.system("rm -f tmp_validate.txt")
-        
 
     # Load the datacard
     Verbose("Loading datacard \"%s\"." % (opts.datacard), True)
@@ -413,19 +428,19 @@ def main(opts, moduleSelector, multipleDirs):
     # For-loop: Data eras
     for i, era in enumerate(moduleSelector.getSelectedEras(), 1):        
         msg  = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Era", "%i" % i, "/", "%s:" % (nEras), era)
-        Print(sh_a + msg + sh_n, i==1)
+        Print(sh_l + msg + sh_n, i==1)
 
         # For-loop: Search modes
         for j, searchMode in enumerate(moduleSelector.getSelectedSearchModes(), 1):
             msg = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Mode", "%i" % j, "/", "%s:" % (nModes), searchMode)
-            Print(sh_a + msg + sh_n, False)
+            Print(sh_l + msg + sh_n, False)
 
             # For-loop: Optimization modes            
             for k, optimizationMode in enumerate(moduleSelector.getSelectedOptimizationModes(), 1):
                 nDatacards +=1
 
                 msg = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Opt", "%i" % k, "/", "%s:" % (nOpts), optimizationMode)
-                Print(sh_a + msg + sh_n, False)
+                Print(sh_l + msg + sh_n, False)
                 
                 Verbose("Create the datacard generator & check config file contents", True)
                 dcgen = DataCard.DataCardGenerator(opts, config)
@@ -451,8 +466,13 @@ def main(opts, moduleSelector, multipleDirs):
 
     # Inform user
     for d in myOutputDirectories:
-        msg = "Created results dir %s" % (sh_s + d + sh_n)
+        msg = "Results (bin-by-bin uncertainties) stored in director %s" % (sh_s + d + sh_n)
         Print(msg)
+        
+        # Create BarlowBeeston version of the datacard
+        if opts.barlowBeeston:
+            os.system("./dcardCreateBarlowBeestonDatacards.py %s" % d)
+
 
     # Optionally, create a tarball with all the results
     CreateTarball(myOutputDirectories, opts)
@@ -480,13 +500,12 @@ if __name__ == "__main__":
     CTRLPLOTDEBUG = False
     VERBOSE       = False    
     TARBALL       = False
-    # New
     ANALYSISTYPE  = "HToTauNu"
     DATACARD      = None
     PROFILER      = False
     DIRECTORIES   = None
-
-
+    BARLOWBEESTON = False
+    
     # Object for selecting data eras, search modes, and optimization modes
     myModuleSelector = analysisModuleSelector.AnalysisModuleSelector() 
 
@@ -505,6 +524,9 @@ if __name__ == "__main__":
 
     parser.add_option("--combine", dest="combine", action="store_true", default=COMBINE,
                       help="Generate datacards for Combine [default=%s]" % (COMBINE) )
+
+    parser.add_option("--barlowBeeston", dest="barlowBeeston", action="store_true", default=BARLOWBEESTON,
+                      help="Replace bin-by-bin uncertainties by Barlow-Beeston (autoMCStats) uncertainties  [default=%s]" % (BARLOWBEESTON) )
 
     parser.add_option("--tarball", dest="tarball", action="store_true", default=TARBALL,
                       help="In addition to a dir with all the output, create also a tarball for easy transfer of results to other machines [default=%s]" % (TARBALL) )
@@ -594,7 +616,7 @@ if __name__ == "__main__":
 
         # Print progress
         msg   = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Directory", "%i" % i, "/", "%s:" % (nDirs), d)
-        Print(sh_t + msg + sh_n, i==1)
+        Print(sh_l + msg + sh_n, i==1)
 
         # Sanity check (directory is located under current working directory)
         if d not in myDirs:

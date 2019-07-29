@@ -21,46 +21,27 @@ import HiggsAnalysis.NtupleAnalysis.tools.statisticalFunctions as statisticalFun
 import HiggsAnalysis.LimitCalc.BRdataInterface as BRdataInterface
 import HiggsAnalysis.NtupleAnalysis.tools.plots as plots
 import HiggsAnalysis.NtupleAnalysis.tools.histograms as histograms
+import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
+
+
+#================================================================================================ 
+# Shell Type
+#================================================================================================ 
+sh_e = ShellStyles.ErrorStyle()
+sh_s = ShellStyles.SuccessStyle()
+sh_h = ShellStyles.HighlightStyle()
+sh_a = ShellStyles.HighlightAltStyle()
+sh_l = ShellStyles.AltStyle()
+sh_t = ShellStyles.NoteStyle()
+sh_n = ShellStyles.NormalStyle()
+sh_w = ShellStyles.WarningStyle()
 
 
 #================================================================================================ 
 # Global Definitions
 #================================================================================================ 
 verbose = False
-
-# Flag for stating if the plots are for paper (True) or not (False)
-forPaper = True
-
-# Label for branching fraction
-BR = "#it{B}"
-
-# Label for H+ decay mode
-hplusDecayMode    = "H^{+} #rightarrow H_{SM}W#rightarrow#tau#tau#mu#nu"
-hplusDecayModeHtb = "H^{+} #rightarrow t#bar{b}"
-
-# The label for the physics process
-process            = "t #rightarrow H^{+}b, %s" % hplusDecayMode
-processHeavy       = "pp #rightarrow #bar{t}(b)H^{+}, %s" % hplusDecayMode
-processHeavyHtb    = "pp #rightarrow #bar{t}(b)H^{+}, %s" % hplusDecayModeHtb
-processCombination = "pp #rightarrow #bar{t}(b)H^{+}"
-process            = "H^{#pm} #rightarrow #tau#nu"
-processHeavy       = process
-processCombination = process
-
-# Label for the H+->tau BR assumption. fixme: alexandros (does not seem to work!)
-BRassumption = ""
-#BRassumption = "%s(H^{+} #rightarrow #tau#nu) = 1" % BR
-
-# Y axis label for the BR
-BRlimit = None
-
-# Y axis label for the sigma x BR
-sigmaBRlimit = None
-
-# Y axis label for the tanbeta
-tanblimit = "tan #beta"
-#tanblimit = "95 % CL limit on tan #beta"
 
 # Labels for the final states
 _finalstateLabels = {
@@ -80,12 +61,11 @@ _finalstateYmaxBR = {
 
 # Default y axis maximum values for sigma x BR limit for the final states
 _finalstateYmaxSigmaBR = {
-    "etau"   : 10.0, # FIXME
-    "mutau"  : 10.0, # FIXME
-    "emu"    : 10.0, # FIXME
+    "etau"   : 10.0, 
+    "mutau"  : 10.0, 
+    "emu"    : 10.0, 
     "default":  1.0,
 }
-
 
 #================================================================================================ 
 # Function Definitions
@@ -111,13 +91,14 @@ def Print(msg, printHeader=True):
     return
 
 
-def massUnit():
+def massUnit(natural=True):
     '''
     Unit for mass (GeV vs. GeV/c^2
     '''
-    if forPaper:
+    if natural:
         return "GeV"
-    return "GeV/c^{2}"
+    else:
+        return "GeV/c^{2}"
 
 
 def useParentheses():
@@ -126,8 +107,6 @@ def useParentheses():
     '''
     global BRlimit, sigmaBRlimit
     
-    #BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
-    #sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
     BRlimit      = "%s(t#rightarrowH^{+}b)#times%s(%s)" % (BR, BR, hplusDecayMode)
     sigmaBRlimit = "#sigma(H^{+})#times%s(%s) (fb)" % (BR, hplusDecayMode)
     return
@@ -141,23 +120,15 @@ def useSubscript(HToTB=False):
     if HToTB:
         BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
         sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
-#    else:
-#        BRlimit      = "#sigma H^{#pm} %s (pb)" % (hplusDecayMode)
-#        sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayMode)
-#        BRlimit      = " %s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayModeHtb)
-#        sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (fb)" % (BR, hplusDecayModeHtb)
     else:
         BRlimit      = "%s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayMode)
         sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (fb)" % (BR, hplusDecayMode)
     return
 
-useSubscript()
-
 def mHplus():
     '''
-    Label for m(H+)
+    Label for m(H+). Normally used as x-axis label
     '''
-    #label = "m_{H^{+}} (%s)" % massUnit()
     label = "m_{H^{#pm}} (%s)" % massUnit()
     return label
 
@@ -253,7 +224,7 @@ class BRLimits:
     Class for reading the BR limits from the JSON file produced by
     landsMergeHistograms.py
     '''
-    def __init__(self, directory=".", excludeMassPoints=[], limitsfile="limits.json", configfile="configuration.json"):
+    def __init__(self, directory=".", analysisType="HToTauNu", excludeMassPoints=[], limitsfile="limits.json", configfile="configuration.json"):
         '''
         Constructor
 
@@ -262,7 +233,7 @@ class BRLimits:
         \param excludeMassPoints  List of strings for mass points to exclude
         '''
         resultfile="limits.json"
-        #configfile="configuration.json"
+        configfile="configuration.json" #unknown purpose
 
         # Open limits file
         msg = "Opening file '%s'" % (limitsfile)
@@ -277,7 +248,15 @@ class BRLimits:
         f = open(os.path.join(directory, configfile), "r")
         config = json.load(f)
         f.close()
-        
+
+        self.analysisType = analysisType
+        myAnalyses = ["HToTauNu", "HToTB", "HToHW"]
+        if analysisType in myAnalyses:
+            self.analysisType = analysisType
+        else:
+            msg = "Invalid analysis type \"%s\". Please selected one of the following: \"%s" % (self.analysisType, "\", \"".join(myAnalyses) + "\"")
+            raise Exception(sh_e + msg + sh_n)
+
         self.lumi = float(limits["luminosity"])
         self.mass = config["masspoints"]
         self.isHeavyStatus = False
@@ -301,7 +280,6 @@ class BRLimits:
         # Print("self.mass[0] = %s. Is this key in limits[\"masspoints\"]? Answer: %s " % (self.mass[0], self.mass[0] in limits["masspoints"]), True)
         firstMassPoint = limits["masspoints"][self.mass[0]]
         
-
         if "observed" in firstMassPoint:
             self.observed = [limits["masspoints"][m]["observed"] for m in self.mass]
             members.append("observed")
@@ -328,7 +306,6 @@ class BRLimits:
             setattr(self, attr+"_string", [m for m in getattr(self, attr)])
             setattr(self, attr, [float(m) for m in getattr(self, attr)])
 
-       
         self.finalstates = []
         def hasDatacard(name):
             for datacard in config["datacards"]:
@@ -346,13 +323,54 @@ class BRLimits:
             self.finalstates.append("emu")
         return
 
+    def getIsHeavy(self):
+        return self.isHeavyStatus
+
+    def getIsLight(self):
+        return not self.isHeavyStatus
+
+    def getSigmaBRlimitText(self):
+        '''
+        https://twiki.cern.ch/twiki/bin/viewauth/CMS/Internal/FigGuidelines (10 Sep 2018) 
+        '''
+        sigmaBRlimits = {}
+
+        br = "#sigma_{H^{#pm}} #bf{#it{#Beta}} (%s) (pb)"
+        sigmaBRlimits["HToTauNu"] = br % ( "H^{#pm} #rightarrow #tau^{#pm} #nu_{#tau}")
+        sigmaBRlimits["HToHW"]    = br % ( "H^{#pm} #rightarrow H^{0}_{SM} W^{#pm}")
+        sigmaBRlimits["HToTB"]    = br % ( "H^{#pm} #rightarrow tb" )
+        return sigmaBRlimits[self.analysisType]
+
+    def getFinalStateText(self):
+        
+        finalStates = {}
+        finalStates["HToTauNu"] = "#tau_{h}+jets final state"
+        finalStates["HToHW"]    = "#mu#tau_{h} and e#tau_{h} final states"
+        finalStates["HToTB"]    = "fully hadronic final state"
+        return finalStates[self.analysisType]
+
+    def getHardProcessText(self):
+        
+        processes = {}
+        processes["HToTauNu"] = "pp #rightarrow t(b)H^{#pm} #rightarrow #tau^{#pm}#nu_{#tau}"
+        processes["HToHW"]    = "pp #rightarrow t(b)H^{#pm} #rightarrow t(b)"
+        processes["HToTB"]    = "pp #rightarrow t(b)H^{#pm} #rightarrow t(b)"
+        return processes[self.analysisType]
+
+
+    def getBRassumptionText(self):
+
+        assumptions = {}
+        assumptions["HToTauNu"] = "#bf{#it{#Beta}}(H^{#pm} #rightarrow #tau^{#pm}#nu_{#tau}) = 1"
+        assumptions["HToHW"]    = ""
+        assumptions["HToTB"]    = ""
+        return assumptions[self.analysisType]
 
     def getLuminosity(self):
         '''
         Get the integrated luminosity in 1/pb
         '''
         return self.lumi
-
 
     def getFinalstates(self):
         '''
@@ -458,7 +476,8 @@ class BRLimits:
         for i in xrange(len(self.mass_string)):
             mass = self.mass_string[i]
             if unblindedStatus:
-                observed = self.observed_string[i]
+                #observed = self.observed_string[i]
+                observed = precision % (self.observed_string[i])
             else:
                 observed = "BLINDED"
             median       = precision % (self.expectedMedian_string[i])
@@ -480,8 +499,8 @@ class BRLimits:
         '''
         table = self.getLimitsTable(unblindedStatus, nDigits)
         # Print limits (row by row)
-        for row in table:
-            print row
+        for i, row in enumerate(table,1):
+            Print(row, i==1)
         return
 
         
@@ -930,7 +949,6 @@ class SignificanceData:
 
     def isHeavyStatus(self):
         return self._isHeavyStatus
-
 
     def massPoints(self):
         return self._masses
@@ -1406,18 +1424,7 @@ def doTanBetaPlotGeneric(name, graphs, luminosity, finalstateText, xlabel, scena
     # Enable OpenGL for transparency
     #if opts.excludedArea:
     ROOT.gEnv.SetValue("OpenGL.CanvasPreferGL", 1)
-    
-#    isHeavy = regime != "light"
     tanbMax = 65
-
-#    if forPaper:
-#        if scenario in ["mhmaxup", "mhmodp", "mhmodm"] and not "_mA" in name:
-#            histograms.cmsTextMode = histograms.CMSMode.PAPER
-#        else:
-#            histograms.cmsTextMode = histograms.CMSMode.UNPUBLISHED
-#    else:
-#        histograms.cmsTextMode = histograms.CMSMode.PRELIMINARY
-
     blinded = True
     if "obs" in graphs.keys():
         blinded = False
@@ -1666,10 +1673,7 @@ def doTanBetaPlotGeneric(name, graphs, luminosity, finalstateText, xlabel, scena
 
     plot.createFrame(name, opts={"ymin": tanbMin, "ymax": tanbMax, "xmin": frameXmin, "xmax": frameXmax})
     plot.frame.GetXaxis().SetTitle(xlabel)
-    plot.frame.GetYaxis().SetTitle(tanblimit)
-
-####    plot.getPad().SetLogy(True)
-
+    plot.frame.GetYaxis().SetTitle("tan#beta")
     plot.draw()
     
     plot.setLuminosity(luminosity)
@@ -1679,8 +1683,6 @@ def doTanBetaPlotGeneric(name, graphs, luminosity, finalstateText, xlabel, scena
         plot.addStandardTexts(cmsTextPosition="left",addLuminosityText=True)
     else:
         plot.addStandardTexts(cmsTextPosition="right",addLuminosityText=True)
-#    histograms.addLuminosityText(x=None, y=None, lumi="2.3-4.9")
-#    histograms.addLuminosityText(x=None, y=None, lumi="%s pb^{-1}"%luminosity)
 
     size = 20
     if regime == "light":

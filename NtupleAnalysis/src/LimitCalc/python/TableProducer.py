@@ -29,6 +29,7 @@ sh_e = ShellStyles.ErrorStyle()
 sh_s = ShellStyles.SuccessStyle()
 sh_h = ShellStyles.HighlightStyle()
 sh_a = ShellStyles.HighlightAltStyle()
+sh_l = ShellStyles.AltStyle()
 sh_t = ShellStyles.NoteStyle()
 sh_n = ShellStyles.NormalStyle()
 sh_w = ShellStyles.WarningStyle()
@@ -256,16 +257,16 @@ class TableProducer:
         self.Verbose("Importing & Calling the control plot maker module", True)
         if self._config.OptionDoControlPlots:
             if opts.analysisType in ["HToTauNu"]:
-                from HiggsAnalysis.LimitCalc.ControlPlotMaker import ControlPlotMaker
-                ControlPlotMaker(self._opts, self._config, self._ctrlPlotDirname, self._luminosity, self._observation, self._datasetGroups)
+                import HiggsAnalysis.LimitCalc.ControlPlotMaker as cp
             elif opts.analysisType in ["HToHW"]:
-                from HiggsAnalysis.LimitCalc.ControlPlotMakerHToHW import ControlPlotMakerHToHW
-                ControlPlotMakerHToHW(self._opts, self._config, self._ctrlPlotDirname, self._luminosity, self._observation, self._datasetGroups)
+                import HiggsAnalysis.LimitCalc.ControlPlotMakerHToHW as cp
             elif opts.analysisType in ["HToTB"]:
-                from HiggsAnalysis.LimitCalc.ControlPlotMakerHToTB import ControlPlotMakerHToTB
-                ControlPlotMakerHToTB(self._opts, self._config, self._ctrlPlotDirname, self._luminosity, self._observation, self._datasetGroups)
+                import HiggsAnalysis.LimitCalc.ControlPlotMakerHToTB as cp
             else:
                 raise Exception(sh_e + msg + sh_n)
+            self.Verbose("Control plots will be created using the %s module" % (sh_h + os.path.basename(cp.__file__) + sh_n), True)
+            # Assumption is that the constructors of all 3 classes take the exact same arguments (currently holds)
+            cp.ControlPlotMaker(self._opts, self._config, self._ctrlPlotDirname, self._luminosity, self._observation, self._datasetGroups)
         else:
             msg = "Skipped making of data-driven control plots. To enable, set OptionDoControlPlots = True in the input datacard."
             if self._opts.verbose:
@@ -428,8 +429,8 @@ class TableProducer:
         for index, m in enumerate(self._config.MassPoints, 1):
             
             # Print progress 
-            msg = "Datacard %s/%s (mH=%s)" % (index, len(self._config.MassPoints), str(m)) 
-            PrintFlushed(ShellStyles.HighlightStyle() + msg + sh_n, index==1)
+            msg = "Datacard %s/%s: mH=%s GeV" % (index, len(self._config.MassPoints), str(m)) 
+            PrintFlushed(sh_l + msg + sh_n, index==1)
             if index == len(self._config.MassPoints):
                 print 
 
