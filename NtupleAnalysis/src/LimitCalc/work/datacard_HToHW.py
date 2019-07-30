@@ -92,7 +92,7 @@ def PrintNuisancesTable(Nuisances, DataGroups):
 # Options
 #================================================================================================  
 OptionTest                             = False # [default: False]
-OptionPaper                            = True  # [default: True]   (Changes figure style to paper style)
+OptionPaper                            = False  # [default: True]   (Changes figure style to paper style)
 OptionIncludeSystematics               = True  # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
 OptionShapeSystematics                 = False # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
 OptionDoControlPlots                   = True  # [default: True]   (Produce control plots defined at end of this file)
@@ -179,10 +179,11 @@ signalTemplate   = DataGroup(datasetType="Signal", histoPath=histoPathInclusive,
 signalDataGroups =  []
 # For-loop: All mass points
 for mass in MassPoints:
+    myMassList=[mass]
     hx=signalTemplate.clone()
     hx.setLabel("Hp" + str(mass) )
     hx.setLandSProcess(0)
-    hx.setValidMassPoints(MassPoints)
+    hx.setValidMassPoints(myMassList)
     hx.setNuisances(mySystematics["Signal"])
     #hx.setDatasetDefinition("ChargedHiggs_HplusTB_HplusToHW_M%s_mH200_2ta_NLO" % (mass))
     hx.setDatasetDefinition(SignalName % (mass))

@@ -40,7 +40,7 @@ sh_w = ShellStyles.WarningStyle()
 #================================================================================================ 
 _legendLabelQCDMC = "QCD (MC)" 
 _legendLabelEWKMC = "EWK (MC)" 
-_legendLabelFakeB = "Jets misid. as #tau_{h}"
+_legendLabelQCDdata = "Mis-ID. #tau_{h} (data)"
 
 drawPlot = plots.PlotDrawer(ratio             = True, 
                             ratioYlabel       = "Data / Bkg  ",
@@ -142,7 +142,7 @@ class ControlPlotMaker:
                 # Initialize histograms
                 hData     = None
                 hSignal   = None
-                hFakeB    = None
+                hQCDdata    = None
                 hQCDMC    = None
                 stackList = []
 
@@ -199,12 +199,12 @@ class ControlPlotMaker:
                         else:
                             hSignal.Add(h)
                     elif c.typeIsQCDinverted():
-                        msg += ". FakeB"
+                        msg += ". QCDdata"
                         self.Verbose(msg, True)
-                        if hFakeB == None:
-                            hFakeB = h.Clone()
+                        if hQCDdata == None:
+                            hQCDdata = h.Clone()
                         else:
-                            hFakeB.Add(h)
+                            hQCDdata.Add(h)
                     elif c.typeIsQCDMC():
                         msg += ". QCDMC"
                         self.Verbose(msg, True)
@@ -227,9 +227,9 @@ class ControlPlotMaker:
                     continue
 
                 # Stack all the histograms
-                if hFakeB != None:
-                    self.Verbose("Stacking FakeB", True)
-                    myHisto = histograms.Histo(hFakeB, "FakeB", legendLabel=_legendLabelFakeB)
+                if hQCDdata != None:
+                    self.Verbose("Stacking QCDdata", True)
+                    myHisto = histograms.Histo(hQCDdata, "QCDdata", legendLabel=_legendLabelQCDdata)
                     myHisto.setIsDataMC(isData=False, isMC=True)
                     stackList.insert(0, myHisto)
                 elif hQCDMC != None:
@@ -314,8 +314,8 @@ class ControlPlotMaker:
                 # Make sure BR is indicated if anyting else but BR=1.0
                 if m > 0 and self._config.OptionBr != 1.0:
                     stackPlot.histoMgr.setHistoLegendLabelMany({
-                            #mySignalLabel: "H^{+} m_{H^{+}}=%d GeV (x %s)" % (m, self._config.OptionBr)
-                            #mySignalLabel: "m_{H^{+}}=%d GeV (x %s)" % (m, self._config.OptionBr)
+                            #mySignalLabel : "H^{+} m_{H^{+}}=%d GeV (x %s)" % (m, self._config.OptionBr)
+                            signalLabel : "m_{H^{+}}=%d GeV (x %s)" % (m, self._config.OptionBr)
                             })
 
                 # Do plotting
@@ -724,8 +724,8 @@ class SelectionFlowPlotMaker:
             myRHWU.makeFlowBinsVisible()
             if self._expectedLabelList[i] == "QCD":
                 myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelQCD)
-            elif self._expectedLabelList[i] == "FakeB":
-                myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelFakeB)
+            elif self._expectedLabelList[i] == "QCDdata":
+                myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelQCDdata)
             elif self._expectedLabelList[i] == "EWKfakes":
                 myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelEWKFakes)
             else:
