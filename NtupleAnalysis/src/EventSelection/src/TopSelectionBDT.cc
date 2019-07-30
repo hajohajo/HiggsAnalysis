@@ -66,7 +66,7 @@ TopSelectionBDT::TopSelectionBDT(const ParameterSet& config, EventCounter& event
     cSubPassedNTopsCut(fEventCounter.addSubCounter("top selection ("+postfix+")", "# tops")),
     // Top candidates
     cTopsAll(fEventCounter.addSubCounter("top candidates ("+postfix+")", "All")),
-    cTopsPassTopMassLowCut(fEventCounter.addSubCounter("top candidates ("+postfix+")", "top mass (low")),
+    cTopsPassTopMassLowCut(fEventCounter.addSubCounter("top candidates ("+postfix+")", "top mass (low)")),
     cTopsPassTopMassUppCut(fEventCounter.addSubCounter("top candidates ("+postfix+")", "top mass (upp)")),
     cTopsPassBDiscCut(fEventCounter.addSubCounter("top candidates ("+postfix+")", "b-disc")),
     cTopsPassBDTCut(fEventCounter.addSubCounter("top candidates ("+postfix+")", "BDTG")),

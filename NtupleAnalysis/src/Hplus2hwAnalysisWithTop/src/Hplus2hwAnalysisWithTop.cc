@@ -85,12 +85,14 @@ Hplus2hwAnalysisWithTop::Hplus2hwAnalysisWithTop(const ParameterSet& config, con
     cFakeTauSFCounter(fEventCounter.addCounter("Fake #tau SF")),
     cTauDMCounter(fEventCounter.addCounter("#tau DM")),
     fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear"), fEventCounter, fHistoWrapper, &fCommonPlots, ""), // fixme: keep counter?
+    // fAngularCutsCollinear(config.getParameter<ParameterSet>("AngularCutsCollinear")), // fixme: keep counter?
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cBTaggingSFCounter(fEventCounter.addCounter("b-tag SF")),
     // fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")),
-    fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"), fEventCounter, fHistoWrapper, &fCommonPlots, ""), // fixme: keep counter?
+    // fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack")), // fixme: keep counter?
     fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
