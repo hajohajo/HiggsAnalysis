@@ -108,7 +108,7 @@ def useParentheses():
     global BRlimit, sigmaBRlimit
     
     BRlimit      = "%s(t#rightarrowH^{+}b)#times%s(%s)" % (BR, BR, hplusDecayMode)
-    sigmaBRlimit = "#sigma(H^{+})#times%s(%s) (fb)" % (BR, hplusDecayMode)
+    sigmaBRlimit = "#sigma(H^{+})#times%s(%s) (pb)" % (BR, hplusDecayMode)
     return
 
     
@@ -122,7 +122,7 @@ def useSubscript(HToTB=False):
         sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
     else:
         BRlimit      = "%s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayMode)
-        sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (fb)" % (BR, hplusDecayMode)
+        sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (pb)" % (BR, hplusDecayMode)
     return
 
 def mHplus():
