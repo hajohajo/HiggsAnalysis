@@ -1624,7 +1624,7 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         ratioSyst2.GetYaxis().SetTitle(ytitle)
         name = "BackgroundStatSystError"
         if paperStyle:
-            name = "StatSystError" #iro
+            name = "StatSystError"
         ratioSyst2.SetName(name)
         if not histograms.uncertaintyMode.addStatToSyst():
             name = "BackgroundSystError"
@@ -1634,9 +1634,9 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
             ret.append(_createHisto(ratioSyst1, drawStyle="[]", legendLabel=None))
         if denominatorStatSyst:
             if paperStyle:
-                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=None, legendStyle="F"))  #iro
+                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=None, legendStyle="F"))
             else:
-                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=_legendLabels[name], legendStyle="F"))  #iro
+                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=_legendLabels[name], legendStyle="F"))
 
         if addAlsoHatchedUncertaintyHisto:
             ratioSyst2_2 = ratioSyst.Clone("BackgroundStatSystError2")

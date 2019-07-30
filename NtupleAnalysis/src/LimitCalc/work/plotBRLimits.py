@@ -10,11 +10,12 @@ USAGE:
 
 
 EXAMPLES:
-/plotBRLimits.py --logY --relative --yMax 10 --yMin 1e-2 --url --bandValue 5 --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats
+./plotBRLimits.py --logY --relative --yMax 10 --yMin 1e-2 --url --bandValue 5 --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats
 
 
 LAST USED:
-/plotBRLimits.py --logY --relative --yMax 10 --yMin 1e-2 --url --bandValue 5 --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats  -s png,pdf --cutLineX 400 --cutLineY 1 --bandValue 5 
+./plotBRLimits.py --logY --relative --yMax 10 --yMin 1e-2 --url --bandValue 5 --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats  -s png,pdf --cutLineX 400 --cutLineY 1 --bandValue 5 
+
 '''
 #================================================================================================
 # Import modules
@@ -736,7 +737,7 @@ if __name__ == "__main__":
     parser.add_option("--relativeYmax", dest="relativeYmax", type="float", default=None, 
                       help="Maximum y-value for relative plots")
     
-    parser.add_option("--relativeYlabel", dest="relativeYlabel", default="Expected limit vs. nominal", 
+    parser.add_option("--relativeYlabel", dest="relativeYlabel", default="95% CL upper limit ratio", 
                       help="Y-axis title for relative plots")
 
     parser.add_option("--url", dest="url", action="store_true", default=URL,
