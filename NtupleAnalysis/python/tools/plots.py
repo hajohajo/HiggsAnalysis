@@ -1218,8 +1218,9 @@ def _createRatioHistos(histo1, histo2, ytitle, ratioType=None, ratioErrorOptions
     elif ratioType == "errorScale":
         ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions))
     elif ratioType == "errorScalePaper":
-        ratioErrorOptions["paperStyle"] = True
-        ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions) )
+        # enable paper-type styling for stat + syst error in main canvas and ratio canvas
+        ratioErrorOptions["paperStyle"] = True 
+        ret.extend(_createRatioHistosErrorScale(histo1, histo2, ytitle, **ratioErrorOptions))
     else:
         raise Exception("Invalid value for argument ratioType '%s', valid are 'errorPropagation', 'binomial', 'errorScale', 'errorScalePaper'")
     return ret        
@@ -1623,8 +1624,6 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
         ratioSyst1.SetName(histo1.GetName()+"_syst")
         ratioSyst2.GetYaxis().SetTitle(ytitle)
         name = "BackgroundStatSystError"
-        if paperStyle:
-            name = "StatSystError"
         ratioSyst2.SetName(name)
         if not histograms.uncertaintyMode.addStatToSyst():
             name = "BackgroundSystError"
@@ -1634,7 +1633,7 @@ def _createRatioHistosErrorScale(histo1, histo2, ytitle, numeratorStatSyst=True,
             ret.append(_createHisto(ratioSyst1, drawStyle="[]", legendLabel=None))
         if denominatorStatSyst:
             if paperStyle:
-                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=None, legendStyle="F"))
+                ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=None, legendStyle="F")) # to avoid duplicate legend entry
             else:
                 ret.append(_createHisto(ratioSyst2, drawStyle="2", legendLabel=_legendLabels[name], legendStyle="F"))
 
@@ -2807,45 +2806,61 @@ class DataMCPlot(PlotSameBase, PlotRatioBase):
     def draw(self):
         PlotSameBase.draw(self)
         PlotRatioBase._draw(self)
+        return
 
-## Same goal as dataset.DataMCPlot, but with explicit histograms instead of construction from DatasetManager
-#
-# From the given histograms, data and MC histograms are identified by
-# their name such that data histogram name(s) are given, and all other
-# histograms than data histograms are assumed to be MC. The default
-# data histogram name is "Data", but this can be set with
-# setDataDatasetNames() method.
+
 class DataMCPlot2(PlotBase, PlotRatioBase):
-    ## Constructor
-    #
-    # \param histos           List of histograms.Histo or TH1/TGraph objects to plot
-    # \param normalizeToOne   Should the histograms be normalized to unit area?
-    # \param kwargs           Keyword arguments (forwarded to plots.PlotBase.__init__()
+    '''
+    Same goal as dataset.DataMCPlot, but with explicit histograms instead of construction from DatasetManager
+
+    From the given histograms, data and MC histograms are identified by
+    their name such that data histogram name(s) are given, and all other
+    histograms than data histograms are assumed to be MC. The default
+    data histogram name is "Data", but this can be set with
+    setDataDatasetNames() method.
+    '''    
     def __init__(self, histos, normalizeToOne=False, **kwargs):
+        '''
+        Constructor
+        
+        \param histos           List of histograms.Histo or TH1/TGraph objects to plot
+        \param normalizeToOne   Should the histograms be normalized to unit area?
+        \param kwargs           Keyword arguments (forwarded to plots.PlotBase.__init__()
+        '''
         PlotBase.__init__(self, histos, **kwargs)
         PlotRatioBase.__init__(self)
         self.normalizeToOne = normalizeToOne
         self.dataDatasetNames = ["Data"]
 
     def setDefaultStyles(self, paperStyle=False):
+                
+        self._paperStyle=paperStyle
+        if paperStyle:
+            _plotStyles["BackgroundStatError"]     = styles.errorRatioStatStyle
+            _plotStyles["BackgroundSystError"]     = styles.errorRatioStatStyle
+            _plotStyles["BackgroundStatSystError"] = styles.errorRatioStatStyle
         self._setLegendStyles()
         self._setLegendLabels()
         self._setPlotStyles()
-        self._paperStyle=paperStyle
+        return
 
-    ## Set the names of data histograms
-    #
-    # \param names   List of names of data histograms
     def setDataDatasetNames(self, names):
+        '''
+        Set the names of data histograms
+        
+        \param names   List of names of data histograms
+        '''
         self.dataDatasetNames = names
-
+        return
     
-    ## Stack MC histograms
-    #
-    # \param stackSignal  Should the signal histograms be stacked too?
-    #
-    # Signal histograms are identified with plots.isSignal() function
     def stackMCHistograms(self, stackSignal=False):
+        '''
+        Stack MC histograms
+        
+        \param stackSignal  Should the signal histograms be stacked too?
+        
+        Signal histograms are identified with plots.isSignal() function
+        '''
         mcNames = filter(lambda n: not n in self.dataDatasetNames, [h.getName() for h in self.histoMgr.getHistos()])
         mcNamesNoSignal = filter(lambda n: not isSignal(n) and not "StackedMCSignal" in n, mcNames)
         if not stackSignal:
@@ -2854,14 +2869,20 @@ class DataMCPlot2(PlotBase, PlotRatioBase):
         # Leave the signal datasets unfilled
         self.histoMgr.forEachHisto(UpdatePlotStyleFill( _plotStyles, mcNamesNoSignal))
         self.histoMgr.stackHistograms("StackedMC", mcNames)
+        return
 
-    ## Stack MC signal histograms
     def stackMCSignalHistograms(self):
+        '''
+        Stack MC signal histograms
+        '''
         mcSignal = filter(lambda n: isSignal(n), self.datasetMgr.getMCDatasetNames())
         self.histoMgr.stackHistograms("StackedMCSignal", mcSignal)
-
-    ## Add MC uncertainty band
+        return
+    
     def addMCUncertainty(self, postfit=False):
+        '''
+        Add MC uncertainty band
+        '''
         if not self.histoMgr.hasHisto("StackedMC"):
             raise Exception("Must call stackMCHistograms() before addMCUncertainty()")
         systKey = "MCSystError"
@@ -2873,16 +2894,20 @@ class DataMCPlot2(PlotBase, PlotRatioBase):
             self.histoMgr.addMCUncertainty(styles.getErrorStyle(), nameList=["StackedMC"], legendLabel=_legendLabels[systKey])
         else:
             if self._paperStyle:
+                # Add only 1 legend entry for stat + syst in main canvas
                 self.histoMgr.addMCUncertainty(styles.getErrorStylePaper(), nameList=["StackedMC"], legendLabel=_legendLabels["StatSystError"], uncertaintyLegendLabel=None)
             else:
                 self.histoMgr.addMCUncertainty(styles.getErrorStyle(), nameList=["StackedMC"], legendLabel=_legendLabels["MCStatError"], uncertaintyLegendLabel=_legendLabels[systKey])
+        return
 
-    ## Create TCanvas and frames for the histogram and a data/MC ratio
-    #
-    # \param filename     Name for TCanvas (becomes the file name)
-    # \param createRatio  Create also the ratio pad?
-    # \param kwargs       Keyword arguments, forwarded to PlotSameBase.createFrame() or PlotRatioBase._createFrameRatio()
     def createFrame(self, filename, createRatio=False, **kwargs):
+        '''
+        Create TCanvas and frames for the histogram and a data/MC ratio
+        
+        \param filename     Name for TCanvas (becomes the file name)
+        \param createRatio  Create also the ratio pad?
+        \param kwargs       Keyword arguments, forwarded to PlotSameBase.createFrame() or PlotRatioBase._createFrameRatio()
+        '''
         self._normalizeToOne()
         if not createRatio:
             PlotBase.createFrame(self, filename, **kwargs)

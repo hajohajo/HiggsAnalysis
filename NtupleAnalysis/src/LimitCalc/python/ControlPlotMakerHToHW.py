@@ -339,7 +339,7 @@ class ControlPlotMaker:
             return
 
         if config.OptionSqrtS == None:
-            raise Exception(ShellStyles.ErrorLabel()+"Please set the parameter OptionSqrtS = <integer_value_in_TeV> in the config file!"+sh_n)
+            raise Exception(sh_e + "Please set the parameter OptionSqrtS = <integer_value_in_TeV> in the config file!" + sh_n)
         return
 
     def _setBlingingString(self, myBlindingString, myParams):
