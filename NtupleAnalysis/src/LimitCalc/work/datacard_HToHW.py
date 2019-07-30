@@ -98,7 +98,7 @@ OptionShapeSystematics                 = False # [default: True]   (Shape system
 OptionDoControlPlots                   = True  # [default: True]   (Produce control plots defined at end of this file)
 OptionGenuineTauBackgroundSource       = "MC"  # [Options: "DataDriven", "MC"]
 OptionFakeTauMeasurementSource         = "DataDriven"  # [default: "DataDriven"] (options: "DataDriven", "MC")
-OptionBr                               = 1.0   # [default: 1.0]    (The Br(t->bH+) used in figures and tables)
+OptionBr                               = 0.001   # [default: 1.0]    (The Br(t->bH+) used in figures and tables)
 OptionSqrtS                            = 13    # [default: 13]     (The sqrt(s) used in figures and tables)
 OptionBlindThreshold                   = 0.10  # [default: None]   (If signal exceeds this fraction of expected events, data is blinded in a given bin)
 OptionCombineSingleColumnUncertainties = False # [default: False]  (Merge nuisances with quadratic sum using the TableProducer.py Only applied to nuisances with one column)
@@ -182,7 +182,7 @@ for mass in MassPoints:
     hx=signalTemplate.clone()
     hx.setLabel("Hp" + str(mass) )
     hx.setLandSProcess(0)
-    hx.setValidMassPoints(myMassList)
+    hx.setValidMassPoints(MassPoints)
     hx.setNuisances(mySystematics["Signal"])
     #hx.setDatasetDefinition("ChargedHiggs_HplusTB_HplusToHW_M%s_mH200_2ta_NLO" % (mass))
     hx.setDatasetDefinition(SignalName % (mass))

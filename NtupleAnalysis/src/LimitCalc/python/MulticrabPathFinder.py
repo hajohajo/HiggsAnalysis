@@ -224,7 +224,7 @@ class MulticrabPathFinder:
             myWord = "Hplus2tbAnalysis"
             myFile = "multicrab.cfg"
         elif (self._analysisType == "HToHW"):
-            myWord = "SignalAnalysis"
+            myWord = "Hplus2hwAnalysis"
             myFile = "multicrab.cfg"
         else:
             myWord = "mbedded"

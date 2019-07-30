@@ -377,8 +377,7 @@ def main(opts, moduleSelector, multipleDirs):
     elif opts.analysisType in ["HToTauNu", "HToHW"]:
         try:
 #            fakesFromData = (config.OptionGenuineTauBackgroundSource == "DataDriven")
-#            fakesFromData = (config.OptionFakeTauMeasurementSource == "DataDriven")
-	     fakesFromData = True
+            fakesFromData = (config.OptionFakeTauMeasurementSource == "DataDriven")
         except AttributeError:
             msg = "The imported file \"%s\" has no attribute \"OptionGenuineTauBackgroundSource\". Please define this parameter in the imported module." % (config.__file__)
             raise AttributeError(msg, True)

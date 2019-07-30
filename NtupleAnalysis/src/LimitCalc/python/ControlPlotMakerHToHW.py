@@ -198,7 +198,7 @@ class ControlPlotMaker:
                             hSignal = h.Clone()
                         else:
                             hSignal.Add(h)
-                    elif c.typeIsFakeB():
+                    elif c.typeIsQCDinverted():
                         msg += ". FakeB"
                         self.Verbose(msg, True)
                         if hFakeB == None:
@@ -315,7 +315,7 @@ class ControlPlotMaker:
                 if m > 0 and self._config.OptionBr != 1.0:
                     stackPlot.histoMgr.setHistoLegendLabelMany({
                             #mySignalLabel: "H^{+} m_{H^{+}}=%d GeV (x %s)" % (m, self._config.OptionBr)
-                            mySignalLabel: "m_{H^{+}}=%d GeV (x %s)" % (m, self._config.OptionBr)
+                            #mySignalLabel: "m_{H^{+}}=%d GeV (x %s)" % (m, self._config.OptionBr)
                             })
 
                 # Do plotting
