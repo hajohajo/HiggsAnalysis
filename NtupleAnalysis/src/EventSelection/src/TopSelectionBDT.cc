@@ -62,7 +62,7 @@ TopSelectionBDT::TopSelectionBDT(const ParameterSet& config, EventCounter& event
     cSubAll(fEventCounter.addSubCounter("top selection ("+postfix+")", "All")),
     cSubPassedJetsCut(fEventCounter.addSubCounter("top selection ("+postfix+")", "#geq 3 jets")),
     cSubPassedBjetsCut(fEventCounter.addSubCounter("top selection ("+postfix+")", "#geq 1 b jets")),
-    cSubPassedBDTGCut(fEventCounter.addSubCounter("top selection ("+postfix+")", "BDT")),
+    // cSubPassedBDTGCut(fEventCounter.addSubCounter("top selection ("+postfix+")", "BDT")),
     cSubPassedNTopsCut(fEventCounter.addSubCounter("top selection ("+postfix+")", "# tops")),
     // Top candidates
     cTopsAll(fEventCounter.addSubCounter("top candidates ("+postfix+")", "All")),
@@ -90,7 +90,7 @@ TopSelectionBDT::TopSelectionBDT(const ParameterSet& config)
   cSubAll(fEventCounter.addSubCounter("top selection", "All")),
   cSubPassedJetsCut(fEventCounter.addSubCounter("top selection", "#geq 3 jets")),
   cSubPassedBjetsCut(fEventCounter.addSubCounter("top selection", "#geq 1 b jets")),
-  cSubPassedBDTGCut(fEventCounter.addSubCounter("top selection", "BDTG")),
+  // cSubPassedBDTGCut(fEventCounter.addSubCounter("top selection", "BDTG")),
   cSubPassedNTopsCut(fEventCounter.addSubCounter("top selection", "# tops")),
   // Top candidates
   cTopsAll(fEventCounter.addSubCounter("top candidates", "All")),
@@ -305,7 +305,7 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
 
   // Initialise variables
   output.fJetsUsedAsBJets = selectedBjets;
-  output.bPassedSelection = true;// iro
+  output.bPassedSelection = false;
 
   // Sanity check
   if (selectedJets.size() < 3) return output;
@@ -809,11 +809,12 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
   // Increment counters
   //================================================================================================
   output.bPassedNTopsCut  = cfg_NumberOfTopsCut.passedCut(output.fSelectedCleanedTopsBDTG.size());
-  output.bPassedSelection = output.bPassedBDTGCut * output.bPassedNTopsCut;
+  // output.bPassedSelection = output.bPassedBDTGCut * output.bPassedNTopsCut;
+  output.bPassedSelection = output.bPassedNTopsCut;
 
-  if (0) std::cout << "=== TopSelectionBDT:: Increment counters" << std::endl;
-  //=== Apply cut on leading BDTG top (at least 1 top with desired BDTG score)
-  if (output.bPassedBDTGCut) cSubPassedBDTGCut.increment();
+  // if (0) std::cout << "=== TopSelectionBDT:: Increment counters" << std::endl;
+  // //=== Apply cut on leading BDTG top (at least 1 top with desired BDTG score)
+  // if (output.bPassedBDTGCut) cSubPassedBDTGCut.increment();
   
   //=== Apply cut on number of tops with BDTG score above BDTG score threshold
   if (output.bPassedNTopsCut) cSubPassedNTopsCut.increment();

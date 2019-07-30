@@ -251,7 +251,7 @@ private:
   Count cSubAll;
   Count cSubPassedJetsCut;
   Count cSubPassedBjetsCut;
-  Count cSubPassedBDTGCut;
+  // Count cSubPassedBDTGCut;
   Count cSubPassedNTopsCut;
   //
   Count cTopsAll;
