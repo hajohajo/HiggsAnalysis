@@ -680,15 +680,16 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]       = {"ymin": 1e-1, "ymaxfactor": 10}
         if h == "counter":
             kwargs["moveLegend"] = _legSW
-            xMin =  8.0
-            xMax = 25.0 # using 1 before because blinding fails there
+            xMin =  8.0 # start from trigger (8.0)
+            xMax = 27.0 # using 1 before because blinding fails there
             kwargs["opts"] = {"xmin": xMin, "xmax": xMax, "ymin": _yMin, "ymax": 5e9}
+            #kwargs["opts"] = {"ymin": _yMin, "ymax": 5e9}
             kwargs["moveLegend"] = _legNE
             kwargs["blindingRangeString"] = "0-100"
         elif "jet selection" in h:
-            kwargs["opts"] = {"xmin": 0.0, "xmax": 6.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+            kwargs["opts"] = {"xmin": 0.0, "xmax": 7.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         elif "tau selection" in h:
-            kwargs["opts"] = {"xmin": 0.0, "xmax": 12.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+            kwargs["opts"] = {"xmin": 0.0, "xmax": 11.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         else:
             pass
 
@@ -902,48 +903,119 @@ def replaceBinLabels(p, kwargs, histoName):
     '''
     https://root.cern.ch/doc/master/classTAttText.html#T5
     '''
-    myBinList  = []
     labelOrien = None # "v" or "h"
+    #vList = ["METFilter selection ()", "METFilter selection", "e selection (Veto)", "mu selection ()", 
+    #         "tau selection ()", "jet selection ()", "angular cuts Collinear ()", "bjet selection ()", 
+    #         "angular cuts BackToBack ()", "top selection ()", "top candidates ()", "counter"]
+    vList = ["counter", "tau selection ()", "e selection (Veto)", "mu selection ()", 
+             "METFilter selection ()", "METFilter selection"]
+    if histoName in vList:
+        labelOrien = "v"
 
-    if histoName == "counter" or histoName == "weighted/counter":
-        labelOrien = "v"
-#        myBinList = ["before skim", "after skim", "base", "pu RW", "prescale", "top p_{T} RW", "exclusive RW", "all", "trigger", "filter", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
-#                     "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "#geq 3 jets", "#geq 1 b jets",
-#                     "b jets SF", "1 top", "top SF", "selected"] # "top SF" = "selected"
-        myBinList = ["trigger", "filters", "PV", "e veto", "1 #mu", "#geq 1 #tau jets", "genuine #tau",
-                     "2 #tau jets", "#tau OS", "#tau SF", "fake #tau SF", "DM", "#geq 3 jets", "#geq 1 b jets",
-                     "b jets SF", "1 top", "top SF", "selected"]
-    elif "bjet" in histoName:
-        myBinList = ["all", "#eta", "p_{T}", "b-discr.", "trg-match", "#geq 1 b jets"]
-    elif "jet" in histoName:
-        myBinList = ["all", "jet ID", "PU ID", "#tau match", "#eta", "p_{T}", "#geq 3 jets", "H_{T}", "J_{T}", "MHT"]
-    elif "top candidates" in histoName:
-        myBinList = ["all", "m_{t} low", "m_{t} upper", "b-discr.", "BDTG", "cleaning"]
-    elif "tau" in histoName:
-        labelOrien = "v"
-        myBinList  = ["all", "trg-match", "DM", "discr.", "e discr.", "#mu discr.", "p_{T}", "#eta", "p_{T}^{ldg tk}", "n-prongs", "isolation", 
-                     "R_{#tau}", "anti-iso", "anti-iso R_{#tau}", "genuine #tau", "selected #tau", "anti-iso #tau", "anti-iso #tau's"]    
-    elif "e selection" in histoName:
-        labelOrien = "v"
-        myBinList  = ["all", "present", "trg-match", "p_{T}", "#eta", "ID", "isolation", "selected", "veto"]
-    elif "mu selection" in histoName:
-        labelOrien = "v"
-        myBinList  = ["all", "present", "trg-match", "p_{T}", "#eta", "ID", "isolation", "selected", "veto"]
-    elif "metfilter" in histoName.lower():
-        labelOrien = "v"
-        myBinList  = ["HBHE", "HBHE-Iso", "ECAL TP", "EE Sc", "Good PV", "Halo", "PF #mu", "PF ch."]
-    else:
-        pass
+    myBinDict  = {}
+    myBinDict["ttree: skimCounterAll"]               = "skim all"
+    myBinDict["ttree: skimCounterPassed"]            = "skimmed"
+    myBinDict["Base::AllEvents"]                     = "base all"
+    myBinDict["Base::PUReweighting"]                 = "PU RW"
+    myBinDict["Base::Prescale"]                      = "prescale"
+    myBinDict["Base::Weighted events with top pT"]   = "top-pt RW"
+    myBinDict["Base::Weighted events for exclusive samples"] = "excl. RW"
+    myBinDict["all events"]                          = "all evts"
+    myBinDict["passed trigger"]                      = "trigger"
+    myBinDict["passed METFilter selection ()"]       = "filters"
+    myBinDict["passed PV"]                           = "PV"
+    myBinDict["passed e selection (Veto)"]           = "e veto"
+    myBinDict["passed mu selection ()"]              = "1 #mu"
+    myBinDict["Passed tau selection ()"]             = "#geq 1 #tau jets"
+    myBinDict["Passed tau selection and genuine ()"] = "genuine #tau"
+    myBinDict["#tau N"]                              = "2 #tau jets"
+    myBinDict["#tau OS"]                             = "#taus OS"
+    myBinDict["#tau SF"]                             = "#tau SF"
+    myBinDict["Fake #tau SF"]                        = "fake #tau SF"
+    myBinDict["#tau DM"]                             = "DM"
+    myBinDict["passed jet selection ()"]             = "#geq 3 jets"
+    myBinDict["passed angular cuts Collinear ()"]    = "R_{coll}"
+    myBinDict["passed b-jet selection ()"]           = "#geq 1 b jets"
+    myBinDict["b-tag SF"]                            = "b jets SF"
+    myBinDict["passed angular cuts BackToBack ()"]   = "R_{bb}"
+    myBinDict["passed top selection ()"]             = "1 top"
+    myBinDict["top-tag SF"]                          = "top SF"
+    myBinDict["Selected Events"]                     = "selected"
+    # 
+    myBinDict["Passed Flag_HBHENoiseFilter"]                    = "HBHE"
+    myBinDict["Passed Flag_HBHENoiseIsoFilter"]                 = "HBHE-Iso"
+    myBinDict["Passed Flag_EcalDeadCellTriggerPrimitiveFilter"] = "ECAL TP"
+    myBinDict["Passed Flag_eeBadScFilter"]                      = "EE Sc"
+    myBinDict["Passed Flag_goodVertices"]                       = "Good PV"
+    myBinDict["Passed Flag_globalSuperTightHalo2016Filter"]     = "Halo"
+    myBinDict["Passed badPFMuonFilter"]                         = "PF #mu"
+    myBinDict["Passed badChargedCandidateFilter"]               = "PF ch."
+    #
+    myBinDict["All events"]              = "all"
+    myBinDict["Passed is present"]       = "present"
+    myBinDict["Passed trigger matching"] = "trg-match"
+    myBinDict["Passed pt cut"]           = "p_{T}"
+    myBinDict["Passed eta cut"]          = "#eta"
+    myBinDict["Passed ID"]               = "ID"
+    myBinDict["Passed isolation"]        = "isolated"
+    myBinDict["Passed selection"]        = "selected"
+    myBinDict["Passed veto"]             = "veto"
+    #
+    myBinDict["Passed decay mode"]             = "DM"
+    myBinDict["Passed generic discriminators"] = "discr."
+    myBinDict["Passed e discr"]                = "e discr."
+    myBinDict["Passed mu discr"]               = "#mu discr."
+    myBinDict["Passed pt cut"]                 = "p_{T}"
+    myBinDict["Passed eta cut"]                = "#eta"
+    myBinDict["Passed ldg.trk pt cut"]         = "p_{T}^{ldg tk}"
+    myBinDict["Passed nprongs"]                = "n-prongs"
+    myBinDict["Passed isolation"]              = "isolation"
+    myBinDict["Passed Rtau"]                   = "R_{#tau}"
+    #
+    myBinDict["Passed anti-isolation"]               = "anti-iso"
+    myBinDict["Passed anti-isolated Rtau"]           = "anti-iso R_{#tau}"
+    myBinDict["Passed tau selection and genuine"]    = "genuine #tau"
+    myBinDict["multiple selected taus"]              = "selected #tau"
+    myBinDict["Passed anti-isolated tau selection"]  = "anti-iso #tau"
+    myBinDict["multiple anti-isolated taus"]         = "anti-iso #tau's"
+    #
+    myBinDict["Passed jet ID"]         = "jet ID"
+    myBinDict["Passed PU ID"]          = "PU ID"
+    myBinDict["Passed tau matching"]   = "#tau match"
+    myBinDict["Passed eta cut"]        = "#eta"
+    myBinDict["Passed pt cut"]         = "p_{T}"
+    myBinDict["Passed jet number cut"] = "#geq 3 jets"
+    myBinDict["Passed HT cut"]         = "H_{T}"
+    myBinDict["Passed JT cut"]         = "J_{T}"
+    myBinDict["Passed MHT cut"]        = "MHT"
+    # 
+    myBinDict["Passed discriminator"]    = "b-discr."
+    myBinDict["Passed Nbjets"]           = "#geq 1 bjets"
+    #
+    myBinDict["Passed cut on jet 1"] = "jet 1"
+    myBinDict["Passed cut on jet 2"] = "jet 2"
+    myBinDict["Passed cut on jet 3"] = "jet 3"
+    myBinDict["Passed cut on jet 4"] = "jet 4"
+    #
+    myBinDict["top mass (low"]  = "m_{t} low" #tmp
+    myBinDict["top mass (low)"] = "m_{t} low"
+    myBinDict["top mass (upp)"] = "m_{t} upp"
+    myBinDict["b-disc"]         = "b-discr."
+    myBinDict["BDTG"]           = "BDTG"
+    myBinDict["cross-clean"]    = "clean"
 
     if labelOrien != None:
         p.getFrame().GetXaxis().LabelsOption(labelOrien)
 
     # Replace all bins
-    for i in range(0, len(myBinList)):
-        if "xmax" in kwargs["opts"]:
-            if i >= kwargs["opts"]["xmax"]:
-                break
-        p.getFrame().GetXaxis().SetBinLabel(i+1, myBinList[i])
+    for i in range(0, p.getFrame().GetNbinsX()):
+        oldLabel = p.getFrame().GetXaxis().GetBinLabel(i+1)
+        if oldLabel in myBinDict.keys():
+            newLabel = myBinDict[oldLabel]
+            p.getFrame().GetXaxis().SetBinLabel(i+1, newLabel)
+        else:
+            continue
+        #print "%d = %s" % (i, p.getFrame().GetXaxis().GetBinLabel(i+1))
     return
 
 def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
