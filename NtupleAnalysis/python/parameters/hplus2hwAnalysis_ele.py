@@ -60,6 +60,18 @@ eVeto = PSet(
 )
 
 ##########
+## Electron identification scale factors
+##########
+
+#scaleFactors.assignMuonIdentificationSF(muonSelection)
+
+##########
+## Electron trigger scale factors
+##########
+
+#scaleFactors.assignMuonTriggerSF(muonSelection, "nominal", trg.MuontriggerEfficiencyJsonName)
+
+##########
 ## Muon veto
 ##########
 

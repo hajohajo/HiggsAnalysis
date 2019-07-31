@@ -73,6 +73,18 @@ muonSelection = PSet(
 	muonIsolType   = "default",      # options: "mini", "default" 
 )
 
+##########
+## Muon identification scale factors
+##########
+
+scaleFactors.assignMuonIdentificationSF(muonSelection, "nominal")
+
+##########
+## Muon trigger scale factors
+##########
+
+scaleFactors.assignMuonTriggerSF(muonSelection, "nominal", trg.MuontriggerEfficiencyJsonName)
+
 
 ##########
 ## Tau

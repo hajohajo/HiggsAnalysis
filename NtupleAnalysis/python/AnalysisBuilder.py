@@ -85,6 +85,7 @@ class AnalysisConfig:
 		# muon ID syst
                 elif value.startswith("MuonIDSyst"):
                     self._config.systematicVariation = "_"+value.replace("Plus","down").replace("Minus","up")
+                    scaleFactors.assignMuonIdentificationSF(self._config.MuonSelection, self._getDirectionString(value), variationType)
 
 		# b tag SF
 		elif value.startswith("BTagSF") or value.startswith("BMistagSF"):
