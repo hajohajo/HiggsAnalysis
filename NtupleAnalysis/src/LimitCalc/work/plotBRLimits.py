@@ -12,9 +12,11 @@ USAGE:
 EXAMPLES:
 ./plotBRLimits.py --logY --relative --yMax 10 --yMin 1e-2 --url --bandValue 5 --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats
 
+./plotBRLimits.py --logY --relative --yMax 10 --yMin 1e-2 --url --bandValue 5 --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats  -s png,pdf --cutLineX 400 --cutLineY 1
+
 
 LAST USED:
-./plotBRLimits.py --logY --relative --yMax 10 --yMin 1e-2 --url --bandValue 5 --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats  -s png,pdf --cutLineX 400 --cutLineY 1 --bandValue 5 
+./plotBRLimits.py -s png --logY --relative --yMax 10 --yMin 1e-2 --url --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_NoBDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_BDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats 
 
 '''
 #================================================================================================
@@ -125,13 +127,13 @@ def main():
         compareList.append( (label, path) )
 
     # Do comparison plot
-    msg  = "Creating limi comparison  plot using the following datacard directories:%s\n\t%s" % (sh_a, "\n\t".join([os.path.basename(d) for d in opts.dirList]) )
+    msg  = "Creating 95%% upper limit comparison plots (%d) using the following datacard directories:%s\n\t%s" % (len(opts.dirList), sh_a, "\n\t".join([os.path.basename(d) for d in opts.dirList]) )
     Print(msg + sh_n, True)
     doCompare(opts.name, compareList) 
 
     # Make overlap plot (two limits on top of each other)
     oList = [compareList[0], compareList[1]]
-    msg   = "Creating overlap plot using the two first datacard directories:%s\n\t%s" % (sh_t, "\n\t".join([os.path.basename(d) for d in opts.dirList[:2]]) )
+    msg   = "Creating overlap plot using the first 2 datacard directories:%s\n\t%s" % (sh_t, "\n\t".join([os.path.basename(d) for d in opts.dirList[:2]]) )
     Print(msg + sh_n, True)
     doOverlap(opts.name, oList)
 
@@ -144,10 +146,14 @@ def GetLabel(dirName):
     Predefined labels for datacard directories
     '''
     dirToLabelDict = {}
-    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats"] = "HPS loose"
-    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats"] = "HPS medium, p_{T}^{tk}>20"
-    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats"] = "HPS medium"
-    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats"] = "HPS loose, p_{T}^{tk}>20"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats"] = "HPS-L"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats"] = "HPS-L, p_{T}^{tk}>20"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats"] =  "HPS-L, p_{T}^{tk}>20, 1 top"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats"] = "HPS-M"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats"] = "HPS-M, p_{T}^{tk}>20"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats"] = "HPS-M, p_{T}^{tk}>20, 1 top"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_BDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-T, p_{T}^{tk}>20, 1 top"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_NoBDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-T, p_{T}^{tk}>20"
 
     dName = os.path.basename(dirName)
     if dName in dirToLabelDict.keys():
@@ -401,12 +407,12 @@ def addPhysicsText(histograms, limit, x=0.45, y=0.84, size=20):
     return
 
 def getLegend(nPlots, limit, xLeg1=0.53):
-    dy = -0.14 #dy = (nPlots-)*0.03
+    dy = - (nPlots-3)*0.03
     
     # Create customised legend
     xLeg2 = 0.93
-    yLeg1 = 0.70 + dy
-    yLeg2 = 0.91 + dy
+    yLeg1 = 0.60 + dy
+    yLeg2 = 0.80 #+ dy
     if opts.unblinded:
         yLeg2 = 0.92 + dy
 
@@ -533,12 +539,12 @@ def doPlotOverlap(limits, paths, labels, saveName, _opts={}):
 
     # Customise legend
     ll = {
-        "%s-Median" % analyses[0]: labels[0],# + " Median",
-        "%s-Median" % analyses[1]: labels[1],# + " Median",
-        "%s-1Sigma" % analyses[0]: "#pm 1#sigma",
-        "%s-2Sigma" % analyses[0]: "#pm 2#sigma",
-        "%s-1Sigma" % analyses[1]: None,
-        "%s-2Sigma" % analyses[1]: None,
+        "%s-Median" % analyses[0]: labels[0] + " Median",
+        "%s-Median" % analyses[1]: labels[1] + " Median",
+        "%s-1Sigma" % analyses[0]: labels[0] + "#pm 1#sigma",
+        "%s-2Sigma" % analyses[0]: labels[0] + "#pm 2#sigma",
+        "%s-1Sigma" % analyses[1]: None, #labels[1] + "#pm 1#sigma", #None,
+        "%s-2Sigma" % analyses[1]: None, #labels[1] + "#pm 2#sigma", #None,
          }
 
     if not opts.boldText:
@@ -551,21 +557,23 @@ def doPlotOverlap(limits, paths, labels, saveName, _opts={}):
     # https://root.cern.ch/doc/master/classTStyle.html#a94c9ae34f921c1efaa09348c2d16d60a
     sList = [3, 5, 6, 8] # [ROOT.kDashed, ROOT.kDotted]
     cList = [ROOT.kRed, ROOT.kBlue]
-    counter = 0
-    
+    fList = [1001, 1001, 1001, 1001] #[1001, 3005, 1001, 3005]
+    count1 = 0
+    count2 = 0
     # For-loop: All limits
     for i, gr in enumerate(graphs, 1):
         name = gr.getName().lower()
         gr.getRootHisto().SetLineWidth(3)
 
         if "median" in name:
-            gr.getRootHisto().SetLineStyle(sList[counter])
-            gr.getRootHisto().SetLineColor(cList[counter])
-            counter+=1
+            gr.getRootHisto().SetLineStyle(sList[count1])
+            gr.getRootHisto().SetLineColor(cList[count1])
+            count1+=1
         elif "sigma" in name:
             gr.getRootHisto().SetLineStyle(ROOT.kSolid)
             gr.getRootHisto().SetLineWidth(4)
-            gr.getRootHisto().SetFillStyle(1001)
+            gr.getRootHisto().SetFillStyle(fList[count2])
+            count2+=1
         else:
             pass
 
@@ -575,8 +583,7 @@ def doPlotOverlap(limits, paths, labels, saveName, _opts={}):
     # If sigma bands are drawn each legend entry is plotted twice. Correct this in the count
     legend = getLegend(0, limit)
     plot.setLegend(legend)
-    if 0:
-        histograms.moveLegend(legend, dx=+0.10, dy=-0.01, dw=0.1, dh=+0.0)
+    histograms.moveLegend(legend, dx=+0.0, dy=0.0, dw=0.0, dh=+0.1) #dh=+0.2)
     
     # Determine save name, minimum and maximum of y-axis
     ymin, ymax, saveName = getYMinMaxAndName(limits, saveName)
