@@ -98,7 +98,7 @@ OptionShapeSystematics                 = False # [default: True]   (Shape system
 OptionDoControlPlots                   = True  # [default: True]   (Produce control plots defined at end of this file)
 OptionGenuineTauBackgroundSource       = "MC"  # [Options: "DataDriven", "MC"]
 OptionFakeTauMeasurementSource         = "DataDriven"  # [default: "DataDriven"] (options: "DataDriven", "MC")
-OptionBr                               = 1.0   # [default: 1.0]    (The Br(t->bH+) used in figures and tables)
+OptionBr                               = 0.01   # [default: 1.0]    (The Br(t->bH+) used in figures and tables)
 OptionSqrtS                            = 13    # [default: 13]     (The sqrt(s) used in figures and tables)
 OptionBlindThreshold                   = 0.10  # [default: None]   (If signal exceeds this fraction of expected events, data is blinded in a given bin)
 OptionCombineSingleColumnUncertainties = False # [default: False]  (Merge nuisances with quadratic sum using the TableProducer.py Only applied to nuisances with one column)
@@ -465,6 +465,40 @@ if OptionPaper:
 from HiggsAnalysis.LimitCalc.InputClasses import ControlPlotInput
 ControlPlots= []
 
+hTausPt = ControlPlotInput(title="SelectedTaus_pT_AfterAllSelections",
+        histoName="SelectedTaus_pT_AfterAllSelections",
+        details={ "xlabel": "Selected #tau ^{}p_{T}",
+          "ylabel": "Events/^{}#Deltap_{T}",
+          "divideByBinWidth": True,
+          "unit": "GeV/c",
+          "log": True,
+          "opts": {"ymin": 0.0009, "ymaxfactor": 15, "xmax": 500},
+        },
+        flowPlotCaption="", # Leave blank if you don't want to include the item to the sele$
+    )
+
+hTausEta = ControlPlotInput(title="SelectedTaus_eta_AfterAllSelections",
+        histoName="SelectedTaus_eta_AfterAllSelections",
+        details={ "xlabel": "Selected #tau #eta",
+          "ylabel": "Events",
+          "divideByBinWidth": False,
+          "unit": "",
+          "log": True,
+          "legendPosition": "SW",
+          "opts": {"ymin": 0.009} }
+	)
+
+hTausPhi = ControlPlotInput(title="SelectedTaus_phi_AfterAllSelections",
+        histoName="SelectedTaus_phi_AfterAllSelections",
+        details={ "xlabel": "Selected #tau #phi",
+          "ylabel": "Events",
+          "divideByBinWidth": False,
+          "unit": "{}^{o}",
+          "log": True,
+          "legendPosition": "SW",
+          "opts": {"ymin": 0.09} }
+	)
+
 hMET = ControlPlotInput(
     title     = "Met", # MET_AfterAllSelections" (Used in determining binning from systematics.py)
     histoName = "MET_AfterAllSelections",
@@ -620,7 +654,7 @@ hTransverseMass = ControlPlotInput(
                     "ratioLegendPosition": "right",
                     "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
                     },
-    blindedRange=[0.0, 2500.0], # specify range min,max if blinding applies to this control plot
+#    blindedRange=[0.0, 2500.0], # specify range min,max if blinding applies to this control plot
     flowPlotCaption  = "", # Leave blank if you don't want to include the item to the selection flow plot    
     # flowPlotCaption  = "m_{jjbb}", # Leave blank if you don't want to include the item to the selection flow plot    
     )
@@ -745,6 +779,9 @@ hBtagDiscriminator = ControlPlotInput(
 #================================================================================================ 
 # Create the list of control plots (NOTE: Set "OptionDoControlPlots" to True)
 #================================================================================================ 
+ControlPlots.append(hTausPt)
+ControlPlots.append(hTausEta)
+ControlPlots.append(hTausPhi)
 ControlPlots.append(hMET)
 ControlPlots.append(hHT)
 ControlPlots.append(hMHT)

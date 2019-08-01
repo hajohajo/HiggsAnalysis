@@ -337,7 +337,7 @@ class BRLimits:
 
         br = "#sigma_{H^{#pm}} #bf{#it{#Beta}} (%s) (pb)"
         sigmaBRlimits["HToTauNu"] = br % ( "H^{#pm} #rightarrow #tau^{#pm} #nu_{#tau}")
-        sigmaBRlimits["HToHW"]    = br % ( "H^{#pm} #rightarrow H W^{#pm} #rightarrow #tau+ #tau-")
+        sigmaBRlimits["HToHW"]    = br % ( "H^{#pm} #rightarrow H W^{#pm}, H#rightarrow #tau^{+}#tau^{-}")
         sigmaBRlimits["HToTB"]    = br % ( "H^{#pm} #rightarrow tb" )
         return sigmaBRlimits[self.analysisType]
 
