@@ -1743,9 +1743,16 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
   
   // Muons
   if(fMuonData.hasIdentifiedMuons()){
-    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonPtAfterAllSelections, bIsGenuineTau, fMuonData.getHighestSelectedMuonPt());
-    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonEtaAfterAllSelections, bIsGenuineTau, fMuonData.getHighestSelectedMuonEta());
-    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonPhiAfterAllSelections, bIsGenuineTau, fMuonData.getHighestSelectedMuonPhi());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonPtAfterAllSelections, bIsGenuineTau, fMuonData.getSelectedMuons()[0].pt());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonEtaAfterAllSelections, bIsGenuineTau, fMuonData.getSelectedMuons()[0].eta());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonPhiAfterAllSelections, bIsGenuineTau, fMuonData.getSelectedMuons()[0].phi());
+  }
+
+  // Electrons
+  if(fElectronData.hasIdentifiedElectrons()){
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedElectronPtAfterAllSelections, bIsGenuineTau, fElectronData.getSelectedElectrons()[0].pt());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedElectronEtaAfterAllSelections, bIsGenuineTau, fElectronData.getSelectedElectrons()[0].eta());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedElectronPhiAfterAllSelections, bIsGenuineTau, fElectronData.getSelectedElectrons()[0].phi());
   }
 
   fHistoSplitter.fillShapeHistogramTriplet(hCtrlNJetsAfterAllSelections, bIsGenuineTau, fJetData.getNumberOfSelectedJets());

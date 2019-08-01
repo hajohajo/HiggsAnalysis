@@ -786,6 +786,10 @@ class TriggerMuonSFJsonReader:
             if i > 0:
                 self.result["binEdges"].append(key)
             i += 1
+#	    print datadict[key]["dataSF"]
+#	    print datadict[key]["dataSFup"]
+#	    print datadict[key]["dataSFdown"]
+
             self.result["SF"].append(datadict[key]["dataSF"])
             self.result["SFdataUp"].append(datadict[key]["dataSFup"])
             self.result["SFdataDown"].append(datadict[key]["dataSFdown"])
@@ -806,6 +810,9 @@ class TriggerMuonSFJsonReader:
         for item in inputdict:
             bindict = {}
             bindict[label+"SF"] = inputdict[item]["value"]
+
+#	    print inputdict[item]["value"]
+#	    print inputdict[item]["error"]
 
             bindict[label+"SFup"] = inputdict[item]["value"]+inputdict[item]["error"]
             bindict[label+"SFdown"] = inputdict[item]["value"]-inputdict[item]["error"]

@@ -39,6 +39,8 @@ public:
     const float getHighestSelectedMuonEta() const { return fHighestSelectedMuonEta; }
     const float getHighestSelectedMuonPhi() const { return fHighestSelectedMuonPhi; }
     const float getHighestSelectedMuonPtBeforePtCut() const { return fHighestSelectedMuonPtBeforePtCut; }
+    const float getMuonTriggerSF() const { return fMuonTriggerSF; }
+    const float getMuonIDSF() const { return fMuonIDSF; }
     // FIXME: Add MC information if deemed necessary
 //     const bool eventContainsMuonFromCJet() const { return fHasMuonFromCjetStatus; }
 //     const bool eventContainsMuonFromBJet() const { return fHasMuonFromBjetStatus; }
@@ -52,6 +54,10 @@ public:
     float fHighestSelectedMuonEta;
     float fHighestSelectedMuonPhi;
     float fHighestSelectedMuonPtBeforePtCut;
+    /// Cache muon identification scale factor
+    float fMuonIDSF;
+    /// Cache for muon trigger SF
+    float fMuonTriggerSF;
     /// MC info about non-isolated muons
     //bool fHasMuonFromCjetStatus;
     //bool fHasMuonFromBjetStatus;
@@ -90,6 +96,11 @@ private:
   bool fVetoMode;
   bool fMiniIsol;
   
+  // muon identification SF
+  GenericScaleFactor fMuonIDSFReader;
+  // muon trigger SF
+  GenericScaleFactor fMuonTriggerSFReader;
+
   // Event counter for passing selection
   Count cPassedMuonSelection;
   // Sub counters

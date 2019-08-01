@@ -77,7 +77,7 @@ muonSelection = PSet(
 ## Muon identification scale factors
 ##########
 
-scaleFactors.assignMuonIdentificationSF(muonSelection, "nominal")
+scaleFactors.assignMuonIdentificationSF(muonSelection, "nominal", "Data")
 
 ##########
 ## Muon trigger scale factors

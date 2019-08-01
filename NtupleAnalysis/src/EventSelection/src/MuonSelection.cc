@@ -15,7 +15,10 @@
 MuonSelection::Data::Data() 
 : fHighestSelectedMuonPt(0.0),
   fHighestSelectedMuonEta(0.0),
-  fHighestSelectedMuonPhi(0.0) { }
+  fHighestSelectedMuonPhi(0.0),
+  fMuonIDSF(1.0),
+  fMuonTriggerSF(1.0)
+ { }
 
 MuonSelection::Data::~Data() { }
 
@@ -27,6 +30,8 @@ MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCoun
   fMiniIsoCut(-1.0),
   fVetoMode(false),
   fMiniIsol(false),
+  fMuonIDSFReader(config.getParameterOptional<ParameterSet>("muonIDSF")),
+  fMuonTriggerSFReader(config.getParameterOptional<ParameterSet>("muonTriggerSF")),
   // Event counter for passing selection
   cPassedMuonSelection(fEventCounter.addCounter("passed mu selection ("+postfix+")")),
   // Sub counters
@@ -51,6 +56,8 @@ MuonSelection::MuonSelection(const ParameterSet& config, const std::string& post
   fMiniIsoCut(-1.0),
   fVetoMode(false),
   fMiniIsol(false),
+  fMuonIDSFReader(config.getParameterOptional<ParameterSet>("muonIDSF")),
+  fMuonTriggerSFReader(config.getParameterOptional<ParameterSet>("muonTriggerSF")),
   // Event counter for passing selection
   cPassedMuonSelection(fEventCounter.addCounter("passed mu selection ("+postfix+")")),
   // Sub counters
@@ -310,6 +317,22 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
   // Assign booleans
   passedSelection = (output.fSelectedMuons.size() > 0);
   passedVeto      = (output.fSelectedMuons.size() == 0);
+
+  // Set muon ID SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedMuons()) {
+//      std::cout << "id: " << fMuonIDSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt()) << "\n";
+      output.fMuonIDSF = fMuonIDSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt());
+    }
+  }
+
+  // Set muon trigger SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedMuons()) {
+//      std::cout << "trg: " << fMuonTriggerSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt()) << "\n";
+      output.fMuonTriggerSF = fMuonTriggerSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt());
+    }
+  }
 
   // Fill histos
   hMuonNAll->Fill(event.muons().size());
