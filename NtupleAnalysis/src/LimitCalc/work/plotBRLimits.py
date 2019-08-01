@@ -154,6 +154,7 @@ def GetLabel(dirName):
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats"] = "HPS-M, p_{T}^{tk}>20, 1 top"
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_BDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-T, p_{T}^{tk}>20, 1 top"
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_NoBDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-T, p_{T}^{tk}>20"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_VLooseID_BDT0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-VL, p_{T}^{tk}>20, 1 top"
 
     dName = os.path.basename(dirName)
     if dName in dirToLabelDict.keys():
