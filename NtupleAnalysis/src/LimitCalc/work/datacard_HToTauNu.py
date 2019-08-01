@@ -14,7 +14,7 @@ EXAMPLES:
 
 
 LAST USED:
-./dcardGenerator_v2.py -x dcardDefault_h2hw_mc.py -d limits2019/ --h2hw
+./dcardGenerator_v3.py --analysisType HToTauNu --datacard datacard_HToTauNu.py --dir 20180620_forUnblinding_RtauMore/ --barlowBeeston -v
 
 
 HN Threads:
@@ -160,6 +160,7 @@ mySystematics["Signal"] = mySystematics["MC"] + ["CMS_HPTB_mu_RF_HPTB","CMS_HPTB
 mySystematics["TT"]     = mySystematics["MC"] + ["QCDscale_ttbar", "pdf_ttbar", "mass_top"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
 mySystematics["ttX"]    = mySystematics["MC"] + ["QCDscale_singleTop", "pdf_singleTop", "mass_top_forSingleTop"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
 mySystematics["EWK"]    = mySystematics["MC"] + ["QCDscale_ewk", "pdf_ewk"] + ["CMS_HPTB_mu_RF_ewk","CMS_HPTB_pdf_ewk"]
+mySystematics["WJets"]  = mySystematics["MC"] + ["QCDscale_ewk", "pdf_ewk"]
 
 if not OptionIncludeSystematics:
     msg = "Disabled systematics for all datasets (Stat. only datacards)"
@@ -196,6 +197,15 @@ TT = DataGroup(label             = labelPrefix + "TT" + labelPostfix, #
                datasetDefinition = "TT", # You must use the exact name given in plots.py (_datasetMerge dictionary)
                validMassPoints   = MassPoints,
                nuisances         = mySystematics["TT"]
+               )
+WJets = DataGroup(label          = labelPrefix + "WJets" + labelPostfix, #
+               landsProcess      = 2,
+               shapeHistoName    = OptionMassShape,
+               histoPath         = histoPathInclusive,
+               datasetType       = "EWKMC",
+               datasetDefinition = "WJets", # You must use the exact name given in plots.py (_datasetMerge dictionary)
+               validMassPoints   = MassPoints,
+               nuisances         = mySystematics["WJets"]
                )
 
 TTX = DataGroup(label                   = labelPrefix + "ttX" + labelPostfix,
@@ -234,6 +244,7 @@ DataGroups = []
 DataGroups.extend(signalDataGroups)
 DataGroups.append(TT)
 DataGroups.append(TTX)
+DataGroups.append(WJets)
 DataGroups.append(DYJets)
 DataGroups.append(Diboson)
 
