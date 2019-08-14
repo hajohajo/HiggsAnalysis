@@ -183,7 +183,7 @@ scaleFactors.setupBtagSFInformation(btagPset=bjetSelection,
 ##########
 
 metSelection = PSet(
-           METCutValue = 30.0,
+           METCutValue = 10.0,
        METCutDirection = ">", # options: ==, !=, <, <=, >, >=
   METSignificanceCutValue = -1000.0,
   METSignificanceCutDirection = ">", # options: ==, !=, <, <=, >, >=

@@ -37,6 +37,8 @@ public:
     const std::vector<Electron>& getSelectedElectrons() const { return fSelectedElectrons; }
     const float getHighestSelectedElectronPt() const { return fHighestSelectedElectronPt; }
     const float getHighestSelectedElectronEta() const { return fHighestSelectedElectronEta; }
+    const float getElectronTriggerSF() const { return fElectronTriggerSF; }
+    const float getElectronIDSF() const { return fElectronIDSF; }
     // FIXME: Add MC information if deemed necessary
     // const bool eventContainsElectronFromCJet() const { return fHasElectronFromCjetStatus; }
     // const bool eventContainsElectronFromBJet() const { return fHasElectronFromBjetStatus; }
@@ -48,6 +50,10 @@ public:
     /// pt and eta of highest pt electron passing the selection
     float fHighestSelectedElectronPt;
     float fHighestSelectedElectronEta;
+    /// Cache electron identification scale factor
+    float fElectronIDSF;
+    /// Cache for electron trigger SF
+    float fElectronTriggerSF;
     /// MC info about non-isolated electrons
     //bool fHasElectronFromCjetStatus;
     //bool fHasElectronFromBjetStatus;
@@ -91,6 +97,11 @@ private:
   bool fMiniIsol;
   bool fElectronMVA;
   
+  // electron identification SF
+  GenericScaleFactor fElectronIDSFReader;
+  // electron trigger SF
+  GenericScaleFactor fElectronTriggerSFReader;
+
   // Event counter for passing selection
   Count cPassedElectronSelection;
   // Sub counters

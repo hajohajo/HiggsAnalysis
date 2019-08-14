@@ -76,7 +76,10 @@ class AnalysisConfig:
                     scaleFactors.assignMETTriggerSF(self._config.METSelection, self._config.BJetSelection.bjetDiscrWorkingPoint, self._getDirectionString(value), self._config.Trigger.METtriggerEfficiencyJsonName, variationType)
                 elif value.startswith("MuonTrgEff"):
                     variationType = value.replace("MuonTrgEff","").replace("Minus","").replace("Plus","")
-                    scaleFactors.assignMuonTriggerSF(self._config.MuonSelection, self._getDirectionString(value), self._config.Trigger.MuontriggerEfficiencyJsonName, variationType)
+                    scaleFactors.assignMuonTriggerSF(self._config.MuonSelection, self._getDirectionString(value), self._config.Trigger.MuontriggerEfficiencyJsonName, variationType="Data")
+		elif value.startswith("ElectronTrgEff"):
+                    variationType = value.replace("ElectronTrgEff","").replace("Minus","").replace("Plus","")
+                    scaleFactors.assignElectronTriggerSF(self._config.ElectronSelection, self._getDirectionString(value), self._config.Trigger.ElectrontriggerEfficiencyJsonName, variationType="Data")
 
                 # tau ID syst
                 elif value.startswith("TauIDSyst"):
@@ -87,6 +90,12 @@ class AnalysisConfig:
                     self._config.systematicVariation = "_"+value.replace("Plus","down").replace("Minus","up")
                     variationType = value.replace("MuonIDSyst","").replace("Minus","").replace("Plus","")
                     scaleFactors.assignMuonIdentificationSF(self._config.MuonSelection, self._getDirectionString(value), variationType="Data")
+
+		# electron ID syst
+                elif value.startswith("ElectronIDSyst"):
+                    self._config.systematicVariation = "_"+value.replace("Plus","down").replace("Minus","up")
+                    variationType = value.replace("ElectronIDSyst","").replace("Minus","").replace("Plus","")
+                    scaleFactors.assignElectronIdentificationSF(self._config.ElectronSelection, self._getDirectionString(value), variationType="Data")
 
 		# b tag SF
 		elif value.startswith("BTagSF") or value.startswith("BMistagSF"):
@@ -250,7 +259,7 @@ class AnalysisBuilder:
         return
 
     def _getAnalysisType(self, analysis):
-        myAnalyses = ["HToTauNu", "HToTB","HToHW", "HToHW_background", "HToHW_withTop"]
+        myAnalyses = ["HToTauNu", "HToTB","HToHW", "HToHW_ele", "HToHW_background", "HToHW_background_ele", "HToHW_withTop"]
         if analysis not in myAnalyses:
             msg = "Unsupported analysis \"%s\". Please select one of the following: %s" % (analysis, ", ".join(myAnalyses))
             raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle() )
@@ -266,10 +275,14 @@ class AnalysisBuilder:
             systList = self.getSystematicsForHToTB()
 	elif  self._analysisType == "HToHW":
             systList = self.getSystematicsForHToHW()
+	elif  self._analysisType == "HToHW_ele":
+            systList = self.getSystematicsForHToHW_ele()
 	elif  self._analysisType == "HToHW_withTop":
             systList = self.getSystematicsForHToHW_withTop()
 	elif  self._analysisType == "HToHW_background":
             systList = self.getSystematicsForHToHW_background()
+	elif  self._analysisType == "HToHW_background_ele":
+            systList = self.getSystematicsForHToHW_background_ele()
         else:
             raise Exception(ShellStyles.ErrorStyle() + "This should never be reached" + ShellStyles.NormalStyle() )
         if len(systList) < 1:
@@ -355,6 +368,33 @@ class AnalysisBuilder:
 
         return items
 
+    def getSystematicsForHToHW_ele(self):
+        items = []
+
+        # Trigger systematics
+        items.extend(["ElectronTrgEffData"])
+
+        # Tau ID variation systematics
+        items.extend(["FakeTauElectron", "FakeTauMuon", "FakeTauJet", "TauIDSyst"])
+
+        # Electron ID variation systematics
+        items.extend(["ElectronIDSyst"])
+
+        # Energy scales and JER systematics
+        items.extend(["TauES", "JES", "JER", "UES"])
+
+        # b quark systematics
+        items.extend(["BTagSF", "BMistagSF"])
+
+        # top quark systematics
+        if self._useTopPtReweighting:
+            items.append("TopPt")
+
+        # PU weight systematics
+        items.extend(["PUWeight"])
+
+        return items
+
     def getSystematicsForHToHW_withTop(self):
         items = []
 
@@ -387,6 +427,14 @@ class AnalysisBuilder:
 
         # Trigger systematics
         items.extend(["MuonTrgEffData"])
+
+        return items
+
+    def getSystematicsForHToHW_background_ele(self):
+        items = []
+
+        # Trigger systematics
+        items.extend(["ElectronTrgEffData"])
 
         return items
 

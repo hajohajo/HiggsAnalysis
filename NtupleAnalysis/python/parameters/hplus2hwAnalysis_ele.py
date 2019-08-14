@@ -13,7 +13,7 @@ import HiggsAnalysis.NtupleAnalysis.parameters.scaleFactors as scaleFactors
 
 trg = PSet(
   # No need to specify version numbers, they are automatically scanned in range 1--100 (remove the '_v' suffix)
-  MuontriggerEfficiencyJsonName = "muonPAGEff.json",
+  ElectrontriggerEfficiencyJsonName = "ElePOGEff.json",
 #  METtriggerEfficiencyJsonName = "metLegTriggerEfficiency_2016_MET90_fit.json",
 #  L1ETM = 80,
   triggerOR = ["HLT_Ele27_eta2p1_WPTight_Gsf"
@@ -48,10 +48,10 @@ metFilter = PSet(
 eVeto = PSet(
     applyTriggerMatching = True,
     triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
-    electronPtCut = 20.0,
+    electronPtCut = 27.0,
     electronEtaCut = 2.5,
 #            electronID = "mvaEleID_PHYS14_PU20bx25_nonTrig_V1_wp90", # highest (wp90) for vetoing (2012: wp95)
-    electronID = "cutBasedElectronID_Spring15_25ns_V1_standalone_veto",
+    electronID = "cutBasedElectronID_Spring15_25ns_V1_standalone_tight",
     electronIDType    = "MVA",  # options: "default", "MVA"
     electronMVA       = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
     electronMVACut    = "Loose",
@@ -63,13 +63,13 @@ eVeto = PSet(
 ## Electron identification scale factors
 ##########
 
-#scaleFactors.assignMuonIdentificationSF(muonSelection)
+scaleFactors.assignElectronIdentificationSF(eVeto, "nominal", "Data")
 
 ##########
 ## Electron trigger scale factors
 ##########
 
-#scaleFactors.assignMuonTriggerSF(muonSelection, "nominal", trg.MuontriggerEfficiencyJsonName)
+scaleFactors.assignElectronTriggerSF(eVeto, "nominal", trg.ElectrontriggerEfficiencyJsonName)
 
 ##########
 ## Muon veto
@@ -78,9 +78,9 @@ eVeto = PSet(
 muonSelection = PSet(
   applyTriggerMatching = False,
    triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
-             muonPtCut = 26.0,
-            muonEtaCut = 2.1, #2.4,
-                muonID = "muIDTight", #"muIDMedium", #"muIDTight", # options: muIDLoose, muIDMedium, muIDTight
+             muonPtCut = 10.0,
+            muonEtaCut = 2.5, #2.4,
+                muonID = "muIDLoose", #"muIDMedium", #"muIDTight", # options: muIDLoose, muIDMedium, muIDTight
          muonIsolation = "veto", #"tight", # for selecting, not vetoing
 	muonIsolType   = "default",      # options: "mini", "default" 
 )
@@ -195,7 +195,7 @@ scaleFactors.setupBtagSFInformation(btagPset=bjetSelection,
 ##########
 
 metSelection = PSet(
-           METCutValue = 30.0,
+           METCutValue = 10.0,
        METCutDirection = ">", # options: ==, !=, <, <=, >, >=
   METSignificanceCutValue = -1000.0,
   METSignificanceCutDirection = ">", # options: ==, !=, <, <=, >, >=

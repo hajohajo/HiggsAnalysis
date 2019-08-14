@@ -11,7 +11,9 @@
 
 ElectronSelection::Data::Data()
 : fHighestSelectedElectronPt(0.0),
-  fHighestSelectedElectronEta(0.0) { }
+  fHighestSelectedElectronEta(0.0),
+  fElectronIDSF(1.0),
+  fElectronTriggerSF(1.0) { }
 
 ElectronSelection::Data::~Data() { }
 
@@ -25,6 +27,8 @@ ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& e
   fVetoMode(false),
   fMiniIsol(false),
   fElectronMVA(false),
+  fElectronIDSFReader(config.getParameterOptional<ParameterSet>("electronIDSF")),
+  fElectronTriggerSFReader(config.getParameterOptional<ParameterSet>("electronTriggerSF")),
   // Event counter for passing selection
   cPassedElectronSelection(fEventCounter.addCounter("passed e selection ("+postfix+")")),
   // Sub counters
@@ -51,6 +55,8 @@ ElectronSelection::ElectronSelection(const ParameterSet& config, const std::stri
   fVetoMode(false),
   fMiniIsol(false),
   fElectronMVA(false),
+  fElectronIDSFReader(config.getParameterOptional<ParameterSet>("electronIDSF")),
+  fElectronTriggerSFReader(config.getParameterOptional<ParameterSet>("electronTriggerSF")),
   // Event counter for passing selection
   cPassedElectronSelection(fEventCounter.addCounter("passed e selection ("+postfix+")")),
   // Sub counters
@@ -332,6 +338,21 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
   // Assign booleans
   passedSelection = (output.fSelectedElectrons.size() > 0);
   passedVeto      = (output.fSelectedElectrons.size() == 0); 
+
+
+  // Set electron ID SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedElectrons()) {
+      output.fElectronIDSF = fElectronIDSFReader.getScaleFactorValue(output.getSelectedElectrons()[0].eta());
+    }
+  }
+
+  // Set electron trigger SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedElectrons()) {
+      output.fElectronTriggerSF = fElectronTriggerSFReader.getScaleFactorValue(output.getSelectedElectrons()[0].pt());
+    }
+  }
 
   // Fill histos
   hElectronNAll->Fill(event.electrons().size());

@@ -83,7 +83,7 @@ scaleFactors.assignMuonIdentificationSF(muonSelection, "nominal", "Data")
 ## Muon trigger scale factors
 ##########
 
-scaleFactors.assignMuonTriggerSF(muonSelection, "nominal", trg.MuontriggerEfficiencyJsonName)
+scaleFactors.assignMuonTriggerSF(muonSelection, "nominal", trg.MuontriggerEfficiencyJsonName, "Data")
 
 
 ##########
@@ -195,7 +195,7 @@ scaleFactors.setupBtagSFInformation(btagPset=bjetSelection,
 ##########
 
 metSelection = PSet(
-           METCutValue = 30.0,
+           METCutValue = 10.0,
        METCutDirection = ">", # options: ==, !=, <, <=, >, >=
   METSignificanceCutValue = -1000.0,
   METSignificanceCutDirection = ">", # options: ==, !=, <, <=, >, >=
