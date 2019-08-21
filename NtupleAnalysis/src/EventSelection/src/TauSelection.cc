@@ -241,8 +241,8 @@ TauSelection::Data TauSelection::analyzeTight(const Event& event) {
 
   // Send data to CommonPlots
   if (fCommonPlots != nullptr)
-    fCommonPlots->fillControlPlotsAtTauSelection(event, data);
-    fCommonPlots->fillControlPlotsAfterTauSelection(event, data);
+//    fCommonPlots->fillControlPlotsAtTauSelection(event, data);
+//    fCommonPlots->fillControlPlotsAfterTauSelection(event, data);
   // Return data
   return data;
 }
@@ -627,7 +627,7 @@ TauSelection::Data TauSelection::privateAnalyzeTight(const Event& event) {
   // Set tau trigger SF value to data object
   if (event.isMC()) {
     if (output.hasIdentifiedTaus()) {
-      cout << "trg sf" << "\n";      
+//      cout << "trg sf" << "\n";      
       output.fTauTriggerSF = fTauTriggerSFReader.getScaleFactorValue(output.getSelectedTau().pt());
     }
     if (output.hasAntiIsolatedTaus()) {

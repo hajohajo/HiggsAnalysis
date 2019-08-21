@@ -321,7 +321,6 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
   // Set muon ID SF value to data object
   if (event.isMC()) {
     if (output.hasIdentifiedMuons()) {
-//      std::cout << "id: " << fMuonIDSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt()) << "\n";
       output.fMuonIDSF = fMuonIDSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt());
     }
   }
@@ -329,7 +328,6 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
   // Set muon trigger SF value to data object
   if (event.isMC()) {
     if (output.hasIdentifiedMuons()) {
-//      std::cout << "trg: " << fMuonTriggerSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt()) << "\n";
       output.fMuonTriggerSF = fMuonTriggerSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt());
     }
   }
