@@ -135,13 +135,15 @@ public:
   /// analyze does fill histograms and incrementes counters
   Data analyze(const Event& event, const Tau& tau);
   Data analyzeWithoutTau(const Event& event);
+  Data analyze(const Event& event, const Tau& tau1, const Tau& tau2);
 
 private:
   /// Initialisation called from constructor
   void initialize(const ParameterSet& config);
   /// The actual selection
   Data privateAnalyze(const Event& event, const math::LorentzVectorT<double>& tauP, const double tauPt);
-  
+  Data privateAnalyze(const Event& event, const math::LorentzVectorT<double>& tauP1, const double tauPt1, const math::LorentzVectorT<double>& tauP2, const double tauPt2);
+
   void findJetMatchingToTau(std::vector<Jet>& collection, const Event& event, const math::LorentzVectorT<double>& tauP);
   /// Routine for calculating the MHT related values
   void calculateMHTInformation(Data& output, const math::LorentzVectorT<double>& tauP, const double tauPt);
