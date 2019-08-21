@@ -139,8 +139,7 @@ public:
 
 private:
   /// Returns true if anti-isolated taus need to be used (QCD measurement)
-  const bool usesAntiIsolatedTaus() const { return fAnalysisType == kQCDMeasurement ||
-      fAnalysisType == kQCDNormalizationSystematicsControlRegion || fAnalysisType == kQCDMeasurement_ele || fAnalysisType == kQCDMeasurement_muon; }
+  const bool usesAntiIsolatedTaus() const { return fAnalysisType == kQCDMeasurement || fAnalysisType == kQCDNormalizationSystematicsControlRegion || fAnalysisType == kQCDMeasurement_ele || fAnalysisType == kQCDMeasurement_muon; }
   
 private:
   ///===== Config params

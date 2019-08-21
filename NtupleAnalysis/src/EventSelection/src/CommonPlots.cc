@@ -836,7 +836,7 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
 						       100, 0, 0.2);
     }// if (!hplus2tb)   
   
-    if (hplus2hw)
+    if (hplus2hw || fAnalysisType == kQCDMeasurement_muon)
     {
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlSelectedMuonPtAfterAllSelections, 
                                                        "SelectedMu_pT_AfterAllSelections", ";#mu p_{T}, GeV/c;N_{events}",
@@ -853,7 +853,7 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
     }// if (hplushw_muon)
 
 
-    if (hplus2hw_ele)
+    if (hplus2hw_ele || fAnalysisType == kQCDMeasurement_ele)
     {
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlSelectedElectronPtAfterAllSelections, 
                                                        "SelectedEle_pT_AfterAllSelections", ";e p_{T}, GeV/c;N_{events}",
@@ -1792,7 +1792,7 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
     {
       if (usesAntiIsolatedTaus()) {
         if (fTauData.getAntiIsolatedTaus().size()>0) {
-	  if ((fAnalysisType == kSignalAnalysis) ) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTau(), fMETData.getMET());
+	  if (fAnalysisType == kQCDMeasurement ) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTau(), fMETData.getMET());
         }
         if (fTauData.getAntiIsolatedTaus().size()>=2) {
           if (fAnalysisType == kHplus2hwAnalysis || fAnalysisType == kQCDMeasurement_muon) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[0],fTauData.getAntiIsolatedTaus()[1],fMuonData.getSelectedMuons()[0], fMETData.getMET());

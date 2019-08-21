@@ -526,6 +526,7 @@ DataMCBinningHToHW = {
     "NJets"       : [i for i in range(3, 15, 1)],
     "NBjets"      : [i for i in range(1, 8, 1)],
     "Mt"          : [0,100,200,300,400,500,600,700,800,1000],
+    "SelectedEle_pT_AfterAllSelections": [0,20,40,60,80,100,150,200,300,400,500,600,700,800,900,1000],
     "SelectedTaus_pT_AfterAllSelections": [0,20,40,60,80,100,150,200,300,400,500,600,700,800,900,1000],
     "SelectedTaus_eta_AfterAllSelections": [-2.5,-2.1,-1.8,-1.6,-1.4,-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,-0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.1,2.5],
     "SelectedTaus_phi_AfterAllSelections": [-3.14,-2.36,-1.57,-0.79,0.00,0.79,1.57,2.36,3.14],
