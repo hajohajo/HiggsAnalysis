@@ -1785,7 +1785,7 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
     {
       if (usesAntiIsolatedTaus()) {
         if (fTauData.getAntiIsolatedTaus().size()>0) {
-	  if (fAnalysisType == kQCDNormalizationSystematicsControlRegion) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTau(), fMETData.getMET());
+	  if (fAnalysisType == kQCDMeasurement || fAnalysisType == kQCDNormalizationSystematicsControlRegion) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTau(), fMETData.getMET());
         }
         if (fTauData.getAntiIsolatedTaus().size()>=2) {
           if (fAnalysisType == kHplus2hwAnalysis || fAnalysisType == kQCDMeasurement_muon) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[0],fTauData.getAntiIsolatedTaus()[1],fMuonData.getSelectedMuons()[0], fMETData.getMET());
@@ -1809,7 +1809,6 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
 
       // Create the up and down variation for tau ID shape
       // Could probably be done in a nicer way elsewhere...
-      
       if(tauIDup && fTauData.hasIdentifiedTaus() &&fTauData.getSelectedTau().pt()>=200){
 	fHistoSplitter.fillShapeHistogramTriplet(hShapeTransverseMass, bIsGenuineTau, myTransverseMass, (hShapeTransverseMass[0]->UnprotectedGetWeight()*(1.0+0.05*fTauData.getSelectedTau().pt()/1000.0)));
       }else if(tauIDdown && fTauData.hasIdentifiedTaus() && fTauData.getSelectedTau().pt()>=200){
