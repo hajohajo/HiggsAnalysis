@@ -34,10 +34,14 @@ as input.
 EXAMPLES:
 ../.././postFit_HToTB.py --mass 500 --prefit && ../.././postFit_HToTB.py --mass 500 && ../.././postFit_HToTB.py --mass 180 --prefit && ../.././postFit_HToTB.py --mass 180 --url
 ../.././postFit_HToTB.py --mass 500 --prefit --fitUncert
+../.././postFit_HToTB.py --mergeRares --url --mass 250,500,800 --fitUncert --prefit && ../.././postFit_HToTB.py --mergeRares --url --mass 250,500,800 --fitUncert
+../.././postFit_HToTB.py --paper --mass 250,500,800 --fitUncert --prefit --url && ../.././postFit_HToTB.py --paper --mass 250,500,800 --fitUncert --url 
+../.././postFit_HToTB.py --paper --mass 250,500,800 --fitUncert --prefit --xMin 150 --url && ../.././postFit_HToTB.py --paper --mass 250,500,800 --fitUncert --xMin 150 --url 
 
 
 LAST USED:
-../.././postFit_HToTB.py --mergeRares --url --mass 250,500,1000 --fitUncert --prefit && ../.././postFit_HToTB.py --mergeRares --url --mass 250,500,1000 --fitUncert
+../.././postFit_HToTB.py --paper --mass 800 --fitUncert --prefit && ../.././postFit_HToTB.py --paper --mass 800 --fitUncert --url 
+
 
 '''
 
@@ -108,7 +112,7 @@ class Category:
         self.h_data     = None
         self.h_signal   = None
         self.histograms = {}
-        self.opts       = {"xmin": xMin, "xmax" : self.gOpts.xMax, "ymin" : yMin, "ymaxfactor": yMaxFactor}
+        self.opts       = {"xmin": self.gOpts.xMin, "xmax" : self.gOpts.xMax, "ymin" : yMin, "ymaxfactor": yMaxFactor}
         self.optsLogx   = {"xmin": xMin, "xmax": opts.xMax}
         self.opts2      = {"ymin": 0.3, "ymax": 1.7}
         self.moveLegend = {}
@@ -170,7 +174,7 @@ class Category:
         
         histoName  = "data_obs"
         histoData   = fINdata.Get(histoName)
-        Print("Getting data histogram \"%s\" from ROOT file \"%s\" (Integral = %.1f)" % (histoName, fINdata.GetName(), histoData.Integral()), True)
+        Verbose("Getting data histogram \"%s\" from ROOT file \"%s\" (Integral = %.1f)" % (histoName, fINdata.GetName(), histoData.Integral()), True)
         self.h_data = histoData.Clone("Data")
 
         # Inspect histogram contents?
@@ -189,6 +193,10 @@ class Category:
         binning.append(min(self.optsLogx["xmax"], opts.xMaxRebin))
         n = len(binning)-1
         self.h_data.SetBins(nbins, array.array("d", binning) )
+
+        # Inspect histogram contents?
+        if opts.verbose:
+            aux.PrintTH1Info(self.h_data)
         
         # Define signal histogram styles
         # if len(opts.masses) > 3:
@@ -201,12 +209,13 @@ class Category:
         for i, m in enumerate(opts.masses, 0):
             hName = "Hp%s" % m
             histo = fINsignal[m].Get(hName)
-            Print("Getting signal histogram \"%s\" from ROOT file \"%s\" (Integral = %.1f)" % (hName, fINsignal[m].GetName(), histo.Integral()), False)
+            Verbose("Getting signal histogram \"%s\" from ROOT file \"%s\" (Integral = %.1f)" % (hName, fINsignal[m].GetName(), histo.Integral()), False)
             if 0:
                 histo.SetLineColor(lineColours[i])
                 histo.SetLineStyle(lineStyles[i])
                 histo.SetLineWidth(3)
-            histo.SetTitle("H^{#pm} (%s GeV)" % m)
+            #histo.SetTitle("H^{#pm} (%s GeV, #sigma = 1 pb, associated)" % m)
+            histo.SetTitle("H^{#pm} (%s GeV, #sigma = 1.0 pb)" % m)
             histo.SetBins(nbins, array.array("d", binning) )
             self.h_signal.append(histo.Clone(hName))
                                    
@@ -231,12 +240,27 @@ class Category:
 
             # Get the histograms
             histo = fINpost.Get(histoName)
-            Print("Getting bkg histogram \"%s\" from ROOT file \"%s\" (Integral = %.1f)" % (histoName, fINpost.GetName(), histo.Integral()), i==1)
+
+            # Safety net for empty histos (if datasset integral is zero corresponding histo will not exist)
+            if "TH1" in str(type(histo)):
+                # print "type(histo) = ", type(histo)
+                pass
+            else: 
+                # Histograms to ignore because dataset yield is zero (hack)
+                msg = "Skipping %s. Not a histogram!" % (histoName)
+                Print(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle(), True)
+                opts.empty.append(histoName.split("/")[-1])
+                continue
+
+            Verbose("Getting bkg histogram \"%s\" from ROOT file \"%s\" (Integral = %.1f)" % (histoName, fINpost.GetName(), histo.Integral()), i==1)
 
             # For-loop: All bins
             for iBin in range(0, histo.GetNbinsX()+1):
                 template.SetBinContent(iBin, histo.GetBinContent(iBin) )
                 template.SetBinError(iBin, histo.GetBinError(iBin) )
+
+            if opts.verbose:
+                aux.PrintTH1Info(histo)
 
             # Customise histogram
             template.SetFillColor(self.colors[hname])
@@ -254,6 +278,8 @@ class Category:
         hhd = histograms.Histo(self.h_data,"Data", legendStyle="PL", drawStyle="E1P")
         hhd.setIsDataMC(isData=True, isMC=False)
         histolist.append(hhd)
+        if 0:
+            aux.PrintTH1Info(hhd.getRootHisto())
 
         # For-loop: All signal histo
         for i, hsignal in enumerate(self.h_signal, 1):
@@ -266,10 +292,24 @@ class Category:
             histolist.append(hhs)
             
         # For-loop: All bkg histos
-        for hname in self.histonames:
-            hhp = histograms.Histo(self.histograms[hname],hname,legendStyle="F", drawStyle="HIST",legendLabel=self.labels[hname])
+        for i, hname in enumerate(self.histonames, 1):
+            # Safety net for empty histos
+            if hname in opts.empty:
+                msg = "Skipping %s. Not a histogram!" % (hname) 
+                Print(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle(), True)
+                continue
+            else:
+                #print hname
+                pass                
+            
+            myLabel = self.labels[hname]
+            myHisto = self.histograms[hname]
+            Verbose("Creating histogram \"%s\" from ROOT file \"%s\" (Integral = %.1f)" % (hname, myHisto.GetName(), myHisto.Integral()), i==1)
+            hhp = histograms.Histo(myHisto, hname, legendStyle="F", drawStyle="HIST", legendLabel=myLabel)
             hhp.setIsDataMC(isData=False,isMC=True)
             histolist.append(hhp)
+            if 0:
+                aux.PrintTH1Info(hhp.getRootHisto())
 
         # Sanity check
         for i, h in enumerate(histolist, 1):
@@ -285,16 +325,22 @@ class Category:
         if opts.fitUncert:
             p.addMCUncertainty(postfit=not opts.prefit) # boolean changes only the legend
 
+        legHeader = ""
         if opts.prefit:
-            p.setLegendHeader("Pre-Fit")
+            legHeader = "Prefit"
         else:
-            p.setLegendHeader("Post-Fit")
+            legHeader = "Postfit"
+        if 0:
+            p.setLegendHeader(legHeader)
+        p.setLegendHeader("Associated production")
+        #histograms.addText(0.2, 0.60, "Associated Production")
 
         # Customise histogram 
         units = "GeV" #(GeV/c^{2})
         myParams = {}
-        myParams["xlabel"]            = "m_{jjbb} (%s)" % (units)
-        myParams["ylabel"]            = "< Events / " + units + " >"
+        myParams["xlabel"]            = "m_{bt^{res}} (%s)" % (units)
+        # myParams["ylabel"]            = "< Events / " + units + " >"
+        myParams["ylabel"]            = "Events / " + units
         myParams["ratio"]             = True
         myParams["ratioYlabel"]       = "Data/Bkg. "
         myParams["logx"]              = self.gOpts.logX
@@ -311,6 +357,9 @@ class Category:
         myParams["addMCUncertainty"]  = True
         myParams["addLuminosityText"] = True
         myParams["moveLegend"]        = self.moveLegend
+        myParams["legendHeader"]      = "TEST"
+        myParams["ratioCreateLegend"] = True
+        myParams["ratioMoveLegend"]    = {}
         #myParams["saveFormats"]       = []
         
         # Draw the plot
@@ -362,22 +411,27 @@ def main(opts):
     h2tb_1 = Category("tbhadr", opts)
     
     # Customise legend position and size
-    hadrMoveLegend = {"dx": -0.08, "dy": -0.02, "dh": 0.14}
+    #hadrMoveLegend = {"dx": -0.08, "dy": -0.02, "dh": 0.14}
+    hadrMoveLegend = {"dx": -0.20, "dy": 0.0, "dh": 0.14}
     h2tb_1.setMoveLegend(hadrMoveLegend)
 
     # Add all histograms
-    h2tb_1.addHisto("FakeB"             , "Fake b (data)", color=ROOT.kBlue-1) #ROOT.kOrange-3)
-    h2tb_1.addHisto("TT_GenuineB"       , "t#bar{t}"     , color=ROOT.kMagenta-2)
-    h2tb_1.addHisto("SingleTop_GenuineB", "Single t"     , color=ROOT.kSpring+4)
-    if opts.mergeRares:
-        h2tb_1.addHisto("Rares_GenuineB", "Rares"        , color=ROOT.kViolet+10)
+    h2tb_1.addHisto("FakeB"      , "Fake b"   , color=ROOT.kBlue-1) #ROOT.kOrange-3)
+    h2tb_1.addHisto("TT_GenuineB", "t#bar{t}" , color=ROOT.kMagenta-2)
+    if opts.paper:
+        h2tb_1.addHisto("ttX_GenuineB", "t,tW,t#bar{t}+X", color=ROOT.kAzure-4)
+        h2tb_1.addHisto("EWK_GenuineB", "Electroweak"    , color=ROOT.kOrange+9)
     else:
-        h2tb_1.addHisto("TTZToQQ_GenuineB"              , "t#bar{t}+Z"       , color=ROOT.kAzure-4)
-        h2tb_1.addHisto("TTTT_GenuineB"                 , "t#bar{t}t#bar{t}" , color=ROOT.kYellow-9)
-        h2tb_1.addHisto("DYJetsToQQ_GenuineB"           , "Z/#gamma^{*}+jets", color=ROOT.kTeal-9)
-        h2tb_1.addHisto("TTWJetsToQQ_GenuineB"          , "t#bar{t}+W"       , color=ROOT.kSpring+9)
-        h2tb_1.addHisto("WJetsToQQ_HT_600ToInf_GenuineB", "W+jets"           , color=ROOT.kOrange+9)
-        h2tb_1.addHisto("Diboson_GenuineB"              , "Diboson"          , color=ROOT.kBlue-4)
+        h2tb_1.addHisto("SingleTop_GenuineB", "Single t"     , color=ROOT.kSpring+4)
+        if opts.mergeRares:
+            h2tb_1.addHisto("Rares_GenuineB", "Rares"        , color=ROOT.kViolet+10)
+        else:
+            h2tb_1.addHisto("TTZToQQ_GenuineB"              , "t#bar{t}+Z"       , color=ROOT.kAzure-4)
+            h2tb_1.addHisto("TTTT_GenuineB"                 , "t#bar{t}t#bar{t}" , color=ROOT.kYellow-9)
+            h2tb_1.addHisto("DYJetsToQQHT_GenuineB"         , "Z/#gamma^{*}+jets", color=ROOT.kTeal-9)
+            h2tb_1.addHisto("TTWJetsToQQ_GenuineB"          , "t#bar{t}+W"       , color=ROOT.kSpring+9)
+            h2tb_1.addHisto("WJetsToQQ_HT_600ToInf_GenuineB", "W+jets"           , color=ROOT.kOrange+9)
+            h2tb_1.addHisto("Diboson_GenuineB"              , "Diboson"          , color=ROOT.kBlue-4)
     categories = [h2tb_1]
 
     # For-loop: All files
@@ -436,7 +490,7 @@ if __name__=="__main__":
     GRIDY           = False
     XMINREBIN       = 0.0
     XMAXREBIN       = 10000
-    XMIN            = 0.0
+    XMIN            = 0.0 #150.0 #0
     XMAX            = 2500 #3000
     MASS            = "300,500,800"
     POSTFITROOTFILE = None
@@ -444,6 +498,7 @@ if __name__=="__main__":
     PREFIT          = False
     FITUNCERT       = False
     MERGERARES      = False
+    PAPER           = False
 
     parser = OptionParser(usage="Usage: %prog [options]", add_help_option=True, conflict_handler="resolve")
 
@@ -504,6 +559,9 @@ if __name__=="__main__":
     parser.add_option("--mergeRares", dest="mergeRares", default=MERGERARES, action="store_true",
                       help="Merge rare datasets into a single dataset? (v. small contribution to final count) [default: %s]" % (MERGERARES) )
 
+    parser.add_option("--paper", dest="paper", default=PAPER, action="store_true",
+                      help="Merge EWK and ttX datasets? (v. small contribution to final count) [default: %s]" % (PAPER) )
+
     (opts, args) = parser.parse_args()
 
     if opts.postfitFile == None:
@@ -515,6 +573,9 @@ if __name__=="__main__":
         fName = "combine_histograms_hplushadronic_m%s.root" % (m)
         opts.dataFiles.append(fName)
 
+    if opts.paper*opts.mergeRares:
+        raise Exception("Cannot have both \"paper\" and \"mergeRares\" options enables! Choose one or the other")
+
     if opts.saveName == None:
         postfix = "postFit"
         if opts.prefit:
@@ -524,4 +585,8 @@ if __name__=="__main__":
     if opts.saveDir == None:
         opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="Closure")
 
+    # Histograms to ignore because dataset yield is zero (hack)
+    opts.empty = []
+
+    # Main code
     main(opts)

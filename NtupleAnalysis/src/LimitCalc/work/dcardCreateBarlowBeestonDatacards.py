@@ -71,7 +71,8 @@ def createBarlowBeeston(input_path,output_extension):
 
     Verbose("Copying directory %s into %s" % (input_directory, output_directory_name), True)
     os.system("mkdir "+ output_directory_name)
-    os.system("cp -r %s/combine* %s" % (input_path, output_directory_name) )
+    #os.system("cp -r %s/combine* %s" % (input_path, output_directory_name) )
+    os.system("cp -rf %s/* %s/." % (input_path, output_directory_name) )
     Verbose("Copying done", True)
 
     # list all the datacard files
@@ -91,7 +92,7 @@ def createBarlowBeeston(input_path,output_extension):
     Verbose("Looping over datacards:", True)
     # For-loop: All  datacards (replace bin-by-bin uncertainties with Barlow-Beeston command)
     for i, dcard_name in enumerate(datacard_names, 1):
-        Print("Processing %s" % dcard_name, i==1)
+        Verbose("Processing %s" % dcard_name, i==1)
         f_in = file("../" + input_path + "/" + dcard_name)
     
         with open(dcard_name, "w") as f:
@@ -105,8 +106,9 @@ def createBarlowBeeston(input_path,output_extension):
             f.truncate()
         
     dirName = ShellStyles.SuccessStyle() + output_directory_name + ShellStyles.NormalStyle()
-    os.chdir("..")
-    Print("Barlow-Beeston datacards stored in directory %s" % (dirName), True)
+    os.chdir("..")    
+    Print("Results (Barlow-Beeston) stored in directory %s" % (dirName), True)
+
     
 #================================================================================================       
 # Main

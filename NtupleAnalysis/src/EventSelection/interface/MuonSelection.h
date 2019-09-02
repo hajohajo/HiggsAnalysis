@@ -5,6 +5,7 @@
 #include "EventSelection/interface/BaseSelection.h"
 #include "DataFormat/interface/Muon.h"
 #include "Framework/interface/EventCounter.h"
+#include "Framework/interface/GenericScaleFactor.h"
 
 #include <string>
 #include <vector>
@@ -77,10 +78,13 @@ private:
   void initialize(const ParameterSet& config, const std::string& postfix);
   /// The actual selection
   Data privateAnalyze(const Event& iEvent);
+  bool passTrgMatching(const Muon& muon, std::vector<math::LorentzVectorT<double>>& trgMuons) const;
 
   // Input parameters
-  const double fMuonPtCut;
-  const double fMuonEtaCut;
+  bool cfg_ApplyTriggerMatching;
+  float cfg_TriggerMatchingCone;
+  const double cfg_MuonPtCut;
+  const double cfg_MuonEtaCut;
   float fRelIsoCut;
   float fMiniIsoCut;
   bool fVetoMode;
@@ -90,12 +94,17 @@ private:
   Count cPassedMuonSelection;
   // Sub counters
   Count cSubAll;
+  Count cSubPassedIsPresent;
+  Count cSubPassedTriggerMatching;
   Count cSubPassedPt;
   Count cSubPassedEta;
   Count cSubPassedID;
   Count cSubPassedIsolation;
+  Count cSubPassedSelection;
+  Count cSubPassedVeto;
   
   // Histograms
+  WrappedTH1 *hTriggerMatchDeltaR;
   WrappedTH1 *hMuonNAll;
   WrappedTH1 *hMuonPtAll;
   WrappedTH1 *hMuonEtaAll;

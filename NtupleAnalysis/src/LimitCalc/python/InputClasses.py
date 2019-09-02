@@ -291,3 +291,21 @@ class ControlPlotInput:
         self.evaluationRange = evaluationRange
         self.flowPlotCaption = flowPlotCaption
         return
+
+    def getTitle(self):
+        return self.title
+
+    def getHistoName(self):
+        return self.histoName
+
+    def getDetails(self):
+        return self.histoName
+
+    def getBlindedRange(self):
+        return self.blindedRange
+
+    def getEvaluationRange(self):
+        return self.evaluationRange
+
+    def getFlowPlotCaption(self):
+        return self.flowPlotCaption

@@ -107,12 +107,14 @@ public:
   Data silentAnalyze(const Event& event);
   /// analyze does fill histograms and incrementes counters
   Data analyze(const Event& event);
+  Data analyzeTight(const Event& event);
 
 private:
   /// Initialisation called from constructor
   void initialize(const ParameterSet& config, const std::string& postfix);
   /// The actual selection
   Data privateAnalyze(const Event& iEvent);
+  Data privateAnalyzeTight(const Event& iEvent);
   bool passTrgMatching(const Tau& tau, std::vector<math::LorentzVectorT<double>>& trgTaus) const;
   // !!!!!!!!!!!!!!!!!!!!!!!!!! bool passDecayModeFinding(const Tau& tau) const { return tau.decayModeFinding(); }
   bool passDecayModeFinding(const Tau& tau) const { return tau.decayModeFindingNewDMs(); }
@@ -174,11 +176,6 @@ private:
   Count cSubPassedAntiIsolation;
   Count cSubPassedAntiIsolationRtau;
   Count cSubPassedTauSelectionGenuine;
-  Count cSubPassedElectronToTau;
-  Count cSubPassedMuonToTau;
-  Count cSubPassedJetToTau;
-  Count cSubPassedGluonToTau;
-  Count cSubPassedUnknownToTau;
   Count cSubPassedTauSelectionMultipleTaus;
   Count cSubPassedAntiIsolatedTauSelection;
   Count cSubPassedAntiIsolatedTauSelectionMultipleTaus;

@@ -14,9 +14,11 @@ EXAMPLES:
 
 
 LAST USED:
-./dcardGenerator_v2.py -x dcardDefault_h2tb_2016.py -d limits2016/ --h2tb
-OR
-./dcardGenerator_v2.py -x dcardDefault_h2tb_2016_new.py -d limits2016/ --h2tb
+./dcardGenerator_v2.py -x dcardDefault_h2tb_2016_paper.py -d limits2016/ --h2tb
+
+
+HN Threads:
+https://hypernews.cern.ch/HyperNews/CMS/get/HIG-18-015/11.html
 
 '''
 #================================================================================================  
@@ -121,15 +123,14 @@ def getFakeBSystematics(myTTBarSystematics, OptionShapeSystematics, verbose=Fals
 #================================================================================================  
 # Options
 #================================================================================================  
-OptionTest                             = False # [default: False]
-OptionPaper                            = True  # [default: True]
-OptionMergeRares                       = True  # [default: True]
+OptionTest                             = True  # [default: False]
+OptionPaper                            = True  # [default: True]   (Changes figure style to paper style)
 OptionIncludeSystematics               = True  # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
-OptionUseTopPtReweightSyst             = False # [default: True] 
-OptionFakeBSyst                        = "TransferFactor3x" # [default: "TransferFactor"] (Options: TransferFactor, TransferFactor2x, TransferFactor3x)
+OptionFakeBSyst                        = "TransferFactor" # [default: "TransferFactor"] (Options: TransferFactor, TransferFactor2x, TransferFactor3x)
 OptionShapeSystematics                 = True  # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
 OptionDoControlPlots                   = True  # [default: True]   (Produce control plots defined at end of this file)
-MassPoints                             = [180, 200, 220, 250, 300, 350, 400, 500, 650, 800, 1000, 1500, 2000, 2500, 3000]#, 5000, 7000, 10000]
+#MassPoints                             = [180, 200, 220, 250, 300, 350, 400, 500, 650, 800, 1000, 1500, 2000, 2500, 3000]#, 5000, 7000, 10000]
+MassPoints                             = [200, 220, 250, 300, 350, 400, 500, 650, 800, 1000, 1500, 2000, 2500, 3000]
 DataCardName                           = "Hplus2tb_13TeV"
 OptionMassShape                        = "LdgTetrajetMass_AfterAllSelections"
 OptionBr                               = 1.0          # [default: 1.0]    (The Br(t->bH+) used in figures and tables)
@@ -138,7 +139,7 @@ BlindAnalysis                          = False        # [default: True]   (Chang
 OptionBlindThreshold                   = None         # [default: None]   (If signal exceeds this fraction of expected events, data is blinded)
 MinimumStatUncertainty                 = 0.5          # [default: 0.5]    (min. stat. uncert. to set to bins with zero events)
 UseAutomaticMinimumStatUncertainty     = False        # [default: False]  (Do NOT use the MinimumStatUncertainty; determine value from lowest non-zero rate for each dataset   )
-OptionCombineSingleColumnUncertainties = False        # [default: False]  (Approxmation that makes limit running faster)
+OptionCombineSingleColumnUncertainties = False        # [default: False]  (Merge nuisances with quadratic sum using the TableProducer.py Only applied to nuisances with one column)
 OptionDisplayEventYieldSummary         = False        # [default: False]  (Print "Event yield summary", using the TableProducer.py)
 OptionDoWithoutSignal                  = False        # [default: False]  (Also do control plots without any signal present)
 OptionFakeBMeasurementSource           = "DataDriven" # [default: "DataDriven"] (options: "DataDriven", "MC")
@@ -190,21 +191,14 @@ myBtagSystematics          = ["CMS_eff_b"]
 mySystematics = {}
 mySystematics["MC"]          = myLumiSystematics + myPileupSystematics + myTrgEffSystematics + myLeptonVetoSystematics + myJetSystematics + myBtagSystematics + myTopTagSystematics
 mySystematics["Signal"]      = mySystematics["MC"] + ["CMS_HPTB_mu_RF_HPTB","CMS_HPTB_pdf_HPTB"]
-mySystematics["FakeB"]       = []
-mySystematics["QCD"]         = mySystematics["MC"]
-if OptionUseTopPtReweightSyst:
-    mySystematics["TT"]      = mySystematics["MC"] + ["QCDscale_ttbar", "pdf_ttbar", "mass_top", "CMS_topreweight"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
-else:
-    mySystematics["TT"]          = mySystematics["MC"] + ["QCDscale_ttbar", "pdf_ttbar", "mass_top"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
-mySystematics["SingleTop"]   = mySystematics["MC"] + ["QCDscale_singleTop", "pdf_singleTop"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
-mySystematics["TTZToQQ"]     = mySystematics["MC"] + ["QCDscale_ttZ", "pdf_ttZ"] + ["CMS_HPTB_mu_RF_ewk","CMS_HPTB_pdf_ewk"]
-mySystematics["TTTT"]        = mySystematics["MC"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
-mySystematics["DYJetsToQQHT"]= mySystematics["MC"] + ["QCDscale_DY", "pdf_DY"] + ["CMS_HPTB_mu_RF_ewk","CMS_HPTB_pdf_ewk"]
-mySystematics["TTWJetsToQQ"] = mySystematics["MC"] + ["QCDscale_ttW", "pdf_ttW"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
-mySystematics["WJetsToQQ_HT_600ToInf"]  = mySystematics["MC"] + ["QCDscale_Wjets", "pdf_Wjets"] + ["CMS_HPTB_mu_RF_ewk","CMS_HPTB_pdf_ewk"]
-mySystematics["Diboson"]     = mySystematics["MC"] + ["QCDscale_VV", "pdf_VV"] + ["CMS_HPTB_mu_RF_ewk","CMS_HPTB_pdf_ewk"]
+mySystematics["TT"]          = mySystematics["MC"] + ["QCDscale_ttbar", "pdf_ttbar", "mass_top"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
 mySystematics["FakeB"]       = getFakeBSystematics(mySystematics["TT"], OptionShapeSystematics, verbose=False)
-mySystematics["Rares"]       = mySystematics["MC"] #+ ["QCDscale_ttW", "pdf_ttW"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
+mySystematics["ttX"]         = mySystematics["MC"] + ["QCDscale_singleTop", "pdf_singleTop", "mass_top_forSingleTop"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"] #"TTWJetsToQQ, TTZToQQ, TTTT, SingleTop"
+#mySystematics["SingleTop"]   = mySystematics["MC"] + ["QCDscale_singleTop", "pdf_singleTop", "mass_top_forSingleTop"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
+#mySystematics["TTZToQQ"]     = mySystematics["MC"] + ["QCDscale_ttZ", "pdf_ttZ"] + ["CMS_HPTB_mu_RF_ewk","CMS_HPTB_pdf_ewk"]
+#mySystematics["TTTT"]        = mySystematics["MC"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
+#mySystematics["TTWJetsToQQ"] = mySystematics["MC"] + ["QCDscale_ttW", "pdf_ttW"] + ["CMS_HPTB_mu_RF_top","CMS_HPTB_pdf_top"]
+mySystematics["EWK"]         = mySystematics["MC"] + ["QCDscale_ewk", "pdf_ewk"] + ["CMS_HPTB_mu_RF_ewk","CMS_HPTB_pdf_ewk"] # "WJetsToQQ, DYJetsToQQHT, Diboson"
 
 if not OptionIncludeSystematics:
     msg = "Disabled systematics for all datasets (Stat. only datacards)"
@@ -243,16 +237,6 @@ myFakeB = DataGroup(label             = labelPrefix + "FakeB", #"FakeBmeasuremen
                     histoPath         = histoPathInclusive
                     )
 
-myQCD = DataGroup(label             = labelPrefix + "QCD",
-                  landsProcess      = 2, # must be SAME index as myFakeB (only of them is used!)
-                  validMassPoints   = MassPoints,
-                  datasetType       = "QCDMC",
-                  datasetDefinition = "QCD",
-                  nuisances         = mySystematics["QCD"],
-                  shapeHistoName    = OptionMassShape,
-                  histoPath         = histoPathInclusive
-                  )
-
 TT = DataGroup(label             = labelPrefix + "TT" + labelPostfix, #
                landsProcess      = 3,
                shapeHistoName    = OptionMassShape, 
@@ -263,86 +247,25 @@ TT = DataGroup(label             = labelPrefix + "TT" + labelPostfix, #
                nuisances         = mySystematics["TT"]
                )
 
-SingleTop = DataGroup(label             = labelPrefix + "SingleTop" + labelPostfix,
+TTX = DataGroup(label                   = labelPrefix + "ttX" + labelPostfix,
                       landsProcess      = 4,
                       shapeHistoName    = OptionMassShape,
                       histoPath         = histoPathEWK,
                       datasetType       = dsetTypeEWK,
-                      datasetDefinition = "SingleTop",
+                      datasetDefinition = "ttX",
                       validMassPoints   = MassPoints,
-                      nuisances         = mySystematics["SingleTop"]
+                      nuisances         = mySystematics["ttX"]
                       )
 
-TTZ = DataGroup(label             = labelPrefix + "TTZToQQ" + labelPostfix, 
-                landsProcess      = 5,
-                shapeHistoName    = OptionMassShape,
-                histoPath         = histoPathEWK,
-                datasetType       = dsetTypeEWK,
-                datasetDefinition = "TTZToQQ",
-                validMassPoints   = MassPoints,
-                nuisances         = mySystematics["TTZToQQ"]
-                )
-
-TTTT = DataGroup(label             = labelPrefix + "TTTT" + labelPostfix,
-                 landsProcess      = 6,
-                 shapeHistoName    = OptionMassShape,
-                 histoPath         = histoPathEWK,
-                 datasetType       = dsetTypeEWK,
-                 datasetDefinition = "TTTT",
-                 validMassPoints   = MassPoints,
-                 nuisances         = mySystematics["TTTT"]
-                 )
-
-DYJets = DataGroup(label             = labelPrefix + "DYJetsToQQHT" + labelPostfix, 
-                   landsProcess      = 7,
-                   shapeHistoName    = OptionMassShape,
-                   histoPath         = histoPathEWK,
-                   datasetType       = dsetTypeEWK,
-                   datasetDefinition = "DYJetsToQQHT",
-                   validMassPoints   = MassPoints,
-                   nuisances         = mySystematics["DYJetsToQQHT"]
-                   )
-
-TTWJets = DataGroup(label             = labelPrefix + "TTWJetsToQQ" + labelPostfix, 
-                    landsProcess      = 8,
-                    shapeHistoName    = OptionMassShape, 
-                    histoPath         = histoPathEWK,
-                    datasetType       = dsetTypeEWK,
-                    datasetDefinition = "TTWJetsToQQ",
-                    validMassPoints   = MassPoints,
-                    nuisances         = mySystematics["TTWJetsToQQ"]
-                    )
-
-WJets = DataGroup(label             = labelPrefix + "WJetsToQQ_HT_600ToInf" + labelPostfix,
-                  landsProcess      = 9,
-                  shapeHistoName    = OptionMassShape,
-                  histoPath         = histoPathEWK, 
-                  datasetType       = dsetTypeEWK,
-                  datasetDefinition = "WJetsToQQ_HT_600ToInf",
-                  validMassPoints   = MassPoints,
-                  nuisances         = mySystematics["WJetsToQQ_HT_600ToInf"]
-                  )
-
-Diboson = DataGroup(label             = labelPrefix + "Diboson" + labelPostfix,
-                    landsProcess      = 10,
-                    shapeHistoName    = OptionMassShape,
-                    histoPath         = histoPathEWK, 
-                    datasetType       = dsetTypeEWK,
-                    datasetDefinition = "Diboson",
-                    validMassPoints   = MassPoints,
-                    nuisances         = mySystematics["Diboson"]
-                    )
-
-Rares = DataGroup(label             = labelPrefix + "Rares" + labelPostfix,
+EWK = DataGroup(label                 = labelPrefix + "EWK" + labelPostfix,
                     landsProcess      = 5,
                     shapeHistoName    = OptionMassShape,
                     histoPath         = histoPathEWK, 
                     datasetType       = dsetTypeEWK,
-                    datasetDefinition = "Rares",
+                    datasetDefinition = "EWK",
                     validMassPoints   = MassPoints,
-                    nuisances         = mySystematics["Rares"]
+                    nuisances         = mySystematics["EWK"]
                     )
-
 
 # Append datasets in order you want them to appear in the data-driven control plot stack
 DataGroups = []
@@ -352,18 +275,8 @@ if OptionFakeBMeasurementSource == "DataDriven":
 else:
     DataGroups.append(myQCD)
 DataGroups.append(TT)
-DataGroups.append(SingleTop)
-if OptionMergeRares:
-    rares = aux.GetListOfRareDatasets()
-    Print("Replacing rare datasets with single \"Rares\" dataset: [%s] -> %s" % ( ts + ", ".join(rares) + ns, ss + "Rares" + ns), True)
-    DataGroups.append(Rares)
-else:
-    DataGroups.append(TTZ)
-    DataGroups.append(TTTT)
-    DataGroups.append(DYJets)
-    DataGroups.append(TTWJets)
-    DataGroups.append(WJets)
-    DataGroups.append(Diboson)
+DataGroups.append(TTX)
+DataGroups.append(EWK)
 
 #================================================================================================  
 # Shape Nuisance Parameters (aka Systematics)  (= rows in datacard) 
@@ -390,38 +303,22 @@ tt_pdf_down          = systematics.getCrossSectionUncertainty("TTJets_pdf").getU
 tt_pdf_up            = systematics.getCrossSectionUncertainty("TTJets_pdf").getUncertaintyUp()
 tt_mass_down         = systematics.getCrossSectionUncertainty("TTJets_mass").getUncertaintyDown()
 tt_mass_up           = systematics.getCrossSectionUncertainty("TTJets_mass").getUncertaintyUp()
-wjets_scale_down     = systematics.getCrossSectionUncertainty("WJets_scale").getUncertaintyDown()
-wjets_scale_up       = systematics.getCrossSectionUncertainty("WJets_scale").getUncertaintyUp()
-wjets_pdf_down       = systematics.getCrossSectionUncertainty("WJets_pdf").getUncertaintyDown()
-singleTop_scale_down = systematics.getCrossSectionUncertainty("SingleTop_scale").getUncertaintyDown()
-singleTop_pdf_down   = systematics.getCrossSectionUncertainty("SingleTop_pdf").getUncertaintyDown()
-DY_scale_down        = systematics.getCrossSectionUncertainty("DYJetsToLL_scale").getUncertaintyDown()
-DY_scale_up          = systematics.getCrossSectionUncertainty("DYJetsToLL_scale").getUncertaintyUp()
-DY_pdf_down          = systematics.getCrossSectionUncertainty("DYJetsToLL_pdf").getUncertaintyDown()
-DY_pdf_up            = systematics.getCrossSectionUncertainty("DYJetsToLL_pdf").getUncertaintyUp()
-diboson_scale_down   = systematics.getCrossSectionUncertainty("Diboson_scale").getUncertaintyDown()
-diboson_scale_up     = systematics.getCrossSectionUncertainty("Diboson_scale").getUncertaintyUp()
-diboson_pdf_down     = systematics.getCrossSectionUncertainty("Diboson_pdf").getUncertaintyDown()
-diboson_pdf_up       = systematics.getCrossSectionUncertainty("Diboson_pdf").getUncertaintyUp()
-ttW_pdf_down         = systematics.getCrossSectionUncertainty("TTW_pdf").getUncertaintyDown()
-ttW_pdf_up           = systematics.getCrossSectionUncertainty("TTW_pdf").getUncertaintyUp()
-ttW_scale_up         = systematics.getCrossSectionUncertainty("TTW_scale").getUncertaintyUp()
-ttW_scale_down       = systematics.getCrossSectionUncertainty("TTW_scale").getUncertaintyDown()
-ttZ_pdf_down         = systematics.getCrossSectionUncertainty("TTZ_pdf").getUncertaintyDown()
-ttZ_pdf_up           = systematics.getCrossSectionUncertainty("TTZ_pdf").getUncertaintyUp()
-ttZ_scale_down       = systematics.getCrossSectionUncertainty("TTZ_scale").getUncertaintyDown()
-ttZ_scale_up         = systematics.getCrossSectionUncertainty("TTZ_scale").getUncertaintyUp()
-#tttt_pdf_down        = systematics.getCrossSectionUncertainty("TTTT_pdf").getUncertaintyDown()
-#tttt_pdf_up          = systematics.getCrossSectionUncertainty("TTTT_pdf").getUncertaintyUp()
-#tttt_scale_down      = systematics.getCrossSectionUncertainty("TTTT_scale").getUncertaintyDown()
-#tttt_scale_up        = systematics.getCrossSectionUncertainty("TTTT_scale").getUncertaintyUp()
+ttX_scale_down       = systematics.getCrossSectionUncertainty("SingleTop_scale").getUncertaintyDown() #iro
+ttX_pdf_down         = systematics.getCrossSectionUncertainty("SingleTop_pdf").getUncertaintyDown()
+ewk_scale_down       = systematics.getCrossSectionUncertainty("Diboson_scale").getUncertaintyDown() #("EWK_scale").getUncertaintyDown()
+ewk_scale_up         = systematics.getCrossSectionUncertainty("Diboson_scale").getUncertaintyUp()   #("EWK_scale").getUncertaintyUp()
+ewk_pdf_down         = systematics.getCrossSectionUncertainty("Diboson_pdf").getUncertaintyDown()   #("EWK_pdf").getUncertaintyDown()
+ewk_pdf_up           = systematics.getCrossSectionUncertainty("Diboson_pdf").getUncertaintyUp()     #("EWK_pdf").getUncertaintyUp()
 lumi_2016            = systematics.getLuminosityUncertainty("2016")
+
 # Default nuisances
 lumi13TeV_Const = Nuisance(id="lumi_13TeV"         , label="Luminosity 13 TeV uncertainty", distr="lnN", function="Constant", value=lumi_2016)
 trgMC_Const     = Nuisance(id="CMS_eff_trg_MC"     , label="Trigger MC efficiency (Approx.)", distr="lnN", function="Constant", value=0.05)
 PU_Const        = Nuisance(id="CMS_pileup"         , label="Pileup (Approx.)", distr="lnN", function="Constant", value=0.05)
-eVeto_Const     = Nuisance(id="CMS_eff_e_veto"     , label="e veto", distr="lnN", function="Ratio", numerator="passed e selection (Veto)", denominator="passed PV", scaling=0.02)
-muVeto_Const    = Nuisance(id="CMS_eff_m_veto"     , label="mu veto", distr="lnN", function="Ratio", numerator="passed mu selection (Veto)", denominator="passed e selection (Veto)", scaling=0.01)
+eVeto_Const     = Nuisance(id="CMS_eff_e_veto"     , label="e veto"  , distr="lnN", function="Ratio", numerator="passed e selection (Veto)", denominator="passed PV", scaling=0.02)
+muVeto_Const    = Nuisance(id="CMS_eff_m_veto"     , label="mu veto" , distr="lnN", function="Ratio", numerator="passed mu selection (Veto)", denominator="passed e selection (Veto)", scaling=0.01)
+#eVeto_Const     = Nuisance(id="CMS_eff_e_veto"     , label="e veto"  , distr="lnN", function="Constant", value=0.05)
+#muVeto_Const    = Nuisance(id="CMS_eff_m_veto"     , label="mu veto" , distr="lnN", function="Constant", value=0.05)
 tauVeto_Const   = Nuisance(id="CMS_eff_tau_veto"   , label="tau veto", distr="lnN", function="Ratio", numerator="Passed tau selection (Veto)", denominator="passed mu selection (Veto)", scaling=0.03)
 bTagSF_Const    = Nuisance(id="CMS_eff_b"          , label="b tagging (Approx.)", distr="lnN", function="Constant", value=0.05)
 JES_Const       = Nuisance(id="CMS_scale_j"        , label="Jet Energy Scale (JES) (Approx.)"     , distr="lnN", function="Constant", value=0.03)
@@ -430,35 +327,24 @@ topPt_Const     = Nuisance(id="CMS_topreweight"    , label="Top pT reweighting (
 topTag_Const    = Nuisance(id="CMS_HPTB_toptagging", label="Top tagging (Approx.)", distr="lnN", function="Constant", value=0.10)
 
 # Cross section uncertainties
-ttbar_scale_Const    = Nuisance(id="QCDscale_ttbar"    , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=tt_scale_down, upperValue=tt_scale_up)
-ttbar_pdf_Const      = Nuisance(id="pdf_ttbar"         , label="TTbar XSection pdf uncertainty", distr="lnN", function="Constant", value=tt_pdf_down, upperValue=tt_pdf_up)
-ttbar_mass_Const     = Nuisance(id="mass_top"          , label="TTbar XSection top mass uncertainty", distr="lnN", function="Constant", value=tt_mass_down, upperValue=tt_mass_up) 
-wjets_scale_Const    = Nuisance(id="QCDscale_Wjets"    , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=wjets_scale_down, upperValue=wjets_scale_up)
-wjets_pdf_Const      = Nuisance(id="pdf_Wjets"         , label="W+jets XSection pdf uncertainty", distr="lnN", function="Constant", value=wjets_pdf_down)
-singleTop_mass_Const = Nuisance(id="mass_singleTop"    , label="Single top XSection top mass uncertainty", distr="lnN", function="Constant", value=tt_mass_down, upperValue=tt_mass_up)  #FIXME: same as ttbar?
-singleTop_scale_Const= Nuisance(id="QCDscale_singleTop", label="QCD XSection uncertainties", distr="lnN", function="Constant", value=singleTop_scale_down)
-singleTop_pdf_Const  = Nuisance(id="pdf_singleTop"     , label="Single top XSection pdf ucnertainty", distr="lnN", function="Constant", value=singleTop_pdf_down)
-DY_scale_Const       = Nuisance(id="QCDscale_DY"       , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=DY_scale_down, upperValue=DY_scale_up)
-DY_pdf_Const         = Nuisance(id="pdf_DY"            , label="DYJets XSection pdf uncertainty", distr="lnN", function="Constant", value=DY_pdf_down)
-diboson_scale_Const  = Nuisance(id="QCDscale_VV"       , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=diboson_scale_down)
-diboson_pdf_Const    = Nuisance(id="pdf_VV"            , label="Diboson XSection pdf uncertainty", distr="lnN", function="Constant", value=diboson_pdf_down)
-ttW_pdf_Const        = Nuisance(id="pdf_ttW"           , label="TTW XSection pdf uncertainty", distr="lnN", function="Constant", value=ttW_pdf_down)
-ttW_scale_Const      = Nuisance(id="QCDscale_ttW"      , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=ttW_scale_down, upperValue=ttW_scale_up)
-ttZ_pdf_Const        = Nuisance(id="pdf_ttZ"           , label="TTZ XSection pdf uncertainty", distr="lnN", function="Constant", value=ttZ_pdf_down)
-ttZ_scale_Const      = Nuisance(id="QCDscale_ttZ"      , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=ttZ_scale_down, upperValue=ttZ_scale_up)
-#tttt_pdf_Const       = Nuisance(id="pdf_tttt"          , label="TTTT XSection pdf uncertainty", distr="lnN", function="Constant", value=tttt_pdf_down)
-#tttt_scale_Const     = Nuisance(id="QCDscale_tttt"     , label="TTTT XSection scale uncertainty", distr="lnN", function="Constant", value=tttt_scale_down)
-
+ttbar_scale_Const    = Nuisance(id="QCDscale_ttbar"       , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=tt_scale_down, upperValue=tt_scale_up)
+ttbar_pdf_Const      = Nuisance(id="pdf_ttbar"            , label="TTbar XSection pdf uncertainty", distr="lnN", function="Constant", value=tt_pdf_down, upperValue=tt_pdf_up)
+ttbar_mass_Const     = Nuisance(id="mass_top"             , label="TTbar XSection top mass uncertainty", distr="lnN", function="Constant", value=tt_mass_down, upperValue=tt_mass_up) 
+ttX_mass_Const       = Nuisance(id="mass_top_forSingleTop", label="Single top mass uncertainty", distr="lnN", function="Constant", value=0.022) #iro
+ttX_scale_Const      = Nuisance(id="QCDscale_singleTop"   , label="QCD XSection uncertainties", distr="lnN", function="Constant", value=ttX_scale_down)#iro
+ttX_pdf_Const        = Nuisance(id="pdf_singleTop"        , label="Single top XSection pdf ucnertainty", distr="lnN", function="Constant", value=ttX_pdf_down)#iro
+ewk_scale_Const      = Nuisance(id="QCDscale_ewk"         , label="EWK XSection uncertainties", distr="lnN", function="Constant", value=ewk_scale_down)
+ewk_pdf_Const        = Nuisance(id="pdf_ewk"              , label="EWK XSection pdf uncertainty", distr="lnN", function="Constant", value=ewk_pdf_down)
 
 #==== Acceptance uncertainties (QCDscale)
-RF_QCDscale_top_const  = Nuisance(id="CMS_HPTB_mu_RF_top" , label="QCDscale acceptance uncertainty for top backgrounds", distr="lnN", function="Constant",value=0.02)
-RF_QCDscale_ewk_const  = Nuisance(id="CMS_HPTB_mu_RF_ewk" , label="QCDscale acceptance uncertainty for EWK backgrounds", distr="lnN", function="Constant",value=0.05)
-RF_QCDscale_HPTB_const = Nuisance(id="CMS_HPTB_mu_RF_HPTB", label="QCDscale acceptance uncertainty for signal"         , distr="lnN", function="Constant",value=0.048)
+RF_QCDscale_top_const  = Nuisance(id="CMS_HPTB_mu_RF_top" , label="Scale acceptance uncertainty for top"   , distr="lnN", function="Constant",value=0.02)
+RF_QCDscale_ewk_const  = Nuisance(id="CMS_HPTB_mu_RF_ewk" , label="Scale acceptance uncertainty for EWK"   , distr="lnN", function="Constant",value=0.05)
+RF_QCDscale_HPTB_const = Nuisance(id="CMS_HPTB_mu_RF_HPTB", label="Scale acceptance uncertainty for signal", distr="lnN", function="Constant",value=0.048)
 #RF_QCDscale_HPTB_const = Nuisance(id="CMS_HPTB_mu_RF_HPTB_heavy", label="QCDscale acceptance uncertainty for signal", distr="lnN", function="Constant",value=0.012)
 
 #==== Acceptance uncertainties  (PDF)
-RF_pdf_top_const  = Nuisance(id="CMS_HPTB_pdf_top", label="PDF acceptance uncertainty for top backgrounds", distr="lnN", function="Constant",value=0.02,upperValue=0.0027)
-RF_pdf_ewk_const  = Nuisance(id="CMS_HPTB_pdf_ewk", label="PDF acceptance uncertainty for EWK backgrounds", distr="lnN", function="Constant",value=0.033,upperValue=0.046)
+RF_pdf_top_const  = Nuisance(id="CMS_HPTB_pdf_top", label="PDF acceptance uncertainty for top", distr="lnN", function="Constant",value=0.02,upperValue=0.0027)
+RF_pdf_ewk_const  = Nuisance(id="CMS_HPTB_pdf_ewk", label="PDF acceptance uncertainty for EWK", distr="lnN", function="Constant",value=0.033,upperValue=0.046)
 RF_pdf_HPTB_const = Nuisance(id="CMS_HPTB_pdf_HPTB", label="PDF acceptance uncertainty for signal", distr="lnN", function="Constant",value=0.004,upperValue=0.017)
 
 # Fake-b nuisances
@@ -477,7 +363,7 @@ topTag_FakeB_Const      = Nuisance(id="CMS_HPTB_toptagging_forFakeB", label="Top
 ttbar_scale_FakeB_Const = Nuisance(id="QCDscale_ttbar_forFakeB"  , label="QCD XSection uncertainties", distr="lnN", function="ConstantForFakeB", value=tt_scale_down, upperValue=tt_scale_up)
 ttbar_pdf_FakeB_Const   = Nuisance(id="pdf_ttbar_forFakeB"       , label="TTbar XSection pdf uncertainty", distr="lnN", function="ConstantForFakeB", value=tt_pdf_down, upperValue=tt_pdf_up)
 ttbar_mass_FakeB_Const  = Nuisance(id="mass_top_forFakeB"        , label="TTbar XSection top mass uncertainty", distr="lnN", function="ConstantForFakeB", value=tt_mass_down, upperValue=tt_mass_up) 
-RF_QCDscale_FakeB_const = Nuisance(id="CMS_HPTB_mu_RF_top_forFakeB", label="QCDscale acceptance uncertainty for FakeB" , distr="lnN", function="ConstantForFakeB",value=0.02)
+RF_QCDscale_FakeB_const = Nuisance(id="CMS_HPTB_mu_RF_top_forFakeB", label="Scale acceptance uncertainty for FakeB" , distr="lnN", function="ConstantForFakeB",value=0.02)
 RF_pdf_FakeB_const      = Nuisance(id="CMS_HPTB_pdf_top_forFakeB"  , label="PDF acceptance uncertainty for FakeB"      , distr="lnN", function="ConstantForFakeB",value=0.02, upperValue=0.0027)
 
 
@@ -491,8 +377,6 @@ if OptionShapeSystematics:
     Nuisances.append(PU_Shape)
     Nuisances.append(JES_Shape)
     Nuisances.append(JER_Shape)
-    if OptionUseTopPtReweightSyst:
-        Nuisances.append(topPt_Shape)
     Nuisances.append(bTagSF_Shape) 
     Nuisances.append(topTag_Shape)
     Nuisances.append(tf_FakeB_Shape)
@@ -503,9 +387,6 @@ else:
     Nuisances.append(JES_FakeB_Const)
     Nuisances.append(JER_FakeB_Const)
     Nuisances.append(JER_Const)
-    if OptionUseTopPtReweightSyst:
-        Nuisances.append(topPt_Const)
-        Nuisances.append(topPt_FakeB_Const)
     Nuisances.append(bTagSF_Const) 
     Nuisances.append(bTagSF_FakeB_Const)
     Nuisances.append(tf_FakeB_Const)
@@ -532,20 +413,11 @@ Nuisances.append(ttbar_pdf_Const)
 Nuisances.append(ttbar_pdf_FakeB_Const)
 Nuisances.append(ttbar_mass_Const)
 Nuisances.append(ttbar_mass_FakeB_Const)
-Nuisances.append(wjets_scale_Const)
-Nuisances.append(wjets_pdf_Const)
-Nuisances.append(singleTop_scale_Const)
-Nuisances.append(singleTop_pdf_Const)
-Nuisances.append(DY_scale_Const)
-Nuisances.append(DY_pdf_Const)
-Nuisances.append(diboson_scale_Const)
-Nuisances.append(diboson_pdf_Const)
-Nuisances.append(ttW_pdf_Const)
-Nuisances.append(ttW_scale_Const)
-Nuisances.append(ttZ_pdf_Const)
-Nuisances.append(ttZ_scale_Const)
-# Nuisances.append(tttt_pdf_Const)
-# Nuisances.append(tttt_scale_Const)
+Nuisances.append(ttX_scale_Const)
+Nuisances.append(ttX_pdf_Const)
+Nuisances.append(ttX_mass_Const)
+Nuisances.append(ewk_scale_Const)
+Nuisances.append(ewk_pdf_Const)
 
 # RF/QCD Scale
 Nuisances.append(RF_QCDscale_top_const)
@@ -572,22 +444,13 @@ PrintNuisancesTable(Nuisances, DataGroups)
 MergeNuisances=[]
 
 # Correlate ttbar and single top cross-section uncertainties
-if 0:
-    MergeNuisances.append(["QCDscale_ttbar", "QCDscale_singleTop"]) #resultant name will be "QCDscale_ttbar"
-    MergeNuisances.append(["pdf_ttbar"  , "pdf_singleTop"])
-else:
-    #MergeNuisances.append(["QCDscale_ttbar", "QCDscale_singleTop", "QCDscale_ttbar_forFakeB", "QCDscale_ttW", "QCDscale_ttZ"])
-    #MergeNuisances.append(["pdf_ttbar"  , "pdf_singleTop"  , "pdf_ttbar_forFakeB"  , "pdf_ttW"  , "pdf_ttZ"])    
-    MergeNuisances.append(["QCDscale_ttbar", "QCDscale_ttbar_forFakeB"])
-    MergeNuisances.append(["pdf_ttbar"  , "pdf_ttbar_forFakeB"])
+MergeNuisances.append(["QCDscale_ttbar", "QCDscale_ttbar_forFakeB"])
+MergeNuisances.append(["pdf_ttbar"  , "pdf_ttbar_forFakeB"])
 
 # Correlate FakeB and GenuineB uncerainties
 MergeNuisances.append(["lumi_13TeV"       , "lumi_13TeV_forFakeB"])
 MergeNuisances.append(["CMS_eff_trg_MC"   , "CMS_eff_trg_MC_forFakeB"])
-#MergeNuisances.append(["CMS_eff_e_veto"   , "CMS_eff_e_veto_forFakeB"])
-#MergeNuisances.append(["CMS_eff_m_veto"   , "CMS_eff_m_veto_forFakeB"])
-#MergeNuisances.append(["CMS_eff_tau_veto" , "CMS_eff_tau_veto_forFakeB"])
-MergeNuisances.append(["mass_top"   , "mass_top_forFakeB"])
+MergeNuisances.append(["mass_top", "mass_top_forFakeB", "mass_top_forSingleTop"])
 MergeNuisances.append(["CMS_HPTB_mu_RF_top", "CMS_HPTB_mu_RF_top_forFakeB"])
 MergeNuisances.append(["CMS_HPTB_pdf_top", "CMS_HPTB_pdf_top_forFakeB"])
 
@@ -596,8 +459,6 @@ if not OptionShapeSystematics:
     MergeNuisances.append(["CMS_eff_b"    , "CMS_eff_b_forFakeB"])
     MergeNuisances.append(["CMS_scale_j"  , "CMS_scale_j_forFakeB"])
     MergeNuisances.append(["CMS_res_j"    , "CMS_res_j_forFakeB"])
-    MergeNuisances.append(["CMS_topreweight", "CMS_topreweight_forFakeB"])
-    #MergeNuisances.append(["CMS_HPTB_toptagging", "CMS_HPTB_toptagging_forFakeB"]) #iro
     
 #================================================================================================ 
 # Convert shape systematics to constants if asked
@@ -686,8 +547,10 @@ hLdgTopPt = ControlPlotInput(
                          "unit"               : "%s" % (uPt),
                          "log"                : True,
                          "legendPosition"     : "NE",
-                         "ratioLegendPosition": "right",
-                         "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 900.0} }
+                         "ratioLegendPosition": "SE", #"right",
+                         #"opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 900.0} }
+                         #"opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmax": 900.0}
+                         "opts"               : {"ymin": 1e-2, "ymaxfactor": 10, "xmax": 800.0}
                          },
     )
 
@@ -963,7 +826,7 @@ hLdgHiggsPt = ControlPlotInput(
                          "log"                : True,
                          "legendPosition"     : "NE",
                          "ratioLegendPosition": "right",
-                         "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 900.0} },
+                         "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}
                          },
     blindedRange=[205.0, 900.0], # specify range min,max if blinding applies to this control plot      
     flowPlotCaption  = "", # Leave blank if you don't want to include the item to the selection flow plot    
@@ -980,7 +843,7 @@ hLdgHiggsMass = ControlPlotInput(
                          "log"                : True,
                          "legendPosition"     : "NE",
                          "ratioLegendPosition": "right",
-                         "opts"               : {"ymin": 1e-2, "ymaxfactor": 10}#, "xmax": 3000.0} 
+                         "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
                          },
     blindedRange=[0.0, 2500.0], # specify range min,max if blinding applies to this control plot
     flowPlotCaption  = "", # Leave blank if you don't want to include the item to the selection flow plot    
@@ -1501,10 +1364,10 @@ if 0:
 if OptionTest:
     ControlPlots = []
     ControlPlots.append(hLdgHiggsMass)
-    ControlPlots.append(hTetrajetBjetPt)
-    ControlPlots.append(hTetrajetBjetEta)
-    ControlPlots.append(hLdgTopPt)
-    ControlPlots.append(hLdgTopMass)
-    ControlPlots.append(hMET)
-    ControlPlots.append(hHT)
-    MassPoints = [500]#, 650]
+    #ControlPlots.append(hTetrajetBjetPt)
+    #ControlPlots.append(hTetrajetBjetEta)
+    #ControlPlots.append(hLdgTopPt)
+    #ControlPlots.append(hLdgTopMass)
+    #ControlPlots.append(hMET)
+    #ControlPlots.append(hHT)
+    MassPoints = [800]

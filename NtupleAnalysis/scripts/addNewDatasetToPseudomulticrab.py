@@ -6,10 +6,17 @@ addNewDatasetToPseudomulticrab.py  -m <same_pseudo_multicrab> [opts]
 
 EXAMPLES:
 addNewDatasetToPseudomulticrab.py  -m Hplus2tbAnalysis_AfterPreapproval_TopMassLE400_BDT0p40_17July2018 --newDsetName Rares
+addNewDatasetToPseudomulticrab.py  -m Hplus2tbAnalysis_AfterPreapproval_MVA0p40_NewTopAndBugFixAndSF_FixedStdSelections_Only2CleanTopsBeforeBDT_Syst_07Jul2018 --newDsetName Rares
+addNewDatasetToPseudomulticrab.py  -m Hplus2tbAnalysis_TopMassLE400_BDT0p40_Binning4Eta5Pt_Syst_NoTopPtReweightCorrXML_10Jan2019 --newDsetName Test
+addNewDatasetToPseudomulticrab.py -m Hplus2tbAnalysis_TopMassLE400_BDT0p40_Binning4Eta5Pt_Syst_NoTopPtReweightCorrXML_10Jan2019 --newDsetName Rares --dsetsToMerge "WJetsToQQ_HT_600ToInf, DYJetsToQQHT, TTWJetsToQQ, TTZToQQ, Diboson, TTTT"
+addNewDatasetToPseudomulticrab.py -m Hplus2tbAnalysis_TopMassLE400_BDT0p40_Binning4Eta5Pt_Syst_NoTopPtReweightCorrXML_10Jan2019 --newDsetName EWK --dsetsToMerge "WJetsToQQ, DYJetsToQQHT, Diboson"
+addNewDatasetToPseudomulticrab.py -m Hplus2tbAnalysis_TopMassLE400_BDT0p40_Binning4Eta5Pt_Syst_NoTopPtReweightCorrXML_10Jan2019 --newDsetName ttX --dsetsToMerge "TTWJetsToQQ, TTZToQQ, TTTT, SingleTop"
 
 
 LAST USED:
-addNewDatasetToPseudomulticrab.py  -m Hplus2tbAnalysis_AfterPreapproval_MVA0p40_NewTopAndBugFixAndSF_FixedStdSelections_Only2CleanTopsBeforeBDT_Syst_07Jul2018 --newDsetName Rares
+addNewDatasetToPseudomulticrab.py -m SignalAnalysis_LooseTauID_NoBDTGm1p0_19July2019 --newDsetName DYJetsToLLHT --analysisName Hplus2hwAnalysisWithTop --dsetsToMerge "DYJetsToLLHT" --dsetSrc ForDataDrivenCtrlPlots --analysisNameSave Hplus2hwAnalysisWithTop
+addNewDatasetToPseudomulticrab.py -m SignalAnalysis_LooseTauID_NoBDTGm1p0_19July2019 --newDsetName Diboson --analysisName Hplus2hwAnalysisWithTop --dsetsToMerge "Diboson" --dsetSrc ForDataDrivenCtrlPlots --analysisNameSave Hplus2hwAnalysisWithTop
+addNewDatasetToPseudomulticrab.py -m SignalAnalysis_LooseTauID_NoBDTGm1p0_19July2019 --newDsetName ttX --analysisName Hplus2hwAnalysisWithTop --dsetsToMerge "ttX" --dsetSrc ForDataDrivenCtrlPlots --analysisNameSave Hplus2hwAnalysisWithTop
 
 '''
 #================================================================================================ 
@@ -237,7 +244,8 @@ class ModuleBuilder:
         self._dsetMgr.loadLuminosities()
 
         # Merge, Rename, Reorder datasets
-        plots.mergeRenameReorderForDataMC(self._dsetMgr)
+        if 1:
+            plots.mergeRenameReorderForDataMC(self._dsetMgr)
         
         # Print initial dataset info
         if opts.verbose:
@@ -376,18 +384,24 @@ class ResultManager:
     Manager class for obtaining all the required information to be saved to a pseudo-multicrab
     '''
     def __init__(self, dsetMgr, luminosity, moduleInfoString, verbose=False):
-        self._verbose      = verbose
-        self._myPlots      = []
-        self._myPlotLabels = []
-        self._folders      = self._GetAllHistogramFolders(dsetMgr)
-        self._histoPaths   = []
-        for folder in self._folders:
-            self._histoPaths.extend(self._GetHistoPaths(dsetMgr, "Data", folder) )
-        self._histoCounters = self._GetHistoPaths(dsetMgr, "Data", "counters/weighted")
+        self._verbose          = verbose
+        self._myPlots          = []
+        self._myPlotLabels     = []
+        self._folders          = self._GetAllHistogramFolders(dsetMgr)
+        self._histoPaths       = []
+        self._histoCounters    = self._GetHistoPaths(dsetMgr, "Data", "counters/weighted")
         self._moduleInfoString = moduleInfoString
+        for folder in self._folders:
+            histoList = self._GetHistoPaths(dsetMgr, "Data", folder) 
+            if histoList != None:
+                self._histoPaths.extend(histoList)
+
+        if histoList != None:
+            nHistos = len(self._histoPaths)
+        else:
+            nHistos = 0
 
         # For-Loop: All plots to consider
-        nHistos = len(self._histoPaths)
         for i, plotName in enumerate(self._histoPaths, 1):
 
             # Ensure that histograms exist && pass other sanity checks
@@ -488,14 +502,17 @@ class ResultManager:
         msg = "Obtaining all ROOT file contents for dataset %s from folder %s" % (ts + dataset + ns, ts + folderPath + ns)
         self.Verbose(msg, True)
         histoList = dsetMgr.getDataset(dataset).getDirectoryContent(folderPath)
-
+        
         if histoList == None:
-            raise Exception("%sDid not find any compatible object under dir \"%s\"" % (es, folderPath + ns) )
+            msg = "Did not find any compatible object under dir/object \"%s\"" % (folderPath) 
+            #raise Exception(es + msg + ns)
+            self.Print(es + msg + ns)
+            return []
         else:
             nHistos = len(histoList)
 
         if nHistos == 0:
-            msg = "Did not find any compatible object under dir %s" % (folderPath)
+            msg = "Did not find any compatible object under dir/object %s" % (folderPath)
             raise Exception(es + msg + ns)
 
         msg = "Found %i histograms for dataset %s" % (nHistos, dataset)
@@ -757,8 +774,8 @@ if __name__ == "__main__":
     global opts
     VERBOSE          = False
     ANALYSISNAME     = "Hplus2tbAnalysis"
-    DSETSTOREMOVE    = ["ZJetsToQQ_HT600toInf", "Charged", "QCD", "SingleTop"]
-    DSETSTOMERGE     = ["WJetsToQQ_HT_600ToInf", "DYJetsToQQHT", "TTWJetsToQQ", "TTZToQQ", "Diboson", "TTTT"]
+    DSETSTOREMOVE    = ["ZJetsToQQ_HT600toInf", "Charged", "QCD"]#, "SingleTop"]
+    DSETSTOMERGE     = "WJetsToQQ_HT_600ToInf, DYJetsToQQHT, TTWJetsToQQ, TTZToQQ, Diboson, TTTT"
     NEWDSETNAME      = "Rares" 
     ANALYSISNAMESAVE = "Hplus2tbAnalysis" # "ForFakeBMeasurement"
     SEARCHMODES      = ["80to1000"]
@@ -777,7 +794,7 @@ if __name__ == "__main__":
                       help="The optimization mode when analysis variation is enabled [default: %s]" % OPTMODE)
 
     parser.add_option("--dsetsToMerge", dest="dsetsToMerge", default=DSETSTOMERGE,
-                      help="Definition of EWK datset, i.e. datasets to be included in the merge [default: %s]" % ", ".join(DSETSTOMERGE) )
+                      help="Definition of EWK datset, i.e. datasets to be included in the merge [default: %s]" % ", ".join(DSETSTOMERGE.split(",")) )
     
     parser.add_option("--analysisName", dest="analysisName", type="string", default=ANALYSISNAME,
                       help="Override default analysisName [default: %s]" % ANALYSISNAME)
@@ -831,6 +848,8 @@ if __name__ == "__main__":
     if len(opts.dsetsToMerge) < 1:
         msg = "List of datasets to merge is empty! At least one dataset is required!"
         raise Exception(ShellStyles.ErrorLabel() + msg + ShellStyles.NormalStyle())
+    else:
+        opts.dsetsToMerge = opts.dsetsToMerge.replace(" ","").split(",")
 
     # Sanity check
     if opts.analysisName == "GenuineB":

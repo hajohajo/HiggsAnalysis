@@ -17,11 +17,14 @@ import os
 import sys
 import ROOT
 
+
 _legendLabelQCD = "QCD" 
-_legendLabelQCDdata = "Mis-ID. #tau_{h} (data)" 
+_legendLabelQCDdata = "Mis-ID. #tau_{h} (data)"
 _legendLabelEmbedding = "EWK+t#bar{t} with #tau_{h} (data)"
 _legendLabelEWKFakes = "EWK+t#bar{t} no #tau_{h} (sim.)"
 #_legendLabelEWKFakes = "EWK+tt with e/#mu/jet#rightarrow#tau_{h} (sim.)"
+
+#print "testataanpas: ", _legendLabelQCDdata 
 
 drawPlot = plots.PlotDrawer(ratio=True, ratioYlabel="Data/Bkg. ", ratioCreateLegend=True,
                             ratioType="errorScale", ratioErrorOptions={"numeratorStatSyst": False},
@@ -36,8 +39,7 @@ drawPlot2D = plots.PlotDrawer(opts2={"ymin": 0.5, "ymax": 1.5},
                             cmsTextPosition="outframe")
 ##
 class ControlPlotMaker:
-    ## Constructor
-    def __init__(self, opts, config, dirname, luminosity, observation, datasetGroups):
+    def __init__(self, opts, config, dirname, luminosity, observation, datasetGroups, verbose=False):
         plots._legendLabels["MCStatError"] = "Bkg. stat."
         plots._legendLabels["MCStatSystError"] = "Bkg. stat.#oplussyst."
         plots._legendLabels["BackgroundStatError"] = "Bkg. stat. unc"
@@ -99,14 +101,18 @@ class ControlPlotMaker:
                                 else:
                                     hSignal.Add(h)
                             elif c.typeIsQCDinverted():
+				print "------------"
+				print "ollaanko nyt vaarassa paikassa"
                                 if hQCDdata == None:
                                     hQCDdata = h.Clone()
                                 else:
                                     hQCDdata.Add(h)
                             elif c.typeIsQCD():
                                 if hQCD == None:
+				    print "hQCD add kai onnistuu"
                                     hQCD = h.Clone()
                                 else:
+				    print "hQCD add onnistuu"
                                     hQCD.Add(h)
                             elif c.typeIsEWK():
                                 #print "EWK genuine:",c.getLabel(),h.getRootHisto().Integral(0,h.GetNbinsX()+2)

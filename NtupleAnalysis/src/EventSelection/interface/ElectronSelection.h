@@ -5,6 +5,7 @@
 #include "EventSelection/interface/BaseSelection.h"
 #include "DataFormat/interface/Electron.h"
 #include "Framework/interface/EventCounter.h"
+#include "Framework/interface/GenericScaleFactor.h"
 
 #include <string>
 #include <vector>
@@ -73,29 +74,38 @@ private:
   void initialize(const ParameterSet& config, const std::string& postfix);
   /// The actual selection
   Data privateAnalyze(const Event& iEvent);
+
+  bool passTrgMatching(const Electron& electron, std::vector<math::LorentzVectorT<double>>& trgElectrons) const;
   /// Return MVA decision based on MVA Cut
   bool getMVADecision(const Electron& ele, const std::string mvaCut);
   
   // Input parameters
-  const double fElectronPtCut;
-  const double fElectronEtaCut;
+  bool  cfg_ApplyTriggerMatching;
+  float cfg_TriggerMatchingCone;
+  const double cfg_ElectronPtCut;
+  const double cfg_ElectronEtaCut;
+  const std::string cfg_ElectronMVACut;
   float fRelIsoCut;
   float fMiniIsoCut;
   bool fVetoMode;
   bool fMiniIsol;
   bool fElectronMVA;
-  const std::string fElectronMVACut;
   
   // Event counter for passing selection
   Count cPassedElectronSelection;
   // Sub counters
   Count cSubAll;
+  Count cSubPassedIsPresent;
+  Count cSubPassedTriggerMatching;
   Count cSubPassedPt;
   Count cSubPassedEta;
   Count cSubPassedID;
   Count cSubPassedIsolation;
+  Count cSubPassedSelection;
+  Count cSubPassedVeto;
   
   // Histograms
+  WrappedTH1 *hTriggerMatchDeltaR;
   WrappedTH1 *hElectronNAll;
   WrappedTH1 *hElectronPtAll;
   WrappedTH1 *hElectronEtaAll;

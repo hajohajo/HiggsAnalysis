@@ -87,19 +87,22 @@ Taus = cms.VPSet(
 Taus_TauPOGRecommendation = cms.VPSet()
 Taus_TauPOGRecommendation.append(Taus[0].clone())
 Taus_TauPOGRecommendation[0].discriminators = cms.vstring(
-                'againstElectronLooseMVA6',                                                                                                                                                                                               
-                'againstElectronMediumMVA6',                                                                                                                                                                                              
-                'againstElectronTightMVA6',                                                                                                                                                                                               
-                'againstElectronVLooseMVA6',                                                                                                                                                                                              
-                'againstElectronVTightMVA6',                                                                                                                                                                                              
-                'againstMuonLoose3',                                                                                                                                                                                                      
-                'againstMuonTight3',                                                                                                                                                                                                      
-                'byLooseCombinedIsolationDeltaBetaCorr3Hits',                                                                                                                                                                             
-                'byMediumCombinedIsolationDeltaBetaCorr3Hits',                                                                                                                                                                            
-                'byTightCombinedIsolationDeltaBetaCorr3Hits',                                                                                                                                                                             
-                'decayModeFinding',                                                                                                                                                                                                       
+                'againstElectronLooseMVA6',
+                'againstElectronMediumMVA6',
+                'againstElectronTightMVA6',
+                'againstElectronVLooseMVA6',
+                'againstElectronVTightMVA6',
+                'againstMuonLoose3',
+                'againstMuonTight3',
+                'byLooseCombinedIsolationDeltaBetaCorr3Hits',
+                'byMediumCombinedIsolationDeltaBetaCorr3Hits',
+                'byTightCombinedIsolationDeltaBetaCorr3Hits',
+                'decayModeFinding',
                 'decayModeFindingNewDMs',
-                'byVLooseIsolationMVArun2v1DBoldDMwLT'
+                'byVLooseIsolationMVArun2v1DBoldDMwLT',
+                'byLooseIsolationMVArun2v1DBoldDMwLT',
+                'byMediumIsolationMVArun2v1DBoldDMwLT',
+                'byTightIsolationMVArun2v1DBoldDMwLT'
 )
 
 TausNoSysVariations = cms.VPSet()

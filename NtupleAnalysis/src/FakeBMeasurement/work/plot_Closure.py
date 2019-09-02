@@ -354,7 +354,7 @@ def PlotComparison(datasetsMgr, hBaseline, hInverted, ext):
         savePath = os.path.join(opts.saveDir, "MC", opts.optMode)
     else:
         savePath = os.path.join(opts.saveDir, opts.optMode)
-    SavePlot(p, saveName, savePath, saveFormats = [".png", ".pdf"])
+    SavePlot(p, saveName, savePath, saveFormats = [".C", ".png", ".pdf"])
     return
 
 def GetHistoKwargs(histoName, ext, opts):

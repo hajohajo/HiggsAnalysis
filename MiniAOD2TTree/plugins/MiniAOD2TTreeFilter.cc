@@ -93,15 +93,6 @@ MiniAOD2TTreeFilter::MiniAOD2TTreeFilter(const edm::ParameterSet& iConfig) :
       std::cout << "Config: JetDumper ignored, because 'Jets' is missing from config" << std::endl;
     }
 
-    fatJetDumper = 0;
-    if (iConfig.exists("FatJets")) {
-      fatJetCollections = iConfig.getParameter<std::vector<edm::ParameterSet>>("FatJets");
-      fatJetDumper = new FatJetDumper(consumesCollector(), fatJetCollections);
-      fatJetDumper->book(Events);
-    } else {
-      std::cout << "Config: FatJetDumper ignored, because 'FatJets' is missing from config" << std::endl;
-    }
-    
     softBTagDumper = 0;
     if (iConfig.exists("SoftBTag")) {
       std::cout << "SoftBTag exists!" << std::endl;
@@ -205,13 +196,16 @@ bool MiniAOD2TTreeFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSet
 	accept = accept && tauDumper->fill(iEvent,iSetup);
         if (trgDumper) trgDumper->triggerMatch(trigger::TriggerTau,tauDumper->selected());
     }
-    if (electronDumper) accept = accept && electronDumper->fill(iEvent,iSetup);
+    if (electronDumper) {
+      accept = accept && electronDumper->fill(iEvent,iSetup);
+      //if (trgDumper) trgDumper->triggerMatch(trigger::TriggerElectron,electronDumper->selected());
+      if (trgDumper) trgDumper->triggerMatch(trigger::TriggerCluster,electronDumper->selected());
+    }
     if (muonDumper) {
 	accept = accept && muonDumper->fill(iEvent,iSetup);
 	if (trgDumper) trgDumper->triggerMatch(trigger::TriggerMuon,muonDumper->selected());
     }
     if (jetDumper) accept = accept && jetDumper->fill(iEvent,iSetup);
-    if (fatJetDumper) accept = accept && fatJetDumper->fill(iEvent, iSetup);
     if (softBTagDumper) accept = accept && softBTagDumper->fill(iEvent,iSetup);
     if (topDumper) accept = accept && topDumper->fill(iEvent,iSetup);
     if (metDumper) accept = accept && metDumper->fill(iEvent,iSetup);
@@ -233,7 +227,6 @@ void MiniAOD2TTreeFilter::reset(){
     if (electronDumper) electronDumper->reset();
     if (muonDumper) muonDumper->reset();
     if (jetDumper) jetDumper->reset();
-    if (fatJetDumper) fatJetDumper->reset();
     if (topDumper) topDumper->reset();
     if (metDumper) metDumper->reset();
     if (genMetDumper) genMetDumper->reset();

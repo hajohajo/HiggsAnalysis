@@ -112,6 +112,16 @@ class TriggerDumper {
         std::vector<double> HLTTau_phi;
         std::vector<double> HLTTau_e;
 
+	std::vector<double> HLTMuon_pt;
+        std::vector<double> HLTMuon_eta;
+        std::vector<double> HLTMuon_phi;
+        std::vector<double> HLTMuon_e;
+
+        std::vector<double> HLTElectron_pt;
+        std::vector<double> HLTElectron_eta;
+        std::vector<double> HLTElectron_phi;
+        std::vector<double> HLTElectron_e;
+
         //std::vector<double> HLTJet_pt;
         //std::vector<double> HLTJet_eta;
         //std::vector<double> HLTJet_phi;

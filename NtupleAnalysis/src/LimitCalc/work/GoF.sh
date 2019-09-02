@@ -63,14 +63,16 @@ fi
 #====================================================================================================
 # Define Variables
 #====================================================================================================
-nToys=10000
-nJobs=50
-queue="8nm"
+nToys=10000 # DO NOT CHANGE! Somehow affects GoF results ("nToys" value hard-coded somewhere in GoF.py?)
+nJobs=50    # DO NOT CHANGE! Somehow affects GoF results ("nJobs" value hard-coded somewhere in GoF.py?)
 toysPerJob=$((nToys/nJobs))
 datacard="combine_datacard_hplushadronic_m${1}.txt"
 rootfile="combine_histograms_hplushadronic_m${1}.root"
 algorithm=${2} # "saturated", "KS" (Kolmogorov-Smirnov), AD (Anderson-Darling)
 dirname="GoF_${algorithm}"
+jobMode=condor # interactive,script,lxbatch,SGE,condor,crab3 (NOTE: LXBATCH is decommissioned)
+#subOpts="+JobFlavour=\"workday\"\n RequestCpus = 2" # https://hypernews.cern.ch/HyperNews/CMS/get/higgs-combination/1170/1.html
+subOpts="+JobFlavour=\"workday\"\nRequestCpus=2" # https://hypernews.cern.ch/HyperNews/CMS/get/higgs-combination/1170/1.html
 
 echo "=== Run GoF for $nToys toys over $nJobs for card $1 (#toys per job = $toysPerJob)"
 
@@ -92,11 +94,11 @@ echo "=== Submit job for toys (`pwd`)"
 for (( t=1; t<=$nJobs; t++ ))
 do
     echo "=== Submit job for toys $t/$nJobs"
-    combineTool.py -m ${1} -M GoodnessOfFit --algorithm ${algorithm} ${datacard} -t $toysPerJob --job-mode lxbatch --sub-opts="-q 8nm" --task-name $t -n toys$t --seed "$((123456*$t))"
+    combineTool.py -m ${1} -M GoodnessOfFit --algorithm ${algorithm} ${datacard} -t $toysPerJob --job-mode $jobMode --sub-opts=${subOpts} --task-name $t -n toys$t --seed "$((123456*$t))"
 done
 
 echo "=== Run job on data:(`pwd`)"
-combineTool.py -m ${1} -M GoodnessOfFit --algorithm ${algorithm} ${datacard} -t 0 -n Data
+# combineTool.py -m ${1} -M GoodnessOfFit --algorithm ${algorithm} ${datacard} -t 0 -n Data
 cd ..
 
 echo "=== Done"

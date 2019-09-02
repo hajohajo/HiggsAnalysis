@@ -30,12 +30,12 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 #       '/store/data/Run2016H/Tau/MINIAOD/03Feb2017_ver2-v1/100000/00A17AC6-8AEB-E611-9A86-A0369F83627E.root',
 #       '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/150/00000/64EFFDF2-D719-E611-A0C3-02163E01421D.root',
-#       '/store/mc/RunIISummer16MiniAODv2/ChargedHiggs_HplusTB_HplusToTauNu_M-200_13TeV_amcatnlo_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/066DC28C-02CB-E611-B4F0-5065F382B2D1.root'
-	'/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0693E0E7-97BE-E611-B32F-0CC47A78A3D8.root'
+       '/store/mc/RunIISummer16MiniAODv2/ChargedHiggs_HplusTB_HplusToTauNu_M-200_13TeV_amcatnlo_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/066DC28C-02CB-E611-B4F0-5065F382B2D1.root'
+#	'/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0693E0E7-97BE-E611-B32F-0CC47A78A3D8.root'
     )
 )
-from H200_Pythia8 import source
-process.source = source
+#from H200_Pythia8 import source
+#process.source = source
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
@@ -54,6 +54,8 @@ process.load("HiggsAnalysis/MiniAOD2TTree/Top_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/MET_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/METNoiseFilter_cfi")
 process.METNoiseFilter.triggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getMETFilteringProcess()))
+
+process.load("HiggsAnalysis.MiniAOD2TTree.SignalAnalysisSkim_cfi")
 
 process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
     OutputFileName = cms.string("miniaod2tree.root"),
@@ -76,15 +78,7 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
     ),
     Trigger = cms.PSet(
 	TriggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getTriggerProcess())),
-	TriggerBits = cms.vstring(
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_MET80_v",
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90_v",
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_MET110_v",
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v",
-            "HLT_VLooseIsoPFTau120_Trk50_eta2p1_v",
-            "HLT_VLooseIsoPFTau140_Trk50_eta2p1_v",
-            "HLT_LooseIsoPFTau50_Trk30_eta2p1_v"
-        ),
+        TriggerBits = process.skim.HLTPaths,
 	L1Extra = cms.InputTag("l1extraParticles:MET"),
 	L1TauObjects = cms.InputTag("caloStage2Digis:Tau"),
         L1EtSumObjects = cms.InputTag("caloStage2Digis:EtSum"),
@@ -125,7 +119,7 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
             branchname = cms.untracked.string("genParticles"),
             src = cms.InputTag("prunedGenParticles"),
             saveAllGenParticles = cms.untracked.bool(True),
-            saveGenBooleans     = cms.untracked.bool(False),
+            saveGenBooleans     = cms.untracked.bool(True),
             saveGenStatusFlags  = cms.untracked.bool(False),
 #            saveGenElectrons = cms.untracked.bool(True),
 #            saveGenMuons = cms.untracked.bool(True),
@@ -150,7 +144,6 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
 )
 
 # === Setup skim counters
-process.load("HiggsAnalysis.MiniAOD2TTree.SignalAnalysisSkim_cfi")
 process.skimCounterAll        = cms.EDProducer("HplusEventCountProducer")
 process.skimCounterPassed     = cms.EDProducer("HplusEventCountProducer")
 process.skim.TriggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getTriggerProcess()))

@@ -1994,7 +1994,7 @@ class SimpleCounter:
         if self.counter != None:
             raise Exception("Can't normalize after the counters have been created!")
         if self.datasetRootHisto.getDataset().isMC():
-            self.datasetRootHisto.normalizeToLuminosity(lumi)
+	    self.datasetRootHisto.normalizeToLuminosity(lumi)
 
     ## Scale (multiply) the counter with a value
     def scale(self, value):

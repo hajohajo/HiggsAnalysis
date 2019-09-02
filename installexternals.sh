@@ -8,10 +8,10 @@ fi
 if [ ! -e ./NtupleAnalysis/external/boost ]; then
   echo "Getting and installing boost"
   cd ./NtupleAnalysis/external
-  wget http://sourceforge.net/projects/boost/files/boost/1.57.0/boost_1_57_0.tar.gz
-  tar xfz boost_1_57_0.tar.gz
-  rm boost_1_57_0.tar.gz
-  ln -s boost_1_57_0/boost boost
+  wget http://sourceforge.net/projects/boost/files/boost/1.70.0/boost_1_70_0.tar.gz
+  tar xfz boost_1_70_0.tar.gz
+  rm boost_1_70_0.tar.gz
+  ln -s boost_1_70_0/boost boost
   cd ../..
   echo "... boost installed"
   echo "Please recompile your code"

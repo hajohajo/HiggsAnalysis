@@ -43,7 +43,7 @@ struct TrijetSelection{
   std::vector<Jet> Jet1;
   std::vector<Jet> Jet2;
   std::vector<Jet> BJet;
-  std::vector<double> MVA;
+  std::vector<double> BDTG;
   std::vector<math::XYZTLorentzVector> TrijetP4;
   std::vector<math::XYZTLorentzVector> DijetP4; 
   std::vector<bool> isGenuine;
@@ -54,7 +54,7 @@ struct SelectedTrijets{
   Jet Jet1;
   Jet Jet2;
   Jet BJet;
-  double MVA;
+  double BDTG;
   math::XYZTLorentzVector TrijetP4;
   math::XYZTLorentzVector DijetP4;
   bool isGenuine;
@@ -73,168 +73,57 @@ public:
     ~Data();
 
     // Status of passing event selection
-    bool passedSelection() const { return bPassedSelection; }    
-    // Status of passing presence of any two tops (with BDT > -1.0) and free b-jet
-    bool passedAnyTwoTopsAndFreeB() const { return bHasTwoTopsAndFreeB;}
-    // Status of passing both MVA cuts
-    bool passedBothMVA() const { return bPassedBothMVA; }
-    // Status of passing MVA cut on ldg MVA top
-    bool passedLdgMVA() const { return bPassedLdgMVA; }
-    // Status of passing MVA cut on subldg MVA top
-    bool passedSubldgMVA() const { return bPassedSubldgMVA; }
+    bool passedMVACut() const { return bPassedBDTGCut; } // for historic reasons (+ backgwards compatibility)
+    bool passedBDTGCut() const { return bPassedBDTGCut; }
+    bool passedNTopsCut() const { return bPassedNTopsCut; }
+    bool passedSelection() const { return bPassedSelection; }
 
-    /// Status of GenuineB event (if false event is FakeB)
-    bool hasFreeBJet() const { return bHasFreeBJet; }
-    // Trijet-1
-    const float getMVAmax1() const { return fMVAmax1; }
-    const Jet getTrijet1Jet1() const { return fTrijet1Jet1; } 
-    const Jet getTrijet1Jet2() const { return fTrijet1Jet2; } 
-    const Jet getTrijet1BJet() const { return fTrijet1BJet; } 
-    const math::XYZTLorentzVector getTrijet1DijetP4() const {return fTrijet1Dijet_p4; }
-    const math::XYZTLorentzVector getTriJet1() const {return fTrijet1_p4; }
-    // Trijet-2
-    const float getMVAmax2() const { return fMVAmax2; }
-    const Jet getTrijet2Jet1() const { return fTrijet2Jet1; } 
-    const Jet getTrijet2Jet2() const { return fTrijet2Jet2; } 
-    const Jet getTrijet2BJet() const { return fTrijet2BJet; } 
-    const math::XYZTLorentzVector getTrijet2Dijet() const {return fTrijet2Dijet_p4; }
-    const math::XYZTLorentzVector getTriJet2() const {return fTrijet2_p4; }
-    // Leading/Subleading Tetrajet
-    const math::XYZTLorentzVector getLdgTetrajet() const {return fLdgTetrajet_p4;} // uses ldg-trijet and tetrajetBjet (NOT the tetrajet with largest pt)
-    const math::XYZTLorentzVector getSubldgTetrajet() const {return fSubldgTetrajet_p4;}
-    const Jet getTetrajetBJet() const {return fTetrajetBJet;}
-    float getMVALdgInPt() const 
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fMVAmax1;
-      else return fMVAmax2;
-    }
-    float getMVASubldgInPt() const 
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fMVAmax2;
-      else return fMVAmax1;
-    }
-
-    // Leading/Subleading Trijet
-    const math::XYZTLorentzVector getLdgTrijet() const 
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet1_p4; 
-      else return fTrijet2_p4; 
-    }
-    const Jet getLdgTrijetBJet() const 
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet1BJet;
-      else return fTrijet2BJet;
-    }
-    const Jet getLdgTrijetJet1() const 
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet1Jet1;
-      else return fTrijet2Jet1;
-    }
-    const Jet getLdgTrijetJet2() const 
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet1Jet2;
-      else return fTrijet2Jet2;
-    }
-    const math::XYZTLorentzVector getLdgTrijetDijet() const
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet1Dijet_p4;
-      else return fTrijet2Dijet_p4;
-    }
-    const double getLdgTrijetTopMassWMassRatio() const
-    { 
-      double R = -1.0;
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) R = fTrijet1_p4.mass()/fTrijet1Dijet_p4.mass();
-      else R = fTrijet2_p4.mass()/fTrijet2Dijet_p4.mass();
-      return R;
-    }
-
-    const math::XYZTLorentzVector getSubldgTrijet() const
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet2_p4;
-      else return fTrijet1_p4; 
-    }
-    const Jet getSubldgTrijetBJet() const 
-    { 
-      if (fTrijet1_p4.pt() < fTrijet2_p4.pt()) return fTrijet1BJet;
-      else return fTrijet2BJet;
-    } 
-    const Jet getSubldgTrijetJet1() const 
-    { 
-      if (fTrijet1_p4.pt() < fTrijet2_p4.pt()) return fTrijet1Jet1;
-      else return fTrijet2Jet1;
-    }
-    const Jet getSubldgTrijetJet2() const 
-    { 
-      if (fTrijet1_p4.pt() < fTrijet2_p4.pt()) return fTrijet1Jet2;
-      else return fTrijet2Jet2;
-    }
-    const math::XYZTLorentzVector getSubldgTrijetDijet() const
-    { 
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet2Dijet_p4;
-      else return fTrijet1Dijet_p4;
-    }
-    const double getSubldgTrijetTopMassWMassRatio() const
-    { 
-      double R = -1.0;
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) R = fTrijet2_p4.mass()/fTrijet2Dijet_p4.mass();
-      else R = fTrijet1_p4.mass()/fTrijet1Dijet_p4.mass();
-      return R;
-    }
-
-    // Leading/Subleading Dijets
-    const math::XYZTLorentzVector getLdgDijet() const 
-    { 
-      if (fTrijet1Dijet_p4.pt() > fTrijet2Dijet_p4.pt()) return fTrijet1Dijet_p4; 
-      else return fTrijet2Dijet_p4; 
-    }
-    const math::XYZTLorentzVector getSubldgDijet() const 
-    {
-      if (fTrijet1Dijet_p4.pt() > fTrijet2Dijet_p4.pt()) return fTrijet2Dijet_p4; 
-      else return fTrijet1Dijet_p4;
-    }
-    
-    const float getLdgTrijetMVA() const
-    {
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fMVAmax1;
-      else return fMVAmax2;
-    }
-
-    const float getSubldgTrijetMVA() const
-    {
-      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fMVAmax2;
-      else return fMVAmax1;
-    }
+    // Trijet
+    const float getTopBDTG() const { return fTopBDTG; }
+    const Jet getTopJet1() const { return fTopJet1; } 
+    const Jet getTopJet2() const { return fTopJet2; } 
+    const Jet getTopBJet() const { return fTopBJet; } 
+    //    const math::XYZTLorentzVector getTopDijetP4() const {return fTopDijet_p4; }
+    const math::XYZTLorentzVector getTopDijet() const {return fTopDijet_p4; }
+    const math::XYZTLorentzVector getTop() const {return fTop_p4; }
 
     const std::vector<Jet>& getSelectedTopsJet1() const { return fSelectedTopsJet1; }
     const std::vector<Jet>& getSelectedTopsJet2() const { return fSelectedTopsJet2; }
     const std::vector<Jet>& getSelectedTopsBJet() const { return fSelectedTopsBJet; }
-    const std::vector<float>& getSelectedTopsMVA() const { return fSelectedTopsMVA; }
-    const size_t getSelectedTopsSize() const { return fSelectedTopsMVA.size(); }
+    const std::vector<float>& getSelectedTopsBDTG() const { return fSelectedTopsBDTG; }
+    const size_t getSelectedTopsSize() const { return fSelectedTopsBDTG.size(); }
 
     const std::vector<Jet>& getNotSelectedTopsJet1() const { return fNotSelectedTopsJet1; }
     const std::vector<Jet>& getNotSelectedTopsJet2() const { return fNotSelectedTopsJet2; }
     const std::vector<Jet>& getNotSelectedTopsBJet() const { return fNotSelectedTopsBJet; }
-    const std::vector<float>& getNotSelectedTopsMVA() const { return fNotSelectedTopsMVA; }
-    const size_t getNotSelectedTopsSize() const { return fNotSelectedTopsMVA.size(); }
+    const std::vector<float>& getNotSelectedTopsBDTG() const { return fNotSelectedTopsBDTG; }
+    const size_t getNotSelectedTopsSize() const { return fNotSelectedTopsBDTG.size(); }
 
     const std::vector<Jet>& getAllTopsJet1() const { return fAllTopsJet1; }
     const std::vector<Jet>& getAllTopsJet2() const { return fAllTopsJet2; }
     const std::vector<Jet>& getAllTopsBJet() const { return fAllTopsBJet; }
-    const std::vector<float>& getAllTopsMVA() const { return fAllTopsMVA; }
-    const size_t getAllTopsSize() const { return fAllTopsMVA.size(); }
+    const std::vector<float>& getAllTopsBDTG() const { return fAllTopsBDTG; }
+    const size_t getAllTopsSize() const { return fAllTopsBDTG.size(); }
 
     const std::vector<Jet>& getSelectedCleanedTopsJet1() const { return fSelectedCleanedTopsJet1; }
     const std::vector<Jet>& getSelectedCleanedTopsJet2() const { return fSelectedCleanedTopsJet2; }
     const std::vector<Jet>& getSelectedCleanedTopsBJet() const { return fSelectedCleanedTopsBJet; }
-    const std::vector<float>& getSelectedCleanedTopsMVA() const { return fSelectedCleanedTopsMVA; }
-    const size_t getSelectedCleanedTopsSize() const { return fSelectedCleanedTopsMVA.size(); }
+    const std::vector<float>& getSelectedCleanedTopsBDTG() const { return fSelectedCleanedTopsBDTG; }
+    const size_t getSelectedCleanedTopsSize() const { return fSelectedCleanedTopsBDTG.size(); }
 
     const std::vector<Jet>& getAllCleanedTopsJet1() const { return fAllCleanedTopsJet1; }
     const std::vector<Jet>& getAllCleanedTopsJet2() const { return fAllCleanedTopsJet2; }
     const std::vector<Jet>& getAllCleanedTopsBJet() const { return fAllCleanedTopsBJet; }
-    const std::vector<float>& getAllCleanedTopsMVA() const { return fAllCleanedTopsMVA; }
-    const size_t getAllCleanedTopsSize() const { return fAllCleanedTopsMVA.size(); }
+    const std::vector<float>& getAllCleanedTopsBDTG() const { return fAllCleanedTopsBDTG; }
+    const size_t getAllCleanedTopsSize() const { return fAllCleanedTopsBDTG.size(); }
     
+    const double getTopMassWMassRatio() const
+    { 
+      double R = fTop_p4.mass()/fTopDijet_p4.mass();
+      return R;
+    }
+
+
     /// Obtain the b-tagging event weight 
     const double getTopTaggingScaleFactorEventWeight() const { return fTopTaggingScaleFactorEventWeight; }
 
@@ -242,61 +131,44 @@ public:
 
   private:
     /// Boolean for passing selection
+    bool bPassedBDTGCut;
+    bool bPassedNTopsCut;
     bool bPassedSelection;
-    bool bHasTwoTopsAndFreeB;
-    bool bPassedBothMVA;
-    bool bPassedLdgMVA;
-    bool bPassedSubldgMVA;
+
     std::vector<Jet> fJetsUsedAsBJets;
     std::vector<Jet> fFailedBJetsUsedAsBJets;
-    bool bHasFreeBJet; // ldg in pt (free) bjet  for invariant mass reco
     /// Trijet-1
-    float fMVAmax1;
-    Jet fTrijet1Jet1;
-    Jet fTrijet1Jet2;
-    Jet fTrijet1BJet;
-    math::XYZTLorentzVector fTrijet1Dijet_p4;
-    math::XYZTLorentzVector fTrijet1_p4;
-    /// Trijet-2
-    float fMVAmax2;
-    Jet fTrijet2Jet1;
-    Jet fTrijet2Jet2;
-    Jet fTrijet2BJet;
-    math::XYZTLorentzVector fTrijet2Dijet_p4;
-    math::XYZTLorentzVector fTrijet2_p4;
-    // Tetrajet
-    Jet fTetrajetBJet;
-    math::XYZTLorentzVector fLdgTetrajet_p4;
-    math::XYZTLorentzVector fSubldgTetrajet_p4;
-    // DijetWithMinDR
-    math::XYZTLorentzVector fDijetWithMinDR_p4;
-    // DijetWithMaxDR
-    math::XYZTLorentzVector fDijetWithMaxDR_p4;
+    float fTopBDTG;
+    Jet fTopJet1;
+    Jet fTopJet2;
+    Jet fTopBJet;
+    math::XYZTLorentzVector fTopDijet_p4;
+    math::XYZTLorentzVector fTop_p4;
 
     std::vector<Jet> fSelectedTopsJet1;
     std::vector<Jet> fSelectedTopsJet2;
     std::vector<Jet> fSelectedTopsBJet;
-    std::vector<float> fSelectedTopsMVA;
+    std::vector<float> fSelectedTopsBDTG;
 
     std::vector<Jet> fNotSelectedTopsJet1;
     std::vector<Jet> fNotSelectedTopsJet2;
     std::vector<Jet> fNotSelectedTopsBJet;
-    std::vector<float> fNotSelectedTopsMVA;
+    std::vector<float> fNotSelectedTopsBDTG;
 
     std::vector<Jet> fAllTopsJet1;
     std::vector<Jet> fAllTopsJet2;
     std::vector<Jet> fAllTopsBJet;
-    std::vector<float> fAllTopsMVA;
+    std::vector<float> fAllTopsBDTG;
 
     std::vector<Jet> fSelectedCleanedTopsJet1;
     std::vector<Jet> fSelectedCleanedTopsJet2;
     std::vector<Jet> fSelectedCleanedTopsBJet;
-    std::vector<float> fSelectedCleanedTopsMVA;
+    std::vector<float> fSelectedCleanedTopsBDTG;
 
     std::vector<Jet> fAllCleanedTopsJet1;
     std::vector<Jet> fAllCleanedTopsJet2;
     std::vector<Jet> fAllCleanedTopsBJet;
-    std::vector<float> fAllCleanedTopsMVA;
+    std::vector<float> fAllCleanedTopsBDTG;
 
     // top-tagging scale factor event weight
     double fTopTaggingScaleFactorEventWeight;
@@ -354,11 +226,9 @@ private:
   bool _getIsMatchedTop(bool isMC, Jet bjet, Jet jet1, Jet jet2, TrijetSelection mcTrueTrijets);
   Jet getLeadingSubleadingJet(const Jet& jet0, const Jet& jet1, string selectedJet);
   bool isMatchedJet(const Jet& jet, const TrijetSelection& myTops, const unsigned int index);
-  TrijetSelection SortInMVAvalue(TrijetSelection TopCand);
-  bool foundFreeBjet(const Jet& trijet1Jet1, const Jet& trijet1Jet2, const Jet& trijet1BJet, const Jet& trijet2Jet1, const Jet& trijet2Jet2, const Jet& trijet2BJet , const std::vector<Jet>& bjets);
-  SelectedTrijets getLdgOrSubldgTop(TrijetSelection myTops, string selectedTrijet);
+  TrijetSelection SortInBDTGvalue(TrijetSelection TopCand);
   SelectedTrijets GetSelectedTopCandidate(TrijetSelection TopCand, int index);
-  bool TopIsCrossCleaned(int Index, TrijetSelection TopCand, const std::vector<Jet>& bjets);
+  bool TopIsCrossCleaned(int Index, TrijetSelection TopCand);
   vector<genParticle> GetGenParticles(const vector<genParticle> genParticles, const int pdgId);
   const genParticle GetLastCopy(const vector<genParticle> genParticles, const genParticle &p);
   genParticle getLeadingSubleadingParton(const genParticle& quark0, const genParticle& quark1, string selectedParton);
@@ -368,8 +238,8 @@ private:
 
  
   // Input parameters
-  const DirectionalCut<double> cfg_AnyTopMVACut;
-  const DirectionalCut<double> cfg_TopMVACut;
+  const DirectionalCut<int> cfg_NumberOfTopsCut;
+  const DirectionalCut<double> cfg_TopBDTGCut;
   const DirectionalCut<double> cfg_TopMassLowCut;
   const DirectionalCut<double> cfg_TopMassUppCut;
   const DirectionalCut<double> cfg_CSV_bDiscCut;
@@ -379,10 +249,10 @@ private:
 
   // Sub counters
   Count cSubAll;
+  Count cSubPassedJetsCut;
   Count cSubPassedBjetsCut;
-  Count cSubPassedLdgMVACut;
-  Count cSubPassedSubldgMVACut;
-  Count cSubPassedFreeBjetCut;
+  // Count cSubPassedBDTGCut;
+  Count cSubPassedNTopsCut;
   //
   Count cTopsAll;
   Count cTopsPassTopMassLowCut;
@@ -420,66 +290,23 @@ private:
   WrappedTH1 *hTopPt_AllCleanedCandidates;
   WrappedTH1 *hTopMultiplicity_AllCleanedCandidates;
 
-  // Ldg in pt free b-jet
-  WrappedTH1  *hTetrajetBJetPt;
-  WrappedTH1  *hTetrajetBJetEta;
-  WrappedTH1  *hTetrajetBJetBDisc;
-
-  // Tetrajet
-  WrappedTH1  *hTetrajetPt;
-  WrappedTH1  *hTetrajetMass;
-  WrappedTH1  *hTetrajetEta;
-
-  // Leading in pt top
-  WrappedTH1  *hLdgTrijetPt;
-  WrappedTH1  *hLdgTrijetMass;
-  WrappedTH1  *hLdgTrijetJet1Pt;
-  WrappedTH1  *hLdgTrijetJet1Eta;
-  WrappedTH1  *hLdgTrijetJet1BDisc;
-  WrappedTH1  *hLdgTrijetJet2Pt;
-  WrappedTH1  *hLdgTrijetJet2Eta;
-  WrappedTH1  *hLdgTrijetJet2BDisc;
-  WrappedTH1  *hLdgTrijetBJetPt;
-  WrappedTH1  *hLdgTrijetBJetEta;
-  WrappedTH1  *hLdgTrijetBJetBDisc;
-  WrappedTH1  *hLdgTrijetDiJetPt;
-  WrappedTH1  *hLdgTrijetDiJetEta;
-  WrappedTH1  *hLdgTrijetDiJetMass;
-  WrappedTH1  *hLdgTrijetDijetDeltaR;
-  WrappedTH1  *hLdgTrijetTopMassWMassRatio;
-  WrappedTH1  *hLdgTrijet_DeltaR_Trijet_TetrajetBjet;
-  WrappedTH1  *hLdgTrijet_DeltaEta_Trijet_TetrajetBjet;
-  WrappedTH1  *hLdgTrijet_DeltaPhi_Trijet_TetrajetBjet;
-  WrappedTH1  *hLdgTrijet_DeltaY_Trijet_TetrajetBjet;
+  WrappedTH1  *hTopPt;
+  WrappedTH1  *hTopMass;
+  WrappedTH1  *hTopJet1Pt;
+  WrappedTH1  *hTopJet1Eta;
+  WrappedTH1  *hTopJet1BDisc;
+  WrappedTH1  *hTopJet2Pt;
+  WrappedTH1  *hTopJet2Eta;
+  WrappedTH1  *hTopJet2BDisc;
+  WrappedTH1  *hTopBJetPt;
+  WrappedTH1  *hTopBJetEta;
+  WrappedTH1  *hTopBJetBDisc;
+  WrappedTH1  *hTopDiJetPt;
+  WrappedTH1  *hTopDiJetEta;
+  WrappedTH1  *hTopDiJetMass;
+  WrappedTH1  *hTopDijetDeltaR;
+  WrappedTH1  *hTopMassWMassRatio;
   
-  // Sub-Leading in pt top
-  WrappedTH1  *hSubldgTrijetPt;
-  WrappedTH1  *hSubldgTrijetMass;
-  WrappedTH1  *hSubldgTrijetJet1Pt;
-  WrappedTH1  *hSubldgTrijetJet1Eta;
-  WrappedTH1  *hSubldgTrijetJet1BDisc;
-  WrappedTH1  *hSubldgTrijetJet2Pt;
-  WrappedTH1  *hSubldgTrijetJet2Eta;
-  WrappedTH1  *hSubldgTrijetJet2BDisc;
-  WrappedTH1  *hSubldgTrijetBJetPt;
-  WrappedTH1  *hSubldgTrijetBJetEta;
-  WrappedTH1  *hSubldgTrijetBJetBDisc;
-  WrappedTH1  *hSubldgTrijetDiJetPt;
-  WrappedTH1  *hSubldgTrijetDiJetEta;
-  WrappedTH1  *hSubldgTrijetDiJetMass;
-  WrappedTH1  *hSubldgTrijetDijetDeltaR;
-  WrappedTH1  *hSubldgTrijetTopMassWMassRatio;
-  WrappedTH1  *hSubldgTrijet_DeltaR_Trijet_TetrajetBjet;
-  WrappedTH1  *hSubldgTrijet_DeltaEta_Trijet_TetrajetBjet;
-  WrappedTH1  *hSubldgTrijet_DeltaPhi_Trijet_TetrajetBjet;
-  WrappedTH1  *hSubldgTrijet_DeltaY_Trijet_TetrajetBjet;
-
-  // Histograms (2D)
-  WrappedTH2 *hDeltaR_LdgTrijet_TetrajetBjet_Vs_SubldgTrijet_TetrajetBjet;
-  WrappedTH2 *hDeltaEta_LdgTrijet_TetrajetBjet_Vs_SubldgTrijet_TetrajetBjet;
-  WrappedTH2 *hDeltaPhi_LdgTrijet_TetrajetBjet_Vs_SubldgTrijet_TetrajetBjet;
-  WrappedTH2 *hDeltaY_LdgTrijet_TetrajetBjet_Vs_SubldgTrijet_TetrajetBjet;
-
 };
 
 #endif

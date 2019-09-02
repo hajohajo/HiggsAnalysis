@@ -200,10 +200,10 @@ def main():
     allSelections.TopSelectionBDT.CSV_bDiscCutValue = 0.54 # allow CSVv2-L for inverted top
     
     # Testing
-    if 1:
+    if 0:
         msg = "WARNING! This is a simple testing of the FakeB measurement with only 1 CSVv2-M. Disable once done!"
         Print(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle(), True)
-        allSelections.FakeBMeasurement.baselineBJetsCutValue     = 1
+        allSelections.FakeBMeasurement.baselineBJetsCutValue     = 0 #1
         allSelections.FakeBMeasurement.baselineBJetsCutDirection = "=="
 
 
@@ -339,7 +339,7 @@ if __name__ == "__main__":
     NEVTS         = -1
     HISTOLEVEL    = "Debug" # 'Never', 'Systematics', 'Vital', 'Informative', 'Debug'
     PUREWEIGHT    = True
-    TOPPTREWEIGHT = True
+    TOPPTREWEIGHT = False
     DOSYSTEMATICS = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")

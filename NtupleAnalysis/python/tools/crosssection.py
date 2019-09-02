@@ -32,6 +32,8 @@ https://twiki.cern.ch/twiki/bin/view/CMS/HowToGenXSecAnalyzer#Running_the_GenXSe
 '''
 
 DEGUB = False
+SIGNALXSECTION = 1.0
+
 def Verbose(msg, printHeader=False):
     '''
     Calls Print() only if verbose options is set to true.
@@ -118,6 +120,7 @@ class CrossSectionList:
 # [19] https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopSigma
 # [20] https://github.com/UHH2/UHH2/wiki/Ntuple-Production-(Run-II,-2nd-round,-50ns)
 # [21] CMS AN2018_042_v4, Table 3
+# [22] https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#HTT
 
 backgroundCrossSections = CrossSectionList(
     CrossSection("QCD_Pt_15to30", {
@@ -223,8 +226,9 @@ backgroundCrossSections = CrossSectionList(
     CrossSection("WW", {
             "7": 43.0, # [3]
             "8": 54.838, # [9], took value for CTEQ PDF since CTEQ6L1 was used in pythia simulation
-            #"13": 64.46, # [13] from Andrea: WW -> lnqq : 52pb + WW -> lnln : 12.46pb
+#            "13": 64.46, # [13] from Andrea: WW -> lnqq : 52pb + WW -> lnln : 12.46pb
             "13": 118.7, # [13] from Andrea: WW -> lnqq : 52pb + WW -> lnln : 12.46pb
+
             }),
     CrossSection("WWToLNuQQ", {
             "13": 49.997, #[17] 
@@ -382,7 +386,7 @@ backgroundCrossSections = CrossSectionList(
             #}),
     CrossSection("WJetsToLNu", {
             "13": 20508.9*3, # [13,17] 20508.9*3, McM for the MLM dataset: 5.069e4
-            }),
+	    }),
     CrossSection("WJetsToLNu_HT_0To70", {
             "13": 20508.9*3, # set to inclusive xsect as HT_0To70 is skimmed from the inclusive sample
             }),
@@ -692,6 +696,21 @@ backgroundCrossSections = CrossSectionList(
     CrossSection("TTZToQQ", {
             "13": 5.297e-01, #5.297e-01 +- 7.941e-04 pb [16] (inputFiles="204FB864-5D1A-E611-9BA7-001E67A3F49D.root")
             }),
+    CrossSection("TTZToLLNuNu_M_10", {
+            "13": 0.2529, # [22]
+            }),
+    CrossSection("ttHJetTobb_M125", {
+            "13": 0.2934, # [22] (NNLO)
+            }),
+    CrossSection("ttHJetToNonbb_M125", {
+            "13": 0.2151, # [22] (NNLO QCD and NLO EW)
+            }),
+    CrossSection("ttHJetToTT_M125", {
+            "13": 0.0321, # [22]
+            }),
+    CrossSection("ttHJetToGG_M125", {
+            "13": 0.0012, # [22]
+            }),
     CrossSection("WJetsToQQ_HT_600ToInf", {
             "13": 9.936e+01, #9.936e+01 +- 4.407e-01 pb [16] (inputFiles="0EA1D6CA-931A-E611-BFCD-BCEE7B2FE01D.root")
             }),
@@ -715,12 +734,15 @@ def setBackgroundCrossSections(datasets, doWNJetsWeighting=True, quietMode=False
     for dset in datasets.getMCDatasets():
         setBackgroundCrossSectionForDataset(dset, doWNJetsWeighting, quietMode)
 
+def getSignalCrossSection():
+    return SIGNALXSECTION
+
 def setBackgroundCrossSectionForDataset(dataset, doWNJetsWeighting=True, quietMode=False):
     datasetName = dataset.getName().split("_ext", 1)[0] #use only the first part of dataset name, before "_ext"
     value = backgroundCrossSections.crossSection(datasetName, dataset.getEnergy())
     if value is None:
         if "ChargedHiggs" in dataset.getName() or "HplusToTauNu" in dataset.getName():
-            value = 1.0 # Force signal xsection to 1 pb
+            value = SIGNALXSECTION #1.0 # Force signal xsection to 1 pb
         else:
             for wnJets in ["W1Jets", "W2Jets", "W3Jets", "W4Jets"]:
                 if wnJets in dataset.getName():

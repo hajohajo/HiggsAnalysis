@@ -10,6 +10,7 @@ void METFilterGenerated::setupBranches(BranchManager& mgr) {
   mgr.book("METFilter_Flag_HBHENoiseFilter", &fFlag_HBHENoiseFilter);
   mgr.book("METFilter_Flag_HBHENoiseIsoFilter", &fFlag_HBHENoiseIsoFilter);
   mgr.book("METFilter_Flag_eeBadScFilter", &fFlag_eeBadScFilter);
+  mgr.book("METFilter_Flag_globalSuperTightHalo2016Filter", &fFlag_globalSuperTightHalo2016Filter);
   mgr.book("METFilter_Flag_globalTightHalo2016Filter", &fFlag_globalTightHalo2016Filter);
   mgr.book("METFilter_Flag_goodVertices", &fFlag_goodVertices);
   mgr.book("METFilter_badChargedCandidateFilter", &fBadChargedCandidateFilter);

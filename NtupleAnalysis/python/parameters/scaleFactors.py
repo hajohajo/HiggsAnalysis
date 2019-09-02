@@ -1,3 +1,25 @@
+''''
+DESCRIPTION:
+This file contains all the scale factors and their uncertainties used in the analysis.
+There are two types of scale factors:
+  1) simple scale factors (such as fake tau uncertainty)
+  2) scale factors as function of some variable (such as b tag uncertainties)
+Both are supplied as config parameters, but the type (2) SF's are accessed 
+via GenericScaleFactor c++ class, which causes some naming scheme rules.
+
+Examples of scale factors that are used in the various analyses:
+Triggers (Jet, Electron, Muon)
+Tau ID
+Tau mis-ID
+B tagging
+Top tagging
+etc..
+
+'''
+
+#================================================================================================  
+# Imports
+#================================================================================================  
 from HiggsAnalysis.NtupleAnalysis.main import PSet
 import json
 import csv
@@ -5,8 +27,14 @@ import os
 import sys
 import math
 
+#================================================================================================
+# Global Definition
+#================================================================================================
 DEBUG = False
 
+#================================================================================================
+# Function Definition
+#================================================================================================
 def Print(msg, printHeader=False):
     fName = __file__.split("/")[-1]
     if printHeader==True:
@@ -26,32 +54,26 @@ def Verbose(msg, printHeader=False):
         print "\t", msg
     return
 
-# This file contains all the scale factors and their uncertainties used in the analysis
-# There are two types of scale factors:
-#   1) simple scale factors (such as fake tau uncertainty)
-#   2) scale factors as function of some variable (such as b tag uncertainties)
-# Both are supplied as config parameters, but the type (2) SF's are accessed 
-# via GenericScaleFactor c++ class, which causes some naming scheme rules
-
-# Tau ID efficiency scale factor
-# https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV
 def assignTauIdentificationSF(tauSelectionPset):
+    '''
+    Tau ID efficiency scale factor
+    https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV
+    '''
     SF = 1.0
-    if tauSelectionPset.isolationDiscr=="byLooseCombinedIsolationDeltaBetaCorr3Hits":    SF = 0.93
+    if   tauSelectionPset.isolationDiscr=="byLooseCombinedIsolationDeltaBetaCorr3Hits":  SF = 0.93
     elif tauSelectionPset.isolationDiscr=="byMediumCombinedIsolationDeltaBetaCorr3Hits": SF = 0.91
     elif tauSelectionPset.isolationDiscr=="byTightCombinedIsolationDeltaBetaCorr3Hits":  SF = 0.89
     elif tauSelectionPset.isolationDiscr=="byVLooseIsolationMVArun2v1DBoldDMwLT":        SF = 0.99
     elif tauSelectionPset.isolationDiscr=="byLooseIsolationMVArun2v1DBoldDMwLT":         SF = 0.99
     elif tauSelectionPset.isolationDiscr=="byMediumIsolationMVArun2v1DBoldDMwLT":        SF = 0.97
     elif tauSelectionPset.isolationDiscr=="byTightIsolationMVArun2v1DBoldDMwLT":         SF = 0.95
+    elif tauSelectionPset.isolationDiscr=="byVTightIsolationMVArun2v1DBoldDMwLT":        SF = 0.93
     else:
-        raise Exception("Error: tau ID scale factor not defined for discriminator %s"%tauSelectionPset.isolationDiscr)
+        msg = "Error: tau ID scale factor not defined for discriminator %s"%tauSelectionPset.isolationDiscr
+        raise Exception(msg)
     tauSelectionPset.tauIdentificationSF = SF
+    return
 
-##===== Tau misidentification (simple SF)
-# \param tauSelectionPset  the tau config PSet
-# \param partonFakingTau   "eToTau", "muToTau", "jetToTau"
-# \param direction         "nominal, "up", "down"
 def assignTauMisidentificationSF(tauSelectionPset, partonFakingTau, direction):
     dirNumber = 0
     if direction == "up":
@@ -101,27 +123,26 @@ def assignMisIDSF(pset, direction, jsonfile, variationType="MC"):
         raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
     return
 
-##===== tau trigger SF (SF as function of pT)
-# \param tauSelectionPset  the tau config PSet
-# \param direction         "nominal, "up", "down"
-# \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
 def assignTauTriggerSF(tauSelectionPset, direction, tauTrgJson, variationType="MC"):
+    '''
+    tau trigger SF (SF as function of pT)
+
+    \param tauSelectionPset  the tau config PSet
+    \param direction         "nominal, "up", "down"
+    \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
+    '''
     # FIXME: there is no mechanic right now to choose correct era / run range
     # FIXME: this approach works as long as there is just one efficiency for the simulated samples
-
     nprongs = "13prong"
     if tauSelectionPset.prongs == 1:
         nprongs = "1prong"
     if tauSelectionPset.prongs == 3:
         nprongs = "3prong"
 
-####    tauTrgJson = "tauLegTriggerEfficiency2015_"+nprongs+".json"
-####    tauTrgJson = "tauLegTriggerEfficiency2016_ICHEP.json"
-
-    print "Taking tau trigger eff/sf from",tauTrgJson
-
+    # tauTrgJson = "tauLegTriggerEfficiency2015_"+nprongs+".json"
+    # tauTrgJson = "tauLegTriggerEfficiency2016_ICHEP.json"
+    Print("Taking tau trigger eff/sf from %s" % (tauTrgJson), True)
     reader = TriggerSFJsonReader("2016", "runs_273150_284044", tauTrgJson)
-
     result = reader.getResult()
     if variationType == "MC":
         _assignTrgSF("tauTriggerSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], tauSelectionPset, direction)
@@ -129,22 +150,23 @@ def assignTauTriggerSF(tauSelectionPset, direction, tauTrgJson, variationType="M
         _assignTrgSF("tauTriggerSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], tauSelectionPset, direction)
     else:
         raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
+    return
 
-##===== MET trigger SF (SF as function of MET)
-# \param METSelectionPset  the MET selection config PSet
-# \param direction         "nominal, "up", "down"
-# \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
 def assignMETTriggerSF(METSelectionPset, btagDiscrWorkingPoint, direction, metTrgJson, variationType="MC"):
+    '''
+    MET trigger SF (SF as function of MET)
+    \param METSelectionPset  the MET selection config PSet
+    \param direction         "nominal, "up", "down"
+    \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
+    '''
     # FIXME: there is no mechanic right now to choose correct era / run range
     # FIXME: this approach works as long as there is just one efficiency for the simulated samples
-####    reader = TriggerSFJsonReader("2015D", "runs_256629_260627", "metLegTriggerEfficiency2015_btag%s.json"%btagDiscrWorkingPoint)
-####    reader = TriggerSFJsonReader("2016", "runs_271036_279588", "metLegTriggerEfficiency2016.json") 
+    # reader = TriggerSFJsonReader("2015D", "runs_256629_260627", "metLegTriggerEfficiency2015_btag%s.json"%btagDiscrWorkingPoint)
+    # reader = TriggerSFJsonReader("2016", "runs_271036_279588", "metLegTriggerEfficiency2016.json") 
 
 
-    print "Taking MET trigger eff/sf from",metTrgJson
-
+    Print("Taking MET trigger eff/sf from %s" % (metTrgJson), True)
     reader = TriggerSFJsonReader("2016_MET90", "runs_273150_284044", metTrgJson)
-
     result = reader.getResult()
     if variationType == "MC":
         _assignTrgSF("metTriggerSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], METSelectionPset, direction)
@@ -152,14 +174,38 @@ def assignMETTriggerSF(METSelectionPset, btagDiscrWorkingPoint, direction, metTr
         _assignTrgSF("metTriggerSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], METSelectionPset, direction)
     else:
         raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
+    return
 
-##===== Btag SF 
-# \param btagPset   PSet of btagging
-# \param btagPayloadFilename     Filename to the csv file provided by btag POG (in the data directory)
-# \param btagEfficiencyFilename  Filename to the json file produced with BTagEfficiencyAnalysis (in the data directory)
-# \param direction  "nominal"/"down"/"up"
-# \param variationInfo  "tag"/"mistag" This parameter specifies if the variation is applied for the b->b component or non-b->b component
+def assignMuonTriggerSF(muonSelectionPset, direction, muonTrgJson, variationType="Data"):
+    '''
+    Muon trigger SF (SF as function of pT)
+    \param muonSelectionPset  the muon config PSet
+    \param direction         "nominal, "up", "down"
+    \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
+    '''
+    # FIXME: there is no mechanic right now to choose correct era / run range
+    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
+
+    Print("Taking muon trigger eff/sf from" % (muonTrgJson), True)
+    reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", muonTrgJson)
+    result = reader.getResult()
+    if variationType == "MC":
+        _assignTrgSF("muonTriggerSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], muonSelectionPset, direction)
+    elif variationType == "Data":
+        _assignTrgSF("muonTriggerSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], muonSelectionPset, direction)
+    else:
+        raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
+    return
+
 def setupBtagSFInformation(btagPset, btagPayloadFilename, btagEfficiencyFilename, direction, variationInfo=None):
+    '''
+    Btag SF 
+    \param btagPset   PSet of btagging
+    \param btagPayloadFilename     Filename to the csv file provided by btag POG (in the data directory)
+    \param btagEfficiencyFilename  Filename to the json file produced with BTagEfficiencyAnalysis (in the data directory)
+    \param direction  "nominal"/"down"/"up"
+    \param variationInfo  "tag"/"mistag" This parameter specifies if the variation is applied for the b->b component or non-b->b component
+    '''
     if not variationInfo in [None, "tag", "mistag"]:
         raise Exception("Error: unknown parameter for variationInfo given (%s)! Valid options are: tag, mistag"%variationInfo)
     #print "Setting btagSF: %s, %s"%(btagPayloadFilename, btagEfficiencyFilename)
@@ -238,8 +284,10 @@ def updateTopTagSFInformationForVariations(topTagPset, direction, variationInfo=
     return
 
 
-## Helper function accessed through setupBtagSFInformation
 def _setupBtagSFDatabase(btagPset, btagPayloadFilename, direction, variationInfo):
+    '''
+    Helper function accessed through setupBtagSFInformation
+    '''
     fullname = os.path.join(os.getenv("HIGGSANALYSIS_BASE"), "NtupleAnalysis", "data", btagPayloadFilename)
     if not os.path.exists(fullname):
         raise Exception("Error: Could not find btag POG btag SF payload csv file! (tried: %s)"%fullname)
@@ -268,17 +316,17 @@ def _setupBtagSFDatabase(btagPset, btagPayloadFilename, direction, variationInfo
         raise Exception("Error: Btag working point '%s' is not defined in the look-up table!"%(btagPset.__getattr__("bjetDiscrWorkingPoint")))
     # Column names in the btag payload file
     headerColumnIndices = {
-      "OperatingPoint": None,
+      "OperatingPoint" : None,
       "measurementType": None,
-      "sysType": None,
+      "sysType"  : None,
       "jetFlavor": None,
-      "etaMin": None,
-      "etaMax": None,
-      "ptMin": None,
-      "ptMax": None,
-      "discrMin": None,
-      "discrMax": None,
-      "formula": None
+      "etaMin"   : None,
+      "etaMax"   : None,
+      "ptMin"    : None,
+      "ptMax"    : None,
+      "discrMin" : None,
+      "discrMax" : None,
+      "formula"  : None
     }
     with open(fullname, 'rb') as csvfile:
         reader = csv.reader(csvfile)
@@ -315,9 +363,12 @@ def _setupBtagSFDatabase(btagPset, btagPayloadFilename, direction, variationInfo
                  formula=row[headerColumnIndices["formula"]])
         psetList.append(p)
     btagPset.btagSF = psetList
+    return
 
-## Helper function accessed through setupBtagSFInformation
 def _setupBtagEfficiency(btagPset, btagEfficiencyFilename, direction, variationInfo):
+    '''
+    Helper function accessed through setupBtagSFInformation
+    '''
     fullname = os.path.join(os.getenv("HIGGSANALYSIS_BASE"), "NtupleAnalysis", "data", btagEfficiencyFilename)
     if not os.path.exists(fullname):
         raise Exception("Error: Could not find the btag efficiency json file! (tried: %s)"%fullname)
@@ -597,7 +648,6 @@ def _setupToptagEfficiency(topTagPset, topTagEfficiencyFilename, direction, vari
         if result["SF"][len(result["SF"])-1] < 0.00001:
             raise Exception("In file '%s' bin %s the SF is zero! Please fix!" % (fileName, pT) )
     
-
         # Define the PSet
         p = PSet(ptMin       = pTMin,
                  ptMax       = pTMax,
@@ -645,8 +695,10 @@ def readValues(inputdict, label):
     return outdict
 
 
-## Helper function
 def _assignTrgSF(name, binEdges, SF, SFup, SFdown, pset, direction):
+    '''
+    Helper function
+    '''
     if not direction in ["nominal", "up", "down"]:
         raise Exception("Error: unknown option for SF direction('%s')!"%direction)
     myScaleFactors = SF[:]
@@ -659,8 +711,82 @@ def _assignTrgSF(name, binEdges, SF, SFup, SFdown, pset, direction):
         scaleFactors = myScaleFactors
     ))
 
-## Reader for trigger SF json files
+class TriggerMuonSFJsonReader:
+    '''
+    Reader for trigger SF json files
+    '''
+    def __init__(self, era, runrange, jsonname):
+        # Read json
+        _jsonpath = os.path.join(os.getenv("HIGGSANALYSIS_BASE"), "NtupleAnalysis", "data", "TriggerEfficiency")
+        filename = os.path.join(_jsonpath, jsonname)
+        if not os.path.exists(filename):
+            raise Exception("Error: file '%s' does not exist!"%filename)
+        f = open(filename)
+        contents = json.load(f)
+        f.close()
+        # Obtain SFs
+        param = "IsoMu24_OR_IsoTkMu24_PtBins"
+        if not param in contents.keys():
+            raise Exception("Error: missing key '%s' in json '%s'! Options: %s"%(param,filename,", ".join(map(str,contents.keys()))))
+        if not "pt_ratio" in contents[param].keys():
+            print "pt_ratio missing in trg json"
+            raise Exception("Error: missing run range '%s' for data in json '%s'! Options: %s"(runrange,filename,", ".join(map(str,contents[param].keys()))))
+        datadict = self._muonReadValues(contents[param]["pt_ratio"], "data")
+        # Obtain MC efficiencies
+#        param = "mcParameters"
+#        if not param in contents.keys():
+#            raise Exception("Error: missing key '%s' in json '%s'! Options: %s"%(param,filename,", ".join(map(str,contents.keys()))))
+#        if not era in contents[param].keys():
+#            raise Exception("Error: missing era '%s' for mc in json '%s'! Options: %s"(runrange,filename,", ".join(map(str,contents[param].keys()))))
+#        mcdict = self._readValues(contents[param][era], "mc")
+        # Calculate SF's
+        keys = datadict.keys()
+#        if len(keys) != len(mcdict.keys()):
+#            raise Exception("Error: different number of bins for data and mc in json '%s'!"%filename)
+        keys.sort()
+        self.result = {}
+        self.result["binEdges"] = []
+        self.result["SF"] = []
+        self.result["SFdataUp"] = []
+        self.result["SFdataDown"] = []
+        self.result["SFmcUp"] = []
+        self.result["SFmcDown"] = []
+        i = 0
+        for key in keys:
+            if i > 0:
+                self.result["binEdges"].append(key)
+            i += 1
+            self.result["SF"].append(datadict[key]["dataSF"])
+            self.result["SFdataUp"].append(datadict[key]["dataSFup"])
+            self.result["SFdataDown"].append(datadict[key]["dataSFdown"])
+#            self.result["SFmcUp"].append(datadict[key]["dataeff"] / mcdict[key]["mceffup"])
+#            if abs(mcdict[key]["mceffdown"]) < 0.000001:
+#                raise Exception("Down variation in bin '%s' is zero in json '%s'"%(key, filename))
+#            self.result["SFmcDown"].append(datadict[key]["dataeff"] / mcdict[key]["mceffdown"])
+            # Sanity check
+#            if self.result["SF"][len(self.result["SF"])-1] < 0.000001:
+#                raise Exception("Error: In file '%s' bin %s the SF is zero! Please fix!"%(filename, key))
+    def getResult(self):
+        return self.result
+
+    def _muonReadValues(self, inputdict, label):
+        outdict = {}
+        for item in inputdict:
+            bindict = {}
+            bindict[label+"SF"] = inputdict[item]["value"]
+
+            bindict[label+"SFup"] = inputdict[item]["value"]+inputdict[item]["error"]
+            bindict[label+"SFdown"] = inputdict[item]["value"]-inputdict[item]["error"]
+
+            #pt bin lower edge
+            outdict[item.split(':')[1].split(',')[0].split('[')[1]] = bindict
+        return outdict
+
+
 class TriggerSFJsonReader:
+    '''
+    Reader for trigger SF json files
+    '''
     def __init__(self, era, runrange, jsonname):
         # Read json
         _jsonpath = os.path.join(os.getenv("HIGGSANALYSIS_BASE"), "NtupleAnalysis", "data", "TriggerEfficiency")
@@ -705,11 +831,11 @@ class TriggerSFJsonReader:
             self.result["SFdataUp"].append(datadict[key]["dataeffup"] / mcdict[key]["mceff"])
             self.result["SFdataDown"].append(datadict[key]["dataeffdown"] / mcdict[key]["mceff"])
             self.result["SFmcUp"].append(datadict[key]["dataeff"] / mcdict[key]["mceffup"])
-            if abs(mcdict[key]["mceffdown"]) < 0.00001:
+            if abs(mcdict[key]["mceffdown"]) < 0.000001:
                 raise Exception("Down variation in bin '%s' is zero in json '%s'"%(key, filename))
             self.result["SFmcDown"].append(datadict[key]["dataeff"] / mcdict[key]["mceffdown"])
             # Sanity check
-            if self.result["SF"][len(self.result["SF"])-1] < 0.00001:
+            if self.result["SF"][len(self.result["SF"])-1] < 0.000001:
                 raise Exception("Error: In file '%s' bin %s the SF is zero! Please fix!"%(filename, key))
 
     def getResult(self):
@@ -734,3 +860,18 @@ class TriggerSFJsonReader:
                 bindict[label+"effdown"] = value
             outdict[item["pt"]] = bindict
         return outdict
+
+
+def assignMisIDSF(pset, direction, jsonfile, variationType="MC"):
+    '''
+    Top-tagging
+    '''
+    reader = TriggerSFJsonReader("2016", "runs_273150_284044", jsonfile)
+    result = reader.getResult()
+    if variationType == "MC":
+        _assignTrgSF("MisIDSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], pset, direction)
+    elif variationType == "Data":
+        _assignTrgSF("MisIDSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], pset, direction)
+    else:
+        raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
+    return
