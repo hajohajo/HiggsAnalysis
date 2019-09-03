@@ -149,7 +149,7 @@ jetSelection = PSet(
               jetPtCuts = [30.0],
              jetEtaCuts = [2.1], #4.7,
      tauMatchingDeltaR  = 0.4, #0.4,
-  numberOfJetsCutValue  = 3,
+  numberOfJetsCutValue  = 2,
   numberOfJetsCutDirection = ">=", # options: ==, !=, <, <=, >, >=
             jetIDDiscr = "IDloose", # options: IDloose, IDtight, IDtightLeptonVeto
           jetPUIDDiscr = "", # does not work at the moment 
@@ -195,7 +195,7 @@ scaleFactors.setupBtagSFInformation(btagPset=bjetSelection,
 ##########
 
 metSelection = PSet(
-           METCutValue = 10.0,
+           METCutValue = 20.0,
        METCutDirection = ">", # options: ==, !=, <, <=, >, >=
   METSignificanceCutValue = -1000.0,
   METSignificanceCutDirection = ">", # options: ==, !=, <, <=, >, >=
