@@ -195,21 +195,34 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   if (muData.getSelectedMuons().size() != 1)
     return;
 
+
+  ////////////
+  // Muon ID and Trigger SF
+  ////////////
+
+  if (fEvent.isMC()) {
+    fEventWeight.multiplyWeight(muData.getMuonIDSF());
+  }
+
+  if (fEvent.isMC()) {
+    fEventWeight.multiplyWeight(muData.getMuonTriggerSF());
+  }
+
   ////////////
   // Dummy Trigger SF for first check
   ////////////
 
-  if (fEvent.isMC()) {
-    if (26 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 30) fEventWeight.multiplyWeight(0.9664);
-    if (30 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 40) fEventWeight.multiplyWeight(0.9781);
-    if (40 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 50) fEventWeight.multiplyWeight(0.9819);
-    if (50 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 60) fEventWeight.multiplyWeight(0.9822);
-    if (60 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 80) fEventWeight.multiplyWeight(0.9804);
-    if (80 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 120) fEventWeight.multiplyWeight(0.9780);
-    if (120 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 200) fEventWeight.multiplyWeight(0.9752);
-    if (200 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 500) fEventWeight.multiplyWeight(0.9704);
-
-  }
+//  if (fEvent.isMC()) {
+//    if (26 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 30) fEventWeight.multiplyWeight(0.9664);
+//    if (30 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 40) fEventWeight.multiplyWeight(0.9781);
+//    if (40 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 50) fEventWeight.multiplyWeight(0.9819);
+//    if (50 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 60) fEventWeight.multiplyWeight(0.9822);
+//    if (60 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 80) fEventWeight.multiplyWeight(0.9804);
+//    if (80 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 120) fEventWeight.multiplyWeight(0.9780);
+//    if (120 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 200) fEventWeight.multiplyWeight(0.9752);
+//    if (200 <= muData.getSelectedMuons()[0].pt() && muData.getSelectedMuons()[0].pt() < 500) fEventWeight.multiplyWeight(0.9704);
+//
+//  }
 
   hMuonPt_afterMuonSelection->Fill(muData.getSelectedMuons()[0].pt());
   hMuonEta_afterMuonSelection->Fill(muData.getSelectedMuons()[0].eta());
@@ -222,7 +235,7 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   if (!tauData.hasIdentifiedTaus())
     return;
 
-  if(tauData.getSelectedTaus().size() < 2)
+  if(tauData.getSelectedTaus().size() != 2)
     return;
 
   if(tauData.getSelectedTaus()[0].charge() == tauData.getSelectedTaus()[1].charge())
@@ -296,7 +309,8 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   // Jet selection
   ////////////
 
-  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
+  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTaus()[0],tauData.getSelectedTaus()[1]);
+//  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
   if (!jetData.passedSelection())
     return;
 
@@ -331,15 +345,15 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
 
   // check if the tau lepton that has the SS as the muon is fake or not
 
-  if (fEvent.isMC()) {
-    if (tauData.getSelectedTaus()[0].charge() != muData.getSelectedMuons()[0].charge() && tauData.getSelectedTaus()[0].isGenuineTau()) {
-      hCheck->Fill(1);
-    } else if (tauData.getSelectedTaus()[1].charge() != muData.getSelectedMuons()[0].charge() && tauData.getSelectedTaus()[1].isGenuineTau()) {
-      hCheck->Fill(1);
-    } else {
-      hCheck->Fill(-1); //tau is SS with the muon and that tau is NOT genuine
-    }
-  }
+//  if (fEvent.isMC()) {
+//    if (tauData.getSelectedTaus()[0].charge() != muData.getSelectedMuons()[0].charge() && tauData.getSelectedTaus()[0].isGenuineTau()) {
+//      hCheck->Fill(1);
+//    } else if (tauData.getSelectedTaus()[1].charge() != muData.getSelectedMuons()[0].charge() && tauData.getSelectedTaus()[1].isGenuineTau()) {
+//      hCheck->Fill(1);
+//    } else {
+//      hCheck->Fill(-1); //tau is SS with the muon and that tau is NOT genuine
+//    }
+//  }
 
 //
 
