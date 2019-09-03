@@ -1267,6 +1267,9 @@ class TableProducer:
                          "CMS_Hptntj_DY", 
                          "CMS_Hptntj_VV"]
 
+        if self._analysisType in ["HToHW"]:
+            myColumnOrder = ["Hp",  "QCDandFakeTau", "TT", "ttX", "Diboson"]
+
 
         if self._analysisType in ["HToTB"]:
             myColumnOrder = ["Hp",  "FakeB", "TT_GenuineB", "SingleTop_GenuineB"]
@@ -1373,7 +1376,41 @@ class TableProducer:
                                ["CMS_Hptntj_QCDbkg_templateFit","Fake tau template fit"],
                                ["CMS_Hptntj_QCDkbg_metshape","Fake tau MET shape"]
                                ]
-            
+
+        if self._analysisType in ["HToHW"]:
+	    myNuisanceOrder = [["CMS_eff_t","tau ID"], # first ID, then the text that goes to the table
+                               ["CMS_eff_t_highpt","high-$p_{T}$ tau ID"],        
+			       ["CMS_eff_m","muon ID"],
+                               ["CMS_eff_trg_MC","muon trigger efficiency"],
+                               ["CMS_eff_e_veto","electron veto eff."],
+#                               ["CMS_eff_m_veto","muon veto eff."],
+                               ["CMS_eff_b","b-tagging eff."],
+#                               ["CMS_fake_b","b-mistagging eff."],
+                               ["CMS_scale_t","tau energy scale"],
+                               ["CMS_scale_j","jet energy scale"],
+                               ["CMS_scale_met","MET unclustered energy scale"],
+                               ["CMS_res_j","jet energy resolution"],
+                               ["CMS_pileup","pileup reweighting"],
+                               ["CMS_HPTB_mu_PDF_HPTB", "pdf acceptance (signal)"],
+                               ["CMS_HPTB_mu_PDF_top", "pdf acceptance (top BG)"],
+                               ["CMS_HPTB_mu_PDF_ewk", "pdf acceptance (EWK BG)"],
+                               ["CMS_HPTB_mu_RF_HPTB", "RF scale acceptance (signal)"],
+                               ["CMS_HPTB_mu_RF_top", "RF scale acceptance (top BG)"],
+                               ["CMS_HPTB_mu_RF_ewk", "RF scale acceptance (EWK BG)"],
+                               ["QCDscale_ttbar", "ttbar scale"],
+                               ["pdf_ttbar", "ttbar pdf"],
+                               ["mass_top", "top mass"],
+			       ["mass_top_forSingleTop","top mass"],
+                               ["QCDscale_singleTop", "ttX scale"],
+                               ["pdf_singleTop", "ttX pdf"],
+#                               ["TTJets_scale", "TT scale"],
+#                               ["pdf_TT", "TT pdf"],
+                               ["CMS_scale_VV", "diboson scale"],
+                               ["CMS_pdf_VV", "diboson pdf"],
+                               ["lumi_13TeV","luminosity (13 TeV)"],
+                               ["CMS_FakeRate","Fake Rate measurement"]
+                               ]
+
         # Make table - The horror!
         myTable = []
         for n in myNuisanceOrder: # for each nuisance
@@ -1395,6 +1432,8 @@ class TableProducer:
                     # if column name matches to dataset group label
                     foundMatch = columnName in c.getLabel()
                     if self._analysisType in ["HToTB"] and not "Hp" in c.getLabel(): #fixme - dirty!
+                        foundMatch = (columnName == c.getLabel())
+		    if self._analysisType in ["HToHW"] and not "Hp" in c.getLabel(): #fixme - dirty!
                         foundMatch = (columnName == c.getLabel())
                     if foundMatch: 
                         # if this column+nuisance combination matches to a list, loop over the list
@@ -1515,7 +1554,10 @@ class TableProducer:
         myOutput += "\\hline\n"
         myOutput += "& Signal & Jet \to \taujet & \multicolumn{5}{c}{EWK+t\={t} genuine tau and e/\mu \to \taujet}"
         myOutput += "\n \\\\"
+
         myCaptionLine = [["","","","t\={t}","W+jets","single top","DY","Diboson"]] 
+	if self._analysisType in ["HToHW"]:
+            myCaptionLine = [["","","","t\={t}","ttX","Diboson"]]
         # Calculate dimensions of tables
         myWidths = []
         myWidths = calculateCellWidths(myWidths, myTable)
