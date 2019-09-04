@@ -12,8 +12,9 @@ if len(sys.argv) < 2:
 from HiggsAnalysis.NtupleAnalysis.main import Process, PSet, Analyzer
 from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import obtainAnalysisSuffix
 process = Process("QCDMeasurement"+obtainAnalysisSuffix(sys.argv))
-process.addDatasetsFromMulticrab(sys.argv[1], blacklist=["ChargedHiggs"])
-
+process.addDatasetsFromMulticrab(sys.argv[1], blacklist=["ChargedHiggs","QCD"])
+####process.addDatasetsFromMulticrab(sys.argv[1], whitelist=["Tau_Run2016C", "^TT$"])
+####process.addDatasetsFromMulticrab(sys.argv[1], whitelist=["ChargedHiggs_HplusTB_HplusToTauNu_M_500"])
 # Add config
 from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import allSelections,applyAnalysisCommandLineOptions,setAngularCutsWorkingPoint
 # Enable genuine tau histograms for common plots (needed for calculating N_QCD)
