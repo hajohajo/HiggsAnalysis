@@ -579,7 +579,7 @@ void QCDMeasurement::doBaselineAnalysis(const Event& event, const Tau& tau, cons
 
 //====== Top selection
   const TopSelectionBDT::Data topData = fBaselineTauTopSelection.analyze(fEvent,jetData,bjetData);
-  if(topData.getAllCleanedTopsSize() != 1) return;
+  ////  if(topData.getAllCleanedTopsSize() != 1) return;
   cBaselineTauTopCounter.increment();
   
 //====== Back-to-back angular cuts
@@ -742,7 +742,7 @@ void QCDMeasurement::doInvertedAnalysis(const Event& event, const Tau& tau, cons
 
 //====== Top selection
   const TopSelectionBDT::Data topData = fInvertedTauTopSelection.analyze(fEvent,jetData,bjetData);
-  if(topData.getAllCleanedTopsSize() != 1) return;
+  ////  if(topData.getAllCleanedTopsSize() != 1) return;
   cInvertedTauTopCounter.increment();
   
 //====== Back-to-back angular cuts

@@ -240,7 +240,7 @@ void SignalAnalysis::process(Long64_t entry) {
 
 //====== Top selection
   const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent,jetData,bjetData);
-  if(topData.getAllCleanedTopsSize() != 1) return;
+  ////  if(topData.getAllCleanedTopsSize() != 1) return;
   cTopCounter.increment();
 
   double myTransverseMass = TransverseMass::reconstruct(tauData.getSelectedTau(), METData.getMET());
