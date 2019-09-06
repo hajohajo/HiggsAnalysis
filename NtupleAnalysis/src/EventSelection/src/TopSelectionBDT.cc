@@ -34,6 +34,8 @@ TopSelectionBDT::Data::Data()
   fAllTopsJet2(),
   fAllTopsBJet(),
   fAllTopsBDTG(),
+  fAllTopsIsGenuine(),
+  fAllTopsIsTagged(),
   fSelectedCleanedTopsJet1(),
   fSelectedCleanedTopsJet2(),
   fSelectedCleanedTopsBJet(),
@@ -42,6 +44,8 @@ TopSelectionBDT::Data::Data()
   fAllCleanedTopsJet2(),
   fAllCleanedTopsBJet(),
   fAllCleanedTopsBDTG(),
+  fAllCleanedTopsIsGenuine(),
+  fAllCleanedTopsIsTagged(),
   fTopTaggingScaleFactorEventWeight(1.0)
 { }
 
@@ -787,6 +791,8 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
       output.fAllTopsJet2.push_back(fAllTops.Jet2.at(i));
       output.fAllTopsBJet.push_back(fAllTops.BJet.at(i));
       output.fAllTopsBDTG.push_back(fAllTops.BDTG.at(i));
+      output.fAllTopsIsGenuine.push_back(fAllTops.isGenuine.at(i));
+      output.fAllTopsIsTagged.push_back(fAllTops.isTagged.at(i));
     }
 
   for (size_t i = 0; i < fSelectedCleanedTops.BDTG.size(); i++)
@@ -803,6 +809,8 @@ TopSelectionBDT::Data TopSelectionBDT::privateAnalyze(const Event& event, const 
       output.fAllCleanedTopsJet2.push_back(fAllCleanedTops.Jet2.at(i));
       output.fAllCleanedTopsBJet.push_back(fAllCleanedTops.BJet.at(i));
       output.fAllCleanedTopsBDTG.push_back(fAllCleanedTops.BDTG.at(i));
+      output.fAllCleanedTopsIsGenuine.push_back(fAllCleanedTops.isGenuine.at(i));
+      output.fAllCleanedTopsIsTagged.push_back(fAllCleanedTops.isTagged.at(i));
     }
 
    //===============================================================================================

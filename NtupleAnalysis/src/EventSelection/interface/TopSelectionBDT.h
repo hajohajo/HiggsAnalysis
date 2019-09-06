@@ -43,7 +43,7 @@ struct TrijetSelection{
   std::vector<Jet> Jet1;
   std::vector<Jet> Jet2;
   std::vector<Jet> BJet;
-  std::vector<double> BDTG;
+  std::vector<float> BDTG;
   std::vector<math::XYZTLorentzVector> TrijetP4;
   std::vector<math::XYZTLorentzVector> DijetP4; 
   std::vector<bool> isGenuine;
@@ -54,7 +54,7 @@ struct SelectedTrijets{
   Jet Jet1;
   Jet Jet2;
   Jet BJet;
-  double BDTG;
+  float BDTG;
   math::XYZTLorentzVector TrijetP4;
   math::XYZTLorentzVector DijetP4;
   bool isGenuine;
@@ -103,6 +103,8 @@ public:
     const std::vector<Jet>& getAllTopsJet2() const { return fAllTopsJet2; }
     const std::vector<Jet>& getAllTopsBJet() const { return fAllTopsBJet; }
     const std::vector<float>& getAllTopsBDTG() const { return fAllTopsBDTG; }
+    const std::vector<bool>& getAllTopsIsGenuine() const { return fAllTopsIsGenuine; }
+    const std::vector<bool>& getAllTopsIsTagged() const { return fAllTopsIsTagged; }
     const size_t getAllTopsSize() const { return fAllTopsBDTG.size(); }
 
     const std::vector<Jet>& getSelectedCleanedTopsJet1() const { return fSelectedCleanedTopsJet1; }
@@ -115,6 +117,9 @@ public:
     const std::vector<Jet>& getAllCleanedTopsJet2() const { return fAllCleanedTopsJet2; }
     const std::vector<Jet>& getAllCleanedTopsBJet() const { return fAllCleanedTopsBJet; }
     const std::vector<float>& getAllCleanedTopsBDTG() const { return fAllCleanedTopsBDTG; }
+    const std::vector<bool>& getAllCleanedTopsIsGenuine() const { return fAllCleanedTopsIsGenuine; }
+    const std::vector<bool>& getAllCleanedTopsIsTagged() const { return fAllCleanedTopsIsTagged; }
+
     const size_t getAllCleanedTopsSize() const { return fAllCleanedTopsBDTG.size(); }
     
     const double getTopMassWMassRatio() const
@@ -159,7 +164,9 @@ public:
     std::vector<Jet> fAllTopsJet2;
     std::vector<Jet> fAllTopsBJet;
     std::vector<float> fAllTopsBDTG;
-
+    std::vector<bool> fAllTopsIsGenuine;
+    std::vector<bool> fAllTopsIsTagged;
+    
     std::vector<Jet> fSelectedCleanedTopsJet1;
     std::vector<Jet> fSelectedCleanedTopsJet2;
     std::vector<Jet> fSelectedCleanedTopsBJet;
@@ -169,6 +176,8 @@ public:
     std::vector<Jet> fAllCleanedTopsJet2;
     std::vector<Jet> fAllCleanedTopsBJet;
     std::vector<float> fAllCleanedTopsBDTG;
+    std::vector<bool> fAllCleanedTopsIsGenuine;
+    std::vector<bool> fAllCleanedTopsIsTagged;
 
     // top-tagging scale factor event weight
     double fTopTaggingScaleFactorEventWeight;
