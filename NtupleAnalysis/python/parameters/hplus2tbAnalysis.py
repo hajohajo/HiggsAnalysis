@@ -245,6 +245,13 @@ scaleFactors.setupToptagSFInformation(topTagPset                     = topSelect
                                       direction                      = "nominal",
                                       variationInfo                  = None)
 
+scaleFactors.setupToptagSFInformation(topTagPset                     = hplus2tbSelection, 
+                                      topTagMisidFilename            = topMisID, 
+                                      topTagEfficiencyFilename       = topTagEff,
+                                      topTagEffUncertaintiesFilename = topTagEffUnc,
+                                      direction                      = "nominal",
+                                      variationInfo                  = None)
+
 #================================================================================================
 # Common plots options
 #================================================================================================
