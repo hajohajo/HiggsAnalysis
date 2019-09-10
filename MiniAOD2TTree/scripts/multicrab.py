@@ -892,9 +892,8 @@ def GetCrabReportDictionary(datasets):
         Verbose("%s (%s/%s)" % ( GetLast2Dirs(d), index+1, len(datasets) ), True)
 
         # Check if task is in "DONE" state
-        #### Lines below disabled since they drop datasets from the report. 16012019/SLehti 
-        ####if GetTaskStatusBool(d):
-        ####    continue
+        if GetTaskStatusBool(d):
+            continue
         
         # Get the CRAB task report & add to dictionary (retrieves job output!)
         report = GetTaskReports(d, opts)
