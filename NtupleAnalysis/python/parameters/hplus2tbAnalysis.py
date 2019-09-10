@@ -160,11 +160,13 @@ topSelectionBDT = PSet(
     WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 
 )
 
-hplus2tbSelection = PSet(
+hplusSelection = PSet(
     AnyTopBDTGCutDirection   =  topSelectionBDT.AnyTopBDTGCutDirection,
     AnyTopBDTGCutValue       =  topSelectionBDT.AnyTopBDTGCutValue,
     TopBDTGCutDirection      =  topSelectionBDT.TopBDTGCutDirection,
     TopBDTGCutValue          =  topSelectionBDT.TopBDTGCutValue,
+    FreeBjetsCutValue        =  1,   # [default: 0]
+    FreeBjetsCutDirection    =  ">=" # [default: ">="]
     )
 #================================================================================================
 # FakeB Measurement Options
@@ -245,7 +247,7 @@ scaleFactors.setupToptagSFInformation(topTagPset                     = topSelect
                                       direction                      = "nominal",
                                       variationInfo                  = None)
 
-scaleFactors.setupToptagSFInformation(topTagPset                     = hplus2tbSelection, 
+scaleFactors.setupToptagSFInformation(topTagPset                     = hplusSelection, 
                                       topTagMisidFilename            = topMisID, 
                                       topTagEfficiencyFilename       = topTagEff,
                                       topTagEffUncertaintiesFilename = topTagEffUnc,
@@ -293,7 +295,7 @@ allSelections = PSet(
     BJetSelection         = bjetSelection,
     METSelection          = metSelection,
     TopSelectionBDT       = topSelectionBDT,
-    Hplus2tbSelection     = hplus2tbSelection,
+    HplusSelection        = hplusSelection,
     # FatJetSelection       = fatjetVeto,
     #FakeBMeasurement      = fakeBMeasurement,
     #FakeBBjetSelection    = fakeBBjetSelection,
