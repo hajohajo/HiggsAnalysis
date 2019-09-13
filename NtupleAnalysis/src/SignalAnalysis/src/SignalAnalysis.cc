@@ -241,17 +241,16 @@ void SignalAnalysis::process(Long64_t entry) {
 //====== Top selection
   const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent,jetData,bjetData);
   // if(topData.getAllCleanedTopsSize() != 1) return;
-  // Apply top selection
-  if (!topData.passedSelection()) return;  
+  if (!topData.passedSelection()) 
+    return;  
   cTopCounter.increment();
 
-  // // Apply top-tag SF
+  // Apply top-tag SF <--- Fix ME (implement soon)
   // if (fEvent.isMC()) 
   //   {
   //     fEventWeight.multiplyWeight(topData.getTopTaggingScaleFactorEventWeight());
   //   }
   // cTopTaggingSFCounter.increment();
-
 
   double myTransverseMass = TransverseMass::reconstruct(tauData.getSelectedTau(), METData.getMET());
 

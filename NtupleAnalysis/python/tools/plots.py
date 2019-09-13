@@ -556,11 +556,12 @@ _datasetMerge = {
     "WZ"       : "Diboson",
     "ZZ"       : "Diboson",
 
-    "ST_s_channel_4f_InclusiveDecays"        : "ttX",
-    "ST_tW_antitop_5f_inclusiveDecays"       : "ttX",
-    "ST_tW_top_5f_inclusiveDecays"           : "ttX", 
-    "ST_t_channel_antitop_4f_inclusiveDecays": "ttX",
-    "ST_t_channel_top_4f_inclusiveDecays"    : "ttX",
+    "ST_s_channel_4f_InclusiveDecays"        : "SingleTop",
+    "ST_tW_antitop_5f_inclusiveDecays"       : "SingleTop",
+    "ST_tW_top_5f_inclusiveDecays"           : "SingleTop", 
+    "ST_t_channel_antitop_4f_inclusiveDecays": "SingleTop",
+    "ST_t_channel_top_4f_inclusiveDecays"    : "SingleTop",
+
     "TTZToLLNuNu_M_10"   : "ttX",
     "TTZToQQ"            : "ttX",
     "TTWJetsToLNu"       : "ttX",

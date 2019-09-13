@@ -284,7 +284,7 @@ void TopTagSFCalculator::bookHistograms(TDirectory* dir, HistoWrapper& histoWrap
 
 // Calculate scale factors
 const float TopTagSFCalculator::calculateSF(const std::vector<math::XYZTLorentzVector> cleanTopP4, 
-					    const std::vector<double> cleanTopMVA, 
+					    const std::vector<float> cleanTopMVA, 
 					    const std::vector<bool> cleanTopIsTagged, 
 					    const std::vector<bool> cleanTopIsGenuine)
 {
