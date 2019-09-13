@@ -45,6 +45,8 @@ set DSETS = " QCD_bEnriched|ttHJetToGG|ttHJetToTT"
 ### ./plotDataMC.py --folder ForDataDrivenCtrlPlotsEWKFakeB -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 ### ./plotDataMC.py --folder ForDataDrivenCtrlPlotsEWKGenuineB -e $DSETS --ratio -s $FORMATS -m $PSEUDO_MCRAB_DIR
 
+./plotMC_ValueVsMass.py --logY --yMin 1e-3 --yMax 1.2 --refCounter "passed trigger" -m $PSEUDO_MCRAB_DIR #-s $FORMATS
+
 
 #================================================================================================
 # TH2

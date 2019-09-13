@@ -16,7 +16,10 @@ EXAMPLES:
 
 
 LAST USED:
-./plotBRLimits.py -s png --logY --relative --yMax 10 --yMin 1e-2 --url --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_NoBDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_BDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats 
+./plotBRLimits.py -s pdf,png,C --logY --relative --yMax 10 --yMin 1e-2 --url --saveDir /publicweb/a/aattikis/Combine/ --analysisType "HToHW" --dirs datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_NoBDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats,datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_BDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats
+
+Unused:
+datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_VLooseID_BDT0p40_tauLdgTrkPt20_31July2019_autoMCStats
 
 '''
 #================================================================================================
@@ -57,7 +60,7 @@ sh_w = ShellStyles.WarningStyle()
 #================================================================================================
 # Global definitions
 #================================================================================================
-styleList = [styles.Style(24, ROOT.kBlack)] + styles.getStyles()
+styleList = [styles.Style(1, ROOT.kBlack)] + [styles.Style(25, ROOT.kSpring-1)] + [styles.Style(22, ROOT.kOrange-3)] + styles.getStyles()
 
 
 #================================================================================================
@@ -146,15 +149,15 @@ def GetLabel(dirName):
     Predefined labels for datacard directories
     '''
     dirToLabelDict = {}
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_VLooseID_BDT0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-VL, p_{T}^{tk}>20, 1 top"
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_19July2019_autoMCStats"] = "HPS-L"
-    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats"] = "HPS-L, p_{T}^{tk}>20"
+    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_NoBDTGm1p0_tauLdgTrkPt20_22July2019_autoMCStats"] = "HPS-L, p_{T}^{tk}>20"                    
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_LooseTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats"] =  "HPS-L, p_{T}^{tk}>20, 1 top"
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_23July2019_autoMCStats"] = "HPS-M"
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_NoBDTGm1p0_tauLdgTrkPt20_24July2019_autoMCStats"] = "HPS-M, p_{T}^{tk}>20"
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019_autoMCStats"] = "HPS-M, p_{T}^{tk}>20, 1 top"
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_BDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-T, p_{T}^{tk}>20, 1 top"
     dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_TightTauID_NoBDTG0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-T, p_{T}^{tk}>20"
-    dirToLabelDict["datacards_HToHW_EraRun2016_Search80to1000_OptNominal_limits2019_MC_mH300to700_VLooseID_BDT0p40_tauLdgTrkPt20_31July2019_autoMCStats"] = "HPS-VL, p_{T}^{tk}>20, 1 top"
 
     dName = os.path.basename(dirName)
     if dName in dirToLabelDict.keys():
@@ -308,12 +311,21 @@ def doPlot(limits, legendLabels, graphs, name, ylabel, _opts={}, yTitle=None):
     def sty(h):
         r = h.getRootHisto()
         r.SetLineWidth(3)
-        r.SetLineStyle(ROOT.kSolid)
+        #r.SetLineStyle(ROOT.kSolid)
+        #import random
+        #r.SetLineStyle(random.randint(1,10)) #works but always different (random!)
         return
 
     # Apply style and set label
     plot.histoMgr.forEachHisto(sty)
     plot.histoMgr.setHistoLegendLabelMany(ll)
+    for i, g in enumerate(hg, 1):
+        if i < 11:
+            g.getRootHisto().SetLineStyle(i)
+        else:
+            tens, ones = divmod(i, 10)
+            g.getRootHisto().SetLineStyle(ones)
+            
 
     # Create & set legend
     nGraphs = len(graphs)
@@ -464,6 +476,7 @@ def doPlotSigmaBands(limits, legendLabels, saveName, _opts={}):
         stGen(gr)
         gr.getRootHisto().SetLineWidth(3)
         gr.getRootHisto().SetLineStyle(1)
+        #gr.getRootHisto().SetMarkerSize(2.0)
         plot.histoMgr.insertHisto(len(plot.histoMgr)-2, gr, legendIndex=len(plot.histoMgr))
         label = legendLabels[i]
         if not opts.boldText:
@@ -565,6 +578,7 @@ def doPlotOverlap(limits, paths, labels, saveName, _opts={}):
     for i, gr in enumerate(graphs, 1):
         name = gr.getName().lower()
         gr.getRootHisto().SetLineWidth(3)
+        #gr.getRootHisto().SetLineStyle(i)
 
         if "median" in name:
             gr.getRootHisto().SetLineStyle(sList[count1])

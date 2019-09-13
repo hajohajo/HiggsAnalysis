@@ -17,6 +17,11 @@ LAST USED:
 ./plotMC_ValueVsMass.py --logY --yMin 1e-3 --yMax 1.2 --refCounter "passed trigger" -m Hplus2hwAnalysisWithTop_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019
 ./plotMC_ValueVsMass.py --logY --yMin 1e-1 --yMax 1.2 --refCounter "ttree: skimCounterAll" -m Hplus2hwAnalysisWithTop_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019 --counters "ttree: skimCounterAll,ttree: skimCounterPassed,Base::AllEvents,Base::PUReweighting,Base::Prescale,Base::Weighted events with top pT,Base::Weighted events for exclusive samples,all events,passed trigger" --refCounter "ttree: skimCounterAll"
 
+./plotMC_ValueVsMass.py --yMin 0.0 --yMax 1.05 --refCounter "All events" --counters "Passed trigger matching,Passed e discr,Passed mu discr,Passed pt cut,Passed eta cut,Passed ldg.trk pt cut,Passed nprongs,Passed isolation" --counterName "tau selection ()" -m Hplus2hwAnalysisWithTop_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019
+
+#./plotMC_ValueVsMass.py --yMin 0.0 --yMax 1.05 --refCounter "All events" --counters "Passed trigger matching,Passed decay mode,Passed generic discriminators,Passed e discr,Passed mu discr,Passed pt cut,Passed eta cut,Passed ldg.trk pt cut,Passed nprongs,Passed isolation" --counterName "tau selection ()" -m Hplus2hwAnalysisWithTop_MediumTauID_BDTG0p40_tauLdgTrkPt20_30July2019
+
+
 USE WITH:
 hplusPrintCounters.py --mainCounterOnly --dataEra "Run2016" --mergeData  --includeTasks "2016|M_500" Hplus2tbAnalysis_TopMassLE400_BDT0p40_Binning4Eta5Pt_Syst_NoTopPtReweightCorrXML_10Jan2019
 
@@ -185,7 +190,7 @@ def main(opts):
 
         # Get the efficiency graphs (Efficiency Vs Cut-flow)
         hGraphList = []
-        histoName  = os.path.join(opts.folder, "counter")
+        histoName  = os.path.join(opts.folder, opts.counterName)
         hGraphList, _kwargs = GetHistoGraphs(datasetsMgr, opts.folder, histoName)
 
         # Plot the histo graphs
@@ -247,7 +252,8 @@ def GetStyle(index):
     myStyles.append(styles.qcdBEnrichedStyle)
     myStyles.append(styles.dibStyle)
     myStyles.append(styles.singleTopStyle)
-    myStyles.append(styles.wjetsStyle)
+    #myStyles.append(styles.wjetsStyle)
+    myStyles.append(styles.Style(ROOT.kFullCircle, ROOT.kAzure+8))
     myStyles.append(styles.ttStyle)
     myStyles.append(styles.qcdStyle)
     myStyles.append(styles.stsStyle)
@@ -309,6 +315,24 @@ def GetLegendNameForBinLabel(binLabel):
         #"#tau SF":
         #"Fake #tau SF":
         #"#tau DM": 
+        "All events"                         : "all", 
+        "Passed trigger matching"            : "trg-m", 
+        "Passed decay mode"                  : "DM", 
+        "Passed generic discriminators"      : "discr.", 
+        "Passed e discr"                     : "e discr.", 
+        "Passed mu discr"                    : "#mu discr.", 
+        "Passed pt cut"                      : "p_{T}", 
+        "Passed eta cut"                     : "#eta", 
+        "Passed ldg.trk pt cut"              : "p^{ldg tk}_{T}", 
+        "Passed nprongs"                     : "n-prongs", 
+        "Passed isolation"                   : "isolation", 
+        "Passed Rtau"                        : "R_{#tau}", 
+        "Passed anti-isolation"              : "anti-isolation", 
+        #"Passed anti-isolated Rtau"          : "", 
+        #"Passed tau selection and genuine"   : "", 
+        #"multiple selected taus"             : "", 
+        #"Passed anti-isolated tau selection" : "", 
+        #"multiple anti-isolated taus"        : "", 
         }
     if binLabel in binDict.keys():
         return binDict[binLabel]
@@ -339,8 +363,13 @@ def PlotHistoGraphs(hGraphList, _kwargs):
         p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerColor(ROOT.kBlue))
         p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(1.3))
         p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerStyle(ROOT.kFullCircle))
+        
+    for i, g in enumerate(hGraphList, 1):
+        if 0: #i == 0:
+            g.getRootHisto().SetMarkerStyle(0)
+        g.getRootHisto().SetLineStyle(i)
 
-    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetLineStyle(ROOT.kDotted))
+    #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetLineStyle(ROOT.kDotted))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetLineWidth(3))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(1.3))
     plots.drawPlot(p, opts.saveName, **_kwargs)
@@ -714,6 +743,7 @@ if __name__ == "__main__":
     SAVENAME     = None
     VERBOSE      = False
     FOLDER       = "counters/weighted/" #"counters"
+    COUNTERNAME  = "counter" #"tau selection ()"
     SIGNALMASS   = [300, 700]
     REFCOUNTER   = "passed trigger" #ttree: skimCounterAll"
     SKIPLIST     = ["passed METFilter selection ()", "passed PV", "Passed tau selection and genuine ()", "#tau SF", "Fake #tau SF",  
@@ -800,6 +830,9 @@ if __name__ == "__main__":
     parser.add_option("--folder", dest="folder", type="string", default = FOLDER,
                       help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOLDER) )
 
+    parser.add_option("--counterName", dest="counterName", type="string", default = COUNTERNAME,
+                      help="Counter to be plotted [default: %s]" % (COUNTERNAME) )
+
     (opts, parseArgs) = parser.parse_args()
 
     # Require at least two arguments (script-name, path to multicrab)
@@ -855,7 +888,8 @@ if __name__ == "__main__":
 
     if opts.refCounter not in opts.allCounters:
         msg = "The reference counter \"%s\" is not supported. If you are certain it exists in the ROOT files then add it to the \"myCounters\" list and re-rerun." % opts.refCounter
-        raise Exception(es + msg + ns)
+        #raw_input(es + msg +ns)
+        #raise Exception(es + msg + ns)
 
     # Set name for saving
     opts.saveName = "EffVsMass_%s" % (opts.refCounter.replace(" ", "").replace("(", "").replace(")", "").replace(":", ""))

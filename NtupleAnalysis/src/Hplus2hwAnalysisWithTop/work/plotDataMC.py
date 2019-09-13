@@ -332,12 +332,14 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +40.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
-    if "BDT" in h or "topbdt" in h.lower():
+    if "BDT" in h:# or "topbdt" in h.lower():
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": -1.0, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        #kwargs["opts"]   = {"xmin": -1.0, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": -1.0, "xmax": +0.90, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["rebinX"] = 2    
-        kwargs["xlabel"] = "BDTG scrore"
+        kwargs["xlabel"] = "BDTG score"
+        kwargs["blindingRangeString"] = "-0.5 to 1.0"
         if "BDT_Selected" in h:
             kwargs["moveLegend"] = _legNW
 
@@ -426,13 +428,14 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +15.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
 
-    if "nallcleanedtops" in h.lower():
+    if "nallcleanedtops" in h.lower() or "ntops_" in h.lower():
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "top multiplicity"
         kwargs["ylabel"] = _yLabel
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-                
+        kwargs["blindingRangeString"] = "1 to 10"
+
     if "counters" in opts.folder:
         ROOT.gStyle.SetLabelSize(16.0, "X")
         kwargs["moveLegend"] = {"dx": -0.08, "dy": 0.0, "dh": 0.1}
@@ -685,7 +688,7 @@ def GetHistoKwargs(h, opts):
             kwargs["opts"] = {"xmin": xMin, "xmax": xMax, "ymin": _yMin, "ymax": 5e9}
             #kwargs["opts"] = {"ymin": _yMin, "ymax": 5e9}
             kwargs["moveLegend"] = _legNE
-            kwargs["blindingRangeString"] = "0-100"
+            kwargs["blindingRangeString"] = "0 to 100"
         elif "jet selection" in h:
             kwargs["opts"] = {"xmin": 0.0, "xmax": 7.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         elif "tau selection" in h:
@@ -706,7 +709,7 @@ def GetHistoKwargs(h, opts):
             kwargs["opts"]   = {"ymin": 9e-4, "ymaxfactor": 3.0}
             kwargs["xlabel"] = "m_{T} (%s)" % kwargs["units"]
             kwargs["divideByBinWidth"] = True
-            kwargs["blindingRangeString"] = "199-%s" % (5000)
+            kwargs["blindingRangeString"] = "199 to %s" % (5000)
         elif "TauTau" in h:
             kwargs["rebinX"] = 5
             kwargs["opts"]   = {"xmax": 600.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -777,7 +780,7 @@ def GetHistoKwargs(h, opts):
     if "_AfterAllSelections" in h or "_AfterTopSelection" in h or "_AfterMetSelection" in h:
         if "blindingRangeString" not in kwargs:
             if "eta" not in h.lower():
-                kwargs["blindingRangeString"] = "0-%s" % (5000)
+                kwargs["blindingRangeString"] = "0 to %s" % (5000)
 
         #kwargs["ratio"] = False
 
@@ -884,8 +887,8 @@ def PlotDataMCHistograms(datasetsMgr, histoName):
 
     # Apply blinding of signal region
     if "blindingRangeString" in kwargs_:
-        startBlind = float(kwargs_["blindingRangeString"].split("-")[1])
-        endBlind   = float(kwargs_["blindingRangeString"].split("-")[0])
+        startBlind = float(kwargs_["blindingRangeString"].split(" to ")[1])
+        endBlind   = float(kwargs_["blindingRangeString"].split(" to ")[0])
         plots.partiallyBlind(p, maxShownValue=startBlind, minShownValue=endBlind, invert=True, moveBlindedText=kwargs_["moveBlindedText"])
 
     # Draw and save the plot
