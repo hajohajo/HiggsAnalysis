@@ -72,6 +72,10 @@ class PSet:
             setattr(pset, key, value)
         return pset
 
+    def write(self,filename):
+        with open(filename, 'w') as outfile:
+            json.dump(self._asDict(), outfile, sort_keys=True, indent=2)
+
     def __getattr__(self, name):
         return self._data[name]
 
@@ -149,6 +153,9 @@ class Analyzer:
 
     def config_(self):
         return self.__dict__["_pset"].serialize_()
+
+    def config(self):
+        return self.__dict__["_pset"]
 
 #================================================================================================
 # Class Definition
@@ -480,6 +487,7 @@ class Process:
         if self._outputPostfix != "":
             outputDir += "_"+self._outputPostfix
 
+        config = None
         # Create output directory
         os.mkdir(outputDir)
         self.Print("Created output directory %s" % (sh_Note + outputDir + sh_Normal), True)
@@ -573,6 +581,7 @@ class Process:
                         if not isinstance(analyzer, Analyzer):
                             raise Exception("Analyzer %s was specified as a function, but returned object of %s instead of Analyzer" % (aname, analyzer.__class__.__name__))
                     inputList.Add(ROOT.TNamed("analyzer_"+aname, analyzer.className_()+":"+analyzer.config_()))
+                    config = analyzer.config()
                     # ttbar status for top pt corrections
                     ttbarStatus = "0"
                     useTopPtCorrection = analyzer.exists("useTopPtWeights") and analyzer.__getattr__("useTopPtWeights")
@@ -802,6 +811,7 @@ class Process:
 
         # Inform user of location of results
         self.Print("Results are in %s" % (sh_Success + outputDir + sh_Normal), True)
+        config.write(os.path.join(outputDir,"parameters.json"))
         return outputDir
     
     def PrintStatsTotal(self, readMbytes, cpuTimeTotal, realTimeTotal, readMbytesTotal):
