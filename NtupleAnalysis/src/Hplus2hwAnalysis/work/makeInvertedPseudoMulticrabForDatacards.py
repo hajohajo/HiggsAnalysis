@@ -19,11 +19,11 @@ import HiggsAnalysis.NtupleAnalysis.tools.pseudoMultiCrabCreator as pseudoMultiC
 
 _generalOptions = {
     "analysisName": "QCDMeasurement",
-    "ewkDatasetsForMerging": ["TT","DYJetsToLL" ], #"WJets","DYJetsToLL"], #,"SingleTop"], #,"Diboson"], # using TT instead of TTJets
+    "ewkDatasetsForMerging": ["TT","Diboson"], #"WJets","DYJetsToLL"], #,"SingleTop"], #,"Diboson"], # using TT instead of TTJets
     "normalizationFactorSource": "QCDNormalizationFactors_AfterStdSelections%s.py",
     "normalizationPoint": "AfterAllSelections", #"AfterStdSelections",
     "normalizationSourcePrefix": "ForQCDNormalization/Normalization",
-    "ewkSourceForQCDPlusFakeTaus": "ForDataDrivenCtrlPlotsEWKGenuineTaus",
+    "ewkSourceForQCDPlusFakeTaus": "ForDataDrivenCtrlPlots",
     "ewkSourceForQCDOnly": "ForDataDrivenCtrlPlots",
 #    "dataSource": "ForDataDrivenCtrlPlots",
     "dataSource": "ForDataDrivenCtrlPlots",
@@ -162,13 +162,13 @@ class ModuleBuilder:
                           self._fakeWeightingMinusResult.getShapePlotLabels())
         self._outputCreator.addModule(mySystModuleMinus)
 
-    def buildFRWeightingSystModule(self, dataPath, ewkPath, normFactorsUp, normFactorsDown,normDataSrc,normEWKSrc):
+    def buildFRWeightingSystModule(self, dataPath, ewkPath, normFactorsUp, normFactorsDown,normDataSrc,normEWKSrc,i):
         # Up variation of fake weighting
         mySystModulePlus = pseudoMultiCrabCreator.PseudoMultiCrabModule(self._dsetMgr,
                                                                         self._era,
                                                                         self._searchMode,
                                                                         self._optimizationMode,
-                                                                        "SystVarFakeWeightingPlus")
+                                                                        "SystVarFakeWeighting_"+str(i)+"Plus")
 
         self._fakeWeightingPlusResult = qcdInvertedResult.QCDInvertedResultManager(dataPath, 
                                                                                    ewkPath,
@@ -189,7 +189,7 @@ class ModuleBuilder:
                                                                          self._era,
                                                                          self._searchMode,
                                                                          self._optimizationMode,
-                                                                         "SystVarFakeWeightingMinus")
+                                                                         "SystVarFakeWeighting_"+str(i)+"Minus")
 
         self._fakeWeightingMinusResult = qcdInvertedResult.QCDInvertedResultManager(dataPath, 
                                                                                     ewkPath,
@@ -253,13 +253,74 @@ def importNormFactors(era, searchMode, optimizationMode, multicrabDirName):
     myNormFactorsSafetyCheck(era, searchMode, optimizationMode)
     # Obtain normalization factors
     myNormFactorsImport = getattr(normFactorsImport, "QCDNormalization")
-    myNormFactorsImportSystVarFakeWeightingDown = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown")
-    myNormFactorsImportSystVarFakeWeightingUp = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp")
+    myNormFactorsImportSystVarFakeWeightingDown_1 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_1")
+    myNormFactorsImportSystVarFakeWeightingUp_1 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_1")
+
+    #### test use of each FR bin as a separate shape
+
+    myNormFactorsImportSystVarFakeWeightingDown_2 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_2")
+    myNormFactorsImportSystVarFakeWeightingUp_2 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_2")
+
+    myNormFactorsImportSystVarFakeWeightingDown_3 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_3")
+    myNormFactorsImportSystVarFakeWeightingUp_3 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_3")
+
+    myNormFactorsImportSystVarFakeWeightingDown_4 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_4")
+    myNormFactorsImportSystVarFakeWeightingUp_4 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_4")
+
+    myNormFactorsImportSystVarFakeWeightingDown_5 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_5")
+    myNormFactorsImportSystVarFakeWeightingUp_5 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_5")
+
+    myNormFactorsImportSystVarFakeWeightingDown_6 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_6")
+    myNormFactorsImportSystVarFakeWeightingUp_6 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_6")
+
+    myNormFactorsImportSystVarFakeWeightingDown_7 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_7")
+    myNormFactorsImportSystVarFakeWeightingUp_7 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_7")
+
+    myNormFactorsImportSystVarFakeWeightingDown_8 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_8")
+    myNormFactorsImportSystVarFakeWeightingUp_8 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_8")
+
+    myNormFactorsImportSystVarFakeWeightingDown_9 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarDown_9")
+    myNormFactorsImportSystVarFakeWeightingUp_9 = getattr(normFactorsImport, "QCDPlusEWKFakeTausNormalizationSystFakeWeightingVarUp_9")
+
+    ####
+
     myNormFactors = {}
+
     myNormFactors["nominal"] = myNormFactorsImport
-    myNormFactors["FakeWeightingDown"] = myNormFactorsImportSystVarFakeWeightingDown
-    myNormFactors["FakeWeightingUp"] = myNormFactorsImportSystVarFakeWeightingUp
+    myNormFactors["FakeWeightingDown"] = myNormFactorsImportSystVarFakeWeightingDown_1
+    myNormFactors["FakeWeightingUp"] = myNormFactorsImportSystVarFakeWeightingUp_1
+
+    #### test use of each FR bin as a separate shape
+
+    myNormFactors["FakeWeightingDown_2"] = myNormFactorsImportSystVarFakeWeightingDown_2
+    myNormFactors["FakeWeightingUp_2"] = myNormFactorsImportSystVarFakeWeightingUp_2
+
+    myNormFactors["FakeWeightingDown_3"] = myNormFactorsImportSystVarFakeWeightingDown_3
+    myNormFactors["FakeWeightingUp_3"] = myNormFactorsImportSystVarFakeWeightingUp_3
+
+    myNormFactors["FakeWeightingDown_4"] = myNormFactorsImportSystVarFakeWeightingDown_4
+    myNormFactors["FakeWeightingUp_4"] = myNormFactorsImportSystVarFakeWeightingUp_4
+
+    myNormFactors["FakeWeightingDown_5"] = myNormFactorsImportSystVarFakeWeightingDown_5
+    myNormFactors["FakeWeightingUp_5"] = myNormFactorsImportSystVarFakeWeightingUp_5
+
+    myNormFactors["FakeWeightingDown_6"] = myNormFactorsImportSystVarFakeWeightingDown_6
+    myNormFactors["FakeWeightingUp_6"] = myNormFactorsImportSystVarFakeWeightingUp_6
+
+    myNormFactors["FakeWeightingDown_7"] = myNormFactorsImportSystVarFakeWeightingDown_7
+    myNormFactors["FakeWeightingUp_7"] = myNormFactorsImportSystVarFakeWeightingUp_7
+
+    myNormFactors["FakeWeightingDown_8"] = myNormFactorsImportSystVarFakeWeightingDown_8
+    myNormFactors["FakeWeightingUp_8"] = myNormFactorsImportSystVarFakeWeightingUp_8
+
+    myNormFactors["FakeWeightingDown_9"] = myNormFactorsImportSystVarFakeWeightingDown_9
+    myNormFactors["FakeWeightingUp_9"] = myNormFactorsImportSystVarFakeWeightingUp_9
+
+    ####
+
     return myNormFactors
+
+
 
 if __name__ == "__main__":
     # Object for selecting data eras, search modes, and optimization modes
@@ -362,40 +423,100 @@ if __name__ == "__main__":
 #                                                                      _generalOptions["EWKsource"])
 
                     if True: #FIXME: add quark gluon weighting systematics!
-                    
+
                         #===== Quark gluon weighting systematics
                         nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
                                                                             _generalOptions["EWKsource"],
                                                                             myNormFactors["FakeWeightingUp"],
                                                                             myNormFactors["FakeWeightingDown"],
 									    normDataSrc=_generalOptions["normalizationDataSource"],
-                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"])
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+									    i=1)
 #                                                                            calculateQCDNormalizationSyst=True,
 #                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
 #                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"])
+                        nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
+                                                                            _generalOptions["EWKsource"],
+                                                                            myNormFactors["FakeWeightingUp_2"],
+                                                                            myNormFactors["FakeWeightingDown_2"],
+                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+									    i=2)
+                        nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
+                                                                            _generalOptions["EWKsource"],
+                                                                            myNormFactors["FakeWeightingUp_3"],
+                                                                            myNormFactors["FakeWeightingDown_3"],
+                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+                                                                            i=3)
+                        nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
+                                                                            _generalOptions["EWKsource"],
+                                                                            myNormFactors["FakeWeightingUp_4"],
+                                                                            myNormFactors["FakeWeightingDown_4"],
+                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+                                                                            i=4)
+                        nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
+                                                                            _generalOptions["EWKsource"],
+                                                                            myNormFactors["FakeWeightingUp_5"],
+                                                                            myNormFactors["FakeWeightingDown_5"],
+                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+                                                                            i=5)
+                        nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
+                                                                            _generalOptions["EWKsource"],
+                                                                            myNormFactors["FakeWeightingUp_6"],
+                                                                            myNormFactors["FakeWeightingDown_6"],
+                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+                                                                            i=6)
+                        nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
+                                                                            _generalOptions["EWKsource"],
+                                                                            myNormFactors["FakeWeightingUp_7"],
+                                                                            myNormFactors["FakeWeightingDown_7"],
+                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+                                                                            i=7)
+                        nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
+                                                                            _generalOptions["EWKsource"],
+                                                                            myNormFactors["FakeWeightingUp_8"],
+                                                                            myNormFactors["FakeWeightingDown_8"],
+                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+                                                                            i=8)
+                        nominalModule.buildFRWeightingSystModule(_generalOptions["dataSource"],
+                                                                            _generalOptions["EWKsource"],
+                                                                            myNormFactors["FakeWeightingUp_9"],
+                                                                            myNormFactors["FakeWeightingDown_9"],
+                                                                            normDataSrc=_generalOptions["normalizationDataSource"],
+                                                                            normEWKSrc=_generalOptions["normalizationEWKSource"],
+                                                                            i=9)
+
                     nominalModule.delete()
                     #===== Time estimate
                     printTimeEstimate(myGlobalStartTime, myStartTime, n, myTotalModules)
                     #===== Now do the rest of systematics variations
-                    for syst in mySystematicsNames:
-                        n += 1
-                        print ShellStyles.CaptionStyle()+"Analyzing systematics variations %d/%d: %s/%s/%s%s"%(n,myTotalModules,myModuleInfoString,syst,shapeType,ShellStyles.NormalStyle())
-                        myStartTime = time.time()
-                        systModule = ModuleBuilder(opts, myOutputCreator)
-                        systModule.createDsetMgr(multicrabDir=myMulticrabDir,
-                                                 era=era,
-                                                 searchMode=searchMode,
-                                                 optimizationMode=optimizationMode,
-                                                 systematicVariation=syst)
-                        systModule.buildModule(_generalOptions["dataSource"],
-                                               _generalOptions["EWKsource"],
-                                               myNormFactors["nominal"],
-                                               calculateQCDNormalizationSyst=False,
-                                               normDataSrc=_generalOptions["normalizationDataSource"],
-                                               normEWKSrc=_generalOptions["normalizationEWKSource"])
-                        printTimeEstimate(myGlobalStartTime, myStartTime, n, myTotalModules)
-                        systModule.delete()
+
+#                    for syst in mySystematicsNames:
+#                        n += 1
+#                        print ShellStyles.CaptionStyle()+"Analyzing systematics variations %d/%d: %s/%s/%s%s"%(n,myTotalModules,myModuleInfoString,syst,shapeType,ShellStyles.NormalStyle())
+#                        myStartTime = time.time()
+#                        systModule = ModuleBuilder(opts, myOutputCreator)
+#                        systModule.createDsetMgr(multicrabDir=myMulticrabDir,
+#                                                 era=era,
+#                                                 searchMode=searchMode,
+#                                                 optimizationMode=optimizationMode,
+#                                                 systematicVariation=syst)
+#                        systModule.buildModule(_generalOptions["dataSource"],
+#                                               _generalOptions["EWKsource"],
+#                                               myNormFactors["nominal"],
+#                                               calculateQCDNormalizationSyst=False,
+#                                               normDataSrc=_generalOptions["normalizationDataSource"],
+#                                               normEWKSrc=_generalOptions["normalizationEWKSource"])
+#                        printTimeEstimate(myGlobalStartTime, myStartTime, n, myTotalModules)
+#                        systModule.delete()
+
         print "\nPseudo-multicrab ready for mass %s...\n"%shapeType
     # Create rest of pseudo multicrab directory
     myOutputCreator.finalize()
-    print "Average processing time of one module: %.1f s, total elapsed time: %.1f s"%((time.time()-myGlobalStartTime)/float(myTotalModules), (time.time()-myGlobalStartTime))
+#    print "Average processing time of one module: %.1f s, total elapsed time: %.1f s"%((time.time()-myGlobalStartTime)/float(myTotalModules), (time.time()-myGlobalStartTime))
