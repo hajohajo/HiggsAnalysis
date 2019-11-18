@@ -53,19 +53,34 @@ public:
     bool passedSelection() const { return bPassedSelection; }
     // Status of passing presence of any two tops (with given BDTG cut) and free b-jet
     bool passedAnyTwoTopsAndFreeB() const { return bHasTwoTopsAndFreeB;}
+    // Status of passing presence of at least n free bjets
+    bool hasFreeBJet() const {return bPass_FreeBjet;}
     const size_t getAllCleanedTopsSize() const { return nAllCleanedTops;}
     
     // Trijet-1
     const float getMVAmax1() const { return fMVAmax1; }
+    const Jet getTrijet1Jet1() const { return fTrijet1Jet1; } 
+    const Jet getTrijet1Jet2() const { return fTrijet1Jet2; } 
+    const Jet getTrijet1BJet() const { return fTrijet1BJet; } 
+    const math::XYZTLorentzVector getTrijet1DijetP4() const {return fTrijet1Dijet_p4; }
+    const math::XYZTLorentzVector getTriJet1() const {return fTrijet1_p4; }
     // Trijet-2
     const float getMVAmax2() const { return fMVAmax2; }
+    const Jet getTrijet2Jet1() const { return fTrijet2Jet1; } 
+    const Jet getTrijet2Jet2() const { return fTrijet2Jet2; } 
+    const Jet getTrijet2BJet() const { return fTrijet2BJet; }     
 
     // Leading Trijet
     const math::XYZTLorentzVector getLdgTrijet() const
     {       
       if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet1_p4;
       else return fTrijet2_p4;
-    }    
+    }
+    const float getMVALdgInPt() const
+    {
+      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fMVAmax1;
+      else return fMVAmax2;
+    }
     const Jet getLdgTrijetBJet() const
     {
       if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet1BJet;
@@ -92,6 +107,11 @@ public:
       if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fTrijet2_p4;
       else return fTrijet1_p4;
     }
+    const float getMVASubldgInPt() const
+    {
+      if (fTrijet1_p4.pt() > fTrijet2_p4.pt()) return fMVAmax2;
+      else return fMVAmax1;
+    }    
     const Jet getSubldgTrijetBJet() const
     {
       if (fTrijet1_p4.pt() < fTrijet2_p4.pt()) return fTrijet1BJet;
@@ -126,6 +146,7 @@ public:
     /// Boolean for passing selection
     bool bPassedSelection;
     bool bHasTwoTopsAndFreeB;
+    bool bPass_FreeBjet;
     size_t nAllCleanedTops;
     float fMVAmax1;
     float fMVAmax2;

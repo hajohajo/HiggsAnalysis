@@ -15,6 +15,7 @@ HplusSelection::Data::Data()
 :
   bPassedSelection(false),
   bHasTwoTopsAndFreeB(false),
+  bPass_FreeBjet(false),
   nAllCleanedTops(),
   fMVAmax1(-1.0),
   fMVAmax2(-1.0),
@@ -449,7 +450,7 @@ HplusSelection::Data HplusSelection::privateAnalyze(const Event& event, const st
 
   output.bPassedSelection = bPass_FreeBjet * bPass_BothMVA;
   output.bHasTwoTopsAndFreeB = bPass_AnyTwoTops * bPass_FreeBjet;
-
+  output.bPass_FreeBjet = bPass_FreeBjet;
 
   //Fill Histograms
   if (0) std::cout << "=== HplusSelection:: Fill histograms" << std::endl;
