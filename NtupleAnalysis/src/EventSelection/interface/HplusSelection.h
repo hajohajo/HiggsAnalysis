@@ -170,20 +170,87 @@ private:
   bool isBJet(const Jet& jet1, const std::vector<Jet>& bjets);
 
   bool isMatchedJet(const Jet& jet, std::vector<Jet> Jet1, std::vector<Jet> Jet2, std::vector<Jet> BJet, const unsigned int index);
-  bool TopIsCrossCleaned( int Index, std::vector<Jet> jet1, std::vector<Jet> jet2, std::vector<Jet> bjet);
+  bool TopIsCrossCleaned( int Index, std::vector<Jet> jet1, std::vector<Jet> jet2, std::vector<Jet> bjet, std::vector<Jet> bjets);
   
   // Input parameters
   const DirectionalCut<float> cfg_TopBDTGCut;
   const DirectionalCut<float> cfg_AnyTopBDTGCut;
   const DirectionalCut<int>   cfg_FreeBjetsCut;
-  //insert here
 
   // Scalefactor calculator
   TopTagSFCalculator fTopTagSFCalculator;
 
   // Histograms (1D)
-  //WrappedTH1 *hTopBDT_AllCandidates;
-  // insert here  
+  WrappedTH1 *hTopBDT_AllCandidates;
+  WrappedTH1 *hTopMass_AllCandidates;
+  WrappedTH1 *hTopPt_AllCandidates;
+  WrappedTH1 *hTopMultiplicity_AllCandidates;
+  WrappedTH1 *hTopBDT_SelectedCandidates;
+  WrappedTH1 *hTopMass_SelectedCandidates;
+  WrappedTH1 *hTopPt_SelectedCandidates;
+  WrappedTH1 *hTopMultiplicity_SelectedCandidates;
+  WrappedTH1 *hTopBDT_SelectedCleanedCandidates;
+  WrappedTH1 *hTopMass_SelectedCleanedCandidates;
+  WrappedTH1 *hTopPt_SelectedCleanedCandidates;
+  WrappedTH1 *hTopMultiplicity_SelectedCleanedCandidates;
+  WrappedTH1 *hTopBDT_NotSelectedCandidates;
+  WrappedTH1 *hTopMass_NotSelectedCandidates;
+  WrappedTH1 *hTopPt_NotSelectedCandidates;
+  WrappedTH1 *hTopMultiplicity_NotSelectedCandidates;
+  WrappedTH1 *hTopBDT_AllCleanedCandidates;
+  WrappedTH1 *hTopMass_AllCleanedCandidates;
+  WrappedTH1 *hTopPt_AllCleanedCandidates;
+  WrappedTH1 *hTopMultiplicity_AllCleanedCandidates;
+  WrappedTH1 *hTetrajetBJetPt;
+  WrappedTH1 *hTetrajetBJetEta;
+  WrappedTH1 *hTetrajetBJetBDisc;
+  WrappedTH1 *hTetrajetPt;
+  WrappedTH1 *hTetrajetMass;
+  WrappedTH1 *hTetrajetEta;
+  WrappedTH1 *hLdgTrijetPt;
+  WrappedTH1 *hLdgTrijetMass;
+  WrappedTH1 *hLdgTrijetJet1Pt;
+  WrappedTH1 *hLdgTrijetJet1Eta;
+  WrappedTH1 *hLdgTrijetJet1BDisc;
+  WrappedTH1 *hLdgTrijetJet2Pt;
+  WrappedTH1 *hLdgTrijetJet2Eta;
+  WrappedTH1 *hLdgTrijetJet2BDisc;
+  WrappedTH1 *hLdgTrijetBJetPt;
+  WrappedTH1 *hLdgTrijetBJetEta;
+  WrappedTH1 *hLdgTrijetBJetBDisc;
+  WrappedTH1 *hLdgTrijetDiJetPt;
+  WrappedTH1 *hLdgTrijetDiJetEta;
+  WrappedTH1 *hLdgTrijetDiJetMass;
+  WrappedTH1 *hLdgTrijetDijetDeltaR;
+  WrappedTH1 *hLdgTrijetTopMassWMassRatio;
+  WrappedTH1 *hLdgTrijet_DeltaR_Trijet_TetrajetBjet;
+  WrappedTH1 *hLdgTrijet_DeltaEta_Trijet_TetrajetBjet;
+  WrappedTH1 *hLdgTrijet_DeltaPhi_Trijet_TetrajetBjet;
+  WrappedTH1 *hLdgTrijet_DeltaY_Trijet_TetrajetBjet;
+  WrappedTH1 *hSubldgTrijetPt;
+  WrappedTH1 *hSubldgTrijetMass;
+  WrappedTH1 *hSubldgTrijetJet1Pt;
+  WrappedTH1 *hSubldgTrijetJet1Eta;
+  WrappedTH1 *hSubldgTrijetJet1BDisc;
+  WrappedTH1 *hSubldgTrijetJet2Pt;
+  WrappedTH1 *hSubldgTrijetJet2Eta;
+  WrappedTH1 *hSubldgTrijetJet2BDisc;
+  WrappedTH1 *hSubldgTrijetBJetPt;
+  WrappedTH1 *hSubldgTrijetBJetEta;
+  WrappedTH1 *hSubldgTrijetBJetBDisc;
+  WrappedTH1 *hSubldgTrijetDiJetPt;
+  WrappedTH1 *hSubldgTrijetDiJetEta;
+  WrappedTH1 *hSubldgTrijetDiJetMass;
+  WrappedTH1 *hSubldgTrijetDijetDeltaR;
+  WrappedTH1 *hSubldgTrijetTopMassWMassRatio;
+  WrappedTH1 *hSubldgTrijet_DeltaR_Trijet_TetrajetBjet;
+  WrappedTH1 *hSubldgTrijet_DeltaEta_Trijet_TetrajetBjet;
+  WrappedTH1 *hSubldgTrijet_DeltaPhi_Trijet_TetrajetBjet;
+  WrappedTH1 *hSubldgTrijet_DeltaY_Trijet_TetrajetBjet;
+  WrappedTH2 *hDeltaR_LdgTrijet_TetrajetBjet_Vs_SubldgTrijet_TetrajetBjet;
+  WrappedTH2 *hDeltaEta_LdgTrijet_TetrajetBjet_Vs_SubldgTrijet_TetrajetBjet;
+  WrappedTH2 *hDeltaPhi_LdgTrijet_TetrajetBjet_Vs_SubldgTrijet_TetrajetBjet;
+  WrappedTH2 *hDeltaY_LdgTrijet_TetrajetBjet_Vs_SubldgTrijet_TetrajetBjet;
 };
 
 #endif
