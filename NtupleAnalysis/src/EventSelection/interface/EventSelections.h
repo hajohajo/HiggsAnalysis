@@ -14,6 +14,8 @@
 #include "EventSelection/interface/TopologySelection.h"
 #include "EventSelection/interface/TopSelection.h"
 #include "EventSelection/interface/TopSelectionBDT.h"
+#include "EventSelection/interface/TopSelectionNN.h"
 #include "EventSelection/interface/HplusSelection.h"
+#include "EventSelection/interface/HplusSelectionNN.h"
 #include "EventSelection/interface/FatJetSelection.h"
 #include "EventSelection/interface/QuarkGluonLikelihoodRatio.h"
