@@ -37,6 +37,8 @@ private:
   METSelection fMETSelection;
   Count cTopCleaningCounter;
   Count cTopTaggingSFCounter;
+  //TopSelectionNN fTopSelection;
+  //HplusSelectionNN fHplusSelection;
   TopSelectionBDT fTopSelection;
   HplusSelection fHplusSelection;
   // FatJetSelection fFatJetSelection;
@@ -68,6 +70,8 @@ Hplus2tbAnalysis::Hplus2tbAnalysis(const ParameterSet& config, const TH1* skimCo
     cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
     fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fHplusSelection(config.getParameter<ParameterSet>("HplusSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    //fTopSelection(config.getParameter<ParameterSet>("TopSelectionNN"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    //fHplusSelection(config.getParameter<ParameterSet>("HplusSelectionNN"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),,
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events"))
 { }
@@ -204,7 +208,8 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
   //================================================================================================
   // 10) Top selection
   //================================================================================================
-  if (0) std::cout << "=== Top (BDT) selection" << std::endl;
+  if (0) std::cout << "=== Top selection" << std::endl;
+  //const TopSelectionNN::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
   const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
 
   if (fEvent.isMC()) 
@@ -213,10 +218,11 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
     }
 
   if (0) std::cout << "=== Hplus2tb selection" << std::endl;
+  //const HplusSelectionNN::Data hplusData = fHplusSelection.analyze(fEvent, jetData, bjetData, topData)
   const HplusSelection::Data hplusData = fHplusSelection.analyze(fEvent, jetData, bjetData, topData);
   
-  // if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
-  // if (hplusData.getAllCleanedTopsSize() != 2) return; 
+  if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
+  if (hplusData.getAllCleanedTopsSize() != 2) return; 
   cTopCleaningCounter.increment();
 
   // Apply top-tag SF
