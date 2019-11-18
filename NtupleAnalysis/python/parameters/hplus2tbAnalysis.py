@@ -160,6 +160,9 @@ topSelectionBDT = PSet(
     WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 
 )
 
+#================================================================================================
+# Hplus selection BDT                                               
+#================================================================================================        
 hplusSelection = PSet(
     AnyTopBDTGCutDirection   =  topSelectionBDT.AnyTopBDTGCutDirection,
     AnyTopBDTGCutValue       =  topSelectionBDT.AnyTopBDTGCutValue,
@@ -168,6 +171,39 @@ hplusSelection = PSet(
     FreeBjetsCutValue        =  1,   # [default: 0]
     FreeBjetsCutDirection    =  ">=" # [default: ">="]
     )
+
+#================================================================================================
+# Top selection NN                                             
+#================================================================================================        
+
+topSelectionNN = PSet(
+    NumberOfTopsCutDirection =  "==",       # [default: "="] (==, !=, <, <=, >, >=)
+    NumberOfTopsCutValue     =  2,          # [default: 0]
+    AnyTopMVACutDirection    =  ">",        # [default: ">"]
+    AnyTopMVACutValue       =  -0.95,      # [default: -1.00]
+    TopMVACutDirection       =  ">=",       # [default: ">="]
+    TopMVACutValue           =  0.50,       # [default: 0.40] NOTE: Only use numbers with 2 decimals
+    TopMassLowCutDirection   =  ">=",       # [default: ">="]
+    TopMassLowCutValue       =  0.00,       # [default: 0.00]
+    TopMassUppCutDirection   =  "<=",       # [default: "<"]
+    TopMassUppCutValue       =  600.00,     # [default: 2000.0]
+    CSV_bDiscCutDirection    =  ">=",       # [default: ">="]
+    CSV_bDiscCutValue        =  0.8484,     # [default: 0.8484, 0.5426]
+    WeightFile               = "sequential_3relu32_1sigmoid1_bs64.txt",
+)
+
+#================================================================================================
+# Hplus selection NN
+#================================================================================================        
+hplusSelectionNN = PSet(
+    AnyTopMVACutDirection   =  topSelectionNN.AnyTopMVACutDirection,
+    AnyTopMVACutValue       =  topSelectionNN.AnyTopMVACutValue,
+    TopMVACutDirection      =  topSelectionNN.TopMVACutDirection,
+    TopMVACutValue          =  topSelectionNN.TopMVACutValue,
+    FreeBjetsCutValue        =  1,   # [default: 0]
+    FreeBjetsCutDirection    =  ">=" # [default: ">="]
+    )
+
 #================================================================================================
 # FakeB Measurement Options
 #================================================================================================
@@ -295,7 +331,9 @@ allSelections = PSet(
     BJetSelection         = bjetSelection,
     METSelection          = metSelection,
     TopSelectionBDT       = topSelectionBDT,
+    TopSelectionNN        = topSelectionNN,
     HplusSelection        = hplusSelection,
+    HplusSelectionNN      = hplusSelectionNN,
     # FatJetSelection       = fatjetVeto,
     #FakeBMeasurement      = fakeBMeasurement,
     #FakeBBjetSelection    = fakeBBjetSelection,
