@@ -27,7 +27,7 @@ public:
     
 private:
   // Input parameters
-  const DirectionalCut<double> cfg_PrelimTopMVACut;
+  //const DirectionalCut<double> cfg_PrelimTopMVACut;
   
   // Common plots
   CommonPlots fCommonPlots;
@@ -204,7 +204,7 @@ REGISTER_SELECTOR(JetTriggersSF);
 
 JetTriggersSF::JetTriggersSF(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    cfg_PrelimTopMVACut(config, "FakeBMeasurement.minTopMVACut"),
+    //cfg_PrelimTopMVACut(config, "FakeBMeasurement.minTopMVACut"),
     fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper), 
     cAllEvents(fEventCounter.addCounter("all events")),
     cControlTrigger(fEventCounter.addCounter("passed cntrl trg")),

@@ -22,7 +22,7 @@ public:
 private:
   // Input parameters
   // const DirectionalCut<float> cfg_PrelimTopFitChiSqr;
-  const DirectionalCut<double> cfg_PrelimTopMVACut;
+  //const DirectionalCut<double> cfg_PrelimTopMVACut;
 
   // Common plots
   CommonPlots fCommonPlots;
@@ -167,7 +167,7 @@ REGISTER_SELECTOR(QGLAnalysis);
 QGLAnalysis::QGLAnalysis(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
     // cfg_PrelimTopFitChiSqr(config, "FakeBMeasurement.prelimTopFitChiSqrCut"),
-    cfg_PrelimTopMVACut(config, "FakeBMeasurement.prelimTopMVACut"),
+    //cfg_PrelimTopMVACut(config, "FakeBMeasurement.prelimTopMVACut"),
     fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper),
     cAllEvents(fEventCounter.addCounter("all events")),
     cTrigger(fEventCounter.addCounter("passed trigger")),
