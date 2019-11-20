@@ -211,22 +211,23 @@ metSelection = PSet(
     )
 
 #================================================================================================
-# Top selection BDT                                               
+# Top selection MVA                                               
 #================================================================================================        
-topSelectionBDT = PSet(
+topSelectionMVA = PSet(
     NumberOfTopsCutDirection = "==",       # [default: "="] (==, !=, <, <=, >, >=)
     NumberOfTopsCutValue     =    1,       # [default: 0]
-    AnyTopBDTGCutDirection   =  ">",       # [default: ">"]
-    AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
-    TopBDTGCutDirection      = ">=",       # [default: ">="]
-    TopBDTGCutValue          =   0.40,     # [default: 0.40] NOTE: Only use numbers with 2 decimals
+    AnyTopMVACutDirection   =  ">",       # [default: ">"]
+    AnyTopMVACutValue       =   -1.00,    # [default: -1.00]
+    TopMVACutDirection      = ">=",       # [default: ">="]
+    TopMVACutValue          =   0.40,     # [default: 0.40] NOTE: Only use numbers with 2 decimals
     TopMassLowCutDirection   = ">=",       # [default: ">="]
     TopMassLowCutValue       =    0.00,    # [default: 0.00]
     TopMassUppCutDirection   = "<=",       # [default: "<"]
     TopMassUppCutValue       = 2000.00,    # [default: 2000.0]
     CSV_bDiscCutDirection    = ">=",       # [default: ">="]
     CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
-    WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 
+    WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml",
+    TopMVAalgo               = "BDTG" # [default: BDTG] (options: "BDTG", "NN") 
 )
 
 
@@ -255,9 +256,9 @@ fakeBMeasurement = PSet(
     baselineBJetsDiscr             = bjetSelection.bjetDiscr,
     baselineBJetsDiscrWP           = bjetSelection.bjetDiscrWorkingPoint,
     # Tops
-    LdgTopMVACutValue              = topSelectionBDT.TopBDTGCutValue,
-    LdgTopMVACutDirection          = topSelectionBDT.TopBDTGCutDirection, 
-    SubldgTopMVACutValue           = topSelectionBDT.TopBDTGCutValue,
+    LdgTopMVACutValue              = topSelectionMVA.TopMVACutValue,
+    LdgTopMVACutDirection          = topSelectionMVA.TopMVACutDirection, 
+    SubldgTopMVACutValue           = topSelectionMVA.TopMVACutValue,
     SubldgTopMVACutDirection       = "<", # [default: "<"]
     )
 
@@ -279,19 +280,19 @@ else:
     raise Exception("This should never be reached!")
 
 # top-tagging (json files available for: defaut, fatJet, ldgJet)
-MVAstring = "%.2f" % topSelectionBDT.TopBDTGCutValue
-# Determine which top JSON files to use depending on the BDT trainigh weightfile used
-if "noDeltaRqq_noTopPtRew" in topSelectionBDT.WeightFile:
+MVAstring = "%.2f" % topSelectionMVA.TopMVACutValue
+# Determine which top JSON files to use depending on the MVA trainigh weightfile used
+if "noDeltaRqq_noTopPtRew" in topSelectionMVA.WeightFile:
     # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)    
     topMisID     = "topMisID_BDT0p40_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"
     topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"
     topTagEffUnc = "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"    
-elif "noDeltaRqq" in topSelectionBDT.WeightFile:
+elif "noDeltaRqq" in topSelectionMVA.WeightFile:
     # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)    
     topMisID     = "topMisID_BDT0p40_TopMassCut400_BDTGnoDRqq.json"
     topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq.json"
     topTagEffUnc = "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq.json"
-elif "noTopPtRew" in topSelectionBDT.WeightFile:
+elif "noTopPtRew" in topSelectionMVA.WeightFile:
     # Disabled top-pt reweighting
     topMisID     = "topMisID_BDT0p40_TopMassCut400_noTopPtRew.json"
     topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json"
@@ -301,7 +302,7 @@ else:
     topMisID     = "topMisID_BDT%s_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
     topTagEff    = "toptagEff_BDT%s_GenuineTT_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
     topTagEffUnc = "toptagEffUncert_BDT%s_GenuineTT_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
-scaleFactors.setupToptagSFInformation(topTagPset                     = topSelectionBDT, 
+scaleFactors.setupToptagSFInformation(topTagPset                     = topSelectionMVA, 
                                       topTagMisidFilename            = topMisID, 
                                       topTagEfficiencyFilename       = topTagEff,
                                       topTagEffUncertaintiesFilename = topTagEffUnc,
@@ -351,7 +352,7 @@ allSelections = PSet(
     BJetSelection         = bjetSelection,
     METSelection          = metSelection,
     AngularCutsBackToBack = angularCutsBackToBack,
-    TopSelectionBDT       = topSelectionBDT,
+    TopSelectionMVA       = topSelectionMVA,
     # FatJetSelection       = fatjetVeto,
     #FakeBMeasurement      = fakeBMeasurement,
     #FakeBBjetSelection    = fakeBBjetSelection,
