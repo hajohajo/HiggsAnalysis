@@ -148,7 +148,7 @@ void FatJetSelection::bookHistograms(TDirectory* dir) {
   return;
 }
 
-FatJetSelection::Data FatJetSelection::silentAnalyze(const Event& event, const TopSelectionBDT::Data& topData) {
+FatJetSelection::Data FatJetSelection::silentAnalyze(const Event& event, const TopSelectionMVA::Data& topData) {
   ensureSilentAnalyzeAllowed(event.eventID());
   // Disable histogram filling and counter
   disableHistogramsAndCounters();
@@ -161,12 +161,12 @@ FatJetSelection::Data FatJetSelection::silentAnalyzeWithoutTop(const Event& even
   ensureSilentAnalyzeAllowed(event.eventID());
   // Disable histogram filling and counter
   disableHistogramsAndCounters();
-  Data myData = privateAnalyze(event, TopSelectionBDT::Data());
+  Data myData = privateAnalyze(event, TopSelectionMVA::Data());
   enableHistogramsAndCounters();
   return myData;
 }
 
-FatJetSelection::Data FatJetSelection::analyze(const Event& event, const TopSelectionBDT::Data& topData) {
+FatJetSelection::Data FatJetSelection::analyze(const Event& event, const TopSelectionMVA::Data& topData) {
   ensureAnalyzeAllowed(event.eventID());
   FatJetSelection::Data data = privateAnalyze(event, topData);
   // Send data to CommonPlots
@@ -178,7 +178,7 @@ FatJetSelection::Data FatJetSelection::analyze(const Event& event, const TopSele
 
 FatJetSelection::Data FatJetSelection::analyzeWithoutTop(const Event& event) {
   ensureAnalyzeAllowed(event.eventID());
-  FatJetSelection::Data data = privateAnalyze(event, TopSelectionBDT::Data());
+  FatJetSelection::Data data = privateAnalyze(event, TopSelectionMVA::Data());
   // Send data to CommonPlots
   // if (fCommonPlots != nullptr)
   // fCommonPlots->fillControlPlotsAtFatJetSelection(event, data);
@@ -186,7 +186,7 @@ FatJetSelection::Data FatJetSelection::analyzeWithoutTop(const Event& event) {
   return data;
 }
 
-FatJetSelection::Data FatJetSelection::privateAnalyze(const Event& event, const TopSelectionBDT::Data& topData) {
+FatJetSelection::Data FatJetSelection::privateAnalyze(const Event& event, const TopSelectionMVA::Data& topData) {
 
   // Increment inclusive counter
   cSubAll.increment();
@@ -435,7 +435,7 @@ const FatJetSelection::FatjetType FatJetSelection::findFatJetMatchedToTopType(AK
 									      const double dR_bjet, 
 									      const double dR_jet1, 
 									      const double dR_jet2, 
-									      const TopSelectionBDT::Data& topData) {
+									      const TopSelectionMVA::Data& topData) {
 
   FatJetSelection::FatjetType type;
 
@@ -463,7 +463,7 @@ void FatJetSelection::findFatJetMatchedToTopDeltaR(AK8Jet fatJetTopMatch,
 						   double &dR_bjet, 
 						   double &dR_jet1, 
 						   double &dR_jet2, 
-						   const TopSelectionBDT::Data& topData) {
+						   const TopSelectionMVA::Data& topData) {
 
   // Get leading top AK4 jet constituents
   const Jet top_bjet = topData.getLdgTrijetBJet();

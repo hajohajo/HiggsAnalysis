@@ -4,7 +4,7 @@
 
 #include "EventSelection/interface/BaseSelection.h"
 #include "DataFormat/interface/AK8Jet.h"
-#include "EventSelection/interface/TopSelectionBDT.h"
+#include "EventSelection/interface/TopSelectionMVA.h"
 #include "Framework/interface/EventCounter.h"
 #include "Tools/interface/DirectionalCut.h"
 #include <boost/concept_check.hpp>
@@ -89,17 +89,17 @@ public:
   virtual void bookHistograms(TDirectory* dir);
   
   /// Use silentAnalyze if you do not want to fill histograms or increment counters
-  Data silentAnalyze(const Event& event, const TopSelectionBDT::Data& topData);
+  Data silentAnalyze(const Event& event, const TopSelectionMVA::Data& topData);
   Data silentAnalyzeWithoutTop(const Event& event);
   /// analyze does fill histograms and incrementes counters
-  Data analyze(const Event& event, const TopSelectionBDT::Data& topData);
+  Data analyze(const Event& event, const TopSelectionMVA::Data& topData);
   Data analyzeWithoutTop(const Event& event);
 
 private:
   /// Initialisation called from constructor
   void initialize(const ParameterSet& config);
   /// The actual selection
-  Data privateAnalyze(const Event& event, const TopSelectionBDT::Data& topData);
+  Data privateAnalyze(const Event& event, const TopSelectionMVA::Data& topData);
   
   void findFatJetMatchedToTop(std::vector<AK8Jet>& collection, const Event& event,  const math::XYZTLorentzVector& topP);
 
@@ -107,9 +107,9 @@ private:
   
   bool hasMother(const Event& event,const genParticle &p, const int mom_pdgId);
 
-  const FatJetSelection::FatjetType findFatJetMatchedToTopType(AK8Jet fatJetMatchedToTop, const double dR_jet1, const double dR_jet2, const double dR_bjet, const TopSelectionBDT::Data& topData);
+  const FatJetSelection::FatjetType findFatJetMatchedToTopType(AK8Jet fatJetMatchedToTop, const double dR_jet1, const double dR_jet2, const double dR_bjet, const TopSelectionMVA::Data& topData);
   
-  void findFatJetMatchedToTopDeltaR(AK8Jet fatJetTopMatch, double &dR_jet1, double &dR_jet2, double &dR_bjet, const TopSelectionBDT::Data& topData);
+  void findFatJetMatchedToTopDeltaR(AK8Jet fatJetTopMatch, double &dR_jet1, double &dR_jet2, double &dR_bjet, const TopSelectionMVA::Data& topData);
   
   // Input parameters
   const std::vector<float> fFatJetPtCuts;
