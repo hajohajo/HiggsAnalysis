@@ -42,7 +42,7 @@ private:
   BJetSelection fBJetSelection;
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
   Count cTopCounter;
   AngularCutsBackToBack fAngularCutsBackToBack;
   //  JetCorrelations fJetCorrelations;
@@ -86,7 +86,7 @@ SignalAnalysis::SignalAnalysis(const ParameterSet& config, const TH1* skimCounte
   cBTaggingSFCounter(fEventCounter.addCounter("b tag SF")),
   fMETSelection(config.getParameter<ParameterSet>("METSelection"),
                 fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-  fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"),
+  fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"),
                 fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   cTopCounter(fEventCounter.addCounter("Top selection")),
   fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"),
@@ -239,7 +239,7 @@ void SignalAnalysis::process(Long64_t entry) {
     return;
 
 //====== Top selection
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent,jetData,bjetData);
+  const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent,jetData,bjetData);
   // if(topData.getAllCleanedTopsSize() != 1) return;
   if (!topData.passedSelection()) 
     return;  

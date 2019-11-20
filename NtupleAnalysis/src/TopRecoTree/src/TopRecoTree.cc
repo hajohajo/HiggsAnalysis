@@ -98,7 +98,6 @@ private:
   METSelection       fMETSelection;
   //  TopologySelection  fTopologySelection;
   //  TopSelection       fTopSelection;
-  //  TopSelectionBDT    fTopSelectionBDT;
   Count              cSelected;
     
 

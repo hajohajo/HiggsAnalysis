@@ -45,7 +45,7 @@ private:
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
   QuarkGluonLikelihoodRatio fQGLRSelection;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
   FatJetSelection fFatJetSelection;
   Count cSelected;
   Count cTrigger_1BTag;
@@ -218,7 +218,7 @@ JetTriggersSF::JetTriggersSF(const ParameterSet& config, const TH1* skimCounters
     cBTaggingSFCounter(fEventCounter.addCounter("b tag SF")),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter 
     fQGLRSelection(config.getParameter<ParameterSet>("QGLRSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events")),
     cTrigger_1BTag(fEventCounter.addCounter("passed sig 1BTag")),

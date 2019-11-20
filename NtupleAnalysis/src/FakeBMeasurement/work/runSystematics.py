@@ -164,8 +164,8 @@ def main():
         ]
 
     # Overwrite values
-    # allSelections.TopSelectionBDT.CSV_bDiscCutDirection  = ">="
-    allSelections.TopSelectionBDT.CSV_bDiscCutValue = 0.54 # allow CSVv2-L for inverted top
+    # allSelections.TopSelectionMVA.CSV_bDiscCutDirection  = ">="
+    allSelections.TopSelectionMVA.CSV_bDiscCutValue = 0.54 # allow CSVv2-L for inverted top
 
     # ================================================================================================
     # Command Line Options

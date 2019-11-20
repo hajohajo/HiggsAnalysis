@@ -39,7 +39,7 @@ private:
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
   // TopologySelection fTopologySelection;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
   Count cSelected;
     
   // Non-common histograms
@@ -182,7 +182,7 @@ QGLAnalysis::QGLAnalysis(const ParameterSet& config, const TH1* skimCounters)
     // fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter
     // fTopologySelection(config.getParameter<ParameterSet>("TopologySelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cSelected(fEventCounter.addCounter("Selected Events"))
 { }
 

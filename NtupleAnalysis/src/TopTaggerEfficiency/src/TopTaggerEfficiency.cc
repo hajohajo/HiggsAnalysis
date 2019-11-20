@@ -42,7 +42,7 @@ public:
   bool isRealMVATop(const Jet& trijetJet1, const Jet& trijetJet2, const Jet& trijetBJet,
 		    const std::vector<Jet>& MCtrue_LdgJet,  const std::vector<Jet>& MCtrue_SubldgJet, const std::vector<Jet>& MCtrue_Bjet);
 
-  int GetLdgOrSubldgTopIndex(std::vector<int>TopIndex, const TopSelectionBDT::Data& topData, string type);
+  int GetLdgOrSubldgTopIndex(std::vector<int>TopIndex, const TopSelectionMVA::Data& topData, string type);
 
   /// Called for each event
   virtual void process(Long64_t entry) override;
@@ -68,7 +68,7 @@ private:
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
   // QuarkGluonLikelihoodRatio fQGLRSelection;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
   HplusSelection fHplusSelection;
   // FatJetSelection fFatJetSelection;
   Count cSelected;
@@ -78,26 +78,26 @@ private:
   //For Efficiency plots
   WrappedTH1 *hAllTopQuarkPt_Matched;
   WrappedTH1 *hTopQuarkPt;
-  WrappedTH1 *hAllTopQuarkPt_MatchedBDT;
+  WrappedTH1 *hAllTopQuarkPt_MatchedMVA;
   WrappedTH1 *hEventTrijetPt2T_Matched;
   WrappedTH1 *hEventTrijetPt2T;
-  WrappedTH1 *hEventTrijetPt2T_BDT;
-  WrappedTH1 *hEventTrijetPt2T_MatchedBDT;
-  WrappedTH1 *hTrijetFakePt_BDT;
+  WrappedTH1 *hEventTrijetPt2T_MVA;
+  WrappedTH1 *hEventTrijetPt2T_MatchedMVA;
+  WrappedTH1 *hTrijetFakePt_MVA;
   WrappedTH1 *hTrijetFakePt;
   
   WrappedTH1 *hAssocTopQuarkPt;
   WrappedTH1 *hAssocTopQuarkPt_Matched;
-  WrappedTH1 *hAssocTopQuarkPt_MatchedBDT;
+  WrappedTH1 *hAssocTopQuarkPt_MatchedMVA;
 
   WrappedTH1 *hHiggsTopQuarkPt;           
   WrappedTH1 *hHiggsTopQuarkPt_Matched;   
-  WrappedTH1 *hHiggsTopQuarkPt_MatchedBDT;
+  WrappedTH1 *hHiggsTopQuarkPt_MatchedMVA;
 
   //Debug
   WrappedTH1 *hBothTopQuarkPt;           
   WrappedTH1 *hBothTopQuarkPt_Matched;   
-  WrappedTH1 *hBothTopQuarkPt_MatchedBDT;
+  WrappedTH1 *hBothTopQuarkPt_MatchedMVA;
 
   //Top candidates multiplicity
   WrappedTH1 *h_TopMultiplicity_AllTops;
@@ -116,19 +116,19 @@ private:
   WrappedTH1 *hTrijetPt_Subldg;
 
   WrappedTH1 *hTrijetPt_LdgOrSldg_Unmatched;
-  WrappedTH1 *hTrijetPt_LdgOrSldg_UnmatchedBDT;
+  WrappedTH1 *hTrijetPt_LdgOrSldg_UnmatchedMVA;
   WrappedTH1 *hTrijetPt_LdgOrSldg_Matched;
-  WrappedTH1 *hTrijetPt_LdgOrSldg_MatchedBDT;
+  WrappedTH1 *hTrijetPt_LdgOrSldg_MatchedMVA;
 
   WrappedTH1 *hTrijetPt_Ldg_Unmatched;
-  WrappedTH1 *hTrijetPt_Ldg_UnmatchedBDT;
+  WrappedTH1 *hTrijetPt_Ldg_UnmatchedMVA;
   WrappedTH1 *hTrijetPt_Ldg_Matched;
-  WrappedTH1 *hTrijetPt_Ldg_MatchedBDT;
+  WrappedTH1 *hTrijetPt_Ldg_MatchedMVA;
    
   WrappedTH1 *hTrijetPt_Sldg_Unmatched;
-  WrappedTH1 *hTrijetPt_Sldg_UnmatchedBDT;
+  WrappedTH1 *hTrijetPt_Sldg_UnmatchedMVA;
   WrappedTH1 *hTrijetPt_Sldg_Matched;
-  WrappedTH1 *hTrijetPt_Sldg_MatchedBDT;
+  WrappedTH1 *hTrijetPt_Sldg_MatchedMVA;
 
 
   // Non-common histograms
@@ -180,19 +180,19 @@ private:
   WrappedTH1Triplet* hLdgTrijet_DeltaR_Dijet_TrijetBjet;
   WrappedTH1Triplet* hLdgTrijet_DeltaR_Dijet;
 
-  WrappedTH1Triplet* hTopBDT_AllCandidates;
+  WrappedTH1Triplet* hTopMVA_AllCandidates;
 
-  WrappedTH1* hLdgInPtTrijetBDT;
-  WrappedTH1* hSubldgInPtTrijetBDT;
-  WrappedTH1* hLdgInBDTTrijetBDT;
-  WrappedTH1* hSubldgInBDTTrijetBDT;
+  WrappedTH1* hLdgInPtTrijetMVA;
+  WrappedTH1* hSubldgInPtTrijetMVA;
+  WrappedTH1* hLdgInMVATrijetMVA;
+  WrappedTH1* hSubldgInMVATrijetMVA;
 
-  WrappedTH1* hTopBDT_AllCleanedCandidates;
-  WrappedTH1* hTrijet1_BDT;
-  WrappedTH1* hTrijet2_BDT;
-  WrappedTH1* hLdgTrijet_BDT;
-  WrappedTH1* hSubldgTrijet_BDT;
-  WrappedTH1* hBothTopCandidates_BDT;
+  WrappedTH1* hTopMVA_AllCleanedCandidates;
+  WrappedTH1* hTrijet1_MVA;
+  WrappedTH1* hTrijet2_MVA;
+  WrappedTH1* hLdgTrijet_MVA;
+  WrappedTH1* hSubldgTrijet_MVA;
+  WrappedTH1* hBothTopCandidates_MVA;
 
   //
   WrappedTH1* hDijetMass_AllTops;
@@ -255,22 +255,22 @@ private:
   WrappedTH2Triplet *hDeltaR_TetrajetBjet_LdgTrijetDijet_Vs_DeltaR_PimDeltaR_LdgTrijet_SubldgTrijet_trueLdgTop;
   
   //TH2
-  WrappedTH2* hTopBDT_Vs_TopMass;
-  WrappedTH2* hTopBDT_Vs_WMass;
-  WrappedTH2* hTopBDT_Vs_TopMass_AllCandidates;
-  WrappedTH2* hTopBDT_Vs_WMass_AllCandidates;
-  WrappedTH2* hTopBDT_Vs_TopMass_AllCleanedCandidates;
-  WrappedTH2* hTopBDT_Vs_WMass_AllCleanedCandidates;
-  WrappedTH2* hTrijet1_BDT_Vs_TopMass;
-  WrappedTH2* hTrijet2_BDT_Vs_TopMass;
-  WrappedTH2* hLdgTrijet_BDT_Vs_TopMass;
-  WrappedTH2* hSubldgTrijet_BDT_Vs_TopMass;
-  WrappedTH2* hTrijet1_BDT_Vs_WMass;
-  WrappedTH2* hTrijet2_BDT_Vs_WMass;
-  WrappedTH2* hLdgTrijet_BDT_Vs_WMass;
-  WrappedTH2* hSubldgTrijet_BDT_Vs_WMass;
-  WrappedTH2* hBothTopCandidates_BDT_Vs_TopMass;
-  WrappedTH2* hBothTopCandidates_BDT_Vs_WMass;
+  WrappedTH2* hTopMVA_Vs_TopMass;
+  WrappedTH2* hTopMVA_Vs_WMass;
+  WrappedTH2* hTopMVA_Vs_TopMass_AllCandidates;
+  WrappedTH2* hTopMVA_Vs_WMass_AllCandidates;
+  WrappedTH2* hTopMVA_Vs_TopMass_AllCleanedCandidates;
+  WrappedTH2* hTopMVA_Vs_WMass_AllCleanedCandidates;
+  WrappedTH2* hTrijet1_MVA_Vs_TopMass;
+  WrappedTH2* hTrijet2_MVA_Vs_TopMass;
+  WrappedTH2* hLdgTrijet_MVA_Vs_TopMass;
+  WrappedTH2* hSubldgTrijet_MVA_Vs_TopMass;
+  WrappedTH2* hTrijet1_MVA_Vs_WMass;
+  WrappedTH2* hTrijet2_MVA_Vs_WMass;
+  WrappedTH2* hLdgTrijet_MVA_Vs_WMass;
+  WrappedTH2* hSubldgTrijet_MVA_Vs_WMass;
+  WrappedTH2* hBothTopCandidates_MVA_Vs_TopMass;
+  WrappedTH2* hBothTopCandidates_MVA_Vs_WMass;
   WrappedTH2 *h_TopMult_AllTops_cleaned_Vs_JetMult;
   WrappedTH2 *h_TopMult_SelectedTops_cleaned_Vs_JetMult;
   WrappedTH2 *h_TopMult_AllTops_cleaned_Vs_JetMult_AfterAllSelections;
@@ -340,8 +340,8 @@ REGISTER_SELECTOR(TopTaggerEfficiency);
 
 TopTaggerEfficiency::TopTaggerEfficiency(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    cfg_PrelimTopMVACut(config, "TopSelectionBDT.TopMVACut"),
-    //cfg_LdgTopDefinition(config.getParameter<std::string>("FakeBTopSelectionBDT.LdgTopDefinition")),
+    cfg_PrelimTopMVACut(config, "TopSelectionMVA.TopMVACut"),
+    //cfg_LdgTopDefinition(config.getParameter<std::string>("FakeBTopSelectionMVA.LdgTopDefinition")),
     fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper),
     cAllEvents(fEventCounter.addCounter("all events")),
     cTrigger(fEventCounter.addCounter("passed trigger")),
@@ -355,7 +355,7 @@ TopTaggerEfficiency::TopTaggerEfficiency(const ParameterSet& config, const TH1* 
     cBTaggingSFCounter(fEventCounter.addCounter("b tag SF")),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter
     // fQGLRSelection(config.getParameter<ParameterSet>("QGLRSelection")),// fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fHplusSelection(config.getParameter<ParameterSet>("HplusSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events")),
@@ -430,8 +430,8 @@ void TopTaggerEfficiency::book(TDirectory *dir) {
   const float fBDiscMax   = fCommonPlots.getBJetDiscBinSettings().max();
 
 
-  TDirectory* subdirTH1 = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "topbdtSelection_");
-  TDirectory* subdirTH2 = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "topbdtSelectionTH2_");
+  TDirectory* subdirTH1 = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "topMVASelection_");
+  TDirectory* subdirTH2 = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "topMVASelectionTH2_");
 
   std::string myInclusiveLabel  = "AnalysisTriplets";
   std::string myFakeLabel       = myInclusiveLabel+"False";
@@ -445,26 +445,26 @@ void TopTaggerEfficiency::book(TDirectory *dir) {
   //For Efficiency plots
   hTopQuarkPt                   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TopQuarkPt"                  , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hAllTopQuarkPt_Matched        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "AllTopQuarkPt_Matched"       , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hAllTopQuarkPt_MatchedBDT     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "AllTopQuarkPt_MatchedBDT"    , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hAllTopQuarkPt_MatchedMVA     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "AllTopQuarkPt_MatchedMVA"    , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hEventTrijetPt2T_Matched      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "EventTrijetPt2T_Matched"     , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hEventTrijetPt2T              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "EventTrijetPt2T"             ,";p_{T} (GeV/c)" , nPtBins, fPtMin, fPtMax);
-  hEventTrijetPt2T_BDT          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "EventTrijetPt2T_BDT"         , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hEventTrijetPt2T_MatchedBDT   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "EventTrijetPt2T_MatchedBDT"  , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hEventTrijetPt2T_MVA          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "EventTrijetPt2T_MVA"         , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hEventTrijetPt2T_MatchedMVA   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "EventTrijetPt2T_MatchedMVA"  , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hTrijetFakePt                 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetFakePt"                ,";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hTrijetFakePt_BDT             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetFakePt_BDT"            ,";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hTrijetFakePt_MVA             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetFakePt_MVA"            ,";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
 
   hAssocTopQuarkPt              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "AssocTopQuarkPt"                  , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hAssocTopQuarkPt_Matched      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "AssocTopQuarkPt_Matched"       , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hAssocTopQuarkPt_MatchedBDT   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "AssocTopQuarkPt_MatchedBDT"    , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hAssocTopQuarkPt_MatchedMVA   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "AssocTopQuarkPt_MatchedMVA"    , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
 
   hHiggsTopQuarkPt              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "HiggsTopQuarkPt"                  , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hHiggsTopQuarkPt_Matched      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "HiggsTopQuarkPt_Matched"       , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hHiggsTopQuarkPt_MatchedBDT   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "HiggsTopQuarkPt_MatchedBDT"    , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hHiggsTopQuarkPt_MatchedMVA   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "HiggsTopQuarkPt_MatchedMVA"    , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
 
   //Debug
   hBothTopQuarkPt              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "BothTopQuarkPt"                  , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hBothTopQuarkPt_Matched      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "BothTopQuarkPt_Matched"       , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hBothTopQuarkPt_MatchedBDT   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "BothTopQuarkPt_MatchedBDT"    , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hBothTopQuarkPt_MatchedMVA   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "BothTopQuarkPt_MatchedMVA"    , ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
 
   //More Efficiency plots
   hTrijetPt_LdgOrSldg          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_LdgOrSldg", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
@@ -472,19 +472,19 @@ void TopTaggerEfficiency::book(TDirectory *dir) {
   hTrijetPt_Subldg             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Subldg",    ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
 
   hTrijetPt_LdgOrSldg_Unmatched     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_LdgOrSldg_Unmatched", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hTrijetPt_LdgOrSldg_UnmatchedBDT  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_LdgOrSldg_UnmatchedBDT", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hTrijetPt_LdgOrSldg_UnmatchedMVA  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_LdgOrSldg_UnmatchedMVA", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hTrijetPt_LdgOrSldg_Matched       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_LdgOrSldg_Matched", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hTrijetPt_LdgOrSldg_MatchedBDT    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_LdgOrSldg_MatchedBDT", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hTrijetPt_LdgOrSldg_MatchedMVA    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_LdgOrSldg_MatchedMVA", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
 
   hTrijetPt_Ldg_Unmatched      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Ldg_Unmatched", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hTrijetPt_Ldg_UnmatchedBDT   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Ldg_UnmatchedBDT", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hTrijetPt_Ldg_UnmatchedMVA   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Ldg_UnmatchedMVA", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hTrijetPt_Ldg_Matched        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Ldg_Matched", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hTrijetPt_Ldg_MatchedBDT     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Ldg_MatchedBDT", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hTrijetPt_Ldg_MatchedMVA     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Ldg_MatchedMVA", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
    
   hTrijetPt_Sldg_Unmatched     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Sldg_Unmatched", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hTrijetPt_Sldg_UnmatchedBDT  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Sldg_UnmatchedBDT", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hTrijetPt_Sldg_UnmatchedMVA  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Sldg_UnmatchedMVA", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
   hTrijetPt_Sldg_Matched       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Sldg_Matched", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
-  hTrijetPt_Sldg_MatchedBDT     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Sldg_MatchedBDT", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
+  hTrijetPt_Sldg_MatchedMVA     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TrijetPt_Sldg_MatchedMVA", ";p_{T} (GeV/c)", nPtBins, fPtMin, fPtMax);
 
 
   //Distances
@@ -564,11 +564,11 @@ void TopTaggerEfficiency::book(TDirectory *dir) {
   hLdgTrijet_DeltaR_Dijet = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgTrijet_DeltaR_Dijet", ";",
 							      nDRBins     , fDRMin     , 6);
 
-  hTopBDT_AllCandidates           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TopBDT_AllCandidates",";top candidate BDT", 40, -1.0, 1.0);
-  hLdgInPtTrijetBDT               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "LdgInPtTrijetBDT",    ";top candidate BDT", 40, -1.0, 1.0);
-  hSubldgInPtTrijetBDT            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "SubldgInPtTrijetBDT", ";top candidate BDT", 40, -1.0, 1.0);
-  hLdgInBDTTrijetBDT              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "LdgInBDTTrijetBDT",   ";top candidate BDT", 40, -1.0, 1.0);
-  hSubldgInBDTTrijetBDT           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "SubldgInBDTTrijetBDT",";top candidate BDT", 40, -1.0, 1.0);
+  hTopMVA_AllCandidates           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TopMVA_AllCandidates",";top candidate MVA", 40, -1.0, 1.0);
+  hLdgInPtTrijetMVA               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "LdgInPtTrijetMVA",    ";top candidate MVA", 40, -1.0, 1.0);
+  hSubldgInPtTrijetMVA            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "SubldgInPtTrijetMVA", ";top candidate MVA", 40, -1.0, 1.0);
+  hLdgInMVATrijetMVA              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "LdgInMVATrijetMVA",   ";top candidate MVA", 40, -1.0, 1.0);
+  hSubldgInMVATrijetMVA           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "SubldgInMVATrijetMVA",";top candidate MVA", 40, -1.0, 1.0);
 
   //Top candidates multiplicity 
   h_TopMultiplicity_AllTops              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TopMultiplicity_AllTops",             ";top multiplicity", 20, 0, 20);
@@ -580,12 +580,12 @@ void TopTaggerEfficiency::book(TDirectory *dir) {
   h_TopMultiplicity_AllTops_cleaned_AfterAllSelections      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TopMultiplicity_AllTops_cleaned_AfterAllSelections",";top multiplicity", 10, 0, 10);
   h_TopMultiplicity_SelectedTops_cleaned_AfterAllSelections = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TopMultiplicity_SelectedTops_cleaned_AfterAllSelections",";top multiplicity", 10, 0, 10);
 
-  hTopBDT_AllCleanedCandidates  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TopBDT_AllCleanedCandidates",";top candidate BDT", 40, -1.0, 1.0);
-  hTrijet1_BDT                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "Trijet1_BDT", ";top candidate BDT", 40, -1.0, 1.0);
-  hTrijet2_BDT                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "Trijet2_BDT", ";top candidate BDT", 40, -1.0, 1.0);
-  hLdgTrijet_BDT                = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "LdgTrijet_BDT", ";top candidate BDT", 40, -1.0, 1.0);
-  hSubldgTrijet_BDT             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "SubldgTrijet_BDT", ";top candidate BDT", 40, -1.0, 1.0);
-  hBothTopCandidates_BDT        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "BothTopCandidates_BDT", ";top candidate BDT", 40, -1.0, 1.0);
+  hTopMVA_AllCleanedCandidates  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "TopMVA_AllCleanedCandidates",";top candidate MVA", 40, -1.0, 1.0);
+  hTrijet1_MVA                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "Trijet1_MVA", ";top candidate MVA", 40, -1.0, 1.0);
+  hTrijet2_MVA                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "Trijet2_MVA", ";top candidate MVA", 40, -1.0, 1.0);
+  hLdgTrijet_MVA                = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "LdgTrijet_MVA", ";top candidate MVA", 40, -1.0, 1.0);
+  hSubldgTrijet_MVA             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "SubldgTrijet_MVA", ";top candidate MVA", 40, -1.0, 1.0);
+  hBothTopCandidates_MVA        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "BothTopCandidates_MVA", ";top candidate MVA", 40, -1.0, 1.0);
 
   //test masses
   hDijetMass_AllTops = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdirTH1, "DijetMass_AllTops", "m_{jj} (GeV/c^{2})", nWMassBins, fWMassMin, fWMassMax);
@@ -643,52 +643,52 @@ void TopTaggerEfficiency::book(TDirectory *dir) {
   hR_beta_trueLdgTop = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "R_beta_trueLdgTop", ";#phi_{beta}", nDRBins, fDRMin, 10.);
   
   // Histograms (2D)
-  hTopBDT_Vs_TopMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopBDT_Vs_TopMass", ";top candidate BDT;m_{top} GeV/c^{2}",
+  hTopMVA_Vs_TopMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopMVA_Vs_TopMass", ";top candidate MVA;m_{top} GeV/c^{2}",
 						  40, -1.0, 1.0, nTopMassBins, fTopMassMin, fTopMassMax);
 
-  hTopBDT_Vs_WMass   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopBDT_Vs_WMass", ";top candidate BDT;m_{W} GeV/c^{2}",
+  hTopMVA_Vs_WMass   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopMVA_Vs_WMass", ";top candidate MVA;m_{W} GeV/c^{2}",
 						  40, -1.0, 1.0, nWMassBins, fWMassMin, fWMassMax);
 
-  hTopBDT_Vs_TopMass_AllCandidates = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopBDT_Vs_TopMass_AllCandidates", ";top candidate BDT;m_{top} GeV/c^{2}",
+  hTopMVA_Vs_TopMass_AllCandidates = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopMVA_Vs_TopMass_AllCandidates", ";top candidate MVA;m_{top} GeV/c^{2}",
 								40, -1.0, 1.0, nTopMassBins, fTopMassMin, fTopMassMax);
 
-  hTopBDT_Vs_WMass_AllCandidates   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopBDT_Vs_WMass_AllCandidates", ";top candidate BDT;m_{W} GeV/c^{2}",                         
+  hTopMVA_Vs_WMass_AllCandidates   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopMVA_Vs_WMass_AllCandidates", ";top candidate MVA;m_{W} GeV/c^{2}",                         
 								40, -1.0, 1.0, nWMassBins, fWMassMin, fWMassMax);                                                           
 
-  hTopBDT_Vs_TopMass_AllCleanedCandidates = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopBDT_Vs_TopMass_AllCleanedCandidates", ";top candidate BDT;m_{top} GeV/c^{2}",
+  hTopMVA_Vs_TopMass_AllCleanedCandidates = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopMVA_Vs_TopMass_AllCleanedCandidates", ";top candidate MVA;m_{top} GeV/c^{2}",
 								       40, -1.0, 1.0, nTopMassBins, fTopMassMin, fTopMassMax);
 
-  hTopBDT_Vs_WMass_AllCleanedCandidates   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopBDT_Vs_WMass_AllCleanedCandidates", ";top candidate BDT;m_{W} GeV/c^{2}",
+  hTopMVA_Vs_WMass_AllCleanedCandidates   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopMVA_Vs_WMass_AllCleanedCandidates", ";top candidate MVA;m_{W} GeV/c^{2}",
 								       40, -1.0, 1.0, nWMassBins, fWMassMin, fWMassMax);
 
-  hTrijet1_BDT_Vs_TopMass   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "Trijet1_BDT_Vs_TopMass", ";top candidate BDT;m_{top} GeV/c^{2}",
+  hTrijet1_MVA_Vs_TopMass   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "Trijet1_MVA_Vs_TopMass", ";top candidate MVA;m_{top} GeV/c^{2}",
 							 40, -1.0, 1.0, nTopMassBins, fTopMassMin, fTopMassMax);
 
-  hTrijet2_BDT_Vs_TopMass  = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "Trijet2_BDT_Vs_TopMass", ";top candidate BDT;m_{top} GeV/c^{2}",
+  hTrijet2_MVA_Vs_TopMass  = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "Trijet2_MVA_Vs_TopMass", ";top candidate MVA;m_{top} GeV/c^{2}",
 							40, -1.0, 1.0, nTopMassBins, fTopMassMin, fTopMassMax);
 
-  hLdgTrijet_BDT_Vs_TopMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "LdgTrijet_BDT_Vs_TopMass", ";top candidate BDT;m_{top} GeV/c^{2}",
+  hLdgTrijet_MVA_Vs_TopMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "LdgTrijet_MVA_Vs_TopMass", ";top candidate MVA;m_{top} GeV/c^{2}",
 							 40, -1.0, 1.0, nTopMassBins, fTopMassMin, fTopMassMax);
 
-  hSubldgTrijet_BDT_Vs_TopMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "SubldgTrijet_BDT_Vs_TopMass", ";top candidate BDT;m_{top} GeV/c^{2}",
+  hSubldgTrijet_MVA_Vs_TopMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "SubldgTrijet_MVA_Vs_TopMass", ";top candidate MVA;m_{top} GeV/c^{2}",
 							    40, -1.0, 1.0, nTopMassBins, fTopMassMin, fTopMassMax);
   
-  hTrijet1_BDT_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "Trijet1_BDT_Vs_WMass", ";top candidate BDT;m_{W} GeV/c^{2}",
+  hTrijet1_MVA_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "Trijet1_MVA_Vs_WMass", ";top candidate MVA;m_{W} GeV/c^{2}",
 						     40, -1.0, 1.0, nWMassBins, fWMassMin, fWMassMax);
 
-  hTrijet2_BDT_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "Trijet2_BDT_Vs_WMass", ";top candidate BDT;m_{W} GeV/c^{2}",
+  hTrijet2_MVA_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "Trijet2_MVA_Vs_WMass", ";top candidate MVA;m_{W} GeV/c^{2}",
 						     40, -1.0, 1.0, nWMassBins, fWMassMin, fWMassMax);
 
-  hLdgTrijet_BDT_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "LdgTrijet_BDT_Vs_WMass", ";top candidate BDT;m_{W} GeV/c^{2}",
+  hLdgTrijet_MVA_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "LdgTrijet_MVA_Vs_WMass", ";top candidate MVA;m_{W} GeV/c^{2}",
 						       40, -1.0, 1.0, nWMassBins, fWMassMin, fWMassMax);
 
-  hSubldgTrijet_BDT_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "SubldgTrijet_BDT_Vs_WMass", ";top candidate BDT;m_{W} GeV/c^{2}",
+  hSubldgTrijet_MVA_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "SubldgTrijet_MVA_Vs_WMass", ";top candidate MVA;m_{W} GeV/c^{2}",
 							  40, -1.0, 1.0, nWMassBins, fWMassMin, fWMassMax);
   
-  hBothTopCandidates_BDT_Vs_TopMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "BothTopCandidates_BDT_Vs_TopMass", ";top candidate BDT;m_{top} GeV/c^{2}",
+  hBothTopCandidates_MVA_Vs_TopMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "BothTopCandidates_MVA_Vs_TopMass", ";top candidate MVA;m_{top} GeV/c^{2}",
 								 40, -1.0, 1.0, nTopMassBins, fTopMassMin, fTopMassMax);
 
-  hBothTopCandidates_BDT_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "BothTopCandidates_BDT_Vs_WMass", ";top candidate BDT;m_{W} GeV/c^{2}",
+  hBothTopCandidates_MVA_Vs_WMass = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "BothTopCandidates_MVA_Vs_WMass", ";top candidate MVA;m_{W} GeV/c^{2}",
 							       40, -1.0, 1.0, nWMassBins, fWMassMin, fWMassMax);
 
   h_TopMult_AllTops_cleaned_Vs_JetMult      = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdirTH2, "TopMult_AllTops_cleaned_Vs_JetMult", ";top multiplicity;jet multiplicity",
@@ -1042,7 +1042,7 @@ bool TopTaggerEfficiency::isBJet(const Jet& jet, const std::vector<Jet>& bjets) 
   return false;
 }
 
-int TopTaggerEfficiency::GetLdgOrSubldgTopIndex(std::vector<int>TopIndex, const TopSelectionBDT::Data& topData, string type){
+int TopTaggerEfficiency::GetLdgOrSubldgTopIndex(std::vector<int>TopIndex, const TopSelectionMVA::Data& topData, string type){
   double maxPt1 = -999.999, maxPt2 = -999.999;
   int maxIndex1 = -1, maxIndex2 = -1;
   
@@ -1165,8 +1165,8 @@ void TopTaggerEfficiency::process(Long64_t entry) {
   //================================================================================================
   // 10) Top selection
   //================================================================================================
-  if (0) std::cout << "=== Top (BDT) selection" << std::endl;
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  if (0) std::cout << "=== Top (MVA) selection" << std::endl;
+  const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
 
   if (0){
     if (fEvent.isMC()) fEventWeight.multiplyWeight(topData.getTopTaggingScaleFactorEventWeight());
@@ -1534,10 +1534,10 @@ void TopTaggerEfficiency::process(Long64_t entry) {
     Jet jet2 = topData.getAllTopsJet2().at(i);
     Jet bjet = topData.getAllTopsBJet().at(i);
     
-    //double mva = topData.getAllTopsBDTG().at(i);
+    //double mva = topData.getAllTopsMVA().at(i);
 
     bool realTrijet = isRealMVATop(jet1, jet2, bjet, MCtrue_LdgJet, MCtrue_SubldgJet, MCtrue_Bjet);
-    hTopBDT_AllCandidates -> Fill(realTrijet, topData.getAllTopsBDTG().at(i));
+    hTopMVA_AllCandidates -> Fill(realTrijet, topData.getAllTopsMVA().at(i));
 
   }
   
@@ -1609,14 +1609,14 @@ void TopTaggerEfficiency::process(Long64_t entry) {
     Jet jet2 = topData.getAllTopsJet2().at(i);
     Jet bjet = topData.getAllTopsBJet().at(i);
     
-    double mva = topData.getAllTopsBDTG().at(i);
+    double mva = topData.getAllTopsMVA().at(i);
 
     math::XYZTLorentzVector trijetP4, dijetP4;
     trijetP4 = jet1.p4() + jet2.p4() + bjet.p4();
     dijetP4  = jet1.p4() + jet2.p4();
 
-    hTopBDT_Vs_TopMass_AllCandidates -> Fill(mva, trijetP4.M());
-    hTopBDT_Vs_WMass_AllCandidates   -> Fill(mva, dijetP4.M());   
+    hTopMVA_Vs_TopMass_AllCandidates -> Fill(mva, trijetP4.M());
+    hTopMVA_Vs_WMass_AllCandidates   -> Fill(mva, dijetP4.M());   
 
   }
 
@@ -1626,20 +1626,20 @@ void TopTaggerEfficiency::process(Long64_t entry) {
     Jet jet2 = topData.getAllCleanedTopsJet2().at(i);
     Jet bjet = topData.getAllCleanedTopsBJet().at(i);
     
-    double mva = topData.getAllCleanedTopsBDTG().at(i);
-    hTopBDT_AllCleanedCandidates -> Fill(mva);
+    double mva = topData.getAllCleanedTopsMVA().at(i);
+    hTopMVA_AllCleanedCandidates -> Fill(mva);
     
     math::XYZTLorentzVector trijetP4, dijetP4;
     trijetP4 = jet1.p4() + jet2.p4() + bjet.p4();
     dijetP4  = jet1.p4() + jet2.p4();
 
-    hTopBDT_Vs_TopMass_AllCleanedCandidates -> Fill(mva, trijetP4.M());
-    hTopBDT_Vs_WMass_AllCleanedCandidates   -> Fill(mva, dijetP4.M());   
+    hTopMVA_Vs_TopMass_AllCleanedCandidates -> Fill(mva, trijetP4.M());
+    hTopMVA_Vs_WMass_AllCleanedCandidates   -> Fill(mva, dijetP4.M());   
   }
   
   if (doMatching){
-    bool TopPassBDT_h = false;
-    bool TopPassBDT_a = false;
+    bool TopPassMVA_h = false;
+    bool TopPassMVA_a = false;
     bool TopMatched_h = false;
     bool TopMatched_a = false;
     //Top from Higgs pt
@@ -1669,20 +1669,20 @@ void TopTaggerEfficiency::process(Long64_t entry) {
       hBothTopQuarkPt_Matched -> Fill(GenATop.pt());
     }
 
-    if (haveMatchedHiggsTop) TopPassBDT_h = isRealMVATop(HiggsTop_LdgJet.at(0), HiggsTop_SubldgJet.at(0), HiggsTop_Bjet.at(0),
+    if (haveMatchedHiggsTop) TopPassMVA_h = isRealMVATop(HiggsTop_LdgJet.at(0), HiggsTop_SubldgJet.at(0), HiggsTop_Bjet.at(0),
 						      topData.getSelectedTopsJet1(), topData.getSelectedTopsJet2(), topData.getSelectedTopsBJet());
-    if (haveMatchedAssocTop) TopPassBDT_a = isRealMVATop(AssocTop_LdgJet.at(0), AssocTop_SubldgJet.at(0), AssocTop_Bjet.at(0),
+    if (haveMatchedAssocTop) TopPassMVA_a = isRealMVATop(AssocTop_LdgJet.at(0), AssocTop_SubldgJet.at(0), AssocTop_Bjet.at(0),
 						      topData.getSelectedTopsJet1(), topData.getSelectedTopsJet2(), topData.getSelectedTopsBJet());
 
-    //Top from Higgs passes BDT
-    if (TopPassBDT_h){
-      hHiggsTopQuarkPt_MatchedBDT -> Fill(GenHTop.pt());
-      hBothTopQuarkPt_MatchedBDT -> Fill(GenHTop.pt());
+    //Top from Higgs passes MVA
+    if (TopPassMVA_h){
+      hHiggsTopQuarkPt_MatchedMVA -> Fill(GenHTop.pt());
+      hBothTopQuarkPt_MatchedMVA -> Fill(GenHTop.pt());
     }
-    //Associated Top passes BDT
-    if (TopPassBDT_a){
-      hAssocTopQuarkPt_MatchedBDT -> Fill(GenATop.pt());
-      hBothTopQuarkPt_MatchedBDT -> Fill(GenATop.pt());
+    //Associated Top passes MVA
+    if (TopPassMVA_a){
+      hAssocTopQuarkPt_MatchedMVA -> Fill(GenATop.pt());
+      hBothTopQuarkPt_MatchedMVA -> Fill(GenATop.pt());
     }
     
     //======================================
@@ -1734,7 +1734,7 @@ void TopTaggerEfficiency::process(Long64_t entry) {
           }//if ( isMatched*sizesAgree )
       }//for (int i = 0; i < topData.getSelectedTopsBJet().size(); i++) 
       if (genuineTopPass){
-	hAllTopQuarkPt_MatchedBDT -> Fill(top.pt());
+	hAllTopQuarkPt_MatchedMVA -> Fill(top.pt());
       }
     }//for (size_t j=0; j<GenTops.size(); j++)
   
@@ -1750,7 +1750,7 @@ void TopTaggerEfficiency::process(Long64_t entry) {
       trijetP4 = jet1.p4() + jet2.p4() + bjet.p4();
       if (isFakeTop){
 	hTrijetFakePt                 -> Fill (trijetP4.Pt());
-	if (cfg_PrelimTopMVACut.passedCut(topData.getAllTopsBDTG().at(i))) hTrijetFakePt_BDT -> Fill (trijetP4.Pt());
+	if (cfg_PrelimTopMVACut.passedCut(topData.getAllTopsMVA().at(i))) hTrijetFakePt_MVA -> Fill (trijetP4.Pt());
       }
     }
   }// if (doMatching)
@@ -2016,10 +2016,10 @@ void TopTaggerEfficiency::process(Long64_t entry) {
   }
   if (LdgWIsWFromH)           hTetrajetMass_LdgWIsWfromH    -> Fill(isBfromH, tetrajet_p4.M());
 
-  hLdgInPtTrijetBDT     -> Fill(hplusData.getMVALdgInPt());
-  hSubldgInPtTrijetBDT  -> Fill(hplusData.getMVASubldgInPt());
-  hLdgInBDTTrijetBDT    -> Fill(hplusData.getMVAmax1());
-  hSubldgInBDTTrijetBDT -> Fill(hplusData.getMVAmax2());
+  hLdgInPtTrijetMVA     -> Fill(hplusData.getMVALdgInPt());
+  hSubldgInPtTrijetMVA  -> Fill(hplusData.getMVASubldgInPt());
+  hLdgInMVATrijetMVA    -> Fill(hplusData.getMVAmax1());
+  hSubldgInMVATrijetMVA -> Fill(hplusData.getMVAmax2());
 
   //Top candidates multiplicity
   h_TopMultiplicity_AllTops_AfterAllSelections              -> Fill(topData.getAllTopsBJet().size());
@@ -2156,4 +2156,4 @@ void TopTaggerEfficiency::process(Long64_t entry) {
   
   return;
 }
-//  LocalWords:  BDT
+//  LocalWords:  MVA
