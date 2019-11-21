@@ -329,7 +329,7 @@ if __name__ == "__main__":
     URL          = False
     SAVEDIR      = None
     VERBOSE      = False
-    FOLDER       = "ForDataDrivenCtrlPlots" #"topbdtSelection_" #jetSelection_
+    FOLDER       = "ForDataDrivenCtrlPlots" #"topMVASelection_" #jetSelection_
     SIGNALMASS   = 800
     SIGNAL       = None
     INTLUMI      = -1.0
@@ -434,7 +434,7 @@ if __name__ == "__main__":
                       "eSelection_Veto", "muSelection_Veto", "tauSelection_Veto",
                       "ForDataDrivenCtrlPlotsEWKFakeB", "ForDataDrivenCtrlPlotsEWKGenuineB",
                       "jetSelection_", "bjetSelection_", "metSelection_", 
-                      "topologySelection_", "topbdtSelection_", "ForDataDrivenCtrlPlots"]
+                      "topologySelection_", "topMVASelection_", "ForDataDrivenCtrlPlots"]
 
     if opts.folder not in allowedFolders:
         Print("Invalid folder \"%s\"! Please select one of the following:" % (opts.folder), True)

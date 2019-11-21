@@ -28,7 +28,7 @@ import ROOT
 #================================================================================================
 # Options
 #================================================================================================
-prefix      = "SystTopBDT"
+prefix      = "SystTopMVA"
 postfix     = ""
 dataEras    = ["2016"]
 searchModes = ["80to1000"]
@@ -148,10 +148,10 @@ def main():
     #==========================
     
     # marina
-    allSelections.SystTopBDTSelection.MVACutValue = 0.40
-    allSelections.TopSelectionBDT.TopMVACutValue  = 0.40
+    allSelections.SystTopMVASelection.MVACutValue = 0.40
+    allSelections.TopSelectionMVA.TopMVACutValue  = 0.40
     
-    # BDT MisID SF
+    # MVA MisID SF
     MisIDSF = PSet(
         MisIDSFJsonName = "topMisID_BDT0p40_TopMassCut400.json",
         ApplyMisIDSF    = False, 
@@ -160,10 +160,10 @@ def main():
     scaleFactors.assignMisIDSF(MisIDSF, "nominal", MisIDSF.MisIDSFJsonName)
     allSelections.MisIDSF = MisIDSF
     
-    allSelections.SystTopBDTSelection.MiniIsoCutValue    = 0.1
-    allSelections.SystTopBDTSelection.MiniIsoInvCutValue = 0.1
-    allSelections.SystTopBDTSelection.METCutValue        = 50.0
-    allSelections.SystTopBDTSelection.METInvCutValue     = 20.0
+    allSelections.SystTopMVASelection.MiniIsoCutValue    = 0.1
+    allSelections.SystTopMVASelection.MiniIsoInvCutValue = 0.1
+    allSelections.SystTopMVASelection.METCutValue        = 50.0
+    allSelections.SystTopMVASelection.METInvCutValue     = 20.0
     
     # Muon
     allSelections.MuonSelection.muonPtCut = 30

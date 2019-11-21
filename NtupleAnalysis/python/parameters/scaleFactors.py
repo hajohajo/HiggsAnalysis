@@ -226,8 +226,8 @@ def setupToptagSFInformation(topTagPset, topTagMisidFilename, topTagEfficiencyFi
     '''
     Top-tagging SF
     \param topTagPset   PSet of topSelection
-    \param topTagMisifFilename  Filename to the json file containing the Misidintification rates (SystTopBDT + PythonWriter)
-    \param topTagEfficiencyFilename  Filename to the json file containing the tagging effifiencies (SystTopBDT + PythonWriter)
+    \param topTagMisifFilename  Filename to the json file containing the Misidintification rates (SystTopMVA + PythonWriter)
+    \param topTagEfficiencyFilename  Filename to the json file containing the tagging effifiencies (SystTopMVA + PythonWriter)
     \param topTagEffUncertaintiesFilename Filename to the json file containing the tagging efficiencies uncertainties (TopTaggerEfficiency + UncertaintyWriter.py)
     \param direction  "nominal"/"down"/"up"
     \param variationInfo  "tag"/"mistag" This parameter specifies if the variation is applied for the top->top component or non-top->top component

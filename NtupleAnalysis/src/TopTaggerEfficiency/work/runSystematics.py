@@ -176,7 +176,7 @@ def main():
     # allSelections.BJetSelection.numberOfBJetsCutValue = 0
     # allSelections.BJetSelection.numberOfBJetsCutDirection = "=="
 
-    print allSelections.TopSelectionBDT
+    print allSelections.TopSelectionMVA
     # ================================================================================================
     # Add Analysis Variations
     # ================================================================================================

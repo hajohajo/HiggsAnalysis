@@ -37,7 +37,7 @@ private:
   METSelection fMETSelection;
   Count cTopCleaningCounter;
   Count cTopTaggingSFCounter;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
   HplusSelection fHplusSelection;
   // FatJetSelection fFatJetSelection;
   Count cSelected;
@@ -66,7 +66,7 @@ Hplus2tbAnalysis::Hplus2tbAnalysis(const ParameterSet& config, const TH1* skimCo
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter
     cTopCleaningCounter(fEventCounter.addCounter("top cleaning")),
     cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fHplusSelection(config.getParameter<ParameterSet>("HplusSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events"))
@@ -204,8 +204,8 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
   //================================================================================================
   // 10) Top selection
   //================================================================================================
-  if (0) std::cout << "=== Top (BDT) selection" << std::endl;
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  if (0) std::cout << "=== Top selection" << std::endl;
+  const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
 
   if (fEvent.isMC()) 
     {
@@ -213,10 +213,11 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
     }
 
   if (0) std::cout << "=== Hplus2tb selection" << std::endl;
+  //const HplusSelectionNN::Data hplusData = fHplusSelection.analyze(fEvent, jetData, bjetData, topData)
   const HplusSelection::Data hplusData = fHplusSelection.analyze(fEvent, jetData, bjetData, topData);
   
-  // if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
-  // if (hplusData.getAllCleanedTopsSize() != 2) return; 
+  if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
+  if (hplusData.getAllCleanedTopsSize() != 2) return; 
   cTopCleaningCounter.increment();
 
   // Apply top-tag SF
@@ -234,7 +235,7 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
 
   cTopTaggingSFCounter.increment();
 
-  // Fill histos after StandardSelections: Require any two tops with BDT > -1.0 and presence of free b-jet (not taken up by any of the two best (in MVA) tops)
+  // Fill histos after StandardSelections: Require any two tops with MVA > -1.0 and presence of free b-jet (not taken up by any of the two best (in MVA) tops)
   //fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, METData, topData);
   if (!hplusData.passedSelection()) return;  
   // std::cout << "\nentry = " << entry << ", topData.getMVAmax1() = " << topData.getMVAmax1() << ", topData.getMVAmax2() = " << topData.getMVAmax2() << ", free-b pT = " << topData.getTetrajetBJet().pt() << std::endl;

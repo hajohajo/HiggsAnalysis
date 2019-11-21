@@ -20,7 +20,7 @@ EXAMPLES:
 
 
 LAST USED:
-./plot_ScaleOrPDF.py -m Hplus2tbAnalysis_Weight_Nominal,Hplus2tbAnalysis_Weight_1,Hplus2tbAnalysis_Weight_2,Hplus2tbAnalysis_Weight_3,Hplus2tbAnalysis_Weight_4,Hplus2tbAnalysis_Weight_6,Hplus2tbAnalysis_Weight_8 --prefix QCDScale --bandValue 2 --relPath "/uscms_data/d3/aattikis/workspace/pseudo-multicrab/Hplus2tbAnalysis/TopSelectionBDT/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/AfterPreapproval" --xmax 800 --ymin 1e0 && ./plot_ScaleOrPDF.py -m Hplus2tbAnalysis_Weight_Nominal,Hplus2tbAnalysis_Weight_9,Hplus2tbAnalysis_Weight_10,Hplus2tbAnalysis_Weight_12,Hplus2tbAnalysis_Weight_16,Hplus2tbAnalysis_Weight_23,Hplus2tbAnalysis_Weight_27,Hplus2tbAnalysis_Weight_32,Hplus2tbAnalysis_Weight_46,Hplus2tbAnalysis_Weight_59,Hplus2tbAnalysis_Weight_63,Hplus2tbAnalysis_Weight_77,Hplus2tbAnalysis_Weight_80,Hplus2tbAnalysis_Weight_96 --prefix PDF --bandValue 2 --relPath "/uscms_data/d3/aattikis/workspace/pseudo-multicrab/Hplus2tbAnalysis/TopSelectionBDT/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/AfterPreapproval" --xmax 800 --ymin 1e0
+./plot_ScaleOrPDF.py -m Hplus2tbAnalysis_Weight_Nominal,Hplus2tbAnalysis_Weight_1,Hplus2tbAnalysis_Weight_2,Hplus2tbAnalysis_Weight_3,Hplus2tbAnalysis_Weight_4,Hplus2tbAnalysis_Weight_6,Hplus2tbAnalysis_Weight_8 --prefix QCDScale --bandValue 2 --relPath "/uscms_data/d3/aattikis/workspace/pseudo-multicrab/Hplus2tbAnalysis/TopSelectionMVA/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/AfterPreapproval" --xmax 800 --ymin 1e0 && ./plot_ScaleOrPDF.py -m Hplus2tbAnalysis_Weight_Nominal,Hplus2tbAnalysis_Weight_9,Hplus2tbAnalysis_Weight_10,Hplus2tbAnalysis_Weight_12,Hplus2tbAnalysis_Weight_16,Hplus2tbAnalysis_Weight_23,Hplus2tbAnalysis_Weight_27,Hplus2tbAnalysis_Weight_32,Hplus2tbAnalysis_Weight_46,Hplus2tbAnalysis_Weight_59,Hplus2tbAnalysis_Weight_63,Hplus2tbAnalysis_Weight_77,Hplus2tbAnalysis_Weight_80,Hplus2tbAnalysis_Weight_96 --prefix PDF --bandValue 2 --relPath "/uscms_data/d3/aattikis/workspace/pseudo-multicrab/Hplus2tbAnalysis/TopSelectionMVA/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/AfterPreapproval" --xmax 800 --ymin 1e0
 OR
 ./doMuRF.csh
 
@@ -314,7 +314,7 @@ if __name__ == "__main__":
     SAVEDIR      = None
     VERBOSE      = False
     NORMALISE    = False
-    FOLDER       = "topSelectionBDT_"
+    FOLDER       = "topSelectionMVA_"
     PREFIX       = ""
     POSTFIX      = ""
     BANDVALUE    = 5.0

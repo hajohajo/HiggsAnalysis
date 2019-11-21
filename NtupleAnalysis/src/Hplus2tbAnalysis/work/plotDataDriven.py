@@ -152,7 +152,7 @@ def main(opts):
             dsetMgr1.printSelections()
             dsetMgr2.printSelections()
             PrintPSet("FakeBMeasurement", dsetMgr1)
-            PrintPSet("TopSelectionBDT" , dsetMgr2)
+            PrintPSet("TopSelectionMVA" , dsetMgr2)
 
         # Remove datasets with overlap?
         removeList = ["QCD-b"]

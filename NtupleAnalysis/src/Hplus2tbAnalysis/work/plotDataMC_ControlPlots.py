@@ -11,7 +11,7 @@ USAGE:
 
 EXAMPLES:
 ./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_StdSelections_TopCut100_AllSelections_TopCut10_171012_011451 --folder jetSelection_ --url
-./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_TopMVA0p90_171106_064503 --folder topbdtSelection_ -e "QCD_HT50to100|QCD_HT100to200|QCD_HT200to300|QCD_HT300to500"
+./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_TopMVA0p90_171106_064503 --folder topMVASelection_ -e "QCD_HT50to100|QCD_HT100to200|QCD_HT200to300|QCD_HT300to500"
 ./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_TopMVA0p90_171106_064503/ --url --signalMass 500
 ./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_MVA0p80_MVA0p80_TopMassCutOff600GeV_180104_043952 --folder counters/weighted --url
 
@@ -24,7 +24,7 @@ LAST USED:
 ./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900/ --folder tauSelection_Veto
 ./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900/ --folder jetSelection_
 ./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900/ --folder bjetSelection_
-./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900/ --folder topbdtSelection_
+./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900/ --folder topMVASelection_
 ./plotDataMC_ControlPlots.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900/ --folder ForDataDrivenCtrlPlots
 
 '''
@@ -269,7 +269,7 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"]   = {"xmax": +6.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
-    if "BDT" in h:
+    if "MVA" in h:
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["cutBox"] = {"cutValue": 0.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": +0.0, "ymin": yMin, "ymaxfactor": yMaxF}
@@ -278,7 +278,7 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"]   = {"xmax": +8.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
-    if h == "TrijetBDT_Mass": # before BDT cut
+    if h == "TrijetMVA_Mass": # before MVA cut
         units            = "GeV/c^{2}"
         kwargs["rebinX"] = 2
         kwargs["xlabel"] = "m_{jjb}^{cand} (%s)" % units
@@ -289,20 +289,20 @@ def GetHistoKwargs(h, opts):
     if h == "TopCandMass": #after all cuts
         units            = "GeV/c^{2}"
         kwargs["rebinX"] = 2
-        kwargs["xlabel"] = "m_{jjb}^{BDT} (%s)" % units
+        kwargs["xlabel"] = "m_{jjb}^{MVA} (%s)" % units
         kwargs["ylabel"] = _yLabel + units
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +500.0, "ymin": yMin, "ymaxfactor": yMaxF}
         kwargs["cutBox"] = {"cutValue": 173.21, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
-    if h == "BDTmultiplicity":
+    if h == "MVAmultiplicity":
         kwargs["rebinX"] = 1
         kwargs["xlabel"] = "top multiplicity"
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +40.0, "ymin": yMin, "ymaxfactor": yMaxF}
         kwargs["cutBox"] = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
-    if h == "BDTGresponse":
+    if h == "MVAresponse":
         kwargs["rebinX"] = 1
-        kwargs["xlabel"] = "BDT discriminant"
+        kwargs["xlabel"] = "MVA discriminant"
         kwargs["ylabel"] = "Events / %.1f "
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +1.0, "ymin": yMin, "ymax": 3e5} #yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.9, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
@@ -324,17 +324,17 @@ def GetHistoKwargs(h, opts):
         kwargs["ylabel"] = _yLabel + units
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +1000.0, "ymin": yMin, "ymaxfactor": yMaxF}
         
-    if h == "EventTrijetPt_BDT": # both pass, matched (fixme: filled for data?)
+    if h == "EventTrijetPt_MVA": # both pass, matched (fixme: filled for data?)
         units            = "GeV/c"
         kwargs["rebinX"] = 2
-        kwargs["xlabel"] = "p_{T,jjb}^{BDT} (%s)" % units
+        kwargs["xlabel"] = "p_{T,jjb}^{MVA} (%s)" % units
         kwargs["ylabel"] = _yLabel + units
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +1000.0, "ymin": yMin, "ymaxfactor": yMaxF}
         
-    if h == "EventTrijetPt2T_BDT": #both pass, both matched (fixme: filled for data?)
+    if h == "EventTrijetPt2T_MVA": #both pass, both matched (fixme: filled for data?)
         units            = "GeV/c"
         kwargs["rebinX"] = 2
-        kwargs["xlabel"] = "p_{T,jjb}^{BDT} (%s)" % units
+        kwargs["xlabel"] = "p_{T,jjb}^{MVA} (%s)" % units
         kwargs["ylabel"] = _yLabel + units
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +1000.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
@@ -394,7 +394,7 @@ def GetHistoKwargs(h, opts):
     if "dgTrijetDiJetPt" in h:
         units            = "GeV/c"
         #kwargs["rebinX"] = 2
-        kwargs["xlabel"] = "p_{T,jj}^{BDT} (%s)" % units
+        kwargs["xlabel"] = "p_{T,jj}^{MVA} (%s)" % units
         kwargs["ylabel"] = _yLabel + units
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +800.0, "ymin": yMin, "ymaxfactor": yMaxF}
 
@@ -730,7 +730,7 @@ def DataMCHistograms(datasetsMgr, histoName):
         skipStrings = ["_Vs_", "Vs", "Matched", "MCtruth", "TopQuark", 
                        "RealSelected", "DeltaMVAgt1", "SelectedTop", 
                        "LdgTrijetFake", "LdgTrijetFakeJJB", "TrijetFake",
-                       "FakeInTopDir", "LdgTrijetFakeJJB_BDT", "LdgTrijetFake_BDT"]
+                       "FakeInTopDir", "LdgTrijetFakeJJB_MVA", "LdgTrijetFake_MVA"]
 
     if opts.folder == "counters":
         skipStrings = ["weighted"]
@@ -750,7 +750,7 @@ def DataMCHistograms(datasetsMgr, histoName):
         skipStrings = [""]
     if opts.folder == "topologySelection_":
         skipStrings = ["_Vs_"]
-    if opts.folder == "topSelectionBDT_":
+    if opts.folder == "topSelectionMVA_":
         skipStrings = ["RelUncert"]
 
     if "ForDataDrivenCtrlPlots" in opts.folder:
@@ -870,7 +870,7 @@ if __name__ == "__main__":
     VERBOSE      = False
     RATIO        = False
     HISTOLEVEL   = "Vital" # 'Vital' , 'Informative' , 'Debug' 
-    FOLDER       = "ForDataDrivenCtrlPlots" # "topSelectionBDT_" #"ForDataDrivenCtrlPlots" #jetSelection_
+    FOLDER       = "ForDataDrivenCtrlPlots" # "topSelectionMVA_" #"ForDataDrivenCtrlPlots" #jetSelection_
 
     
     # Define the available script options

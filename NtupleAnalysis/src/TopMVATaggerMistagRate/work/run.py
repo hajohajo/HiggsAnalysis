@@ -65,7 +65,7 @@ import ROOT
 #================================================================================================
 # Options
 #================================================================================================
-prefix      = "TopBDTTaggerMistagRate"
+prefix      = "TopMVATaggerMistagRate"
 postfix     = ""
 dataEras    = ["2016"]
 searchModes = ["80to1000"]
@@ -206,8 +206,8 @@ def main():
     allSelections.METSelection.METCutValue                = -1000.0
     allSelections.METSelection.METCutDirection            = ">"
 
-    # Study MisID vs BDT Cut
-    #allSelections.TopSelectionBDT.MVACutValue = 0.40
+    # Study MisID vs MVA Cut
+    #allSelections.TopSelectionMVA.MVACutValue = 0.40
     
     # ================================================================================================
     # Add Analysis Variations

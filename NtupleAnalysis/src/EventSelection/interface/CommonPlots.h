@@ -120,7 +120,7 @@ public:
 					       const JetSelection::Data& jetData, 
 					       const BJetSelection::Data& bjetData, 
 					       const METSelection::Data& METData, 
-					       const TopSelectionBDT::Data& topData);
+					       const TopSelectionMVA::Data& topData);
   void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
   void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false);
   void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineB);  //HToTB-specific
@@ -245,7 +245,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlMHTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterStdSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlTopMVAAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetMassAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopMassAfterStdSelections;
@@ -350,7 +350,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterAllSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlTopMVAAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetMassAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopMassAfterAllSelections;
@@ -386,7 +386,7 @@ private:
   METSelection::Data fMETData;
   TopologySelection::Data fTopologyData;
   // QuarkGluonLikelihoodRatio::Data fQGLRData;
-  TopSelectionBDT::Data fTopData;
+  TopSelectionMVA::Data fTopData;
   AngularCutsCollinear::Data fBackToBackAngularCutsData;
   // FatJetSelection::Data fFatJetData;
   // FatJetSoftDropSelection::Data fFatJetSoftDropData;

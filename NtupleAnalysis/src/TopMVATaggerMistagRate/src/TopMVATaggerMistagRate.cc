@@ -6,11 +6,11 @@
 #include "EventSelection/interface/EventSelections.h"
 
 #include "TDirectory.h"
-//TopBDTTaggerMistagRate
-class TopBDTTaggerMistagRate: public BaseSelector {
+//TopMVATaggerMistagRate
+class TopMVATaggerMistagRate: public BaseSelector {
 public:
-  explicit TopBDTTaggerMistagRate(const ParameterSet& config, const TH1* skimCounters);
-  virtual ~TopBDTTaggerMistagRate() {}
+  explicit TopMVATaggerMistagRate(const ParameterSet& config, const TH1* skimCounters);
+  virtual ~TopMVATaggerMistagRate() {}
 
   /// Books histograms
   virtual void book(TDirectory *dir) override;
@@ -23,17 +23,17 @@ public:
   //Get leading in pt jet
   Jet GetLdgJet(const std::vector<Jet>& Jets);
   //Get leading in pt trijet
-  int GetLdgTopIndex(const TopSelectionBDT::Data& topData, vector<int> TopCandIndex);
+  int GetLdgTopIndex(const TopSelectionMVA::Data& topData, vector<int> TopCandIndex);
   // Check if Top candidate passes Top selection
-  bool PassBDT(const TopSelectionBDT::Data& topData, int ldgTop_index);
-  // Keep indices of top candidatese passing the BDT
-  vector<int> GetSelectedTopCandIndex(const TopSelectionBDT::Data& topData, vector<int> TopCandIndex);
+  bool PassMVA(const TopSelectionMVA::Data& topData, int ldgTop_index);
+  // Keep indices of top candidatese passing the MVA
+  vector<int> GetSelectedTopCandIndex(const TopSelectionMVA::Data& topData, vector<int> TopCandIndex);
   //Keep indices of cross-cleaned top candidates
-  vector<int> GetCleanedTopCandIndex(const TopSelectionBDT::Data& topData, vector<int> TopCandIndex);
+  vector<int> GetCleanedTopCandIndex(const TopSelectionMVA::Data& topData, vector<int> TopCandIndex);
   bool isMatchedJet(const Jet& jet, const std::vector<Jet>& jets);
 private:
   // Input parameters
-  const DirectionalCut<double> cfg_BDTGCut;
+  const DirectionalCut<double> cfg_MVACut;
   const unsigned int cfg_NBjets;
   const std::vector<float> cfg_JetPtCuts; 
 
@@ -52,7 +52,7 @@ private:
   BJetSelection      fBJetSelection;
   Count              cBTaggingSFCounter;
   METSelection       fMETSelection;
-  TopSelectionBDT    fTopSelection;
+  TopSelectionMVA    fTopSelection;
   Count cSelected;
     
   // Non-common histograms
@@ -100,11 +100,11 @@ private:
 };
 
 #include "Framework/interface/SelectorFactory.h"
-REGISTER_SELECTOR(TopBDTTaggerMistagRate);
+REGISTER_SELECTOR(TopMVATaggerMistagRate);
 
-TopBDTTaggerMistagRate::TopBDTTaggerMistagRate(const ParameterSet& config, const TH1* skimCounters)
+TopMVATaggerMistagRate::TopMVATaggerMistagRate(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    cfg_BDTGCut(config, "TopSelectionBDT.TopBDTGCut"),
+    cfg_MVACut(config, "TopSelectionMVA.TopMVACut"),
     cfg_NBjets(config.getParameter<unsigned int>("BJetSelection.numberOfBJetsCutValue")),
     cfg_JetPtCuts(config.getParameter<std::vector<float>>("JetSelection.jetPtCuts")),
     fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper),
@@ -120,15 +120,15 @@ TopBDTTaggerMistagRate::TopBDTTaggerMistagRate(const ParameterSet& config, const
     cBTaggingSFCounter(fEventCounter.addCounter("b tag SF")),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter
     // fQGLRSelection(config.getParameter<ParameterSet>("QGLRSelection")),// fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events"))
 { }
 
 
-void TopBDTTaggerMistagRate::book(TDirectory *dir) {
+void TopMVATaggerMistagRate::book(TDirectory *dir) {
 
-  if (0) std::cout << "=== TopBDTTaggerMistagRate::book()" << std::endl;
+  if (0) std::cout << "=== TopMVATaggerMistagRate::book()" << std::endl;
   // Book common plots histograms
   fCommonPlots.book(dir, isData());
 
@@ -160,7 +160,7 @@ void TopBDTTaggerMistagRate::book(TDirectory *dir) {
   const float fHtMin = fCommonPlots.getHtBinSettings().min();
   const float fHtMax = fCommonPlots.getHtBinSettings().max();
 
-  TDirectory* dirTH1 = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "TopBDTTagger_QCDMistagRate");
+  TDirectory* dirTH1 = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "TopMVATagger_QCDMistagRate");
   // Book non-common histograms
   h_FatJet_tau21  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dirTH1, "FatJet_tau21", ";#tau_{21}(#tau_{2}/#tau_{1})", 50, 0, 1.0);
   h_FatJet_tau32  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dirTH1, "FatJet_tau32", ";#tau_{32}(#tau_{3}/#tau_{2})", 50, 0, 1.0);
@@ -212,19 +212,19 @@ void TopBDTTaggerMistagRate::book(TDirectory *dir) {
 }
 
 
-void TopBDTTaggerMistagRate::setupBranches(BranchManager& branchManager) {
+void TopMVATaggerMistagRate::setupBranches(BranchManager& branchManager) {
   fEvent.setupBranches(branchManager);
   return;
 }
 
-bool TopBDTTaggerMistagRate::areSameJets(const Jet& jet1, const Jet& jet2) {
+bool TopMVATaggerMistagRate::areSameJets(const Jet& jet1, const Jet& jet2) {
   float dR = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
   float dR_match = 0.1;
   if (dR <= dR_match) return true;
   else return false;
 }
 
-Jet TopBDTTaggerMistagRate::GetLdgJet(const std::vector<Jet>& Jets){
+Jet TopMVATaggerMistagRate::GetLdgJet(const std::vector<Jet>& Jets){
 
   double maxPt = -999.99;
   Jet LdgJet;
@@ -237,7 +237,7 @@ Jet TopBDTTaggerMistagRate::GetLdgJet(const std::vector<Jet>& Jets){
   return LdgJet;
 }
 
-int TopBDTTaggerMistagRate::GetLdgTopIndex(const TopSelectionBDT::Data& topData, vector<int> TopCandIndex){
+int TopMVATaggerMistagRate::GetLdgTopIndex(const TopSelectionMVA::Data& topData, vector<int> TopCandIndex){
   size_t nTops = TopCandIndex.size();
   double maxPt =  -999.99;
   int ldgTopIndex = -1;
@@ -259,41 +259,41 @@ int TopBDTTaggerMistagRate::GetLdgTopIndex(const TopSelectionBDT::Data& topData,
 }
 
 
-bool TopBDTTaggerMistagRate::PassBDT(const TopSelectionBDT::Data& topData, int ldgTop_index){
+bool TopMVATaggerMistagRate::PassMVA(const TopSelectionMVA::Data& topData, int ldgTop_index){
 
   Jet ldgTop_Jet1 = topData.getAllTopsJet1().at(ldgTop_index);
   Jet ldgTop_Jet2 = topData.getAllTopsJet2().at(ldgTop_index);
   Jet ldgTop_BJet = topData.getAllTopsBJet().at(ldgTop_index);
 
-  bool passBDT = false;
+  bool passMVA = false;
 
   for (size_t i = 0; i < topData.getSelectedTopsBJet().size(); i++){
     Jet bjet = topData.getSelectedTopsBJet().at(i);
     Jet jet1 = topData.getSelectedTopsJet1().at(i);
     Jet jet2 = topData.getSelectedTopsJet2().at(i);
 
-    if (areSameJets(ldgTop_Jet1, jet1) && areSameJets(ldgTop_Jet2, jet2) && areSameJets(ldgTop_BJet, bjet)) passBDT = true;
+    if (areSameJets(ldgTop_Jet1, jet1) && areSameJets(ldgTop_Jet2, jet2) && areSameJets(ldgTop_BJet, bjet)) passMVA = true;
   }
-  return passBDT;
+  return passMVA;
 }
 
-vector<int> TopBDTTaggerMistagRate::GetSelectedTopCandIndex(const TopSelectionBDT::Data& topData, vector<int> TopCandIndex){
+vector<int> TopMVATaggerMistagRate::GetSelectedTopCandIndex(const TopSelectionMVA::Data& topData, vector<int> TopCandIndex){
   vector<int> SelectedTopCandIndex;
   for (size_t i=0; i<TopCandIndex.size(); i++){
     int index = TopCandIndex.at(i);
 
-    float mva = topData.getAllTopsBDTG().at(index);
-    if (cfg_BDTGCut.passedCut(mva)) SelectedTopCandIndex.push_back(index);
+    float mva = topData.getAllTopsMVA().at(index);
+    if (cfg_MVACut.passedCut(mva)) SelectedTopCandIndex.push_back(index);
   }
   return SelectedTopCandIndex;
 }
 
 
-vector<int> TopBDTTaggerMistagRate::GetCleanedTopCandIndex(const TopSelectionBDT::Data& topData, vector<int> TopCandIndex){
+vector<int> TopMVATaggerMistagRate::GetCleanedTopCandIndex(const TopSelectionMVA::Data& topData, vector<int> TopCandIndex){
   
   // Description:
   // Used to find the cross-cleaned trijet multiplicity.
-  // Fales: If at least one of the subjets of the trijets are used by the trijets with Higher BDT value (Higher BDT value -> smaller index: Trijets sorted in BDT value)
+  // Fales: If at least one of the subjets of the trijets are used by the trijets with Higher MVA value (Higher MVA value -> smaller index: Trijets sorted in MVA value)
   // True:  If cross-cleaned trijet
 
   vector<int> TopCandIndex_cleaned;
@@ -306,7 +306,7 @@ vector<int> TopBDTTaggerMistagRate::GetCleanedTopCandIndex(const TopSelectionBDT
     Jet bjet = topData.getAllTopsBJet().at(index);
     bool keepTop = true;
 
-    //Keep Top candidate with highest BDT value
+    //Keep Top candidate with highest MVA value
     if (i == 0) TopCandIndex_cleaned.push_back(index);
     else{
       for (size_t j=0; j<(size_t)i; j++)
@@ -317,7 +317,7 @@ vector<int> TopBDTTaggerMistagRate::GetCleanedTopCandIndex(const TopSelectionBDT
 	  Jet bjet_prev = topData.getAllTopsBJet().at(index_prev);
 	  Top_jets.push_back(jet1_prev); Top_jets.push_back(jet2_prev); Top_jets.push_back(bjet_prev);
 
-	  // Skip top candidates with same jets as Trijets with higher BDT value
+	  // Skip top candidates with same jets as Trijets with higher MVA value
 	  bool bsharedJets = isMatchedJet(jet1, Top_jets) || isMatchedJet(jet2, Top_jets) || isMatchedJet(bjet, Top_jets);
 	  if (bsharedJets) keepTop = false; 
 	}
@@ -327,7 +327,7 @@ vector<int> TopBDTTaggerMistagRate::GetCleanedTopCandIndex(const TopSelectionBDT
   return TopCandIndex_cleaned; 
 }
 
-bool TopBDTTaggerMistagRate::isMatchedJet(const Jet& jet, const std::vector<Jet>& jets) {
+bool TopMVATaggerMistagRate::isMatchedJet(const Jet& jet, const std::vector<Jet>& jets) {
   for (auto Jet: jets)
     {
       if (areSameJets(jet, Jet)) return true;
@@ -335,12 +335,12 @@ bool TopBDTTaggerMistagRate::isMatchedJet(const Jet& jet, const std::vector<Jet>
   return false;
 }
 
-void TopBDTTaggerMistagRate::process(Long64_t entry) {
+void TopMVATaggerMistagRate::process(Long64_t entry) {
 
   // Sanity check
-  // if (cfg_LdgTopDefinition != "BDTG" &&  cfg_LdgTopDefinition != "Pt")
+  // if (cfg_LdgTopDefinition != "MVA" &&  cfg_LdgTopDefinition != "Pt")
   //   {
-  //     throw hplus::Exception("config") << "Unsupported method of defining the leading top (=" << cfg_LdgTopDefinition << "). Please select from \"BDTG\" and \"Pt\".";
+  //     throw hplus::Exception("config") << "Unsupported method of defining the leading top (=" << cfg_LdgTopDefinition << "). Please select from \"MVA\" and \"Pt\".";
   //   }
 
   //====== Initialize
@@ -432,8 +432,8 @@ void TopBDTTaggerMistagRate::process(Long64_t entry) {
   //================================================================================================
   // 11) Top selection
   //================================================================================================
-  if (0) std::cout << "=== Top (BDT) selection" << std::endl;
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  if (0) std::cout << "=== Top (MVA) selection" << std::endl;
+  const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
 
 
   //Keep events with exactly one b-tagged jet
@@ -475,9 +475,9 @@ void TopBDTTaggerMistagRate::process(Long64_t entry) {
       //Pt of all top candidates
       h_AfterStandardSelections_Tops_Pt  -> Fill(Top_p4.Pt());
       
-      float mva = topData.getAllTopsBDTG().at(i);
-      //Pt of all top candidates passing the BDT cut
-      if (cfg_BDTGCut.passedCut(mva)) h_AfterAllSelections_Tops_Pt  -> Fill(Top_p4.Pt());
+      float mva = topData.getAllTopsMVA().at(i);
+      //Pt of all top candidates passing the MVA cut
+      if (cfg_MVACut.passedCut(mva)) h_AfterAllSelections_Tops_Pt  -> Fill(Top_p4.Pt());
     }
   }
   
@@ -526,7 +526,7 @@ void TopBDTTaggerMistagRate::process(Long64_t entry) {
 	if (dR_fatjet_Top > 2.0) keepTopCandidate = true;	
 	if (keepTopCandidate) h_AfterStandardSelections_FatJet_Pt -> Fill(fatJet.pt());
 
-	if (keepTopCandidate && cfg_BDTGCut.passedCut(topData.getAllTopsBDTG().at(i))) h_AfterAllSelections_FatJet_Pt -> Fill(fatJet.pt());
+	if (keepTopCandidate && cfg_MVACut.passedCut(topData.getAllTopsMVA().at(i))) h_AfterAllSelections_FatJet_Pt -> Fill(fatJet.pt());
 
       }
       
@@ -536,9 +536,9 @@ void TopBDTTaggerMistagRate::process(Long64_t entry) {
       //Pt of all top candidates
       h_AfterStandardSelections_Tops_Pt  -> Fill(Top_p4.Pt());
 
-      float mva = topData.getAllTopsBDTG().at(i);
-      //Pt of all top candidates passing the BDT cut
-      if (cfg_BDTGCut.passedCut(mva)) h_AfterAllSelections_Tops_Pt  -> Fill(Top_p4.Pt());
+      float mva = topData.getAllTopsMVA().at(i);
+      //Pt of all top candidates passing the MVA cut
+      if (cfg_MVACut.passedCut(mva)) h_AfterAllSelections_Tops_Pt  -> Fill(Top_p4.Pt());
 
     }    
   }
@@ -573,16 +573,16 @@ void TopBDTTaggerMistagRate::process(Long64_t entry) {
       //Pt of all top candidates
       h_AfterStandardSelections_Tops_Pt  -> Fill(Top_p4.Pt());
       
-      float mva = topData.getAllTopsBDTG().at(i);
-      //Pt of all top candidates passing the BDT cut
-      if (cfg_BDTGCut.passedCut(mva)) h_AfterAllSelections_Tops_Pt  -> Fill(Top_p4.Pt());
+      float mva = topData.getAllTopsMVA().at(i);
+      //Pt of all top candidates passing the MVA cut
+      if (cfg_MVACut.passedCut(mva)) h_AfterAllSelections_Tops_Pt  -> Fill(Top_p4.Pt());
     }    
   }
 
-  if (0){ //Debug: Check if Top Candidates are sorted in BDT value
+  if (0){ //Debug: Check if Top Candidates are sorted in MVA value
     for (size_t i=0; i<TopCandIndex.size(); i++){
       int index = TopCandIndex.at(i);
-      std::cout<<"index = "<<index<<" mva = "<<topData.getAllTopsBDTG().at(index)<<std::endl;
+      std::cout<<"index = "<<index<<" mva = "<<topData.getAllTopsMVA().at(index)<<std::endl;
     }
   }
 
@@ -598,7 +598,7 @@ void TopBDTTaggerMistagRate::process(Long64_t entry) {
       Jet jet2 = topData.getAllTopsJet2().at(index);
       Jet bjet = topData.getAllTopsBJet().at(index);
       
-      std::cout<<"top index "<<index<<"mva "<<topData.getAllTopsBDTG().at(index)<<"jet1 "<<jet1.index()<<"jet2 "<<jet2.index()<<"bjet "<<bjet.index()<<std::endl;
+      std::cout<<"top index "<<index<<"mva "<<topData.getAllTopsMVA().at(index)<<"jet1 "<<jet1.index()<<"jet2 "<<jet2.index()<<"bjet "<<bjet.index()<<std::endl;
     }
     std::cout<<"====="<<std::endl;
   }
@@ -639,8 +639,8 @@ void TopBDTTaggerMistagRate::process(Long64_t entry) {
 
   if (bjetData.getSelectedBJets().size() > 1) h_AfterStandardSelections_Bjet2_Pt     -> Fill(bjetData.getSelectedBJets().at(1).pt());
 
-  bool passBDT = PassBDT(topData, ldgTop_index);  
-  if (!passBDT) return;
+  bool passMVA = PassMVA(topData, ldgTop_index);  
+  if (!passMVA) return;
 
   //Fill plots after all Selections
   h_AfterAllSelections_LdgTop_Pt       -> Fill(Top_p4.Pt());  

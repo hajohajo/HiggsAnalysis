@@ -104,7 +104,7 @@ class AnalysisConfig:
                     elif value.startswith("TopMistagSF"):
                         variationType = "mistag"
                     direction = value.replace("TopTagSF","").replace("TopMistagSF","").replace("Minus","down").replace("Plus","up")
-                    scaleFactors.updateTopTagSFInformationForVariations(self._config.TopSelectionBDT, direction=direction, variationInfo=variationType)
+                    scaleFactors.updateTopTagSFInformationForVariations(self._config.TopSelectionMVA, direction=direction, variationInfo=variationType)
 
 		# top quarks
 		elif value.startswith("TopPt"):
