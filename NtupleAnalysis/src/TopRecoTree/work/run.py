@@ -13,17 +13,16 @@ a time most probably you are I/O -limited. The limit is how much memory one proc
 
 
 USAGE:
-./run.py -m <multicrab_directory> -j <numOfCores> -i <DatasetName>
-or
 ./run.py -m <multicrab_directory> -n 10 -e "Keyword1|Keyword2|Keyword3"
 
-Example:
-./run.py -m /multicrab_CMSSW752_Default_07Jan2016/
-./run.py -m multicrab_CMSSW752_Default_07Jan2016/ -j 16
-./run.py -m multicrab_Hplus2tbAnalysis_v8014_20160818T1956 -n 1000 -e QCD
-./run.py -m <multicrab-directory> -e TT_extOB
-./run.py -m <multicrab_directory> -n 10 -e "QCD_bEnriched_HT300|2016|ST_"
+
+EXAMPLE:
 ./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/ -i "TT"
+
+
+LAST USED:
+./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/
+
 
 ROOT:
 The available ROOT options for the Error-Ignore-Level are (const Int_t):
@@ -33,6 +32,7 @@ The available ROOT options for the Error-Ignore-Level are (const Int_t):
         kWarning  =   2000
         kError    =   3000
         kBreak    =   4000
+
 
 HistoLevel:
 For the histogramAmbientLevel each DEEPER level is a SUBSET of the rest. 
@@ -125,7 +125,84 @@ def main():
         Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=opts.excludeTasks)
     else:
-        myBlackList = ["QCD_b"]
+        myBlackList = [
+            "ChargedHiggs_HplusTB_HplusToTB_M_1000",
+            "hargedHiggs_HplusTB_HplusToTB_M_10000",
+            "hargedHiggs_HplusTB_HplusToTB_M_1000_ext1",
+            "hargedHiggs_HplusTB_HplusToTB_M_1500",
+            "hargedHiggs_HplusTB_HplusToTB_M_1500_ext1",
+            "hargedHiggs_HplusTB_HplusToTB_M_180",
+            "hargedHiggs_HplusTB_HplusToTB_M_180_ext1",
+            "hargedHiggs_HplusTB_HplusToTB_M_200",
+            "hargedHiggs_HplusTB_HplusToTB_M_2000",
+            "ChargedHiggs_HplusTB_HplusToTB_M_2000_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_200_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_220",
+            "ChargedHiggs_HplusTB_HplusToTB_M_220_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_250",
+            "ChargedHiggs_HplusTB_HplusToTB_M_2500",
+            "ChargedHiggs_HplusTB_HplusToTB_M_2500_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_250_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_300",
+            "ChargedHiggs_HplusTB_HplusToTB_M_3000",
+            "ChargedHiggs_HplusTB_HplusToTB_M_3000_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_300_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_350",
+            "ChargedHiggs_HplusTB_HplusToTB_M_350_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_400",
+            "ChargedHiggs_HplusTB_HplusToTB_M_400_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_500",
+            "ChargedHiggs_HplusTB_HplusToTB_M_5000",
+            "ChargedHiggs_HplusTB_HplusToTB_M_500_ext1",
+            "ChargedHiggs_HplusTB_HplusToTB_M_650",
+            "ChargedHiggs_HplusTB_HplusToTB_M_7000",
+            "ChargedHiggs_HplusTB_HplusToTB_M_800",
+            "ChargedHiggs_HplusTB_HplusToTB_M_800_ext1",
+            "DYJetsToQQ_HT180",
+            "JetHT_Run2016B_03Feb2017_ver2_v2_273150_275376",
+            "JetHT_Run2016C_03Feb2017_v1_275656_276283",
+            "JetHT_Run2016D_03Feb2017_v1_276315_276811",
+            "JetHT_Run2016E_03Feb2017_v1_276831_277420",
+            "JetHT_Run2016F_03Feb2017_v1_277932_278800",
+            "JetHT_Run2016F_03Feb2017_v1_278801_278808",
+            "JetHT_Run2016G_03Feb2017_v1_278820_280385",
+            "JetHT_Run2016H_03Feb2017_ver2_v1_281613_284035",
+            "JetHT_Run2016H_03Feb2017_ver3_v1_284036_284044",
+            "QCD_HT1000to1500",
+            "QCD_HT1000to1500_ext1",
+            "QCD_HT100to200",
+            "QCD_HT1500to2000",
+            "QCD_HT1500to2000_ext1",
+            "QCD_HT2000toInf",
+            "QCD_HT2000toInf_ext1",
+            "QCD_HT200to300",
+            "QCD_HT200to300_ext1",
+            "QCD_HT300to500",
+            "QCD_HT300to500_ext1",
+            "QCD_HT500to700",
+            "QCD_HT500to700_ext1",
+            "QCD_HT50to100",
+            "QCD_HT700to1000",
+            "QCD_HT700to1000_ext1",
+            "ST_s_channel_4f_InclusiveDecays",
+            "ST_tW_antitop_5f_inclusiveDecays",
+            "ST_tW_antitop_5f_inclusiveDecays_ext1",
+            "ST_tW_top_5f_inclusiveDecays",
+            "ST_tW_top_5f_inclusiveDecays_ext1",
+            "ST_t_channel_antitop_4f_inclusiveDecays",
+            "ST_t_channel_top_4f_inclusiveDecays",
+            #"TT",
+            "TTTT",
+            "TTWJetsToQQ",
+            "TTZToQQ",
+            "WJetsToQQ_HT_600ToInf",
+            "WWTo4Q",
+            "WZ",
+            "WZ_ext1",
+            "ZJetsToQQ_HT600toInf",
+            "ZZTo4Q",
+            "QCD_b"]
+
         Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
         Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         regex =  "|".join(myBlackList)
@@ -142,11 +219,10 @@ def main():
     from HiggsAnalysis.NtupleAnalysis.parameters.hplus2tbAnalysis import allSelections
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
-    # allSelections.BjetSelection.triggerMatchingApply = True
-    # allSelections.TopSelection.ChiSqrCutValue = 100.0
-    # allSelections.BJetSelection.numberOfBJetsCutValue = 0
-    # allSelections.BJetSelection.numberOfBJetsCutDirection = "=="
-
+    #allSelections.Trigger.triggerOR = [] 
+    #allSelections.METFilter = []
+    allSelections.JetSelection.numberOfBJetsCutValue  = 5 # [default: 7]
+    allSelections.BJetSelection.numberOfBJetsCutValue = 1 # [default: 3]
     
     # ================================================================================================
     # Add Analysis Variations

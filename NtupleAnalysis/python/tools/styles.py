@@ -490,6 +490,10 @@ styles = [
     Style(33, ROOT.kGray+2),
     Style(34, ROOT.kBlue+3),
     Style(35, ROOT.kOrange+1),
+    Style(35, ROOT.kGray),
+    Style(35, ROOT.kTeal),
+    Style(35, ROOT.kViolet),
+    Style(35, ROOT.kOrange+2),
     Style(36, ROOT.kCyan-5),
     Style(22, ROOT.kBlue),
     Style(25, ROOT.kBlack)

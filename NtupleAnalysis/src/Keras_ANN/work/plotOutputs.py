@@ -10,27 +10,20 @@ USAGE:
 
 
 EXAMPLES:
-./plotOutputs.py -s png --logY --yMin 5e1 --saveDir /publicweb/a/aattikis/Test/ --dirs Keras_3Layers_19relu_100relu_1sigmoid_1000000Epochs_5000BatchSize_06-Nov-2019_17h39m,Keras_3Layers_19relu_100relu_1sigmoid_1000000Epochs_500BatchSize_06-Nov-2019_17h06m,Keras_3Layers_1024relu_512relu_1sigmoid_100000Epochs_1000BatchSize_05-Nov-2019_14h49m --refIndex 2 --cutLineX 0.5
-./plotOutputs.py -s png --logY --yMin 5e1 --saveDir /publicweb/a/aattikis/Test/ --dirs Keras_3Layers_19relu_100relu_1sigmoid_1000000Epochs_5000BatchSize_06-Nov-2019_17h39m,Keras_3Layers_19relu_100relu_1sigmoid_1000000Epochs_500BatchSize_06-Nov-2019_17h06m,Keras_3Layers_1024relu_512relu_1sigmoid_100000Epochs_1000BatchSize_05-Nov-2019_14h49m --refIndex 2
-./plotOutputs.py -s png --logY --yMin 5e1 --saveDir /publicweb/a/aattikis/Test/ --dirs Keras_3Layers_19relu_190relu_1sigmoid_10Epochs_100BatchSize_07-Nov-2019_18h19m,Keras_3Layers_19relu_190relu_1sigmoid_15Epochs_100BatchSize_07-Nov-2019_18h19m,Keras_3Layers_19relu_190relu_1sigmoid_20Epochs_100BatchSize_07-Nov-2019_18h19m
-./plotOutputs.py -s png --logY --plotType output  --dirs Keras_3Layers_19relu_190relu_1sigmoid_10Epochs_100BatchSize_07-Nov-2019_18h19m,Keras_3Layers_19relu_190relu_1sigmoid_15Epochs_100BatchSize_07-Nov-2019_18h19m,Keras_3Layers_19relu_190relu_1sigmoid_20Epochs_100BatchSize_07-Nov-2019_18h19m
-./plotOutputs.py -s png --logY --plotType output --dirs trial6,trial7,trial8
-./plotOutputs.py -s png --logY --plotType output --dirs trial6,trial7,trial8 --refIndex 3
-./plotOutputs.py -s png --logY --plotType output --dirs new1,new2 --refIndex 3 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2 --refIndex 3 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --plotType significance --dirs new1,new2 --saveDir /publicweb/a/aattikis/Test --yMin 0.0 --refIndex 3 --yMaxFactor 1.1
-./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --dirs new5,new6,new7,new8 --saveDir /publicweb/a/aattikis/new5_6_7_8
 ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --dirs new5,new6,new7,new8 --saveDir /publicweb/a/aattikis/new5_6_7_8
 ./plotOutputs.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2,new3 --refIndex 3 --saveDir /publicweb/a/aattikis/Test
 ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 3 --dirs new1,new2,new3 --saveDir /publicweb/a/aattikis/Test 
 ./plotOutputs.py -s png --logY --plotType output --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 8 --dirs new1,new2,new3,new4 --saveDir /publicweb/a/aattikis/Test
 ./plotOutputs.py -s png --logY --plotType output --dirs new1,new8,new9 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new1,new8,new9 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new1,new8,new9 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new1,new8,new9 --saveDir /publicweb/a/aattikis/Test
+./plotOutputs.py -s png --plotType roc --logY -saveDir /publicweb/a/aattikis/Test --logX --xMin 0.6 --yMin 6e-3 --yMax 1e-1 --dirs new2,new8,new9,new10,new11
+./plotOutputs.py -s png --plotType roc --xMin 0.01 --logY --dirs new9,new10,new11 --saveDir /publicweb/a/aattikis/BDT --refName BDT --cutLineX 0.93
+./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test  --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT --cutLineX 0.93
 
 
 LAST USED:
 ./plotOutputs.py -s png --logY --plotType output --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --plotType roc --logY -saveDir /publicweb/a/aattikis/Test --logX --xMin 0.6 --yMin 6e-3 --yMax 1e-1 --dirs new2,new8,new9,new10,new11
-
+./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test --dirs 500k_sample,Keras_BDTG2018_Aug2018 --cutLineX 0.93 --xMin 0.0
+./plotOutputs.py -s png --plotType var --logY --saveDir /publicweb/a/aattikis/SotiSoti --dirs Keras_Test --yMin 0.5e-3 --yMax 1.0
 
 
 '''
@@ -123,6 +116,9 @@ def main():
 
         Verbose("Picked %s" % directory, True)
         resultsList.append(_results.Output(directory, excludePoints=[]))
+        if opts.refName != None:
+            if opts.refName in d:
+                opts.refIndex = i
 
     # Do comparison plot
     msg  = "Creating comparison plots (%d) using the following results directories:%s\n\t%s" % (len(opts.dirList), sh_t, "\n\t".join([os.path.basename(d) for d in opts.dirList]) )
@@ -135,6 +131,13 @@ def main():
         doSignificance(opts.saveName, resultsList) 
     elif "roc" in opts.plotType.lower():
         doROC(opts.saveName, resultsList)
+    elif "var" in opts.plotType.lower():
+        for var in  ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
+                     "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
+                     "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
+                     "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
+                     "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]:
+            doVariables(opts.saveName, var, resultsList)
     else:
         pass
     
@@ -152,6 +155,7 @@ def doOutput(name, resultsList):
 
     # For-loop: All Output-class objects
     for r in resultsList:
+        print r.getDirectory()
         gSig, lSig = r.getGraphs(opts.plotName + "_signal")
         gBkg, lBkg = r.getGraphs(opts.plotName + "_background")
         if opts.yMin == None:
@@ -279,6 +283,8 @@ def doROC(name, resultsList):
             opts.yMax = r.getYMax()*1.10
         gSigList.extend(gSig)
         gBkgList.extend(gBkg)
+        if "BDT" in r.getDirectory():
+            lSig = ["BDTG"]
         legList.extend(lSig)
         
     # Re-arrange legend
@@ -299,14 +305,77 @@ def doROC(name, resultsList):
 
         # For-loop: All points in graph
         for j in range(0, N):
-            x.append(gSigList[i].GetY()[j])
-            y.append(gBkgList[i].GetY()[j])
+            xVal = gSigList[i].GetY()[j]
+            yVal = gBkgList[i].GetY()[j]
+            if xVal <= opts.xMin:
+                continue
+            x.append(xVal)
+            y.append(yVal)
+            Verbose("%s) x = %s, y = %s" % (g.GetName(), xVal, yVal), False)
 
         # Create the TGraph
         g = ROOT.TGraph(N, array.array('d', x), array.array('d',y))
         gSvBList.append(g)
 
     # Make the plot
+    doPlot(legList, gSvBList, opts.saveName, **kwargs)
+    return
+
+def doVariables(name, variable, resultsList):
+    
+    # Do the comparison plot
+    Verbose("Creating the expected plots", True)
+    gSigList = []
+    gBkgList = []
+    legList  = []
+    gSvBList = []
+    opts.saveName = variable
+
+    # For-loop: All Output-class objects
+    for r in resultsList:
+        gSig, lSig = r.getGraphs(variable + "_signal")
+        gBkg, lBkg = r.getGraphs(variable + "_background")
+        if opts.yMin == None:
+            opts.yMin = r.getYMin()
+        if opts.yMax == None and opts.yMax == None:
+            opts.yMax = r.getYMax()*1.10
+        gSigList.extend(gSig)
+        gBkgList.extend(gBkg)
+        legList.extend(["signal"]) 
+        legList.extend(["background"])
+        
+    # Plot the graph
+    kwargs = GetVarKwargs(variable, opts)
+    gList = [gSigList[0], gBkgList[0]]
+
+    # For-loop: All TGraphs
+    #for i, g in enumerate(gSigList, 0):
+    for i, g in enumerate(gList, 0):
+        x  = []
+        y  = []
+        N  = g.GetN()
+        nS = g.GetName()
+        nB = g.GetName()
+        Verbose("nS = %s, nB = %s" % (nS, nB), True)
+
+        # For-loop: All points in graph
+        for j in range(0, N+1):
+            xVal = g.GetX()[j]
+            yVal = g.GetY()[j]
+            if xVal <= opts.xMin:
+                continue
+            # Protection: don't include (x,y) = (0.0, 0.0)
+            if xVal !=0.0 and yVal !=0.0:
+                x.append(xVal)
+                y.append(yVal)
+            Verbose("%d) x = %0.3f, y = %0.3f" % (j, xVal, yVal), j==0)
+        # Create the TGraph
+        Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
+        g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
+        gSvBList.append(g)
+
+    # Make the plot
+    Verbose("Making the plot", True)
     doPlot(legList, gSvBList, opts.saveName, **kwargs)
     return
 
@@ -326,12 +395,14 @@ def doPlot(legList, graphList, saveName, **kwargs):
         hgList.append(hg)
 
     # Create a plot-base object
+    Verbose("Creating the plot-base object", True)
     # plot = plots.PlotBase(hgList, saveFormats=[])
-    hgList.insert(0, hgList.pop(opts.refIndex)) #iro
+    hgList.insert(0, hgList.pop(opts.refIndex))
     plot = plots.ComparisonManyPlot(hgList[0], hgList[1:], saveFormats=[])
     #plot = plots.ComparisonManyPlot(hgList[-1], hgList[:-1], saveFormats=[])
 
     # Apply histo style
+    Verbose("Applying the histogram styles (generator)", True)
     plot.histoMgr.forEachHisto(styles.generator())
     # plot.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(1.2))
     # plot.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetLineWidth(3))
@@ -343,15 +414,19 @@ def doPlot(legList, graphList, saveName, **kwargs):
         return
 
     # Apply style and set label
+    Verbose("Applying the histogram styles (forEachHisto)", True)
     plot.histoMgr.forEachHisto(sty)
-    plot.setLegendHeader("Sequential Model (Keras)")
+    if opts.plotType != "var":
+        plot.setLegendHeader("Sequential Model (Keras)")
 
     # Draw the plot
+    Verbose("Drawing the plot", True)
     plots.drawPlot(plot, saveName, **kwargs)
     if opts.removeLegend:
         plot.removeLegend()
 
     # Save plots and return
+    Verbose("Saving the plot as %s" % (saveName), True)
     SavePlot(plot, opts.saveDir, saveName, opts.saveFormats)
     
     Verbose("Plots saved under directory %s"% (sh_s + aux.convertToURL(opts.saveDir, opts.url) + sh_n), True)
@@ -364,6 +439,185 @@ def GetKwargsRatio(kwargs):
     kwargs["opts"]["ymax"] = 3.0
     kwargs["log"] = False
     tdrstyle.TDRStyle().setLogY(False)
+    return kwargs
+
+def GetVarKwargs(var, opts):
+    dh = -0.12 + (len(opts.dirList)-3)*0.04
+    legNW  = {"dx": -0.53, "dy": -0.05, "dh": dh}
+    legSW  = {"dx": -0.53, "dy": -0.30, "dh": dh}
+    legNE  = {"dx": -0.05, "dy": -0.05, "dh": dh}
+    legSE  = {"dx": -0.18, "dy": -0.45, "dh": dh}
+    if opts.paper:
+        #histograms.cmsTextMode = histograms.CMSMode.PAPER
+        cmsExtraText = ""
+    else:
+        #histograms.cmsTextMode = histograms.CMSMode.PRELIMINARY
+        #histograms.cmsTextMode = histograms.CMSMode.UNPUBLISHED
+        cmsExtraText = "Preliminary"
+
+    kwargs  = {
+        "xlabel"           : "DNN Output",
+        "ylabel"           : "Entries",
+        "addMCUncertainty" : False,
+        "addLuminosityText": False,
+        "addCmsText"       : True,
+        "cmsExtraText"     : cmsExtraText,
+        "cmsTextPosition"  : "outframe",
+        "opts"             : {"xmin": opts.xMin, "xmax": opts.xMax, "ymin": opts.yMin, "ymax": opts.yMax},
+        "opts2"            : {"ymin": 0.59, "ymax": 1.41},
+        "log"              : opts.logY,
+        "moveLegend"       : legNE,
+        "xtitlesize"       : 0.1,
+        "ytitlesize"       : 0.1,
+        "cutBox"           : {"cutValue":  0.0, "fillColor": 16, "box": False, "line": False , "cutGreaterThan": False},
+        #"cutBoxY"          : {"cutValue": 1000.0, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}  # does not work!
+        }
+
+    # General settings
+    if opts.yMaxFactor:
+        kwargs["opts"]["ymaxfactor"] = opts.yMaxFactor
+        del kwargs["opts"]["ymax"]
+    if opts.logY and kwargs["opts"]["ymin"] <= 0.0:
+        msg = "Cannot have log-y enabled and y-min set to 0.0. Setting to y-min to 1.0."
+        Print(sh_h + msg + sh_n, True)
+        kwargs["opts"]["ymin"] = 1e0
+    if opts.logX and kwargs["opts"]["xmin"] <= 0.0:
+        msg = "Cannot have log-x enabled and y-min set to <=0.0. Setting to x-min to 1e-2"
+        Print(sh_h + msg + sh_n, True)
+        kwargs["opts"]["xmin"] = 1e-2
+    if opts.cutLineX != None:
+        kwargs["cutBox"]  = {"cutValue": opts.cutLineX, "fillColor": 16, "box": False, "line": True , "cutGreaterThan": False}
+    if opts.cutLineY != None:
+        Print("This does not work! Bug-fixing required!", True)
+        kwargs["cutBoxY"] = {"cutValue": opts.cutLineY, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False} 
+
+    if var == "TrijetPtDR":
+        kwargs["opts"]["xmin"]   =  0.0
+        kwargs["opts"]["xmax"]   = 800.0
+        kwargs["xlabel"] = "p_{T}#DeltaR_{t}"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["ylabel"] = "a.u. / %0.0f"
+
+    if var == "TrijetDijetPtDR":
+        kwargs["opts"]["xmin"]   =  0.0
+        kwargs["opts"]["xmax"]   = 800.0
+        kwargs["xlabel"] = "p_{T}#DeltaR_{W}"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["ylabel"] = "a.u. / %0.f"
+
+    if var == "TrijetBjetMass":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   = 100.0
+        kwargs["xlabel"] = "m_{b} [GeV]"
+        #kwargs["ylabel"] = "a.u. / %0.f GeV"
+
+    if var == "TrijetLdgJetBDisc":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   =   1.0
+        kwargs["xlabel"] = "b-tag discr."
+        #kwargs["ylabel"] = "a.u. / %0.2f"
+
+    if var == "TrijetSubldgJetBDisc":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   =   1.0
+        kwargs["xlabel"] = "b-tag discr."
+        #kwargs["ylabel"] = "a.u. / %0.2f"
+
+    if var == "TrijetBJetLdgJetMass":
+        kwargs["opts"]["xmin"]   =  0.0
+        kwargs["opts"]["xmax"]   = 600.0
+        kwargs["xlabel"] = "m_{b,j_{1}} [GeV]"
+        kwargs["yMin"]   = 1e-3
+
+    if var == "TrijetBJetSubldgJetMass":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   = 600.0
+        kwargs["xlabel"] = "m_{b,j_{2}} [GeV]"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["ylabel"] = "a.u. / %0.0f GeV"
+
+    if var == "TrijetMass":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   = 800.0
+        kwargs["xlabel"] = "m_{W} [GeV]"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["ylabel"] = "a.u. / %0.0f GeV"
+
+    if var == "TrijetDijetMass":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   = 500.0
+        kwargs["xlabel"] = "m_{W} [GeV]"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["ylabel"] = "a.u. / %0.0f GeV"
+
+    if var == "TrijetBJetBDisc":
+        kwargs["opts"]["xmin"]   =  0.0
+        kwargs["opts"]["xmax"]   =  1.0
+        kwargs["xlabel"] = "b-tag discr."
+        #kwargs["ylabel"] = "a.u. / %0.2f"
+
+    if var == "TrijetSoftDrop_n2":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   =   2.0
+        kwargs["xlabel"] = "soft-drop n_{2}"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["ylabel"] = "a.u. / %0.2f"
+
+    if var == "TrijetLdgJetCvsL":
+        kwargs["opts"]["xmin"]   =  -1.0
+        kwargs["opts"]["xmax"]   =  +1.0
+        kwargs["xlabel"] = "CvsL discr."
+        kwargs["yMin"]   = 1e-3
+        kwargs["yMax"]   = 1e-1
+        #kwargs["ylabel"] = "a.u. / %0.2f"
+
+    if var == "TrijetSubldgJetCvsL":
+        kwargs["opts"]["xmin"]   =  -1.0
+        kwargs["opts"]["xmax"]   =  +1.0
+        kwargs["xlabel"] = "CvsL discr."
+        kwargs["yMin"]   = 1e-3
+        kwargs["yMax"]   = 1e-1
+        #kwargs["ylabel"] = "a.u. / %0.2f"
+
+    if var == "TrijetLdgJetPtD":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   =   1.0
+        kwargs["xlabel"] = "p_{T}D"
+        #kwargs["ylabel"] = "a.u. / %0.2f"
+
+    if var == "TrijetSubldgJetPtD":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   =   1.0
+        kwargs["xlabel"] = "p_{T}D"
+        #kwargs["ylabel"] = "a.u. / %0.2f"
+
+    if var == "TrijetLdgJetAxis2":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   =   0.16
+        kwargs["xlabel"] = "axis2"
+        #kwargs["ylabel"] = "a.u. / %0.3f"
+
+    if var == "TrijetSubldgJetAxis2":
+        kwargs["opts"]["xmin"]   =   0.0
+        kwargs["opts"]["xmax"]   =   0.16
+        kwargs["xlabel"] = "axis2"
+        #kwargs["ylabel"] = "a.u. / %0.3f"
+
+    if var == "TrijetLdgJetMult":
+        kwargs["opts"]["xmin"]  =  0.0
+        #kwargs["opts"]["xmax"]   = 40.0
+        kwargs["xlabel"] = "constituent multiplicity"
+        #kwargs["ylabel"] = "a.u. / %0.0f"
+
+    if var == "TrijetSubldgJetMult":
+        kwargs["opts"]["xmin"]   =  0.0
+        kwargs["opts"]["xmax"]   = 40.0
+        kwargs["xlabel"] = "constituent multiplicity"
+        #kwargs["ylabel"] = "a.u. / %0.0f"
+
+    # No need for this since we plot TGraphs
+    del kwargs["opts"]["xmin"]
+    del kwargs["opts"]["xmax"]
     return kwargs
 
 def GetKwargs(opts):
@@ -476,6 +730,7 @@ if __name__ == "__main__":
     CUTLINEX     = None
     CUTLINEY     = None
     REFINDEX     = 0
+    REFNAME      = None
     EXCLUDE      = ""
     REMOVELEGEND = False
     GRIDX        = False
@@ -483,8 +738,8 @@ if __name__ == "__main__":
     RESULTSJSON  = "results.json"
     LOGX         = False
     LOGY         = False
-    XMIN         = 0.0
-    XMAX         = 1.0
+    XMIN         = -1.0
+    XMAX         = +1.0
     YMIN         = None
     YMAX         = None
     YMAXFACTOR   = None
@@ -580,6 +835,9 @@ if __name__ == "__main__":
     parser.add_option("--refIndex", dest="refIndex", type="int", default=REFINDEX,
                       help="Index to use fo the reference TGraph when doing relative plots [default: %s]" % (REFINDEX) )
 
+    parser.add_option("--refName", dest="refName", type="string", default=REFNAME,
+                      help="String in TGraph directory to use as reference when doing relative plots [default: %s]" % (REFNAME) )
+
     (opts, args) = parser.parse_args()
 
 
@@ -599,8 +857,14 @@ if __name__ == "__main__":
     if len(opts.dirList) > 1:
         msg = "Directories considered:%s\n\t%s" % (sh_t, "\n\t".join(opts.dirList))
         Verbose(msg + sh_n, True)
+    elif len(opts.dirList) ==  1:
+        if opts.plotType != "var":
+            msg = "At least 2 directories required. Only %d passed with --dirs argument!" % len(opts.dirList)
+            raise Exception(sh_e + msg + sh_n)
+        else:
+            pass
     else:
-        msg = "At least 2 directories required. Only %d passed with --dirs argument!" % len(opts.dirList)
+        msg = "This should never be reached"
         raise Exception(sh_e + msg + sh_n)
 
     # Sanity check (analysis type)
@@ -639,7 +903,7 @@ if __name__ == "__main__":
         Verbose("index = %d, dir = %s" % (i, d), i==0)
         
     # Check plot type
-    plotTypes = ["output", "prediction", "training", "testing", "efficiency", "significance", "roc"]
+    plotTypes = ["output", "prediction", "training", "testing", "efficiency", "significance", "roc", "var"]
     plotNames = {}
     plotNames["output"]       = "Output"
     plotNames["prediction"]   = "OutputPred"
@@ -648,6 +912,7 @@ if __name__ == "__main__":
     plotNames["efficiency"]   = "Efficiency"
     plotNames["significance"] = "Significance"
     plotNames["roc"]          = "ROC"
+    plotNames["var"]          = "TrijetLdgJetBDisc"
 
     if opts.plotType.lower() not in plotTypes:
         msg = "Unsupported plot type  \"%s\". Please select from the following:" % (", ".join(plotTypes))

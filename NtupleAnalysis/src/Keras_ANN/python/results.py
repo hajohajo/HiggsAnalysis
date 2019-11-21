@@ -398,7 +398,11 @@ class Output:
             self._storeYMinYMax(yArray)
             graph  = ROOT.TGraph(len(xArray), xArray, yArray)    
             graph.SetName(k)
-            styles.applyStyle(graph, i)
+            if i < 19:
+                styles.applyStyle(graph, i)
+            else:
+                self.Verbose("WARNING! i = %d. Using 0 instead" % (i), True)
+                styles.applyStyle(graph, 0)
             graphList.append(graph)
             legList.append(self.getLegendLabel())
         return graphList, legList
