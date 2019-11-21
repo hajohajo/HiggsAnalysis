@@ -44,7 +44,7 @@ private:
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
   AngularCutsBackToBack fAngularCutsBackToBack;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
   Count cTopTaggingSFCounter;
   // FatJetSelection fFatJetSelection;
   Count cSelected;
@@ -93,7 +93,7 @@ Hplus2hwAnalysisWithTop::Hplus2hwAnalysisWithTop(const ParameterSet& config, con
     fMETSelection(config.getParameter<ParameterSet>("METSelection")),
     fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"), fEventCounter, fHistoWrapper, &fCommonPlots, ""), // fixme: keep counter?
     // fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack")), // fixme: keep counter?
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events"))
@@ -386,8 +386,8 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   //================================================================================================
   // 10) Top selection
   //================================================================================================
-  if (0) std::cout << "=== Top (BDT) selection" << std::endl;
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  if (0) std::cout << "=== Top (MVA) selection" << std::endl;
+  const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
 
   // Fill histos after StandardSelections
    fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, metData, topData);

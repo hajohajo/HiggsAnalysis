@@ -52,7 +52,7 @@ private:
   Count cBaselineBTaggingSFCounter;
   BJetSelection fBaselineBJetSelection;
   METSelection fBaselineMETSelection;
-  TopSelectionBDT fBaselineTopSelection;
+  TopSelectionMVA fBaselineTopSelection;
   Count cBaselineAnyTwoTopsAndFreeBCounter;
   Count cBaselineTwoCleanTopsCounter;
   Count cBaselineTopTaggingSFCounter;
@@ -63,7 +63,7 @@ private:
   Count cInvertedBTaggingSFCounter;
   BJetSelection fInvertedBJetSelection;
   METSelection fInvertedMETSelection;
-  TopSelectionBDT fInvertedTopSelection;
+  TopSelectionMVA fInvertedTopSelection;
   Count cInvertedAnyTwoTopsAndFreeBCounter;
   Count cInvertedTwoCleanTopsCounter;
   Count cInvertedTopTaggingSFCounter;
@@ -428,7 +428,7 @@ FakeBMeasurement::FakeBMeasurement(const ParameterSet& config, const TH1* skimCo
     cBaselineBTaggingSFCounter(fEventCounter.addCounter("3 b-jets SF")),
     fBaselineBJetSelection(config.getParameter<ParameterSet>("BJetSelection")),// fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBaselineMETSelection(config.getParameter<ParameterSet>("METSelection")),
-    fBaselineTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, "Baseline"),
+    fBaselineTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, "Baseline"),
     cBaselineAnyTwoTopsAndFreeBCounter(fEventCounter.addCounter("any 2 tops & free b")),
     cBaselineTwoCleanTopsCounter(fEventCounter.addCounter("2 clean tops")),
     cBaselineTopTaggingSFCounter(fEventCounter.addCounter("top SF")),
@@ -438,7 +438,7 @@ FakeBMeasurement::FakeBMeasurement(const ParameterSet& config, const TH1* skimCo
     cInvertedBTaggingSFCounter(fEventCounter.addCounter("2 b-jets SF")),
     fInvertedBJetSelection(config.getParameter<ParameterSet>("FakeBBjetSelection")),//, fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fInvertedMETSelection(config.getParameter<ParameterSet>("METSelection")),
-    fInvertedTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, "Inverted"),
+    fInvertedTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, "Inverted"),
     cInvertedAnyTwoTopsAndFreeBCounter(fEventCounter.addCounter("any 2 tops & free b")),
     cInvertedTwoCleanTopsCounter(fEventCounter.addCounter("2 clean tops")),
     cInvertedTopTaggingSFCounter(fEventCounter.addCounter("top SF")),
@@ -1114,9 +1114,9 @@ void FakeBMeasurement::book(TDirectory *dir) {
   hBaseline_HT_AfterAllSelections =  
     fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_HT_AfterAllSelections", ";H_{T};Occur / %.1f", nHtBins, fHtMin, fHtMax);
   hBaseline_MVAmax1_AfterAllSelections =  
-    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_MVAmax1_AfterAllSelections", ";#BDT discriminant;Occur / %.2f", 40, -1.0, +1.0);
+    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_MVAmax1_AfterAllSelections", ";#MVA discriminant;Occur / %.2f", 40, -1.0, +1.0);
   hBaseline_MVAmax2_AfterAllSelections =  
-    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_MVAmax2_AfterAllSelections", ";#BDT discriminant;Occur / %.2f", 40, -1.0, +1.0);
+    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_MVAmax2_AfterAllSelections", ";#MVA discriminant;Occur / %.2f", 40, -1.0, +1.0);
 
   hBaseline_LdgTetrajetPt_AfterAllSelections = 
     fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs,
@@ -1279,9 +1279,9 @@ void FakeBMeasurement::book(TDirectory *dir) {
   hBaseline_HT_AfterCRSelections =  
     fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_HT_AfterCRSelections", ";H_{T};Occur / %.1f", nHtBins, fHtMin, fHtMax);
   hBaseline_MVAmax1_AfterCRSelections =  
-    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_MVAmax1_AfterCRSelections", ";#BDT discriminant;Occur / %.2f", 40, -1.0, +1.0);
+    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_MVAmax1_AfterCRSelections", ";#MVA discriminant;Occur / %.2f", 40, -1.0, +1.0);
   hBaseline_MVAmax2_AfterCRSelections =  
-    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_MVAmax2_AfterCRSelections", ";#BDT discriminant;Occur / %.2f", 40, -1.0, +1.0);
+    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Baseline_MVAmax2_AfterCRSelections", ";#MVA discriminant;Occur / %.2f", 40, -1.0, +1.0);
 
   hBaseline_LdgTetrajetPt_AfterCRSelections = 
     fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs,
@@ -1444,9 +1444,9 @@ void FakeBMeasurement::book(TDirectory *dir) {
   hInverted_HT_AfterAllSelections =  
     fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_HT_AfterAllSelections", ";H_{T};Occur / %.1f", nHtBins, fHtMin, fHtMax);
   hInverted_MVAmax1_AfterAllSelections =  
-    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_MVAmax1_AfterAllSelections", ";#BDT discriminant;Occur / %.2f", 40, -1.0, +1.0);
+    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_MVAmax1_AfterAllSelections", ";#MVA discriminant;Occur / %.2f", 40, -1.0, +1.0);
   hInverted_MVAmax2_AfterAllSelections =  
-    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_MVAmax2_AfterAllSelections", ";#BDT discriminant;Occur / %.2f", 40, -1.0, +1.0);
+    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_MVAmax2_AfterAllSelections", ";#MVA discriminant;Occur / %.2f", 40, -1.0, +1.0);
 
   hInverted_LdgTetrajetPt_AfterAllSelections = 
     fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs,
@@ -1609,9 +1609,9 @@ void FakeBMeasurement::book(TDirectory *dir) {
   hInverted_HT_AfterCRSelections =  
     fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_HT_AfterCRSelections", ";H_{T};Occur / %.1f", nHtBins, fHtMin, fHtMax);
   hInverted_MVAmax1_AfterCRSelections =  
-    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_MVAmax1_AfterCRSelections", ";#BDT discriminant;Occur / %.2f", 40, -1.0, +1.0);
+    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_MVAmax1_AfterCRSelections", ";#MVA discriminant;Occur / %.2f", 40, -1.0, +1.0);
   hInverted_MVAmax2_AfterCRSelections =  
-    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_MVAmax2_AfterCRSelections", ";#BDT discriminant;Occur / %.2f", 40, -1.0, +1.0);
+    fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs, "Inverted_MVAmax2_AfterCRSelections", ";#MVA discriminant;Occur / %.2f", 40, -1.0, +1.0);
 
   hInverted_LdgTetrajetPt_AfterCRSelections = 
     fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myFakeBDirs,
@@ -1848,14 +1848,14 @@ void FakeBMeasurement::DoBaselineAnalysis(Long64_t entry,
   // 10) Top selection
   //================================================================================================
   if (0) std::cout << "=== Baseline: Top selection" << std::endl;
-  // const TopSelectionBDT::Data topData = fBaselineTopSelection.analyze(fEvent, jetData, bjetData); 
-  const TopSelectionBDT::Data topData = fBaselineTopSelection.silentAnalyze(fEvent, jetData, bjetData);  // disable counters & histograms (misleading)
+  // const TopSelectionMVA::Data topData = fBaselineTopSelection.analyze(fEvent, jetData, bjetData); 
+  const TopSelectionMVA::Data topData = fBaselineTopSelection.silentAnalyze(fEvent, jetData, bjetData);  // disable counters & histograms (misleading)
 
-  // Ensure 2 tops with BDT > -1.0 and free b-jet are present
+  // Ensure 2 tops with MVA > -1.0 and free b-jet are present
   if (!topData.passedAnyTwoTopsAndFreeB()) return;
   cBaselineAnyTwoTopsAndFreeBCounter.increment();
 
-  // Require exactly 2 clean tops (no BDT cut yet)
+  // Require exactly 2 clean tops (no MVA cut yet)
   if (topData.getAllCleanedTopsSize() != 2) return;
   cBaselineTwoCleanTopsCounter.increment();
 
@@ -2294,14 +2294,14 @@ void FakeBMeasurement::DoInvertedAnalysis(Long64_t entry,
   // 10) Top selection
   //================================================================================================
   if (0) std::cout << "=== Inverted BJet: Top selection" << std::endl;
-  // const TopSelectionBDT::Data topData = fInvertedTopSelection.analyze(fEvent, jetData, invBjetData);
-  const TopSelectionBDT::Data topData = fInvertedTopSelection.silentAnalyze(fEvent, jetData, invBjetData); // disable counters & histograms (misleading)
+  // const TopSelectionMVA::Data topData = fInvertedTopSelection.analyze(fEvent, jetData, invBjetData);
+  const TopSelectionMVA::Data topData = fInvertedTopSelection.silentAnalyze(fEvent, jetData, invBjetData); // disable counters & histograms (misleading)
 
-  // Ensure 2 tops with BDT > -1.0 and free b-jet are present
+  // Ensure 2 tops with MVA > -1.0 and free b-jet are present
   if (!topData.passedAnyTwoTopsAndFreeB()) return;
   cInvertedAnyTwoTopsAndFreeBCounter.increment();
 
-  // Require exactly 2 clean tops (no BDT cut yet)
+  // Require exactly 2 clean tops (no MVA cut yet)
   if (topData.getAllCleanedTopsSize() != 2) return;
   cInvertedTwoCleanTopsCounter.increment();
 
@@ -2321,7 +2321,7 @@ void FakeBMeasurement::DoInvertedAnalysis(Long64_t entry,
   bool bPass_BothMVA      = bPass_LdgTopMVA * bPass_SubldgTopMVA;
   bool bPass_InvertedTop  = bPass_LdgTopMVA * cfg_SubldgTopMVACut.passedCut(subldgMVA);
 
-  // Fill histos after StandardSelections: Require any two tops with BDT > -1.0 and presence of free b-jet (not taken up by any of the two best (in MVA) tops) 
+  // Fill histos after StandardSelections: Require any two tops with MVA > -1.0 and presence of free b-jet (not taken up by any of the two best (in MVA) tops) 
   std::vector<float> myFactorisationInfo;
   myFactorisationInfo.push_back(topData.getTetrajetBJet().pt() );
   myFactorisationInfo.push_back(topData.getTetrajetBJet().eta() );

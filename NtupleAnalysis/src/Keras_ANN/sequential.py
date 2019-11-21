@@ -450,7 +450,7 @@ def main(opts):
         Print(es + msg + ns, True)
 
     # Write the model
-    modelName = "Model_%s_trained.h5" % (os.path.basename(opts.rootFileName).replace(".root",""))
+    modelName = "Model_%s_trained.h5" % (opts.rootFileName.replace(".root",""))
     model.save(modelName)
         
     # serialize model to JSON (contains arcitecture of model)
@@ -463,7 +463,7 @@ def main(opts):
     model.save(modelName)
         
     # write weights and architecture in txt file
-    func.WriteModel(model, model_json, os.path.join(opts.saveDir, "model.txt") )
+    func.WriteModel(model, model_json, inputList, os.path.join(opts.saveDir, "model.txt") )
 
     # Produce method score (i.e. predict output value for given input dataset). Computation is done in batches.
     # https://stackoverflow.com/questions/49288199/batch-size-in-model-fit-and-model-predict
@@ -567,9 +567,9 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var.root"
+    #ROOTFILENAME = "histograms-TT_19var.root"
     #ROOTFILENAME = "histograms-TT_19var_6Jets_2BJets.root"
-    #ROOTFILENAME = "histograms-TT_19var_5Jets_1BJets.root"
+    ROOTFILENAME = "histograms-TT_19var_5Jets_1BJets.root"
     NOTBATCHMODE = False
     SAVEDIR      = None
     SAVEFORMATS  = "png"

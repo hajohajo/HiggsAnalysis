@@ -48,7 +48,7 @@ private:
   BJetSelection fBaselineTauBJetSelection;
   Count cBaselineTauBTaggingSFCounter;
   METSelection fBaselineTauMETSelection;
-  TopSelectionBDT fBaselineTauTopSelection;
+  TopSelectionMVA fBaselineTauTopSelection;
   Count cBaselineTauTopCounter;
   AngularCutsBackToBack fBaselineTauAngularCutsBackToBack;
   Count cBaselineTauSelectedEvents;
@@ -65,7 +65,7 @@ private:
   BJetSelection fInvertedTauBJetSelection;
   Count cInvertedTauBTaggingSFCounter;
   METSelection fInvertedTauMETSelection;
-  TopSelectionBDT fInvertedTauTopSelection;
+  TopSelectionMVA fInvertedTauTopSelection;
   Count cInvertedTauTopCounter;
   AngularCutsBackToBack fInvertedTauAngularCutsBackToBack;
   Count cInvertedTauSelectedEvents;
@@ -170,7 +170,7 @@ QCDMeasurement::QCDMeasurement(const ParameterSet& config, const TH1* skimCounte
   cBaselineTauBTaggingSFCounter(fEventCounter.addCounter("BaselineTau: b tag SF")),
   fBaselineTauMETSelection(config.getParameter<ParameterSet>("METSelection"),
                 fEventCounter, fHistoWrapper, nullptr, "BaselineTau"),
-  fBaselineTauTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"),
+  fBaselineTauTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"),
                 fEventCounter, fHistoWrapper, nullptr, "BaselineTau"),
   cBaselineTauTopCounter(fEventCounter.addCounter("BaselineTau: top tagging")),
   fBaselineTauAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"),
@@ -195,7 +195,7 @@ QCDMeasurement::QCDMeasurement(const ParameterSet& config, const TH1* skimCounte
   cInvertedTauBTaggingSFCounter(fEventCounter.addCounter("InvertedTau: b tag SF")),
   fInvertedTauMETSelection(config.getParameter<ParameterSet>("METSelection"),
                 fEventCounter, fHistoWrapper, &fCommonPlots, "InvertedTau"),
-  fInvertedTauTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"),
+  fInvertedTauTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"),
                 fEventCounter, fHistoWrapper, &fCommonPlots, "InvertedTau"),
   cInvertedTauTopCounter(fEventCounter.addCounter("InvertedTau: top tagging")),
   fInvertedTauAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"),
@@ -578,7 +578,7 @@ void QCDMeasurement::doBaselineAnalysis(const Event& event, const Tau& tau, cons
     return;
 
 //====== Top selection
-  const TopSelectionBDT::Data topData = fBaselineTauTopSelection.analyze(fEvent,jetData,bjetData);
+  const TopSelectionMVA::Data topData = fBaselineTauTopSelection.analyze(fEvent,jetData,bjetData);
   ////  if(topData.getAllCleanedTopsSize() != 1) return;
   cBaselineTauTopCounter.increment();
   
@@ -741,7 +741,7 @@ void QCDMeasurement::doInvertedAnalysis(const Event& event, const Tau& tau, cons
     return;
 
 //====== Top selection
-  const TopSelectionBDT::Data topData = fInvertedTauTopSelection.analyze(fEvent,jetData,bjetData);
+  const TopSelectionMVA::Data topData = fInvertedTauTopSelection.analyze(fEvent,jetData,bjetData);
   ////  if(topData.getAllCleanedTopsSize() != 1) return;
   cInvertedTauTopCounter.increment();
   

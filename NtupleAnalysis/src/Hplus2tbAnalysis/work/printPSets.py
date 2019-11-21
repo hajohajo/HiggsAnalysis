@@ -146,7 +146,7 @@ def main(opts):
         if 0:
             datasetsMgr.printSelections()
             PrintPSet("BJetSelection", datasetsMgr)
-            PrintPSet("TopSelectionBDT", datasetsMgr)
+            PrintPSet("TopSelectionMVA", datasetsMgr)
             PrintPSet("FakeBMeasurement", datasetsMgr)
             sys.exit()
 

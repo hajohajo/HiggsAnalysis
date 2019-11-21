@@ -134,6 +134,54 @@ def PlotOutput(Y_train, Y_test, saveDir, saveName, isSB, saveFormats):
     plot.SavePlot(canvas, saveDir, saveName, saveFormats)
     canvas.Close()
     return
+
+def PlotInputs(signal, bkg, var, saveDir, saveFormats):
+    ROOT.gStyle.SetOptStat(0)
+
+    # Create canvas
+    canvas = plot.CreateCanvas()
+    canvas.cd()
+    
+    info = plot.GetHistoInfo(var)
+    # Create histograms
+    hsignal = ROOT.TH1F('signal', '', info["nbins"], info["xmin"], info["xmax"])
+    hbkg    = ROOT.TH1F('bkg', '', info["nbins"], info["xmin"], info["xmax"])
+
+    # Fill histograms
+    for r in signal:
+        hsignal.Fill(r)
+
+    for r in bkg:
+        hbkg.Fill(r)
+
+    if 1:
+        hsignal.Scale(1./hsignal.Integral())
+        hbkg.Scale(1./hbkg.Integral())
+
+    ymax = max(hsignal.GetMaximum(), hbkg.GetMaximum())
+
+    plot.ApplyStyle(hsignal, ROOT.kAzure-3)
+    hsignal.SetFillColor(ROOT.kAzure-3)
+
+    plot.ApplyStyle(hbkg, ROOT.kRed +2 )
+
+    for h in [hsignal, hbkg]:
+        h.SetMaximum(ymax*1.2)
+        h.GetXaxis().SetTitle(info["xlabel"])
+        h.GetYaxis().SetTitle(info["ylabel"])
+
+    hsignal.Draw("HIST")
+    hbkg.Draw("HIST SAME")
+
+    # Create legend
+    leg=plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
+    leg.AddEntry(hsignal, "Truth-matched","pl")
+    leg.AddEntry(hbkg, "Unmatched","pl")
+    leg.Draw()
+
+    plot.SavePlot(canvas, saveDir, var, saveFormats, True)
+    canvas.Close()
+    return
         
 def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats):
 
@@ -582,13 +630,19 @@ def PlotOvertrainingTest(Y_train_S, Y_test_S, Y_train_B, Y_test_B, saveDir, save
     plot.SavePlot(canvas, saveDir, saveName, saveFormats)
     canvas.Close()
     return htrain_s1, htest_s1, htrain_b1, htest_b1
-            
-def WriteModel(model, model_json, output):
+
+
+def WriteModel(model, model_json, inputList, output):
     '''
     Write model weights and architecture in txt file
     '''
     arch = json.loads(model_json)
     with open(output, 'w') as fout:
+        #Store input variable names
+        fout.write('inputs ' + str(len(inputList)) + '\n')
+        for var in inputList:
+            fout.write(var + '\n')
+                   
         # Store number of layers
         fout.write( 'layers ' + str(len(model.layers)) + '\n')
         layers = []

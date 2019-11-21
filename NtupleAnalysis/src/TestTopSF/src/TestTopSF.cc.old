@@ -39,7 +39,7 @@ private:
   BJetSelection fBJetSelection;
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
   Count cTopSelectionCounter;
   Count cTopTaggingSFCounter;
   // FatJetSelection fFatJetSelection;
@@ -51,12 +51,12 @@ private:
   WrappedTH1 *hAllCleanedTop_Pt_noSF;
   WrappedTH1 *hAllCleanedTop_Eta_noSF;
   WrappedTH1 *hAllCleanedTop_M_noSF;
-  WrappedTH1 *hAllCleanedTop_BDT_noSF;
+  WrappedTH1 *hAllCleanedTop_MVA_noSF;
 
   WrappedTH1 *hAllCleanedTop_Pt;
   WrappedTH1 *hAllCleanedTop_Eta;
   WrappedTH1 *hAllCleanedTop_M;
-  WrappedTH1 *hAllCleanedTop_BDT;
+  WrappedTH1 *hAllCleanedTop_MVA;
 
 };
 
@@ -65,8 +65,8 @@ REGISTER_SELECTOR(TestTopSF);
 
 TestTopSF::TestTopSF(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    cfg_PrelimTopMVACut(config, "FakeBTopSelectionBDT.MVACut"),
-    cfg_LdgTopDefinition(config.getParameter<std::string>("FakeBTopSelectionBDT.LdgTopDefinition")),
+    cfg_PrelimTopMVACut(config, "FakeBTopSelectionMVA.MVACut"),
+    cfg_LdgTopDefinition(config.getParameter<std::string>("FakeBTopSelectionMVA.LdgTopDefinition")),
     fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper),
     cAllEvents(fEventCounter.addCounter("all events")),
     cTrigger(fEventCounter.addCounter("passed trigger")),
@@ -79,7 +79,7 @@ TestTopSF::TestTopSF(const ParameterSet& config, const TH1* skimCounters)
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cBTaggingSFCounter(fEventCounter.addCounter("b-tag SF")),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cTopSelectionCounter(fEventCounter.addCounter("top selection")),
     cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
@@ -124,12 +124,12 @@ void TestTopSF::book(TDirectory *dir) {
   hAllCleanedTop_Pt_noSF   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_Pt_noSFt"       ,";p_{T} (GeV/c)", nPtBins     , fPtMin     , fPtMax);
   hAllCleanedTop_Eta_noSF  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_Eta_noSF"  ,";#eta"         , nEtaBins    , fEtaMin    , fEtaMax);
   hAllCleanedTop_M_noSF    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_M_noSF"     ,";M (GeV/c^{2})", nTopMassBins, fTopMassMin, fTopMassMax);
-  hAllCleanedTop_BDT_noSF  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_BDT_noSF"     ,";BDT response", 40, -1, 1);
+  hAllCleanedTop_MVA_noSF  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_MVA_noSF"     ,";MVA response", 40, -1, 1);
 
   hAllCleanedTop_Pt   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_Pt"       ,";p_{T} (GeV/c)", nPtBins     , fPtMin     , fPtMax);
   hAllCleanedTop_Eta  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_Eta"  ,";#eta"         , nEtaBins    , fEtaMin    , fEtaMax);
   hAllCleanedTop_M    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_M"     ,";M (GeV/c^{2})", nTopMassBins, fTopMassMin, fTopMassMax);
-  hAllCleanedTop_BDT  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_BDT"     ,";BDT response", 40, -1, 1);
+  hAllCleanedTop_MVA  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllCleanedTop_MVA"     ,";MVA response", 40, -1, 1);
 
   return;
 }
@@ -238,8 +238,8 @@ void TestTopSF::process(Long64_t entry) {
   //================================================================================================
   // 11) Top selection
   //================================================================================================
-  if (0) std::cout << "=== Top (BDT) selection" << std::endl;
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+  if (0) std::cout << "=== Top (MVA) selection" << std::endl;
+  const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
   bool passPrelimMVACut = false;  
   if (cfg_LdgTopDefinition == "MVA")
     {
@@ -279,7 +279,7 @@ void TestTopSF::process(Long64_t entry) {
     hAllCleanedTop_Pt_noSF   -> Fill(TopP4.Pt());
     hAllCleanedTop_Eta_noSF  -> Fill(TopP4.Eta());
     hAllCleanedTop_M_noSF    -> Fill(TopP4.M());
-    hAllCleanedTop_BDT_noSF  -> Fill(mva);
+    hAllCleanedTop_MVA_noSF  -> Fill(mva);
   }
     
   if (fEvent.isMC()) 
@@ -299,7 +299,7 @@ void TestTopSF::process(Long64_t entry) {
     hAllCleanedTop_Pt   -> Fill(TopP4.Pt());
     hAllCleanedTop_Eta  -> Fill(TopP4.Eta());
     hAllCleanedTop_M    -> Fill(TopP4.M());
-    hAllCleanedTop_BDT  -> Fill(mva);
+    hAllCleanedTop_MVA  -> Fill(mva);
   }
    
   //  //================================================================================================
