@@ -92,7 +92,7 @@ def Print(msg, printHeader=False):
 def Verbose(msg, printHeader=True, verbose=False):
     if not opts.verbose:
         return
-    aux.Print(msg, printHeader)
+    Print(msg, printHeader)
     return
 
 def GetLumi(datasetsMgr):
