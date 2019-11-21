@@ -24,6 +24,7 @@ LAST USED:
 ./plotOutputs.py -s png --logY --plotType output --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test
 ./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test --dirs 500k_sample,Keras_BDTG2018_Aug2018 --cutLineX 0.93 --xMin 0.0
 ./plotOutputs.py -s png --plotType var --logY --saveDir /publicweb/a/aattikis/SotiSoti --dirs Keras_Test --yMin 0.5e-3 --yMax 1.0
+./plotOutputs.py -s pdf,C,png --plotType var --saveDir /publicweb/a/aattikis/DNN --dirs Keras_3Layers_19relu_190relu_1sigmoid_500Epochs_5000BatchSize_21-Nov-2019_07h21m34s --yMin 0.5e-3 --yMaxFactor 2.0 --boldText
 
 
 '''
@@ -132,11 +133,11 @@ def main():
     elif "roc" in opts.plotType.lower():
         doROC(opts.saveName, resultsList)
     elif "var" in opts.plotType.lower():
-        for var in  ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
-                     "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
-                     "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
-                     "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
-                     "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]:
+        for var in ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
+                    "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
+                    "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
+                    "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
+                    "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]:
             doVariables(opts.saveName, var, resultsList)
     else:
         pass
@@ -359,16 +360,19 @@ def doVariables(name, variable, resultsList):
         Verbose("nS = %s, nB = %s" % (nS, nB), True)
 
         # For-loop: All points in graph
-        for j in range(0, N+1):
+        for j in range(0, N):
             xVal = g.GetX()[j]
             yVal = g.GetY()[j]
+
             if xVal <= opts.xMin:
                 continue
+
             # Protection: don't include (x,y) = (0.0, 0.0)
             if xVal !=0.0 and yVal !=0.0:
                 x.append(xVal)
                 y.append(yVal)
             Verbose("%d) x = %0.3f, y = %0.3f" % (j, xVal, yVal), j==0)
+
         # Create the TGraph
         Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
         g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
@@ -453,7 +457,7 @@ def GetVarKwargs(var, opts):
     else:
         #histograms.cmsTextMode = histograms.CMSMode.PRELIMINARY
         #histograms.cmsTextMode = histograms.CMSMode.UNPUBLISHED
-        cmsExtraText = "Preliminary"
+        cmsExtraText = "Simulation" #"Preliminary"
 
     kwargs  = {
         "xlabel"           : "DNN Output",
@@ -616,8 +620,15 @@ def GetVarKwargs(var, opts):
         #kwargs["ylabel"] = "a.u. / %0.0f"
 
     # No need for this since we plot TGraphs
-    del kwargs["opts"]["xmin"]
-    del kwargs["opts"]["xmax"]
+    if opts.xMin == None:
+        del kwargs["opts"]["xmin"]
+    else:
+        kwargs["opts"]["xmin"] = opts.xMin
+    if opts.xMax == None:
+        del kwargs["opts"]["xmax"]
+    else:
+        kwargs["opts"]["xmax"] = opts.xMax
+
     return kwargs
 
 def GetKwargs(opts):
@@ -738,8 +749,8 @@ if __name__ == "__main__":
     RESULTSJSON  = "results.json"
     LOGX         = False
     LOGY         = False
-    XMIN         = -1.0
-    XMAX         = +1.0
+    XMIN         = None
+    XMAX         = None
     YMIN         = None
     YMAX         = None
     YMAXFACTOR   = None

@@ -77,7 +77,7 @@ def CreateDir(saveDir):
             print "Output saved under", saveDir
     return
 
-def SavePlot(canvas, saveDir, saveName, saveFormats=["pdf", "root"], verbose=True):
+def SavePlot(canvas, saveDir, saveName, saveFormats=["pdf", "root"], verbose=False):
     
     # Create output directory if it does not exist
     CreateDir(saveDir)
