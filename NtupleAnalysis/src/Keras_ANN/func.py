@@ -20,7 +20,7 @@ def Print(msg, printHeader=False):
     return
    
 def convertHistoToGaph(histo, verbose=False):
-                                                                                                                                                                                                            
+
     # Lists for values
     x     = []
     y     = []
@@ -38,8 +38,8 @@ def convertHistoToGaph(histo, verbose=False):
         yVal  = histo.GetBinContent(i)
         yLow  = histo.GetBinError(i)
         yHigh = yLow
-                                                                                                                                                                                                            
-        # Store values                                                                                                                                                                                      
+ 
+        # Store values
         x.append(xVal)
         xerrl.append(xLow)
         xerrh.append(xHigh)
@@ -47,7 +47,7 @@ def convertHistoToGaph(histo, verbose=False):
         yerrl.append(yLow)
         yerrh.append(yHigh)
         
-    # Create the TGraph with asymmetric errors                                                                                                                                                              
+    # Create the TGraph with asymmetric errors
     tgraph = ROOT.TGraphAsymmErrors(len(x),
                                     array.array("d",x),
                                     array.array("d",y),
@@ -69,13 +69,13 @@ def convertHistoToGaph(histo, verbose=False):
     table.append("{0:^70}".format(histo.GetName()))
     table.append(header)
     table.append(hLine)
-                                                                                                                                                                                                            
+ 
     # For-loop: All values x-y and their errors
     for i, xV in enumerate(x, 0):
         row = align.format(i+1, "%.4f" % xerrl[i], "%.4f" %  x[i], "%.4f" %  xerrh[i], "%.5f" %  y[i], "+/-", "%.5f" %  yerrh[i])
         table.append(row)
     table.append(hLine)
-                                                                                                                                                                                                            
+
     if 0:
         for i, line in enumerate(table, 1):
             print line
@@ -145,7 +145,7 @@ def PlotInputs(signal, bkg, var, saveDir, saveFormats):
     info = plot.GetHistoInfo(var)
     # Create histograms
     hsignal = ROOT.TH1F('signal', '', info["nbins"], info["xmin"], info["xmax"])
-    hbkg    = ROOT.TH1F('bkg', '', info["nbins"], info["xmin"], info["xmax"])
+    hbkg    = ROOT.TH1F('bkg'   , '', info["nbins"], info["xmin"], info["xmax"])
 
     # Fill histograms
     for r in signal:
@@ -175,34 +175,68 @@ def PlotInputs(signal, bkg, var, saveDir, saveFormats):
 
     # Create legend
     leg=plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
-    leg.AddEntry(hsignal, "Truth-matched","pl")
-    leg.AddEntry(hbkg, "Unmatched","pl")
+    leg.AddEntry(hsignal, "Truth-matched","f") #"pl"
+    leg.AddEntry(hbkg, "Unmatched","l") #"pl"
     leg.Draw()
 
     plot.SavePlot(canvas, saveDir, var, saveFormats, True)
     canvas.Close()
     return
         
-def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats):
+def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
     resultsDict = {}
     resultsDict["signal"]     = signal
     resultsDict["background"] = bkg
- 
+
+    normalizeToOne = False
+    if "normalizeToOne" in kwargs:
+        normalizeToOne = kwargs["normalizeToOne"]
+
    # Create canvas
     ROOT.gStyle.SetOptStat(0)
     canvas = plot.CreateCanvas()
     canvas.cd()
 
-    hList = []
-    gList = []
-    yMin  = 100000
-    yMax  = -1
+    hList  = []
+    gList  = []
+    yMin   = 100000
+    yMax   = -1
+    xMin   = 0.0
+    xMax   = 1.0
+    nBins  = 50
+    xTitle = "DNN output"
+    yTitle = "Entries"
+    log    = True
 
+    if "log" in kwargs:
+        log = kwargs["log"]
+    
+    if "xTitle" in kwargs:
+        xTitle = kwargs["xTitle"]
+
+    if "yTitle" in kwargs:
+        yTitle = kwargs["yTitle"]
+    elif "output" in saveName.lower():
+        xTitle = "Entries"
+    elif "efficiency" in saveName.lower():
+        xTitle = "Efficiency"
+    elif "significance" in saveName.lower():
+        xTitle = "Significance"
+    else:
+        pass    
+
+    if "xMin" in kwargs:
+        xMin = kwargs['xMin']
+    if "xMax" in kwargs:
+        xMax = kwargs['xMax']
+    if "nBins" in kwargs:
+        xBins = kwargs['nBins']
+    
     # For-loop: 
     for i, key in enumerate(resultsDict.keys(), 0):
 
-        h = ROOT.TH1F(key, '', 50, 0.0, 1.0)             
+        h = ROOT.TH1F(key, '', nBins, xMin, xMax)
         for j, x in enumerate(resultsDict[key], 0):
             h.Fill(x)
             try:
@@ -215,25 +249,33 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats):
 
         # Customise & append to list
         plot.ApplyStyle(h, i+1)
+
+        if normalizeToOne:
+            if "ymax" in kwargs:
+                yMax = kwargs["yMax"]
+            else:
+                yMax = 1.0
+            if "yMin" in kwargs:
+                yMin = kwargs["yMin"]
+            else:
+                yMin = 1e-4
+
+            if h.Integral()>0.0:
+                h.Scale(1./h.Integral())
         hList.append(h)
 
     if yMin <= 0.0:
         yMin = 100
-    canvas.SetLogy()
+    if log:
+        canvas.SetLogy()
 
     # For-loop: All histograms
     for i, h in enumerate(hList, 0):
         h.SetMinimum(yMin*0.85)        
         h.SetMaximum(yMax*1.15)
-        h.GetXaxis().SetTitle("DNN output")
-        if "output" in saveName.lower():
-            h.GetYaxis().SetTitle("Entries")
-        elif "efficiency" in saveName.lower():
-            h.GetYaxis().SetTitle("Efficiency")
-        elif "significance" in saveName.lower():
-            h.GetYaxis().SetTitle("Significance")
-        else:
-            pass
+
+        h.GetXaxis().SetTitle(xTitle)
+        h.GetYaxis().SetTitle(yTitle)
             
         if i==0:
             h.Draw("HIST")
@@ -241,7 +283,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats):
             h.Draw("HIST SAME")
     
     # Create legend
-    leg=plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
+    leg = plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
     for h in hList:
         leg.AddEntry(h, h.GetName(),"l")
     leg.Draw()

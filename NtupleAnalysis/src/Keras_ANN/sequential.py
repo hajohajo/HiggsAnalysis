@@ -159,6 +159,164 @@ def Verbose(msg, printHeader=True, verbose=False):
     Print(msg, printHeader)
     return
 
+def GetKwargs(var):
+
+    kwargs  = {
+        "normalizeToOne": True,
+        "xTitle" : "DNN Output",
+        "yTitle" : "a.u.",
+        "xMin"   : 0.0,
+        "xMax"   : 1.0,
+        "nBins"  : 50,
+        "log"    : True,
+        }
+
+    if var == "TrijetPtDR":
+        kwargs["xMin"]   =  0.0
+        kwargs["xMax"]   = 800.0
+        kwargs["nBins"]  =  80
+        kwargs["xTitle"] = "p_{T}#DeltaR_{t}"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["yTitle"] = "a.u. / %0.0f"
+
+    if var == "TrijetDijetPtDR":
+        kwargs["xMin"]   =  0.0
+        kwargs["xMax"]   = 800.0
+        kwargs["nBins"]  =  80
+        kwargs["xTitle"] = "p_{T}#DeltaR_{W}"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["yTitle"] = "a.u. / %0.f"
+
+    if var == "TrijetBjetMass":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   = 100.0
+        kwargs["nBins"]  = 100
+        kwargs["xTitle"] = "m_{b} [GeV]"
+        #kwargs["yTitle"] = "a.u. / %0.f GeV"
+
+    if var == "TrijetLdgJetBDisc":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   =   1.0
+        kwargs["nBins"]  = 100
+        kwargs["xTitle"] = "b-tag discr."
+        #kwargs["yTitle"] = "a.u. / %0.2f"
+
+    if var == "TrijetSubldgJetBDisc":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   =   1.0
+        kwargs["nBins"]  = 100
+        kwargs["xTitle"] = "b-tag discr."
+        #kwargs["yTitle"] = "a.u. / %0.2f"
+
+    if var == "TrijetBJetLdgJetMass":
+        kwargs["xMin"]   =  0.0
+        kwargs["xMax"]   = 600.0
+        kwargs["nBins"]  = 300
+        kwargs["xTitle"] = "m_{b,j_{1}} [GeV]"
+        kwargs["yMin"]   = 1e-3
+
+    if var == "TrijetBJetSubldgJetMass":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   = 600.0
+        kwargs["nBins"]  = 300
+        kwargs["xTitle"] = "m_{b,j_{2}} [GeV]"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["yTitle"] = "a.u. / %0.0f GeV"
+
+    if var == "TrijetMass":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   = 800.0
+        kwargs["nBins"]  =  80
+        kwargs["xTitle"] = "m_{W} [GeV]"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["yTitle"] = "a.u. / %0.0f GeV"
+
+    if var == "TrijetDijetMass":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   = 500.0
+        kwargs["nBins"]  =  50
+        kwargs["xTitle"] = "m_{W} [GeV]"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["yTitle"] = "a.u. / %0.0f GeV"
+
+    if var == "TrijetBJetBDisc":
+        kwargs["xMin"]   =  0.0
+        kwargs["xMax"]   =  1.0
+        kwargs["nBins"]  = 100
+        kwargs["xTitle"] = "b-tag discr."
+        #kwargs["yTitle"] = "a.u. / %0.2f"
+
+    if var == "TrijetSoftDrop_n2":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   =   2.0
+        kwargs["nBins"]  = 200
+        kwargs["xTitle"] = "soft-drop n_{2}"
+        kwargs["yMin"]   = 1e-3
+        #kwargs["yTitle"] = "a.u. / %0.2f"
+
+    if var == "TrijetLdgJetCvsL":
+        kwargs["xMin"]   =  -1.0
+        kwargs["xMax"]   =  +1.0
+        kwargs["nBins"]  = 200*2
+        kwargs["xTitle"] = "CvsL discr."
+        kwargs["yMin"]   = 1e-3
+        kwargs["yMax"]   = 1e-1
+        #kwargs["yTitle"] = "a.u. / %0.2f"
+
+    if var == "TrijetSubldgJetCvsL":
+        kwargs["xMin"]   =  -1.0
+        kwargs["xMax"]   =  +1.0
+        kwargs["nBins"]  = 200*2
+        kwargs["xTitle"] = "CvsL discr."
+        kwargs["yMin"]   = 1e-3
+        kwargs["yMax"]   = 1e-1
+        #kwargs["yTitle"] = "a.u. / %0.2f"
+
+    if var == "TrijetLdgJetPtD":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   =   1.0
+        kwargs["nBins"]  = 100
+        kwargs["xTitle"] = "p_{T}D"
+        #kwargs["yTitle"] = "a.u. / %0.2f"
+
+    if var == "TrijetSubldgJetPtD":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   =   1.0
+        kwargs["nBins"]  = 100
+        kwargs["xTitle"] = "p_{T}D"
+        #kwargs["yTitle"] = "a.u. / %0.2f"
+
+    if var == "TrijetLdgJetAxis2":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   =   0.16
+        kwargs["nBins"]  = 160
+        kwargs["xTitle"] = "axis2"
+        #kwargs["yTitle"] = "a.u. / %0.3f"
+
+    if var == "TrijetSubldgJetAxis2":
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   =   0.16
+        kwargs["nBins"]  = 160
+        kwargs["xTitle"] = "axis2"
+        #kwargs["yTitle"] = "a.u. / %0.3f"
+
+    if var == "TrijetLdgJetMult":
+        kwargs["xMin"]  =  0.0
+        kwargs["xMax"]   = 40.0
+        kwargs["nBins"]  = 40
+        kwargs["xTitle"] = "constituent multiplicity"
+        #kwargs["yTitle"] = "a.u. / %0.0f"
+
+    if var == "TrijetSubldgJetMult":
+        kwargs["xMin"]   =  0.0
+        kwargs["xMax"]   = 40.0
+        kwargs["nBins"]  = 40
+        kwargs["xTitle"] = "constituent multiplicity"
+        #kwargs["yTitle@"] = "a.u. / %0.0f"
+
+    return kwargs
+
+
 def CrossEntropy(yHat, y):
     ''' 
     For future class implementation
@@ -293,7 +451,7 @@ def main(opts):
     inputList.append("TrijetSubldgJetBDisc")
     inputList.append("TrijetBJetLdgJetMass")
     inputList.append("TrijetBJetSubldgJetMass")
-    #inputList.append("TrijetMass")
+    inputList.append("TrijetMass")
     inputList.append("TrijetDijetMass")
     inputList.append("TrijetBJetBDisc")
     inputList.append("TrijetSoftDrop_n2")
@@ -367,7 +525,7 @@ def main(opts):
         else:            
             layer += " (hidden layer)" # A layer of nodes that produce the output variables.
             
-        Print("Adding %s, with %s%d neurons%s and activation function %s" % (ts + layer + ns, ls, n, ns, ls + opts.activation[iLayer] + ns), i==0)
+        Print("Adding %s, with %s%d neurons%s and activation function %s" % (ts + layer + ns, ls, n, ns, ls + opts.activation[iLayer] + ns), iLayer==0)
         if iLayer == 0:
             if opts.neurons[iLayer] != nInputs > 1:
                 msg = "The number of neurons must equal the number of features (columns) in your data. Some NN configuration add one additional node for a bias term"
@@ -400,6 +558,12 @@ def main(opts):
     X_signal     = dset_signal[:nsignal, 0:nInputs]
     X_background = dset_bkg[:nsignal, 0:nInputs]
     Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_signal), ns, es, len(X_background), ns), True)
+
+    # Plot the input variables
+    Print("Plotting all %d input variables for signal and bacgkround" % (len(inputList)), True)
+    if opts.plotInputs:
+        for i, var in enumerate(inputList, 0):
+            func.PlotInputs(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], var, "%s/%s" % (opts.saveDir, "inputs"), opts.saveFormats)
 
     # Split the datasets (X= 19 inputs, Y=output variable). Test size 0.5 means half for training half for testing
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state=opts.rndSeed, shuffle=True)
@@ -450,7 +614,7 @@ def main(opts):
         Print(es + msg + ns, True)
 
     # Write the model
-    modelName = "Model_%s_trained.h5" % (opts.rootFileName.replace(".root",""))
+    modelName = "Model_%s_trained.h5" % (os.path.basename(opts.rootFileName).replace(".root",""))
     model.save(modelName)
         
     # serialize model to JSON (contains arcitecture of model)
@@ -511,6 +675,9 @@ def main(opts):
     func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain", jsonWr, opts.saveFormats)
     func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest" , jsonWr, opts.saveFormats)
 
+    for i, var in enumerate(inputList, 0):
+        func.PlotAndWriteJSON(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+
     # Plot overtraining test
     htrain_s, htest_s, htrain_b, htest_b = func.PlotOvertrainingTest(pred_train_S, pred_test_S, pred_train_B, pred_test_B, opts.saveDir, "OvertrainingTest", opts.saveFormats)
 
@@ -567,9 +734,9 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    #ROOTFILENAME = "histograms-TT_19var.root"
-    #ROOTFILENAME = "histograms-TT_19var_6Jets_2BJets.root"
-    ROOTFILENAME = "histograms-TT_19var_5Jets_1BJets.root"
+    ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var.root"
+    #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root"
+    #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root"
     NOTBATCHMODE = False
     SAVEDIR      = None
     SAVEFORMATS  = "png"
@@ -587,6 +754,7 @@ if __name__ == "__main__":
     OPTIMIZER    = 'adam'
     CFGJSON      = "config.json"
     RESULTSJSON  = "results.json"
+    PLOTINPUTS   = False
 
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -596,6 +764,9 @@ if __name__ == "__main__":
 
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE, 
                       help="Enable verbose mode (for debugging purposes mostly) [default: %s]" % VERBOSE)
+
+    parser.add_option("--plotInputs", dest="plotInputs", action="store_true", default=PLOTINPUTS, 
+                      help="Enable plotting of input variables [default: %s]" % PLOTINPUTS)
 
     parser.add_option("--rootFileName", dest="rootFileName", type="string", default=ROOTFILENAME, 
                       help="Input ROOT file containing the signal and backbground TTrees with the various TBrances *variables) [default: %s]" % ROOTFILENAME)
