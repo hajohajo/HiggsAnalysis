@@ -159,6 +159,27 @@ def Verbose(msg, printHeader=True, verbose=False):
     Print(msg, printHeader)
     return
 
+def eval(model, x_test, y_test, opts):
+    '''
+    https://keras.io/models/model/#evaluate
+
+    NOTE: computation is done in batches
+    '''
+    metrics = model.evaluate(
+        x=x_test,
+        y=y_test,
+        batch_size=opts.batchSize,
+        verbose=1,
+        sample_weight=None
+    )
+    print "*"*100
+    print ('Loss: {:.3f}, Accuracy: {:.3f}'.format(metrics[0], metrics[1]))
+    print "model.metrics_names = ", model.metrics_names
+    print "len(metrics) = ", len(metrics)
+    print 
+    print "*"*100
+    return
+
 def GetKwargs(var):
 
     kwargs  = {
@@ -170,6 +191,28 @@ def GetKwargs(var):
         "nBins"  : 50,
         "log"    : True,
         }
+
+    if var == "loss":
+        kwargs["normalizeToOne"] = False
+        kwargs["xMin"]   =  0.
+        kwargs["xMax"]   = opts.epochs
+        kwargs["nBins"]  = opts.epochs
+        kwargs["xTitle"] = "epoch"
+        kwargs["yTitle"] = "loss"
+        kwargs["yMin"]   = 0.0
+        kwargs["log"]    = False
+        return kwargs
+
+    if var == "acc":
+        kwargs["normalizeToOne"] = False
+        kwargs["xMin"]   =  0.0
+        kwargs["xMax"]   = opts.epochs
+        kwargs["nBins"]  = opts.epochs
+        kwargs["xTitle"] = "epoch"
+        kwargs["yTitle"] = "accuracy"
+        kwargs["yMin"]   = 0.0
+        kwargs["log"]    = False
+        return kwargs
 
     if var == "TrijetPtDR":
         kwargs["xMin"]   =  0.0
@@ -359,14 +402,21 @@ def checkNeuronsPerLayer(nsignal, opts):
             continue
         
         # Determine in/out neurons and compare to min-max range allowed
-        nIn  = opts.neurons[-1]
-        nOut = opts.neurons[i]
+        #nIn  = opts.neurons[-1] #?
+        #nOut = opts.neurons[i]  #?
+        nN  = opts.neurons[i]
+        nIn  = opts.neurons[0]
+        nOut = opts.neurons[-1]
         dof  = (2*nsignal) * (nIn + nOut)     # 2*nsignal = number of samples in training data set
         nMax = (2*nsignal) / (2*(nIn + nOut))
         nMin = (2*nsignal) / (10*(nIn + nOut))
-        if nOut > nMax or nOut < nMin:
-            msg = "The number of OUT neurons for layer #%d (IN=%d, OUT=%d) is not within the recommended range(%d-%d). This may result in over-fitting" % (i, nIn, nOut, nMin, nMax)
+        #if nOut > nMax or nOut < nMin:
+        #    msg = "The number of OUT neurons for layer #%d (IN=%d, OUT=%d) is not within the recommended range(%d-%d). This may result in over-fitting" % (i, nIn, nOut, nMin, nMax)
+        #    Print(hs + msg + ns, True)
+        if nN > nIn or nN < nOut:
+            msg = "The number of OUT neurons for layer #%d (%d neurons) is not within the recommended range(%d <= N <= %d). This may result in over-fitting" % (i, nN, nIn, nOut)
             Print(hs + msg + ns, True)
+
     return
 
 def writeCfgFile(opts):
@@ -522,13 +572,13 @@ def main(opts):
     dset_all    = df_all.values
 
     # Define keras model as a linear stack of layers. Add layers one at a time until we are happy with our network architecture.
-    Print("Creating the sequential Keras model", True)
+    Verbose("Creating the sequential Keras model", True)
     model = Sequential()
 
     # The best network structure is found through a process of trial and error experimentation. Generally, you need a network large enough to capture the structure of the problem.
     # The Dense function defines each layer - how many neurons and mathematical function to use.
     for iLayer, n in enumerate(opts.neurons, 0):
-        layer = "%d layer#" % (int(iLayer)+1)
+        layer = "layer#%d" % (int(iLayer)+1)
         if iLayer == 0:
             layer += " (input Layer)" # Input variables, sometimes called the visible layer.
         elif iLayer == len(opts.neurons)-1:
@@ -584,8 +634,8 @@ def main(opts):
     # Early stop? Stop training when a monitored quantity has stopped improving.
     # Show patience of "50" epochs with a change in the loss function smaller than "min_delta" before stopping procedure
     # https://stackoverflow.com/questions/43906048/keras-early-stopping
-    earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0, patience=10, verbose=1, mode='auto')
-    # earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=50)
+    #earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0, patience=10, verbose=1, mode='auto')
+    earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=50)
     callbacks = [earlystop]
 
     # [Loss function is used to understand how well the network is working (compare predicted label with actual label via some function)]
@@ -611,7 +661,7 @@ def main(opts):
     # (An "epoch" is an arbitrary cutoff, generally defined as "one iteration of training on the whole dataset", 
     # used to separate training into distinct phases, which is useful for logging and periodic evaluation.)
     try:
-        hist = model.fit(X_train,
+        seqModel = model.fit(X_train,
                          Y_train,
                          validation_data=(X_test, Y_test),
                          epochs     = opts.epochs,    # a full pass over all of your training data
@@ -620,6 +670,14 @@ def main(opts):
                          verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
                          callbacks  = callbacks
                      )
+
+        # Retrieve  the training / validation loss / accuracy at each epoch
+        trainLossList = seqModel.history['loss']
+        trainAccList  = seqModel.history['acc']
+        valLossList   = seqModel.history['val_loss']
+        valAccList    = seqModel.history['val_acc']
+        epochList     = range(opts.epochs)
+
     except KeyboardInterrupt: #(KeyboardInterrupt, SystemExit):
         msg = "Manually interrupted the training (keyboard interrupt)!"
         Print(es + msg + ns, True)
@@ -681,11 +739,10 @@ def main(opts):
     jsonWr  = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)
 
     # Plot selected output and save to JSON file for future use
-    func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"     , jsonWr, opts.saveFormats)
-    func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred" , jsonWr, opts.saveFormats)
-    func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain", jsonWr, opts.saveFormats)
-    func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest" , jsonWr, opts.saveFormats)
-
+    func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"       , jsonWr, opts.saveFormats)
+    func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred"   , jsonWr, opts.saveFormats)
+    func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats)
+    func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats)
     for i, var in enumerate(inputList, 0):
         func.PlotAndWriteJSON(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
 
@@ -704,6 +761,13 @@ def main(opts):
     xVals, xErrs, sig_def, sig_alt = func.GetSignificance(htest_s, htest_b)
     func.PlotTGraph(xVals, xErrs, sig_def, effErrs_B, opts.saveDir, "SignificanceA", jsonWr, opts.saveFormats)
     func.PlotTGraph(xVals, xErrs, sig_alt, effErrs_B, opts.saveDir, "SignificanceB", jsonWr, opts.saveFormats)
+    # Metrics
+    xErr = [0.0 for i in range(0, len(valAccList))]
+    yErr = [0.0 for i in range(0, len(valAccList))]
+    func.PlotTGraph(epochList, xErr, trainLossList, yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+    func.PlotTGraph(epochList, xErr, trainAccList , yErr , opts.saveDir, "TrainAccuracy", jsonWr, opts.saveFormats, **GetKwargs("acc") )
+    func.PlotTGraph(epochList, xErr, valLossList  , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+    func.PlotTGraph(epochList, xErr, valAccList   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
 
     # Plot ROC curve
     gSig = func.GetROC(htest_s, htest_b)
@@ -922,14 +986,21 @@ if __name__ == "__main__":
 
     # Inform user
     table    = []
-    msgAlign = "{:^10} {:^10} {:>12}"
-    title    =  msgAlign.format("Layer #", "Neurons", "Activation")
+    msgAlign = "{:^10} {:^10} {:>12} {:>10}"
+    title    =  msgAlign.format("Layer #", "Neurons", "Activation", "Type")
     hLine    = "="*len(title)
     table.append(hLine)
     table.append(title)
     table.append(hLine)
     for i, n in enumerate(opts.neurons, 0): 
-        table.append( msgAlign.format(i+1, opts.neurons[i], opts.activation[i]) )
+        layerType = "unknown"
+        if i == 0:
+            layerType = "input"
+        elif i+1 == len(opts.neurons):
+            layerType = "output"
+        else:
+            layerType = "hidden"
+        table.append( msgAlign.format(i+1, opts.neurons[i], opts.activation[i], layerType) )
     table.append("")
     for r in table:
         Print(r, False)
