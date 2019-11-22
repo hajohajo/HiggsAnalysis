@@ -18,14 +18,16 @@ EXAMPLES:
 ./plotOutputs.py -s png --plotType roc --logY -saveDir /publicweb/a/aattikis/Test --logX --xMin 0.6 --yMin 6e-3 --yMax 1e-1 --dirs new2,new8,new9,new10,new11
 ./plotOutputs.py -s png --plotType roc --xMin 0.01 --logY --dirs new9,new10,new11 --saveDir /publicweb/a/aattikis/BDT --refName BDT --cutLineX 0.93
 ./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test  --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT --cutLineX 0.93
+./plotOutputs.py -s png --logY --plotType output --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test
 
 
 LAST USED:
-./plotOutputs.py -s png --logY --plotType output --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test
 ./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test --dirs 500k_sample,Keras_BDTG2018_Aug2018 --cutLineX 0.93 --xMin 0.0
 ./plotOutputs.py -s png --plotType var --logY --saveDir /publicweb/a/aattikis/SotiSoti --dirs Keras_Test --yMin 0.5e-3 --yMax 1.0
 ./plotOutputs.py -s pdf,C,png --plotType var --saveDir /publicweb/a/aattikis/DNN --dirs Keras_3Layers_19relu_190relu_1sigmoid_500Epochs_5000BatchSize_21-Nov-2019_07h21m34s --yMin 0.5e-3 --yMaxFactor 2.0 --boldText
+./plotOutputs.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDTG
 
+./plotOutputs.py --plotType significance --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotOutputs.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotOutputs.py --plotType efficiency --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT
 
 '''
 #================================================================================================
@@ -119,7 +121,7 @@ def main():
         resultsList.append(_results.Output(directory, excludePoints=[]))
         if opts.refName != None:
             if opts.refName in d:
-                opts.refIndex = i
+                opts.refIndex = i-1 #iro
 
     # Do comparison plot
     msg  = "Creating comparison plots (%d) using the following results directories:%s\n\t%s" % (len(opts.dirList), sh_t, "\n\t".join([os.path.basename(d) for d in opts.dirList]) )
@@ -242,10 +244,13 @@ def doSignificance(name, resultsList):
         gBkgList.extend(gBkg)
         legList.extend(lSig)
         
-    # Re-arrange legend
+    # Re-arrange lists
+    if opts.refIndex >= len(legList):
+        opts.refIndex = opts.refIndex-1
     legList.insert(0, legList.pop(opts.refIndex))
     gSigList.insert(0, gSigList.pop(opts.refIndex))
     gBkgList.insert(0, gBkgList.pop(opts.refIndex))
+
     # Plot the graph
     kwargs = GetKwargs(opts)
 
@@ -308,8 +313,10 @@ def doROC(name, resultsList):
         for j in range(0, N):
             xVal = gSigList[i].GetY()[j]
             yVal = gBkgList[i].GetY()[j]
+
             if xVal <= opts.xMin:
                 continue
+
             x.append(xVal)
             y.append(yVal)
             Verbose("%s) x = %s, y = %s" % (g.GetName(), xVal, yVal), False)
@@ -401,7 +408,7 @@ def doPlot(legList, graphList, saveName, **kwargs):
     # Create a plot-base object
     Verbose("Creating the plot-base object", True)
     # plot = plots.PlotBase(hgList, saveFormats=[])
-    hgList.insert(0, hgList.pop(opts.refIndex))
+    #hgList.insert(0, hgList.pop(opts.refIndex))
     plot = plots.ComparisonManyPlot(hgList[0], hgList[1:], saveFormats=[])
     #plot = plots.ComparisonManyPlot(hgList[-1], hgList[:-1], saveFormats=[])
 
@@ -757,7 +764,7 @@ if __name__ == "__main__":
     PAPER        = False
     SAVENAME     = None
     SAVEDIR      = None
-    SAVEFORMATS  = "png" #pdf,png,C"
+    SAVEFORMATS  = "pdf,png" # pdf,C,png" # is .C format problematic? (hangs)
     URL          = False
     VERBOSE      = False
     BOLDTEXT     = False
@@ -872,8 +879,6 @@ if __name__ == "__main__":
         if opts.plotType != "var":
             msg = "At least 2 directories required. Only %d passed with --dirs argument!" % len(opts.dirList)
             raise Exception(sh_e + msg + sh_n)
-        else:
-            pass
     else:
         msg = "This should never be reached"
         raise Exception(sh_e + msg + sh_n)
@@ -925,11 +930,17 @@ if __name__ == "__main__":
     plotNames["roc"]          = "ROC"
     plotNames["var"]          = "TrijetLdgJetBDisc"
 
+
     if opts.plotType.lower() not in plotTypes:
         msg = "Unsupported plot type  \"%s\". Please select from the following:" % (", ".join(plotTypes))
         raise Exception(sh_e + msg + sh_n)
     else:
         opts.plotName = plotNames[opts.plotType]
+        if opts.plotType in ["roc", "efficiency", "significance"]:
+            if opts.xMin == None:
+                opts.xMin = 0.0
+            if opts.xMax == None:
+                opts.xMax = 1.0
 
     # Define directory name for saving output
     if opts.saveDir == None:
