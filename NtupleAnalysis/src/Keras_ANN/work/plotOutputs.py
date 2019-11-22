@@ -141,6 +141,9 @@ def main():
                     "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
                     "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]:
             doVariables(opts.saveName, var, resultsList)
+    elif "metric" in opts.plotType.lower():
+        for metric in ["TrainAccuracy", "ValAccuracy", "TrainLoss", "ValLoss"]:
+            doMetrics(opts.saveName, metric, resultsList)
     else:
         pass
     
@@ -390,6 +393,58 @@ def doVariables(name, variable, resultsList):
     doPlot(legList, gSvBList, opts.saveName, **kwargs)
     return
 
+def doMetrics(name, metric, resultsList):
+    
+    # Do the comparison plot
+    Verbose("Creating the expected plots", True)
+    grList  = []
+    legList = []
+    opts.saveName = metric
+
+    # For-loop: All Output-class objects
+    for r in resultsList:
+        gr, leg = r.getGraphs(metric)
+        if opts.yMin == None:
+            opts.yMin = r.getYMin()
+        if opts.yMax == None and opts.yMax == None:
+            opts.yMax = r.getYMax()*1.10
+        grList.extend(gr)
+        legList.extend(leg)
+        
+    # Plot the graph
+    kwargs = GetMetricKwargs(metric, opts)
+    gList  = []
+
+    # For-loop: All TGraphs
+    for i, g in enumerate(grList, 0):
+        x  = []
+        y  = []
+        N  = g.GetN()
+
+        # For-loop: All points in graph
+        for j in range(0, N):
+            xVal = g.GetX()[j]
+            yVal = g.GetY()[j]
+
+            if xVal <= opts.xMin:
+                continue
+
+            # Protection: don't include (x,y) = (0.0, 0.0)
+            if xVal !=0.0 and yVal !=0.0:
+                x.append(xVal)
+                y.append(yVal)
+            Verbose("%d) x = %0.3f, y = %0.3f" % (j, xVal, yVal), j==0)
+
+        # Create the TGraph
+        Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
+        g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
+        gList.append(g)
+
+    # Make the plot
+    Verbose("Making the plot", True)
+    doPlot(legList, gList, opts.saveName, **kwargs)
+    return
+
 def doPlot(legList, graphList, saveName, **kwargs):
     
     # Definitions
@@ -450,6 +505,82 @@ def GetKwargsRatio(kwargs):
     kwargs["opts"]["ymax"] = 3.0
     kwargs["log"] = False
     tdrstyle.TDRStyle().setLogY(False)
+    return kwargs
+
+def GetMetricKwargs(metric, opts):
+    dh = -0.12 + (len(opts.dirList)-3)*0.04
+    legNW  = {"dx": -0.53, "dy": -0.05, "dh": dh}
+    legSW  = {"dx": -0.53, "dy": -0.30, "dh": dh}
+    legNE  = {"dx": -0.53, "dy": -0.05, "dh": dh}
+    legSE  = {"dx": -0.53, "dy": -0.45, "dh": dh}
+    if opts.paper:
+        #histograms.cmsTextMode = histograms.CMSMode.PAPER
+        cmsExtraText = ""
+    else:
+        #histograms.cmsTextMode = histograms.CMSMode.PRELIMINARY
+        #histograms.cmsTextMode = histograms.CMSMode.UNPUBLISHED
+        cmsExtraText = "Simulation" #"Preliminary"
+
+    kwargs  = {
+        "xlabel"           : "DNN Output",
+        "ylabel"           : "Entries",
+        "addMCUncertainty" : False,
+        "addLuminosityText": False,
+        "addCmsText"       : True,
+        "cmsExtraText"     : cmsExtraText,
+        "cmsTextPosition"  : "outframe",
+        "opts"             : {"xmin": opts.xMin, "xmax": opts.xMax},#, "ymin": opts.yMin, "ymax": opts.yMax},
+        "log"              : opts.logY,
+        "moveLegend"       : legNE,
+        "xtitlesize"       : 0.1,
+        "ytitlesize"       : 0.1,
+        "cutBox"           : {"cutValue":  0.0, "fillColor": 16, "box": False, "line": False , "cutGreaterThan": False},
+        #"cutBoxY"          : {"cutValue": 1000.0, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}  # does not work!
+        }
+
+    # General settings
+    if opts.yMaxFactor:
+        kwargs["opts"]["ymaxfactor"] = opts.yMaxFactor
+        #del kwargs["opts"]["ymax"]
+    if opts.logY and kwargs["opts"]["ymin"] <= 0.0:
+        msg = "Cannot have log-y enabled and y-min set to 0.0. Setting to y-min to 1.0."
+        Print(sh_h + msg + sh_n, True)
+        kwargs["opts"]["ymin"] = 1e0
+    if opts.logX and kwargs["opts"]["xmin"] <= 0.0:
+        msg = "Cannot have log-x enabled and y-min set to <=0.0. Setting to x-min to 1e-2"
+        Print(sh_h + msg + sh_n, True)
+        kwargs["opts"]["xmin"] = 1e-2
+    if opts.cutLineX != None:
+        kwargs["cutBox"]  = {"cutValue": opts.cutLineX, "fillColor": 16, "box": False, "line": True , "cutGreaterThan": False}
+    if opts.cutLineY != None:
+        Print("This does not work! Bug-fixing required!", True)
+        kwargs["cutBoxY"] = {"cutValue": opts.cutLineY, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False} 
+
+    if "loss" in metric.lower():
+        #kwargs["opts"]["xmin"]   =  0.0
+        #kwargs["opts"]["xmax"]   = 800.0
+        kwargs["xlabel"] = "epoch"
+        kwargs["yMin"]   = 0.0 #1e-3
+        kwargs["ylabel"] = "loss"
+
+    if "accuracy" in metric.lower():
+        #kwargs["opts"]["xmin"]   =   0.0
+        #kwargs["opts"]["xmax"]   = 800.0
+        kwargs["xlabel"] = "epoch"
+        kwargs["yMin"]   = 0.0 # 1e-3
+        kwargs["ylabel"] = "accuracy"
+        kwargs["moveLegend"] = legSE
+
+    # No need for this since we plot TGraphs
+    if opts.xMin == None:
+        del kwargs["opts"]["xmin"]
+    else:
+        kwargs["opts"]["xmin"] = opts.xMin
+    if opts.xMax == None:
+        del kwargs["opts"]["xmax"]
+    else:
+        kwargs["opts"]["xmax"] = opts.xMax
+
     return kwargs
 
 def GetVarKwargs(var, opts):
@@ -919,7 +1050,7 @@ if __name__ == "__main__":
         Verbose("index = %d, dir = %s" % (i, d), i==0)
         
     # Check plot type
-    plotTypes = ["output", "prediction", "training", "testing", "efficiency", "significance", "roc", "var"]
+    plotTypes = ["output", "prediction", "training", "testing", "efficiency", "significance", "roc", "var", "metric"]
     plotNames = {}
     plotNames["output"]       = "Output"
     plotNames["prediction"]   = "OutputPred"
@@ -929,7 +1060,7 @@ if __name__ == "__main__":
     plotNames["significance"] = "Significance"
     plotNames["roc"]          = "ROC"
     plotNames["var"]          = "TrijetLdgJetBDisc"
-
+    plotNames["metric"]       = "metric"
 
     if opts.plotType.lower() not in plotTypes:
         msg = "Unsupported plot type  \"%s\". Please select from the following:" % (", ".join(plotTypes))

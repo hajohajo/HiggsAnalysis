@@ -301,7 +301,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
         jsonWr.addGraph(gName, gr)
     return
 
-def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormats):
+def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
     # Create a TGraph object
     graph = plot.GetGraph(xVals, yVals, xErrs, xErrs, yErrs, yErrs)
@@ -321,6 +321,7 @@ def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormat
                                     array.array("d", yErrs),
                                     array.array("d", yErrs))
     tgraph.SetName(saveName)
+    legName = None
     if "efficiency" in saveName.lower():
         legName = "efficiency"
         if saveName.lower().endswith("sig"):
@@ -337,15 +338,23 @@ def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormat
         plot.ApplyStyle(tgraph, ROOT.kOrange)
         
     # Draw the TGraph
-    tgraph.GetXaxis().SetLimits(-0.05, 1.0)
+    if "xTitle" in kwargs:
+        tgraph.GetXaxis().SetTitle(kwargs["xTitle"])
+    if "yTitle" in kwargs:
+        tgraph.GetYaxis().SetTitle(kwargs["yTitle"])
+    if "xMin" in kwargs and "xMax" in kwargs:
+        tgraph.GetXaxis().SetLimits(kwargs["xMin"], kwargs["xMax"])
+    else:
+        tgraph.GetXaxis().SetLimits(-0.05, 1.0)
     #tgraph.SetMaximum(1.1)
     #tgraph.SetMinimum(0)
     tgraph.Draw("AC")
         
     # Create legend
     leg = plot.CreateLegend(0.60, 0.70, 0.85, 0.80)
-    leg.AddEntry(tgraph, legName, "l")
-    leg.Draw()
+    if legName != None:
+        leg.AddEntry(tgraph, legName, "l")
+        leg.Draw()
 
     plot.SavePlot(canvas, saveDir, saveName, saveFormats)
     canvas.Close()

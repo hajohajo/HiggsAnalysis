@@ -762,12 +762,12 @@ def main(opts):
     func.PlotTGraph(xVals, xErrs, sig_def, effErrs_B, opts.saveDir, "SignificanceA", jsonWr, opts.saveFormats)
     func.PlotTGraph(xVals, xErrs, sig_alt, effErrs_B, opts.saveDir, "SignificanceB", jsonWr, opts.saveFormats)
     # Metrics
-    xErr = [0.0 for i in range(0, len(valAccList))]
-    yErr = [0.0 for i in range(0, len(valAccList))]
-    func.PlotTGraph(epochList, xErr, trainLossList, yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
-    func.PlotTGraph(epochList, xErr, trainAccList , yErr , opts.saveDir, "TrainAccuracy", jsonWr, opts.saveFormats, **GetKwargs("acc") )
-    func.PlotTGraph(epochList, xErr, valLossList  , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
-    func.PlotTGraph(epochList, xErr, valAccList   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
+    xErr = [0.0 for i in range(0, opts.epochs)]
+    yErr = [0.0 for i in range(0, opts.epochs)]
+    func.PlotTGraph(epochList[0:opts.epochs], xErr, trainLossList[0:opts.epochs-1], yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+    func.PlotTGraph(epochList[0:opts.epochs], xErr, trainAccList[0:opts.epochs-1] , yErr , opts.saveDir, "TrainAccuracy", jsonWr, opts.saveFormats, **GetKwargs("acc") )
+    func.PlotTGraph(epochList[0:opts.epochs], xErr, valLossList[0:opts.epochs-1]  , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+    func.PlotTGraph(epochList[0:opts.epochs], xErr, valAccList[0:opts.epochs-1]   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
 
     # Plot ROC curve
     gSig = func.GetROC(htest_s, htest_b)
@@ -952,7 +952,7 @@ if __name__ == "__main__":
     nYear  = now.strftime("%Y")
     #nTime  = now.strftime("%Hh%Mm") # w/o seconds
     nTime  = now.strftime("%Hh%Mm%Ss") # w/ seconds
-    nDate  = "%s-%s-%s_%s" % (nDay, nMonth, nYear, nTime)
+    nDate  = "%s-%s_%s_%s" % (nDay, nMonth, nYear, nTime)
     if opts.entrystop != None:
         sName  = "Keras_%s_%s_%s" % (specs, str(opts.entrystop) + "Entrystop", nDate)
     else:
