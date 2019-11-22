@@ -390,6 +390,9 @@ def writeCfgFile(opts):
     jsonWr.addParameter("train sample", opts.trainSample)
     jsonWr.addParameter("test sample" , opts.testSample)
     jsonWr.addParameter("ROOT file" , opts.rootFileName)
+    jsonWr.addParameter("# variables", len(opts.inputList))
+    for i,b in enumerate(opts.inputList, 1):
+        jsonWr.addParameter("var%d"% i, b)
     jsonWr.write(opts.cfgJSON)
     return
 
@@ -463,15 +466,17 @@ def main(opts):
     inputList.append("TrijetSubldgJetAxis2")
     inputList.append("TrijetLdgJetMult")
     inputList.append("TrijetSubldgJetMult")
+    opts.inputList = inputList
     nInputs = len(inputList)
-
+    
     # Construct signal and background dataframes using a list of TBranches (a Dataframe is a two dimensional structure representing data in python)
+    # https://uproot.readthedocs.io/en/latest/ttree-handling.html#id7
     Print("Constucting dataframes for signal and background with %d input variables:\n\t%s%s%s" % (nInputs, ss, "\n\t".join(inputList), ns), True)
-    df_signal = signal.pandas.df(inputList) # call an array-fetching method to fill a Pandas DataFrame.
-    df_bkg    = background.pandas.df(inputList)
+    df_signal = signal.pandas.df(inputList, entrystop=opts.entrystop) # call an array-fetching method to fill a Pandas DataFrame.
+    df_bkg    = background.pandas.df(inputList, entrystop=opts.entrystop)
 
     # Get the index (row labels) of the DataFrame.
-    nsignal = len(df_signal.index)
+    nsignal = len(df_signal.index)    
     nbkg    = len(df_bkg.index)
     Verbose("Signal has %s%d%s row labels. Background has %s%d%s row labels" % (ss, nsignal, ns, es, nbkg, ns), True)
 
@@ -485,7 +490,13 @@ def main(opts):
     # Get a Numpy representation of the DataFrames for signal and background datasets
     Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
     dset_signal = df_signal.values
-    dset_bkg    = df_bkg.values
+    dset_bkg = df_bkg.values
+    # Alternative fix in case of "memory error"
+    if 0: 
+        df_bkg      = df_bkg.iloc[0:nsignal] 
+        dset_bkg    = df_bkg.values
+
+    # Print datasets?
     printDataset(dset_signal)
     printDataset(dset_bkg)
 
@@ -734,13 +745,14 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var.root"
-    #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root"
-    #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root"
+    #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var.root"               #  92 000
+    #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root"  # 460 000
+    ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root"  # 875 000
     NOTBATCHMODE = False
     SAVEDIR      = None
     SAVEFORMATS  = "png"
     URL          = False
+    ENTRYSTOP    = None
     VERBOSE      = False
     RNDSEED      = 1234
     EPOCHS       = 100
@@ -800,6 +812,9 @@ if __name__ == "__main__":
 
     parser.add_option("--neurons", dest="neurons", type="string", default=NEURONS,
                       help="List of neurons to use for each sequential layer (comma-separated integers)  [default: %s]" % NEURONS)
+
+    parser.add_option("--entrystop", dest="entrystop", type="int", default=ENTRYSTOP,
+                      help="Entry at which the (TBranch of TTree) reading stops. If ROOT file itoo big it may result to a \"memory error\", depending on the resources available in the machine used.  If \"None\", stop at the end of the branch. [default: %s]" % ENTRYSTOP)
 
     parser.add_option("--lossFunction", dest="lossFunction", type="string", default=LOSSFUNCTION,
                       help="One of the two parameters required to compile a model. The weights will take on values such that the loss function is minimized [default: %s]" % LOSSFUNCTION)
@@ -874,7 +889,10 @@ if __name__ == "__main__":
     #nTime  = now.strftime("%Hh%Mm") # w/o seconds
     nTime  = now.strftime("%Hh%Mm%Ss") # w/ seconds
     nDate  = "%s-%s-%s_%s" % (nDay, nMonth, nYear, nTime)
-    sName  = "Keras_%s_%s" % (specs, nDate)
+    if opts.entrystop != None:
+        sName  = "Keras_%s_%s_%s" % (specs, str(opts.entrystop) + "Entrystop", nDate)
+    else:
+        sName  = "Keras_%s_%s" % (specs, nDate)
 
     # Determine path for saving plots
     if opts.saveDir == None:
@@ -886,13 +904,14 @@ if __name__ == "__main__":
         else:
             myDir = os.path.join(os.getcwd())
         opts.saveDir = os.path.join(myDir, sName)
+
     # Create dir if it does not exist
     if not os.path.exists(opts.saveDir):
-        os.mkdir(opts.saveDir)
+        os.mkdir(opts.saveDir)    
 
     # Create logfile
     opts.logFile = "stdout.log" #sName + ".log"
-    opts.logPath = os.path.join(opts.saveDir, opts.logFile)    
+    opts.logPath = os.path.join(opts.saveDir, opts.logFile)
     bak_stdout   = sys.stdout
     log_file     = None
     if opts.log:
