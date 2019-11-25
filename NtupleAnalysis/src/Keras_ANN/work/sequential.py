@@ -110,6 +110,7 @@ import random as rn
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
+from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
@@ -201,7 +202,6 @@ def GetKwargs(var):
         kwargs["yTitle"] = "loss"
         kwargs["yMin"]   = 0.0
         kwargs["log"]    = False
-        return kwargs
 
     if var == "acc":
         kwargs["normalizeToOne"] = False
@@ -212,7 +212,6 @@ def GetKwargs(var):
         kwargs["yTitle"] = "accuracy"
         kwargs["yMin"]   = 0.0
         kwargs["log"]    = False
-        return kwargs
 
     if var == "TrijetPtDR":
         kwargs["xMin"]   =  0.0
@@ -357,6 +356,7 @@ def GetKwargs(var):
         kwargs["xTitle"] = "constituent multiplicity"
         #kwargs["yTitle@"] = "a.u. / %0.0f"
 
+    kwargs["nBins"]  *= 2
     return kwargs
 
 
@@ -497,25 +497,25 @@ def main(opts):
 
     # Input list of discriminatin variables (TBranches)
     inputList = []
-    inputList.append("TrijetPtDR")
-    inputList.append("TrijetDijetPtDR")
-    inputList.append("TrijetBjetMass")
-    inputList.append("TrijetLdgJetBDisc")
-    inputList.append("TrijetSubldgJetBDisc")
-    inputList.append("TrijetBJetLdgJetMass")
-    inputList.append("TrijetBJetSubldgJetMass")
-    inputList.append("TrijetMass")
-    inputList.append("TrijetDijetMass")
-    inputList.append("TrijetBJetBDisc")
-    inputList.append("TrijetSoftDrop_n2")
-    inputList.append("TrijetLdgJetCvsL")
-    inputList.append("TrijetSubldgJetCvsL")
-    inputList.append("TrijetLdgJetPtD")
-    inputList.append("TrijetSubldgJetPtD")
-    inputList.append("TrijetLdgJetAxis2")
-    inputList.append("TrijetSubldgJetAxis2")
-    inputList.append("TrijetLdgJetMult")
-    inputList.append("TrijetSubldgJetMult")
+    # inputList.append("TrijetPtDR")
+    # inputList.append("TrijetDijetPtDR")
+    # inputList.append("TrijetBjetMass")
+    # inputList.append("TrijetLdgJetBDisc")
+    # inputList.append("TrijetSubldgJetBDisc")
+    # inputList.append("TrijetBJetLdgJetMass")
+    # inputList.append("TrijetBJetSubldgJetMass")
+    inputList.append("TrijetMass") #iro
+    # inputList.append("TrijetDijetMass")
+    # inputList.append("TrijetBJetBDisc")
+    # inputList.append("TrijetSoftDrop_n2")
+    # inputList.append("TrijetLdgJetCvsL")
+    # inputList.append("TrijetSubldgJetCvsL")
+    # inputList.append("TrijetLdgJetPtD")
+    # inputList.append("TrijetSubldgJetPtD")
+    # inputList.append("TrijetLdgJetAxis2")
+    # inputList.append("TrijetSubldgJetAxis2")
+    # inputList.append("TrijetLdgJetMult")
+    # inputList.append("TrijetSubldgJetMult")
     opts.inputList = inputList
     nInputs = len(inputList)
     
@@ -620,9 +620,24 @@ def main(opts):
     X_background = dset_bkg[:nsignal, 0:nInputs]
     Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_signal), ns, es, len(X_background), ns), True)
 
+    # iro
+    scaler = StandardScaler()
+    StandardScaler(copy=False, with_mean=True, with_std=True)
+    # Compute the mean and std to be used for later scaling.
+    #print(scaler.fit(X_signal))
+    #print(scaler.mean_)
+    #print(scaler.transform(X_signal))
+
+    # Fit to data, then transform it by performing standardization by centering and scaling
+    print X_signal
+    print "="*50
+    if 1:
+        x_signal     = scaler.fit_transform(X_signal)
+        x_background = scaler.fit_transform(X_signal)
+
     # Plot the input variables
-    Print("Plotting all %d input variables for signal and bacgkround" % (len(inputList)), True)
     if opts.plotInputs:
+        Verbose("Plotting all %d input variables for signal and bacgkround" % (len(inputList)), True)
         for i, var in enumerate(inputList, 0):
             func.PlotInputs(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], var, "%s/%s" % (opts.saveDir, "inputs"), opts.saveFormats)
 
@@ -1052,15 +1067,18 @@ if __name__ == "__main__":
         Verbose (msg, False)         
 
     # Get some basic information
-    opts.keras     = keras.__version__
-    opts.hostname  = socket.gethostname()
-    opts.python    = "%d.%d.%d" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
-    opts.gitBranch = subprocess.check_output(["git", "branch", "-a"])
-    opts.gitStatus = subprocess.check_output(["git", "status"])
-    opts.gitDiff   = subprocess.check_output(["git", "diff"])
+    opts.keras      = keras.__version__
+    opts.tensorflow = tf.__version__
+    opts.hostname   = socket.gethostname()
+    opts.python     = "%d.%d.%d" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
+    opts.gitBranch  = subprocess.check_output(["git", "branch", "-a"])
+    opts.gitStatus  = subprocess.check_output(["git", "status"])
+    opts.gitDiff    = subprocess.check_output(["git", "diff"])
 
     # Call the main function
-    Print("Using Keras %s (hostname = %s)" % (ss + opts.keras + ns, ls + opts.hostname + ns), True)
+    Print("Hostname is %s" % (ls + opts.hostname + ns), True)
+    Print("Using Keras %s" % (ss + opts.keras + ns), True)
+    Print("Using Tensorflow %s" % (ss + tf.__version__ + ns), False)
     main(opts)
 
     Print("All output saved under directory %s" % (ls + opts.saveDir + ns), True)

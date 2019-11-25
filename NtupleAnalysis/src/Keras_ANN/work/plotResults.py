@@ -6,28 +6,19 @@ or even for comparing exclusion limits of different channels.
 
 
 USAGE:
-./plotOutputs.py  [opts]
+./plotResults.py  [opts]
 
 
 EXAMPLES:
-./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --dirs new5,new6,new7,new8 --saveDir /publicweb/a/aattikis/new5_6_7_8
-./plotOutputs.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2,new3 --refIndex 3 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 3 --dirs new1,new2,new3 --saveDir /publicweb/a/aattikis/Test 
-./plotOutputs.py -s png --logY --plotType output --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 8 --dirs new1,new2,new3,new4 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --logY --plotType output --dirs new1,new8,new9 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new1,new8,new9 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new1,new8,new9 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new1,new8,new9 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --plotType roc --logY -saveDir /publicweb/a/aattikis/Test --logX --xMin 0.6 --yMin 6e-3 --yMax 1e-1 --dirs new2,new8,new9,new10,new11
-./plotOutputs.py -s png --plotType roc --xMin 0.01 --logY --dirs new9,new10,new11 --saveDir /publicweb/a/aattikis/BDT --refName BDT --cutLineX 0.93
-./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test  --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT --cutLineX 0.93
-./plotOutputs.py -s png --logY --plotType output --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test
+./plotResults.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --dirs new5,new6,new7,new8 --saveDir /publicweb/a/aattikis/new5_6_7_8
+./plotResults.py -s png --logY --plotType output --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 8 --dirs new1,new2,new3,new4 --saveDir /publicweb/a/aattikis/Test
+./plotResults.py -s png --logY --plotType output --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType efficiency --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType roc --logY --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test
 
 
 LAST USED:
-./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test --dirs 500k_sample,Keras_BDTG2018_Aug2018 --cutLineX 0.93 --xMin 0.0
-./plotOutputs.py -s png --plotType var --logY --saveDir /publicweb/a/aattikis/SotiSoti --dirs Keras_Test --yMin 0.5e-3 --yMax 1.0
-./plotOutputs.py -s pdf,C,png --plotType var --saveDir /publicweb/a/aattikis/DNN --dirs Keras_3Layers_19relu_190relu_1sigmoid_500Epochs_5000BatchSize_21-Nov-2019_07h21m34s --yMin 0.5e-3 --yMaxFactor 2.0 --boldText
-./plotOutputs.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDTG
-
-./plotOutputs.py --plotType significance --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotOutputs.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotOutputs.py --plotType efficiency --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT
+./plotResults.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDTG
+./plotResults.py --plotType significance --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotResults.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotResults.py --plotType efficiency --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT
+/plotResults.py --plotType metric --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs Keras_3Layers_19relu_20relu_1sigmoid_20Epochs_1000BatchSize_10000Entrystop_22-Nov-2019_10h27m10s,Keras_3Layers_19relu_40relu_1sigmoid_20Epochs_1000BatchSize_10000Entrystop_22-Nov-2019_10h26m20s,Keras_3Layers_19relu_100relu_1sigmoid_20Epochs_1000BatchSize_600000Entrystop_22-Nov_2019_10h37m38s --yMaxFactor 1.2
 
 '''
 #================================================================================================
@@ -510,9 +501,9 @@ def GetKwargsRatio(kwargs):
 def GetMetricKwargs(metric, opts):
     dh = -0.12 + (len(opts.dirList)-3)*0.04
     legNW  = {"dx": -0.53, "dy": -0.05, "dh": dh}
-    legSW  = {"dx": -0.53, "dy": -0.30, "dh": dh}
     legNE  = {"dx": -0.53, "dy": -0.05, "dh": dh}
-    legSE  = {"dx": -0.53, "dy": -0.45, "dh": dh}
+    legSW  = {"dx": -0.53, "dy": -0.35, "dh": dh}
+    legSE  = {"dx": -0.53, "dy": -0.35, "dh": dh}
     if opts.paper:
         #histograms.cmsTextMode = histograms.CMSMode.PAPER
         cmsExtraText = ""
@@ -542,10 +533,12 @@ def GetMetricKwargs(metric, opts):
     if opts.yMaxFactor:
         kwargs["opts"]["ymaxfactor"] = opts.yMaxFactor
         #del kwargs["opts"]["ymax"]
-    if opts.logY and kwargs["opts"]["ymin"] <= 0.0:
+    else:
+        kwargs["opts"]["ymax"] = opts.yMax
+    if opts.logY:# and kwargs["opts"]["ymin"] <= 0.0:
         msg = "Cannot have log-y enabled and y-min set to 0.0. Setting to y-min to 1.0."
-        Print(sh_h + msg + sh_n, True)
-        kwargs["opts"]["ymin"] = 1e0
+        #Print(sh_h + msg + sh_n, True)
+        kwargs["opts"]["ymin"] = 1e-2
     if opts.logX and kwargs["opts"]["xmin"] <= 0.0:
         msg = "Cannot have log-x enabled and y-min set to <=0.0. Setting to x-min to 1e-2"
         Print(sh_h + msg + sh_n, True)
@@ -557,17 +550,15 @@ def GetMetricKwargs(metric, opts):
         kwargs["cutBoxY"] = {"cutValue": opts.cutLineY, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False} 
 
     if "loss" in metric.lower():
-        #kwargs["opts"]["xmin"]   =  0.0
-        #kwargs["opts"]["xmax"]   = 800.0
         kwargs["xlabel"] = "epoch"
-        kwargs["yMin"]   = 0.0 #1e-3
         kwargs["ylabel"] = "loss"
+        kwargs["opts"]["ymin"] = 0.0
+        kwargs["opts"]["ymax"] = 0.5
 
     if "accuracy" in metric.lower():
-        #kwargs["opts"]["xmin"]   =   0.0
-        #kwargs["opts"]["xmax"]   = 800.0
         kwargs["xlabel"] = "epoch"
-        kwargs["yMin"]   = 0.0 # 1e-3
+        kwargs["opts"]["ymin"] = 0.8
+        kwargs["opts"]["ymax"] = 1.0
         kwargs["ylabel"] = "accuracy"
         kwargs["moveLegend"] = legSE
 
@@ -586,9 +577,9 @@ def GetMetricKwargs(metric, opts):
 def GetVarKwargs(var, opts):
     dh = -0.12 + (len(opts.dirList)-3)*0.04
     legNW  = {"dx": -0.53, "dy": -0.05, "dh": dh}
-    legSW  = {"dx": -0.53, "dy": -0.30, "dh": dh}
     legNE  = {"dx": -0.05, "dy": -0.05, "dh": dh}
-    legSE  = {"dx": -0.18, "dy": -0.45, "dh": dh}
+    legSW  = {"dx": -0.53, "dy": -0.35, "dh": dh}
+    legSE  = {"dx": -0.18, "dy": -0.35, "dh": dh}
     if opts.paper:
         #histograms.cmsTextMode = histograms.CMSMode.PAPER
         cmsExtraText = ""
@@ -1021,7 +1012,7 @@ if __name__ == "__main__":
         raise Exception(sh_e + msg + sh_n)
     else:
         msg = "Analysis type is %s" % (sh_t + opts.analysisType + sh_n)
-        Print(msg, True)        
+        Verbose(msg, True)        
 
     # Sanity checks
     opts.excludePoints = []
@@ -1091,4 +1082,4 @@ if __name__ == "__main__":
     main()
     
     if not opts.batchMode:
-        raw_input("=== plotOutputs.py: Press any key to quit ROOT ...")
+        raw_input("=== plotResults.py: Press any key to quit ROOT ...")
