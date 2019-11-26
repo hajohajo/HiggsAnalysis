@@ -163,6 +163,30 @@ def Verbose(msg, printHeader=True, verbose=False):
     Print(msg, printHeader)
     return
 
+def GetModelWeightsAndBiases(inputList, neuronsList):
+    '''
+    Customly-defined function to estimate the model
+    parameters (total, weights, biases)
+    '''
+    nParamsT  = 0
+    nBiasT    = 0 
+    nWeightsT = 0
+    nInputs   = len(inputList)
+
+    for i, n in enumerate(neuronsList, 0):
+        nParams = 0
+        nBias   = neuronsList[i]
+        if i == 0:
+            nWeights = nInputs * neuronsList[i]
+        else:
+            nWeights = neuronsList[i-1] * neuronsList[i]
+        nParams += nBias + nWeights
+
+        nParamsT  += nParams
+        nWeightsT += nWeights
+        nBiasT += nBias
+    return nParamsT, nWeightsT, nBiasT
+
 def GetModelParams(model):
     '''
     https://stackoverflow.com/questions/45046525/how-can-i-get-the-number-of-trainable-parameters-of-a-model-in-keras
@@ -439,7 +463,6 @@ def writeCfgFile(opts):
 
     # Write to json file
     jsonWr = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)
-
     jsonWr.addParameter("keras version", opts.keras)
     jsonWr.addParameter("host name", opts.hostname)
     jsonWr.addParameter("python version", opts.python)
@@ -447,6 +470,8 @@ def writeCfgFile(opts):
     jsonWr.addParameter("model parameters (total)", opts.modelParams)
     jsonWr.addParameter("model parameters (trainable)", opts.modelParamsTrain)
     jsonWr.addParameter("model parameters (non-trainable)", opts.modelParamsNonTrainable)
+    jsonWr.addParameter("model weights", opts.modelWeights)
+    jsonWr.addParameter("model biases", opts.modelBiases)
     jsonWr.addParameter("rndSeed", opts.rndSeed)
     jsonWr.addParameter("layers", len(opts.neurons))
     jsonWr.addParameter("hidden layers", len(opts.neurons)-2)
@@ -459,7 +484,7 @@ def writeCfgFile(opts):
     jsonWr.addParameter("train sample", opts.trainSample)
     jsonWr.addParameter("test sample" , opts.testSample)
     jsonWr.addParameter("ROOT file" , opts.rootFileName)
-    jsonWr.addParameter("# variables", len(opts.inputList))
+    jsonWr.addParameter("input variables", len(opts.inputList))
     for i,b in enumerate(opts.inputList, 1):
         jsonWr.addParameter("var%d"% i, b)
     jsonWr.write(opts.cfgJSON)
@@ -635,17 +660,12 @@ def main(opts):
     msg = "Model has a total of %s%d%s parameters (neuron weights and biases) " % (hs, nParams, ns)
     Print(msg, True)
     total_count, trainable_count, non_trainable_count  = GetModelParams(model)
+    nParams, nWeights, nBias = GetModelWeightsAndBiases(inputList, opts.neurons)
     opts.modelParams = total_count
     opts.modelParamsTrain = trainable_count
     opts.modelParamsNonTrainable = non_trainable_count
-
-    nParams = 0
-    for i, n in enumerate(opts.neurons, 1):
-        if i == len(opts.neurons):
-            break
-        nParams += opts.neurons[i-1] * opts.neurons[i]
-    #print "nParams = ", nParams
-    #sys.exit()
+    opts.modelWeights = nWeights
+    opts.modelBiases  = nBias
 
     # Get a dictionary containing the configuration of the model. The model can be reinstantiated from its config via: model = Model.from_config(config)
     if 0:

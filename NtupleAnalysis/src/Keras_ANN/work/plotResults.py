@@ -118,7 +118,6 @@ def main():
     msg  = "Creating comparison plots (%d) using the following results directories:%s\n\t%s" % (len(opts.dirList), sh_t, "\n\t".join([os.path.basename(d) for d in opts.dirList]) )
     Print(msg + sh_n, True)
     if "output" in opts.plotType.lower():
-        print "HERE"*10
         doOutput(opts.saveName, resultsList) 
     elif "efficiency" in opts.plotType.lower():
         doEfficiency(opts.saveName, resultsList)
@@ -153,7 +152,6 @@ def doOutput(name, resultsList):
 
     # For-loop: All Output-class objects
     for r in resultsList:
-        print r.getDirectory()
         gSig, lSig = r.getGraphs(opts.plotName + "_signal")
         gBkg, lBkg = r.getGraphs(opts.plotName + "_background")
         if opts.yMin == None:
