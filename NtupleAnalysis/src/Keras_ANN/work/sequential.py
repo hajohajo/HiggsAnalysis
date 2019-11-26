@@ -98,15 +98,18 @@ https://cds.cern.ch/record/2157570
 #================================================================================================ 
 # print "=== Importing KERAS"
 import keras
+from keras import backend as backend
 import uproot
 import numpy
 import pandas
 import ROOT
 import array
 import os
+import psutil
 import math
 import json
 import random as rn
+
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
@@ -159,6 +162,19 @@ def Verbose(msg, printHeader=True, verbose=False):
         return
     Print(msg, printHeader)
     return
+
+def GetModelParams(model):
+    '''
+    https://stackoverflow.com/questions/45046525/how-can-i-get-the-number-of-trainable-parameters-of-a-model-in-keras
+    '''
+    trainable_count = int(
+        numpy.sum([backend.count_params(p) for p in set(model.trainable_weights)]))
+
+    non_trainable_count = int(
+        numpy.sum([backend.count_params(p) for p in set(model.non_trainable_weights)]))
+    
+    total_count = trainable_count + non_trainable_count
+    return total_count, trainable_count, non_trainable_count
 
 def eval(model, x_test, y_test, opts):
     '''
@@ -428,6 +444,9 @@ def writeCfgFile(opts):
     jsonWr.addParameter("host name", opts.hostname)
     jsonWr.addParameter("python version", opts.python)
     jsonWr.addParameter("model", "sequential")
+    jsonWr.addParameter("model parameters (total)", opts.modelParams)
+    jsonWr.addParameter("model parameters (trainable)", opts.modelParamsTrain)
+    jsonWr.addParameter("model parameters (non-trainable)", opts.modelParamsNonTrainable)
     jsonWr.addParameter("rndSeed", opts.rndSeed)
     jsonWr.addParameter("layers", len(opts.neurons))
     jsonWr.addParameter("hidden layers", len(opts.neurons)-2)
@@ -487,6 +506,13 @@ def main(opts):
     # Setting the seed for python random numbers
     rn.seed(opts.rndSeed)
 
+    # Determine the number of threads running
+    p = psutil.Process(os.getpid())
+    Print("Number of threads is %s" % (ts + str(p.num_threads()) + ns), True)
+    if 0:
+        sess = tf.Session()
+        Print("Number of threads after starting TF session is %s" % (ts + str(p.num_threads()) + ns), True)
+
     # Setting tensorflow random seed
     tf.set_random_seed(opts.rndSeed)
 
@@ -497,25 +523,25 @@ def main(opts):
 
     # Input list of discriminatin variables (TBranches)
     inputList = []
-    # inputList.append("TrijetPtDR")
-    # inputList.append("TrijetDijetPtDR")
-    # inputList.append("TrijetBjetMass")
-    # inputList.append("TrijetLdgJetBDisc")
-    # inputList.append("TrijetSubldgJetBDisc")
-    # inputList.append("TrijetBJetLdgJetMass")
-    # inputList.append("TrijetBJetSubldgJetMass")
-    inputList.append("TrijetMass") #iro
-    # inputList.append("TrijetDijetMass")
-    # inputList.append("TrijetBJetBDisc")
-    # inputList.append("TrijetSoftDrop_n2")
-    # inputList.append("TrijetLdgJetCvsL")
-    # inputList.append("TrijetSubldgJetCvsL")
-    # inputList.append("TrijetLdgJetPtD")
-    # inputList.append("TrijetSubldgJetPtD")
-    # inputList.append("TrijetLdgJetAxis2")
-    # inputList.append("TrijetSubldgJetAxis2")
-    # inputList.append("TrijetLdgJetMult")
-    # inputList.append("TrijetSubldgJetMult")
+    inputList.append("TrijetPtDR")
+    inputList.append("TrijetDijetPtDR")
+    inputList.append("TrijetBjetMass")
+    inputList.append("TrijetLdgJetBDisc")
+    inputList.append("TrijetSubldgJetBDisc")
+    inputList.append("TrijetBJetLdgJetMass")
+    inputList.append("TrijetBJetSubldgJetMass")
+    inputList.append("TrijetMass")
+    inputList.append("TrijetDijetMass")
+    inputList.append("TrijetBJetBDisc")
+    inputList.append("TrijetSoftDrop_n2")
+    inputList.append("TrijetLdgJetCvsL")
+    inputList.append("TrijetSubldgJetCvsL")
+    inputList.append("TrijetLdgJetPtD")
+    inputList.append("TrijetSubldgJetPtD")
+    inputList.append("TrijetLdgJetAxis2")
+    inputList.append("TrijetSubldgJetAxis2")
+    inputList.append("TrijetLdgJetMult")
+    inputList.append("TrijetSubldgJetMult")
     opts.inputList = inputList
     nInputs = len(inputList)
     
@@ -543,8 +569,8 @@ def main(opts):
     dset_bkg = df_bkg.values
     # Alternative fix in case of "memory error"
     if 0: 
-        df_bkg      = df_bkg.iloc[0:nsignal] 
-        dset_bkg    = df_bkg.values
+        df_bkg   = df_bkg.iloc[0:nsignal] 
+        dset_bkg = df_bkg.values
 
     # Print datasets?
     printDataset(dset_signal)
@@ -588,28 +614,45 @@ def main(opts):
             
         Print("Adding %s, with %s%d neurons%s and activation function %s" % (ts + layer + ns, ls, n, ns, ls + opts.activation[iLayer] + ns), iLayer==0)
         if iLayer == 0:
-            if opts.neurons[iLayer] != nInputs > 1:
-                msg = "The number of neurons must equal the number of features (columns) in your data. Some NN configuration add one additional node for a bias term"
-                Print(msg, True)
             # Only first layer demands input_dim. For the rest it is implied.
             model.add( Dense(opts.neurons[iLayer], input_dim = nInputs) ) #, weights = [np.zeros([692, 50]), np.zeros(50)] OR bias_initializer='zeros',  or bias_initializer=initializers.Constant(0.1)
             model.add(Activation(opts.activation[iLayer]))
-            #model.add( Dense(opts.neurons[iLayer], input_dim = nInputs, activation = opts.activation[iLayer]) ) # her majerty Soti requested to break this into 2 lines
+            # model.add( Dense(opts.neurons[iLayer], input_dim = nInputs, activation = opts.activation[iLayer]) ) # her majerty Soti requested to break this into 2 lines
         else:
             if 0: #opts.neurons[iLayer] < nInputs:
                 msg = "The number of  neurons (=%d) is less than the number of input variables (=%d). Please set the number of neurons to be at least the number of inputs!" % (opts.neurons[iLayer], nInputs)
                 raise Exception(es + msg + ns)  
             model.add( Dense(opts.neurons[iLayer]))
             model.add(Activation(opts.activation[iLayer]))
-            #model.add( Dense(opts.neurons[iLayer], activation = opts.activation[iLayer]) ) 
+            # model.add( Dense(opts.neurons[iLayer], activation = opts.activation[iLayer]) ) 
 
     # Print a summary representation of your model. 
     Print("Printing model summary:", True)
     model.summary()
+    
+    # Get the number of parameters of the model
+    nParams = model.count_params()
+    msg = "Model has a total of %s%d%s parameters (neuron weights and biases) " % (hs, nParams, ns)
+    Print(msg, True)
+    total_count, trainable_count, non_trainable_count  = GetModelParams(model)
+    opts.modelParams = total_count
+    opts.modelParamsTrain = trainable_count
+    opts.modelParamsNonTrainable = non_trainable_count
+
+    nParams = 0
+    for i, n in enumerate(opts.neurons, 1):
+        if i == len(opts.neurons):
+            break
+        nParams += opts.neurons[i-1] * opts.neurons[i]
+    #print "nParams = ", nParams
+    #sys.exit()
 
     # Get a dictionary containing the configuration of the model. The model can be reinstantiated from its config via: model = Model.from_config(config)
     if 0:
         config = model.get_config()
+        for c in config:
+            print "c = ", c
+            print
     
     # Split data into input (X) and output (Y). (Note: dataset includes both signal and background sequentially)
     # Use only 2*nsignal rows => First nSignal rows is the signal. Another (equal) nSignal rows for the bkg. 
@@ -620,20 +663,23 @@ def main(opts):
     X_background = dset_bkg[:nsignal, 0:nInputs]
     Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_signal), ns, es, len(X_background), ns), True)
 
-    # iro
-    scaler = StandardScaler()
-    StandardScaler(copy=False, with_mean=True, with_std=True)
-    # Compute the mean and std to be used for later scaling.
-    #print(scaler.fit(X_signal))
-    #print(scaler.mean_)
-    #print(scaler.transform(X_signal))
 
-    # Fit to data, then transform it by performing standardization by centering and scaling
-    print X_signal
-    print "="*50
-    if 1:
-        x_signal     = scaler.fit_transform(X_signal)
-        x_background = scaler.fit_transform(X_signal)
+    # Standardization of a dataset is a common requirement for many machine learning estimators: they might behave badly if the individual features do not
+    # more or less look like standard normally distributed data (e.g. Gaussian with 0 mean and unit variance).
+    # https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
+    if opts.standardiseDsets:
+        Print("Standardize features by removing the mean and scaling to unit variance", True)
+        scaler = StandardScaler()
+
+        # Compute the mean and std to be used for later scaling
+        scaler.fit(X_signal)
+        StandardScaler(copy=True, with_mean=True, with_std=True)
+        Verbose("X_signal before standardisation: %s" % X_signal, True)
+
+        # Fit to data, then transform it by performing standardization by centering and scaling (Mean and standard deviation were previously stored with StandardScaler())
+        X_signal     = scaler.fit_transform(X_signal)
+        X_background = scaler.fit_transform(X_background)
+        Verbose("X_signal after standardisation: %s" % X_signal, True)
 
     # Plot the input variables
     if opts.plotInputs:
@@ -676,6 +722,7 @@ def main(opts):
     # (An "epoch" is an arbitrary cutoff, generally defined as "one iteration of training on the whole dataset", 
     # used to separate training into distinct phases, which is useful for logging and periodic evaluation.)
     try:
+        Print("Number of threads before fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
         seqModel = model.fit(X_train,
                          Y_train,
                          validation_data=(X_test, Y_test),
@@ -685,6 +732,7 @@ def main(opts):
                          verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
                          callbacks  = callbacks
                      )
+        Print("Number of threads after fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
 
         # Retrieve  the training / validation loss / accuracy at each epoch
         trainLossList = seqModel.history['loss']
@@ -831,6 +879,7 @@ if __name__ == "__main__":
     SAVEDIR      = None
     SAVEFORMATS  = "png"
     URL          = False
+    STANDARDISE  = True
     ENTRYSTOP    = None
     VERBOSE      = False
     RNDSEED      = 1234
@@ -852,6 +901,9 @@ if __name__ == "__main__":
 
     parser.add_option("--notBatchMode", dest="notBatchMode", action="store_true", default=NOTBATCHMODE, 
                       help="Disable batch mode (opening of X window) [default: %s]" % NOTBATCHMODE)
+
+    parser.add_option("--standardiseDsets", dest="standardiseDsets", action="store_true", default=STANDARDISE,
+                      help="Standardizing a dataset involves rescaling the distribution of values so that the mean of observed values is 0 and the standard deviation is 1. This can be thought of as subtracting the mean value or centering the data. [default: %s]" % STANDARDISE)
 
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE, 
                       help="Enable verbose mode (for debugging purposes mostly) [default: %s]" % VERBOSE)
@@ -1054,8 +1106,8 @@ if __name__ == "__main__":
         raise Exception(es + msg + ns)    
 
     # Determine number of layers
-    opts.nLayers = len(opts.neurons)
-    opts.nHiddenLayers = len(opts.neurons)-2
+    opts.nLayers = len(opts.neurons)+1
+    opts.nHiddenLayers = len(opts.neurons)-1
     # Sanity check
     if opts.nHiddenLayers < 1:
         msg = "The NN has %d hidden layers. It must have at least 1 hidden layer" % (opts.nHiddenLayers)

@@ -118,6 +118,7 @@ def main():
     msg  = "Creating comparison plots (%d) using the following results directories:%s\n\t%s" % (len(opts.dirList), sh_t, "\n\t".join([os.path.basename(d) for d in opts.dirList]) )
     Print(msg + sh_n, True)
     if "output" in opts.plotType.lower():
+        print "HERE"*10
         doOutput(opts.saveName, resultsList) 
     elif "efficiency" in opts.plotType.lower():
         doEfficiency(opts.saveName, resultsList)
@@ -340,7 +341,10 @@ def doVariables(name, variable, resultsList):
         if opts.yMin == None:
             opts.yMin = r.getYMin()
         if opts.yMax == None and opts.yMax == None:
-            opts.yMax = r.getYMax()*1.10
+            if  r.getYMax() != None:
+                opts.yMax = r.getYMax()*1.10
+            else:
+                opts.yMax = 1.0
         gSigList.extend(gSig)
         gBkgList.extend(gBkg)
         legList.extend(["signal"]) 
@@ -553,11 +557,11 @@ def GetMetricKwargs(metric, opts):
         kwargs["xlabel"] = "epoch"
         kwargs["ylabel"] = "loss"
         kwargs["opts"]["ymin"] = 0.0
-        kwargs["opts"]["ymax"] = 0.5
+        kwargs["opts"]["ymax"] = 1.0
 
     if "accuracy" in metric.lower():
         kwargs["xlabel"] = "epoch"
-        kwargs["opts"]["ymin"] = 0.8
+        kwargs["opts"]["ymin"] = 0.0
         kwargs["opts"]["ymax"] = 1.0
         kwargs["ylabel"] = "accuracy"
         kwargs["moveLegend"] = legSE
