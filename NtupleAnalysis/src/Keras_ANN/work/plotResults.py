@@ -132,6 +132,12 @@ def main():
                     "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
                     "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]:
             doVariables(opts.saveName, var, resultsList)
+            #doVariables(opts.saveName, var, resultsList, "_WP0p5")
+            #doVariables(opts.saveName, var, resultsList, "_WP0p7")
+            #doVariables(opts.saveName, var, resultsList, "_WP0p9")
+            doVariablesWPs(opts.saveName, var, resultsList, WPs = ["0.1", "0.3", "0.5", "0.7", "0.9"], signal=True)
+            doVariablesWPs(opts.saveName, var, resultsList, WPs = ["0.1", "0.3", "0.5", "0.7", "0.9"], signal=False)
+
     elif "metric" in opts.plotType.lower():
         for metric in ["TrainAccuracy", "ValAccuracy", "TrainLoss", "ValLoss"]:
             doMetrics(opts.saveName, metric, resultsList)
@@ -322,7 +328,7 @@ def doROC(name, resultsList):
     doPlot(legList, gSvBList, opts.saveName, **kwargs)
     return
 
-def doVariables(name, variable, resultsList):
+def doVariables(name, variable, resultsList, WP=""):
     
     # Do the comparison plot
     Verbose("Creating the expected plots", True)
@@ -330,12 +336,12 @@ def doVariables(name, variable, resultsList):
     gBkgList = []
     legList  = []
     gSvBList = []
-    opts.saveName = variable
+    opts.saveName = variable + WP
 
     # For-loop: All Output-class objects
     for r in resultsList:
-        gSig, lSig = r.getGraphs(variable + "_signal")
-        gBkg, lBkg = r.getGraphs(variable + "_background")
+        gSig, lSig = r.getGraphs(variable + "_signal%s" % (WP) )
+        gBkg, lBkg = r.getGraphs(variable + "_background%s" % (WP) )
         if opts.yMin == None:
             opts.yMin = r.getYMin()
         if opts.yMax == None and opts.yMax == None:
@@ -361,6 +367,76 @@ def doVariables(name, variable, resultsList):
         nS = g.GetName()
         nB = g.GetName()
         Verbose("nS = %s, nB = %s" % (nS, nB), True)
+
+        # For-loop: All points in graph
+        for j in range(0, N):
+            xVal = g.GetX()[j]
+            yVal = g.GetY()[j]
+
+            if xVal <= opts.xMin:
+                continue
+
+            # Protection: don't include (x,y) = (0.0, 0.0)
+            if xVal !=0.0 and yVal !=0.0:
+                x.append(xVal)
+                y.append(yVal)
+            Verbose("%d) x = %0.3f, y = %0.3f" % (j, xVal, yVal), j==0)
+
+        # Create the TGraph
+        Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
+        g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
+        gSvBList.append(g)
+
+    # Make the plot
+    Verbose("Making the plot", True)
+    doPlot(legList, gSvBList, opts.saveName, **kwargs)
+    return
+
+def doVariablesWPs(name, variable, resultsList, WPs = ["0.5", "0.7", "0.9"], signal=True):
+    
+    dset = "signal"
+    if signal:
+        dset = "background"
+
+    # Do the comparison plot
+    Verbose("Creating the expected plots", True)
+    grList   = []
+    legList  = []
+    gSvBList = []
+    WPList   = ["_%s" % dset] + ["_%s_WP%s" % (dset, wp.replace(".", "p")) for wp in WPs]
+    opts.saveName = variable + "_WPs_" + dset
+    
+    # For-loop: All results
+    for i,r in enumerate(resultsList, 1):
+
+        # For-loop: All Working Points (DNN score)
+        for j, wp in enumerate(WPList, 1):
+            g, l = r.getGraphs(variable + wp)
+            if opts.yMin == None:
+                opts.yMin = r.getYMin()
+            if opts.yMax == None and opts.yMax == None:
+                if  r.getYMax() != None:
+                    opts.yMax = r.getYMax()*1.10
+            else:
+                opts.yMax = 1.0
+
+            # Append graph to list
+            grList.append(g[0])
+
+            if "_WP" in wp:
+                legList.append(dset + " (%s)" % wp.split("_")[-1].replace("p", ".").replace("WP", ""))
+            else:
+                legList.append(dset)
+
+    # Plot the graph
+    kwargs = GetVarKwargs(variable, opts)
+    kwargs["moveLegend"] = {"dx": -0.18, "dy": -0.05, "dh": -0.1}
+
+    # For-loop: All TGraphs
+    for i, g in enumerate(grList, 0):
+        x  = []
+        y  = []
+        N  = g.GetN()
 
         # For-loop: All points in graph
         for j in range(0, N):
@@ -503,9 +579,9 @@ def GetKwargsRatio(kwargs):
 def GetMetricKwargs(metric, opts):
     dh = -0.12 + (len(opts.dirList)-3)*0.04
     legNW  = {"dx": -0.53, "dy": -0.05, "dh": dh}
-    legNE  = {"dx": -0.53, "dy": -0.05, "dh": dh}
+    legNE  = {"dx": -0.18, "dy": -0.05, "dh": dh}
     legSW  = {"dx": -0.53, "dy": -0.35, "dh": dh}
-    legSE  = {"dx": -0.53, "dy": -0.35, "dh": dh}
+    legSE  = {"dx": -0.18, "dy": -0.35, "dh": dh}
     if opts.paper:
         #histograms.cmsTextMode = histograms.CMSMode.PAPER
         cmsExtraText = ""
@@ -674,7 +750,7 @@ def GetVarKwargs(var, opts):
     if var == "TrijetMass":
         kwargs["opts"]["xmin"]   =   0.0
         kwargs["opts"]["xmax"]   = 800.0
-        kwargs["xlabel"] = "m_{W} [GeV]"
+        kwargs["xlabel"] = "m_{t} [GeV]"
         kwargs["yMin"]   = 1e-3
         #kwargs["ylabel"] = "a.u. / %0.0f GeV"
 
