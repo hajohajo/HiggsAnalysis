@@ -18,6 +18,17 @@ def Print(msg, printHeader=False):
     else:
         print "\t", msg
     return
+
+def Verbose(msg, printHeader=False, verbose=False):
+    if not verbose:
+        return
+    fName = __file__.split("/")[-1]
+    if printHeader==True:
+        print "=== ", fName
+        print "\t", msg
+    else:
+        print "\t", msg
+    return
    
 def convertHistoToGaph(histo, verbose=False):
 
@@ -298,6 +309,261 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
     # Write the Tgraph into the JSON file
     for gr in gList:
         gName = "%s_%s" % (saveName, gr.GetName())
+        jsonWr.addGraph(gName, gr)
+    return
+
+def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
+
+    resultsDict = {}
+    resultsDict["signal"]     = signal
+    resultsDict["background"] = bkg
+
+    normalizeToOne = False
+    if "normalizeToOne" in kwargs:
+        normalizeToOne = kwargs["normalizeToOne"]
+
+   # Create canvas
+    ROOT.gStyle.SetOptStat(0)
+    canvas = plot.CreateCanvas()
+    canvas.cd()
+
+    hList  = []
+    gList  = []
+    yMin   = 100000
+    yMax   = -1
+    xMin   = 0.0
+    xMax   = 1.0
+    nBins  = 50
+    xTitle = "DNN output"
+    yTitle = "Entries"
+    log    = True
+
+    if "log" in kwargs:
+        log = kwargs["log"]
+    
+    if "xTitle" in kwargs:
+        xTitle = kwargs["xTitle"]
+
+    if "yTitle" in kwargs:
+        yTitle = kwargs["yTitle"]
+    elif "output" in saveName.lower():
+        xTitle = "Entries"
+    elif "efficiency" in saveName.lower():
+        xTitle = "Efficiency"
+    elif "significance" in saveName.lower():
+        xTitle = "Significance"
+    else:
+        pass    
+
+    if "xMin" in kwargs:
+        xMin = kwargs['xMin']
+    if "xMax" in kwargs:
+        xMax = kwargs['xMax']
+    if "nBins" in kwargs:
+        xBins = kwargs['nBins']
+    
+    # For-loop: 
+    for i, key in enumerate(resultsDict.keys(), 0):
+
+        h = ROOT.TH1F(key, '', nBins, xMin, xMax)
+        for j, x in enumerate(resultsDict[key], 0):
+            h.Fill(x)
+            try:
+                yMin = min(x[0], yMin)
+            except:
+                pass
+                
+        # Save maximum
+        yMax = max(h.GetMaximum(), yMax)
+
+        # Customise & append to list
+        plot.ApplyStyle(h, i+1)
+
+        if normalizeToOne:
+            if "ymax" in kwargs:
+                yMax = kwargs["yMax"]
+            else:
+                yMax = 1.0
+            if "yMin" in kwargs:
+                yMin = kwargs["yMin"]
+            else:
+                yMin = 1e-4
+
+            if h.Integral()>0.0:
+                h.Scale(1./h.Integral())
+        hList.append(h)
+
+    if yMin <= 0.0:
+        yMin = 100
+    if log:
+        canvas.SetLogy()
+
+    # For-loop: All histograms
+    for i, h in enumerate(hList, 0):
+        h.SetMinimum(yMin*0.85)        
+        h.SetMaximum(yMax*1.15)
+
+        h.GetXaxis().SetTitle(xTitle)
+        h.GetYaxis().SetTitle(yTitle)
+            
+        if i==0:
+            h.Draw("HIST")
+        else:
+            h.Draw("HIST SAME")
+    
+    # Create legend
+    leg = plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
+    for h in hList:
+        leg.AddEntry(h, h.GetName(),"l")
+    leg.Draw()
+
+    plot.SavePlot(canvas, saveDir, saveName, saveFormats)
+    canvas.Close()
+
+    # Create TGraph
+    for h in hList:
+        gList.append(convertHistoToGaph(h))
+
+    # Write the Tgraph into the JSON file
+    for gr in gList:
+        gName = "%s_%s" % (saveName, gr.GetName())
+        jsonWr.addGraph(gName, gr)
+    return
+
+def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
+
+    resultsDict = {}
+    resultsDict["signal"]     = signal
+    resultsDict["background"] = bkg
+
+    normalizeToOne = False
+    if "normalizeToOne" in kwargs:
+        normalizeToOne = kwargs["normalizeToOne"]
+
+   # Create canvas
+    ROOT.gStyle.SetOptStat(0)
+    canvas = plot.CreateCanvas()
+    canvas.cd()
+
+    hList  = []
+    gList  = []
+    yMin   = 100000
+    yMax   = -1
+    xMin   = 0.0
+    xMax   = 1.0
+    nBins  = 50
+    xTitle = "DNN output"
+    yTitle = "Entries"
+    log    = True
+
+    if "log" in kwargs:
+        log = kwargs["log"]
+    
+    if "xTitle" in kwargs:
+        xTitle = kwargs["xTitle"]
+
+    if "yTitle" in kwargs:
+        yTitle = kwargs["yTitle"]
+    elif "output" in saveName.lower():
+        xTitle = "Entries"
+    elif "efficiency" in saveName.lower():
+        xTitle = "Efficiency"
+    elif "significance" in saveName.lower():
+        xTitle = "Significance"
+    else:
+        pass    
+
+    if "xMin" in kwargs:
+        xMin = kwargs['xMin']
+    if "xMax" in kwargs:
+        xMax = kwargs['xMax']
+    if "nBins" in kwargs:
+
+        xBins = kwargs['nBins']
+    
+    # For-loop: 
+    for i, key in enumerate(resultsDict.keys(), 0):
+
+        h = ROOT.TH1F(key, '', nBins, xMin, xMax)
+        for j, x in enumerate(resultsDict[key], 0):
+            
+            score = None
+            if key == "signal":
+                score = sigOutput[j]
+            elif key == "background":
+                score = bkgOutput[j]
+            else:
+                raise Exception("This should not be reached")
+    
+            # Check if DNN score satisfies cut
+            if score < cutValue:
+                Verbose("%d) DNN score for %s is %.3f" % (j, key, score), False)
+                continue
+            else:
+                Verbose("%d) DNN score for %s is %.3f" % (j, key, score), False)
+
+            # Fill the histogram
+            h.Fill(x)
+            try:
+                yMin = min(x[0], yMin)
+            except:
+                pass
+                
+        # Save maximum
+        yMax = max(h.GetMaximum(), yMax)
+
+        # Customise & append to list
+        plot.ApplyStyle(h, i+1)
+
+        if normalizeToOne:
+            if "ymax" in kwargs:
+                yMax = kwargs["yMax"]
+            else:
+                yMax = 1.0
+            if "yMin" in kwargs:
+                yMin = kwargs["yMin"]
+            else:
+                yMin = 1e-4
+
+            if h.Integral()>0.0:
+                h.Scale(1./h.Integral())
+        hList.append(h)
+
+    if yMin <= 0.0:
+        yMin = 100
+    if log:
+        canvas.SetLogy()
+
+    # For-loop: All histograms
+    for i, h in enumerate(hList, 0):
+        h.SetMinimum(yMin*0.85)        
+        h.SetMaximum(yMax*1.15)
+
+        h.GetXaxis().SetTitle(xTitle)
+        h.GetYaxis().SetTitle(yTitle)
+            
+        if i==0:
+            h.Draw("HIST")
+        else:
+            h.Draw("HIST SAME")
+    
+    # Create legend
+    leg = plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
+    for h in hList:
+        leg.AddEntry(h, h.GetName(),"l")
+    leg.Draw()
+    
+    postfix = "_%s%s" % ("WP", str(cutValue).replace(".", "p"))
+    plot.SavePlot(canvas, saveDir, saveName + postfix, saveFormats)
+    canvas.Close()
+
+    # Create TGraph
+    for h in hList:
+        gList.append(convertHistoToGaph(h))
+
+    # Write the Tgraph into the JSON file
+    for gr in gList:
+        gName = "%s_%s" % (saveName, gr.GetName()) + postfix
         jsonWr.addGraph(gName, gr)
     return
 
