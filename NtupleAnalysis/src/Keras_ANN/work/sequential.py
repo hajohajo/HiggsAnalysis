@@ -761,7 +761,8 @@ def main(opts):
         scaler = StandardScaler()
 
         # Compute the mean and std to be used for later scaling
-        scaler.fit(X_signal)
+        scaler.fit(X) #fixme-iro
+        #scaler.fit(X_signal)
         StandardScaler(copy=True, with_mean=True, with_std=True)
         Verbose("X_signal before standardisation: %s" % X_signal, True)
 
@@ -898,14 +899,16 @@ def main(opts):
 
     # For-loop: All branches to be plotted for various DNN score cuts (v. slow, especially for large number of "entrystop")
     for i, var in enumerate(inputList, 0):
+        if var != "TrijetMass":
+            continue
         PrintFlushed("Variable %s (%d/%d)" % (var, i+1, len(inputList)), i==0)
-        func.PlotAndWriteJSON(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))    
+        func.PlotAndWriteJSON(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
 
-        #Verbose("Plotting variable %s for DNN score 0.1" % (var), True)
-        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+        Verbose("Plotting variable %s for DNN score 0.1" % (var), True)
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
 
-        #Verbose("Plotting variable %s for DNN score 0.3" % (var), True)
-        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+        Verbose("Plotting variable %s for DNN score 0.3" % (var), True)
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
 
         Verbose("Plotting variable %s for DNN score 0.5" % (var), True)
         func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))

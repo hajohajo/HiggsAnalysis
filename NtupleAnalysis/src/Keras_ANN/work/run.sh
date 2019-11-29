@@ -121,9 +121,17 @@
 # nohup ./sequential.py --activation relu,relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,30,1 --epochs 1000 --batchSize 32 --log -s pdf --lossFunction "is_categorical_crossentropy" &
 
 # LAST
-for bs in 256 512 1024 2048 4096 8192; do 
-    echo "=== BatchSize = ${bs}"
-    sleep 15
-    nohup ./sequential.py --activation relu,relu,sigmoid --neurons 19,500,1 --epochs 200 --batchSize ${bs} -s pdf --entrystop 800000 --log -s pdf &
-done
+#for bs in 256 512 1024 2048 4096 8192; do 
+#    echo "=== BatchSize = ${bs}"
+#    sleep 15
+#    nohup ./sequential.py --activation relu,relu,sigmoid --neurons 19,500,1 --epochs 200 --batchSize ${bs} -s pdf --entrystop 800000 --log -s pdf &
+#done
 
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf &
+sleep 15
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --decorrelate &
+sleep 15
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --standardise &
+sleep 15
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --decorrelate --standardise &

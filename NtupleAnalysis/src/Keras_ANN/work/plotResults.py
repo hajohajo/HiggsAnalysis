@@ -19,6 +19,7 @@ LAST USED:
 ./plotResults.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDTG
 ./plotResults.py --plotType significance --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotResults.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotResults.py --plotType efficiency --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT
 /plotResults.py --plotType metric --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs Keras_3Layers_19relu_20relu_1sigmoid_20Epochs_1000BatchSize_10000Entrystop_22-Nov-2019_10h27m10s,Keras_3Layers_19relu_40relu_1sigmoid_20Epochs_1000BatchSize_10000Entrystop_22-Nov-2019_10h26m20s,Keras_3Layers_19relu_100relu_1sigmoid_20Epochs_1000BatchSize_600000Entrystop_22-Nov_2019_10h37m38s --yMaxFactor 1.2
+./plotResults.py --plotType var --saveDir /publicweb/a/aattikis/Test --cutLineX 0.93 --xMin 0.0 --dirs results
 
 '''
 #================================================================================================
@@ -125,18 +126,41 @@ def main():
         doSignificance(opts.saveName, resultsList) 
     elif "roc" in opts.plotType.lower():
         doROC(opts.saveName, resultsList)
-    elif "var" in opts.plotType.lower():
-        for var in ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
-                    "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
-                    "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
-                    "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
-                    "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]:
-            doVariables(opts.saveName, var, resultsList)
-            #doVariables(opts.saveName, var, resultsList, "_WP0p5")
-            #doVariables(opts.saveName, var, resultsList, "_WP0p7")
-            #doVariables(opts.saveName, var, resultsList, "_WP0p9")
-            doVariablesWPs(opts.saveName, var, resultsList, WPs = ["0.1", "0.3", "0.5", "0.7", "0.9"], signal=True)
-            doVariablesWPs(opts.saveName, var, resultsList, WPs = ["0.1", "0.3", "0.5", "0.7", "0.9"], signal=False)
+    elif opts.plotType.lower() == "var":
+        for var in opts.variables:
+            if var != "TrijetMass":
+                continue
+
+            # For-loop: All working points (DNN score)
+            for wp in ["", "0p1", "0p3", "0p5", "0p7", "0p9"]:
+                if wp != "":
+                    pfix = "_%s" % wp
+                else:
+                    pfix = ""
+                doVariablesWPs(var, resultsList, [wp], signal=True , defaultLegend=True, postFix=pfix)
+                doVariablesWPs(var, resultsList, [wp], signal=False, defaultLegend=True, postFix=pfix)
+    elif opts.plotType.lower() == "var-wp":
+        _saveDir = opts.saveDir
+        WPs = ["0p1", "0p3", "0p5", "0p7", "0p9"]
+
+        # For-loop: All variables
+        for i, var in enumerate(opts.variables, 1): 
+            opts.saveDir = _saveDir
+
+            # For-loop: All input directories
+            for j, r in enumerate(resultsList, 1):
+                opts.saveDir = os.path.join(_saveDir, r.getDirectoryBase())
+
+                # For-loop: All working points (DNN score)
+                for wp in WPs:
+                    doVariables(opts.saveName, var, [r], "_WP%s" % (wp) )
+
+                doVariablesWPs(var, [r], WPs, signal=True )
+                doVariablesWPs(var, [r], WPs, signal=False)
+            print
+
+        # Recover the original save directory
+        opts.saveDir = _saveDir
 
     elif "metric" in opts.plotType.lower():
         for metric in ["TrainAccuracy", "ValAccuracy", "TrainLoss", "ValLoss"]:
@@ -359,7 +383,6 @@ def doVariables(name, variable, resultsList, WP=""):
     gList = [gSigList[0], gBkgList[0]]
 
     # For-loop: All TGraphs
-    #for i, g in enumerate(gSigList, 0):
     for i, g in enumerate(gList, 0):
         x  = []
         y  = []
@@ -392,7 +415,7 @@ def doVariables(name, variable, resultsList, WP=""):
     doPlot(legList, gSvBList, opts.saveName, **kwargs)
     return
 
-def doVariablesWPs(name, variable, resultsList, WPs = ["0.5", "0.7", "0.9"], signal=True):
+def doVariablesWPs(variable, resultsList, WPs = None, signal=True, defaultLegend=False, postFix=""):
     
     dset = "signal"
     if signal:
@@ -403,15 +426,27 @@ def doVariablesWPs(name, variable, resultsList, WPs = ["0.5", "0.7", "0.9"], sig
     grList   = []
     legList  = []
     gSvBList = []
-    WPList   = ["_%s" % dset] + ["_%s_WP%s" % (dset, wp.replace(".", "p")) for wp in WPs]
-    opts.saveName = variable + "_WPs_" + dset
+    if WPs  == None:
+        WPList = ["_%s" % dset] + ["_%s_WP%s" % (dset, wp.replace(".", "p")) for wp in ["0p1", "0p3", "0p5", "0p7", "0p9"] ]
+    else:
+        WPList = ["_%s_WP%s" % (dset, wp.replace(".", "p")) for wp in WPs]    
+    opts.saveName = variable + "_WPs_" + dset  + postFix
     
     # For-loop: All results
-    for i,r in enumerate(resultsList, 1):
+    for i, r in enumerate(resultsList, 1):
 
         # For-loop: All Working Points (DNN score)
         for j, wp in enumerate(WPList, 1):
+            
+            # Special case
+            if wp.endswith("_WP"):
+                wp = wp.replace("_WP", "")
+
             g, l = r.getGraphs(variable + wp)
+            if len(g) < 1 or len(g) > 1:
+                msg = "Cannot find graph for variable %s" % (sh_h + variable + wp + sh_n)
+                raise Exception(sh_e + msg + sh_n)
+
             if opts.yMin == None:
                 opts.yMin = r.getYMin()
             if opts.yMax == None and opts.yMax == None:
@@ -422,15 +457,16 @@ def doVariablesWPs(name, variable, resultsList, WPs = ["0.5", "0.7", "0.9"], sig
 
             # Append graph to list
             grList.append(g[0])
-
-            if "_WP" in wp:
-                legList.append(dset + " (%s)" % wp.split("_")[-1].replace("p", ".").replace("WP", ""))
+            if defaultLegend:
+                legList.extend(l)
+            elif "_WP" in wp:
+                legList.append(dset + " (%s)" % wp.split("_")[-1].replace("WP", "").replace("0p", "0."))
             else:
                 legList.append(dset)
 
     # Plot the graph
     kwargs = GetVarKwargs(variable, opts)
-    kwargs["moveLegend"] = {"dx": -0.18, "dy": -0.05, "dh": -0.1}
+    kwargs["moveLegend"] = {"dx": -0.55, "dy": -0.05, "dh": -0.1}
 
     # For-loop: All TGraphs
     for i, g in enumerate(grList, 0):
@@ -459,7 +495,7 @@ def doVariablesWPs(name, variable, resultsList, WPs = ["0.5", "0.7", "0.9"], sig
 
     # Make the plot
     Verbose("Making the plot", True)
-    doPlot(legList, gSvBList, opts.saveName, **kwargs)
+    doPlot(legList, gSvBList, opts.saveName, **kwargs)    
     return
 
 def doMetrics(name, metric, resultsList):
@@ -526,15 +562,13 @@ def doPlot(legList, graphList, saveName, **kwargs):
             gName = legList[i]
         else:
             gName = "#font[42]{%s}" % legList[i]
-        hg = histograms.HistoGraph(graphList[i], gName, drawStyle="L", legendStyle="l")
+        hg = histograms.HistoGraph(graphList[i], gName, drawStyle="CP", legendStyle="lp")
         hgList.append(hg)
 
     # Create a plot-base object
     Verbose("Creating the plot-base object", True)
     # plot = plots.PlotBase(hgList, saveFormats=[])
-    #hgList.insert(0, hgList.pop(opts.refIndex))
     plot = plots.ComparisonManyPlot(hgList[0], hgList[1:], saveFormats=[])
-    #plot = plots.ComparisonManyPlot(hgList[-1], hgList[:-1], saveFormats=[])
 
     # Apply histo style
     Verbose("Applying the histogram styles (generator)", True)
@@ -552,18 +586,18 @@ def doPlot(legList, graphList, saveName, **kwargs):
     Verbose("Applying the histogram styles (forEachHisto)", True)
     plot.histoMgr.forEachHisto(sty)
     if opts.plotType != "var":
-        plot.setLegendHeader("Sequential Model (Keras)")
+        plot.setLegendHeader("Sequential Model")
 
     # Draw the plot
     Verbose("Drawing the plot", True)
     plots.drawPlot(plot, saveName, **kwargs)
     if opts.removeLegend:
         plot.removeLegend()
-
+        
     # Save plots and return
     Verbose("Saving the plot as %s" % (saveName), True)
     SavePlot(plot, opts.saveDir, saveName, opts.saveFormats)
-    
+
     Verbose("Plots saved under directory %s"% (sh_s + aux.convertToURL(opts.saveDir, opts.url) + sh_n), True)
     return
 
@@ -579,9 +613,9 @@ def GetKwargsRatio(kwargs):
 def GetMetricKwargs(metric, opts):
     dh = -0.12 + (len(opts.dirList)-3)*0.04
     legNW  = {"dx": -0.53, "dy": -0.05, "dh": dh}
-    legNE  = {"dx": -0.18, "dy": -0.05, "dh": dh}
+    legNE  = {"dx": -0.40, "dy": -0.05, "dh": dh}
     legSW  = {"dx": -0.53, "dy": -0.35, "dh": dh}
-    legSE  = {"dx": -0.18, "dy": -0.35, "dh": dh}
+    legSE  = {"dx": -0.40, "dy": -0.35, "dh": dh}
     if opts.paper:
         #histograms.cmsTextMode = histograms.CMSMode.PAPER
         cmsExtraText = ""
@@ -1119,7 +1153,7 @@ if __name__ == "__main__":
         Verbose("index = %d, dir = %s" % (i, d), i==0)
         
     # Check plot type
-    plotTypes = ["output", "prediction", "training", "testing", "efficiency", "significance", "roc", "var", "metric"]
+    plotTypes = ["output", "prediction", "training", "testing", "efficiency", "significance", "roc", "var", "var-wp", "metric"]
     plotNames = {}
     plotNames["output"]       = "Output"
     plotNames["prediction"]   = "OutputPred"
@@ -1128,7 +1162,8 @@ if __name__ == "__main__":
     plotNames["efficiency"]   = "Efficiency"
     plotNames["significance"] = "Significance"
     plotNames["roc"]          = "ROC"
-    plotNames["var"]          = "TrijetLdgJetBDisc"
+    plotNames["var"]          = "TrijetLdgJetBDisc" #dubmie
+    plotNames["var-wp"]       = "TrijetLdgJetBDisc" #dumbie
     plotNames["metric"]       = "metric"
 
     if opts.plotType.lower() not in plotTypes:
@@ -1155,6 +1190,13 @@ if __name__ == "__main__":
     else:
         opts.saveFormats = [opts.saveFormats]
     opts.saveFormats = ["." + s for s in opts.saveFormats]
+    
+    # Define the variables (top-tagging)
+    opts.variables = ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
+                      "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
+                      "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
+                      "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
+                      "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]
 
     # Call the main function
     main()
