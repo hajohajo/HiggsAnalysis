@@ -148,6 +148,12 @@ class Output:
             raise Exception(sh_e + msg + sh_n)
         return
 
+    def getCfgFile(self):
+        return os.path.join(self.getDirectoryBase(), self.cfgFile)
+
+    def getCfgFileBase(self):
+        return self.cfgFile
+
     def storeCfgFiles(self):
         
         # Open & load configuration json file
@@ -172,11 +178,11 @@ class Output:
                     aName = v.title().replace(" ", "")
                     # make all characters lower case except first from every new word (e.g. "python version" -> 'pythonVersion")
                     aName = aName[0].lower() + aName[1:]
-                    self.Verbose("Storing parameter %s from config.json file" % (sh_h + aName + sh_n), False)
+                    self.Verbose("Storing parameter %s from file %s." % (sh_h + aName + sh_n, sh_h + self.getCfgFile() + sh_n), False)
                     setattr(self, "%s" % aName, config[v])
             else:
                 iErr+=1
-                msg = "Cannot find variable %s in file %s." % (sh_h + v + sh_n, sh_a + self.cfgFile + sh_n)
+                msg = "Cannot find variable %s in file %s." % (sh_a + v + sh_n, sh_a + self.getCfgFile() + sh_n)
                 self.Print(msg, iErr == 0)
 
         # Print all object attributes?

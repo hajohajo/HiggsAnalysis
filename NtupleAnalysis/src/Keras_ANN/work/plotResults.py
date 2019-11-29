@@ -141,11 +141,12 @@ def main():
                 doVariablesWPs(var, resultsList, [wp], signal=False, defaultLegend=True, postFix=pfix)
     elif opts.plotType.lower() == "var-wp":
         _saveDir = opts.saveDir
-        WPs = ["0p1", "0p3", "0p5", "0p7", "0p9"]
+        WPs = ["", "0p1", "0p3", "0p5", "0p7", "0p9"]
 
         # For-loop: All variables
         for i, var in enumerate(opts.variables, 1): 
             opts.saveDir = _saveDir
+            Print("Plotting variable %s" % (var), i==1)
 
             # For-loop: All input directories
             for j, r in enumerate(resultsList, 1):
@@ -153,7 +154,11 @@ def main():
 
                 # For-loop: All working points (DNN score)
                 for wp in WPs:
-                    doVariables(opts.saveName, var, [r], "_WP%s" % (wp) )
+                    if wp == "":
+                        myWP = ""
+                    else:
+                        myWP = "_WP%s" % (wp)
+                    doVariables(opts.saveName, var, [r], myWP )
 
                 doVariablesWPs(var, [r], WPs, signal=True )
                 doVariablesWPs(var, [r], WPs, signal=False)
@@ -585,7 +590,8 @@ def doPlot(legList, graphList, saveName, **kwargs):
     # Apply style and set label
     Verbose("Applying the histogram styles (forEachHisto)", True)
     plot.histoMgr.forEachHisto(sty)
-    if opts.plotType != "var":
+    #if opts.plotType != "var":
+    if 0:
         plot.setLegendHeader("Sequential Model")
 
     # Draw the plot
@@ -1192,11 +1198,12 @@ if __name__ == "__main__":
     opts.saveFormats = ["." + s for s in opts.saveFormats]
     
     # Define the variables (top-tagging)
-    opts.variables = ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
-                      "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
-                      "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
-                      "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
-                      "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]
+    opts.variables = ["TrijetMass"]
+    # opts.variables = ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
+    #                   "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
+    #                   "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
+    #                   "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
+    #                   "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]
 
     # Call the main function
     main()
