@@ -158,15 +158,21 @@ class Output:
         f.close()
 
         # Create list of variable to retrieve    
-        vList = ["timestamp", "layers", "optimizer", "loss function", "epochs", "neurons", "hidden layers", "batch size",  "model", "activation functions"]
+        vList = ["timestamp", "layers", "optimizer", "loss function", "epochs", "neurons", "hidden layers", "batch size",  "model", "activation functions", 
+                 "rndSeed", "train sample", "model parameters (trainable)", "python version", "test sample", "model weights", "model parameters (total)",
+                 "host name", "standardised datasets", "keras version", "decorrelate mass", "model biases", "model parameters (non-trainable)",
+                 "ROOT file", "input variables"]
         iErr  = -1
         for v in vList:
             if v in config:
                 if hasattr(self, v):
                     raise Exception("Output instance already has attribute %s" % (v))
                 else:
+                    # remove spaces
                     aName = v.title().replace(" ", "")
+                    # make all characters lower case except first from every new word (e.g. "python version" -> 'pythonVersion")
                     aName = aName[0].lower() + aName[1:]
+                    self.Verbose("Storing parameter %s from config.json file" % (sh_h + aName + sh_n), False)
                     setattr(self, "%s" % aName, config[v])
             else:
                 iErr+=1
@@ -202,7 +208,6 @@ class Output:
                 #    self.Print("AttrName = %s, AttrType = %s" % (sh_h + attrName + sh_n, sh_l + str(attrValue) + sh_n), True)
 
                 setattr(self, "%s" % attrName, attrValue)
-                # key = "%s-%s" % (os.path.basename(self.directory), k) #iro
                 key = k
                 self.resultsX[key] = [d["x"] for d in getattr(self, k)]
                 self.resultsY[key] = [d["y"] for d in getattr(self, k)]
@@ -363,24 +368,36 @@ class Output:
         return
 
     def getLegendLabel(self):
-        label = "%sL (" % (self.layers)
+        
+        # Create the lable variable
+        #label = "%sL (" % (self.layers)
+        label = ""
+        
         # Dirty trick to convert to list the activationFunctions variable (unicode)
         self.activationList = self.activationFunctions.encode('UTF8').replace("[", "").replace("]", "").replace("'", "").split(",")
-        self.neuronsList    = self.neurons.encode('UTF8').replace("[", "").replace("]", "").replace("'", "").replace(" ", "").split(",")
+        self.neuronsList    = self.neurons.encode('UTF8').replace("[", "").replace("]", "").replace("'", "").replace(" ", "").split(",") 
 
         # For-loop: All actication functions
         for i, a in enumerate(self.activationList, 0):
             self.Verbose("%s, type(%s) = %s" % (a, a, type(a)), True)
             label+= " %s%s" % (self.activationList[i].replace("sigmoid", "sig"), self.neuronsList[i])
 
-        label+= ")"
-        label+= " %sb" % (self.batchSize)
-        label+= " %se" % (self.epochs) # this is not very relevant since we have early-stop enabled
+        #label+= ")"
+        label+= " %sbs" % (self.batchSize)
+        label+= " %sep" % (self.epochs) # this is not very relevant since we have early-stop enabled
+        self.Verbose("dir = %s, st = \"%s\", type(st) = %s" % (self.getDirectoryBase(), self.standardisedDatasets.encode('UTF8'), type(self.standardisedDatasets.encode('UTF8'))), True)
+        if self.standardisedDatasets.encode('UTF8') == "True":
+            label+= " S"
+        if self.decorrelateMass.encode('UTF8') == "True":
+            label+= " M"
         # self.optimizer
         # self.hiddenLayers
         # self.lossFunction
         # self.model
         return label
+
+    def getResultsFile(self):
+        return self.resultsFile
 
     def _getGraphs(self, keyword=None):
 
@@ -390,7 +407,10 @@ class Output:
         for i, k in enumerate(self.resultsX.keys(), 0):
             #self.Print("Setting graph name to %s" % (sh_a + k + sh_n), i==0)
             if keyword!=None:
-                if keyword not in k:
+                #if keyword not in k:
+                if keyword != k:
+                    #msg = "Cannot find keyword %s in results file %s" % (sh_h + keyword + sh_e, sh_h + os.path.join(self.getDirectoryBase() , self.getResultsFile()) + sh_e)
+                    #raise Exception(sh_e + msg + sh_n)
                     continue 
             xArray = array.array("d", self.resultsX[k])
             yArray = array.array("d", self.resultsY[k])
@@ -449,3 +469,6 @@ class Output:
 
     def getDirectory(self):
         return self.directory
+
+    def getDirectoryBase(self):
+        return os.path.basename(self.directory)
