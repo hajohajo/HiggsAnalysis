@@ -14,13 +14,12 @@ EXAMPLES:
 ./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root --dir Keras_3Layers_50relu_50relu_1sigmoid_100Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_27Nov2019_07h39m25s --saveDir /publicweb/a/aattikis/ALEX --entries 100000
 ./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --dir Keras_3Layers_50relu_50relu_1sigmoid_100Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_27Nov2019_07h39m25s --saveDir /publicweb/a/aattikis/ALEX --entries 100000
 ./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-QCD_7Jets_3BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s
+./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s
+./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-QCD_7Jets_3BJets.root --saveDir /publicweb/a/aattikis/QCD --entries 200000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s --wp 0.5
 
 
 LAST USED:
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s
-
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-QCD_7Jets_3BJets.root --saveDir /publicweb/a/aattikis/QCD --entries 200000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s --wp 0.5
-
+./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_200Epochs_2000BatchSize_800000Entrystop_29Nov2019_05h12m17s --wp 0.0
 
 '''
 #================================================================================================ 
@@ -102,12 +101,14 @@ def main():
     style.setGridY(False)
 
     # Definitions
-    filename  = opts.filename
-    tfile     = ROOT.TFile.Open(filename)    
-    
+    filename = opts.filename
+    tfile    = ROOT.TFile.Open(filename)    
+    sigTree  = "treeS"
+    bkgTree  = "treeB"
+
     #Signal and background branches
-    signal     = uproot.open(filename)["treeS"]
-    background = uproot.open(filename)["treeB"]
+    signal     = uproot.open(filename)[sigTree]
+    background = uproot.open(filename)[bkgTree]
     
     # Input list of the model to be used
     inputList = []
@@ -131,31 +132,54 @@ def main():
     inputList.append("TrijetLdgJetMult")
     inputList.append("TrijetSubldgJetMult")
     nInputs = len(inputList)
-    
-    # Signal and background dataframes
-    df_signal     = signal.pandas.df(inputList, entrystop=opts.entries)
-    df_background = background.pandas.df(inputList, entrystop=opts.entries)
+
+    # Signal dataframe
+    df_signal = signal.pandas.df(inputList, entrystop=opts.entries) # contains all TBranches (inputList) from the signal TTree 
+    nBranches = len(df_signal.values[0])
+    nEntries  = len(df_signal.values)
+    Print("Constructing the signal dataframe (Tree %s with %s%d variables%s each with %s%d entries%s)" % (hs + sigTree + ns, ts, nBranches, ns, ls, nEntries, ns), True)
+
+    # Background dataframe
+    df_background = background.pandas.df(inputList, entrystop=opts.entries) # contains all TBranches (inputList) from the background TTree 
+    nBranches     = len(df_background.values[0])
+    nEntries      = len(df_background.values)
+    Print("Constructing the background dataframe (Tree %s with %s%d variables%s each with %s%d entries%s)" % (hs + bkgTree + ns, ts, nBranches, ns, ls, nEntries, ns), True)
 
     # Number of events to predict the output and plot the top-quark mass
     if opts.entries == None:
         opts.entries = min(len(df_signal.index), len(df_background.index))
-    Print("Number of events: %d" % (opts.entries), True)
+        Print("Number of events: %d" % (opts.entries), True)
 
-    # Signal and background datasets
+    # Signal and background datasets (just the values of the TBranches)
     dset_signal     = df_signal.values
     dset_background = df_background.values
+
+    # Print information
+    if 0:
+        # Print: index, variable1, variable2, ...
+        print df_signal
+        
+        # Print a list of lists (each list contains the values of each variable)
+        print df_signal.values
+
+        # Print a list of column titles 
+        print df_signal.columns
     
     # Concatinate signal + background datasets
     df_list = [df_signal, df_background]
-    df_all = pandas.concat(df_list)
+    df_all  = pandas.concat(df_list)
     dataset = df_all.values
     
     # Target (top-quark mass) datasets (list of all mass values)
+    # (i.e. Get the list of TrijetMass values from the signal tree)
     if opts.dataset == "QCD":
         dset_target_sig = None
     else:
         dset_target_sig = signal.pandas.df(["TrijetMass"]).values
+    # Get the list of TrijetMass values from the background tree
     dset_target_bkg = background.pandas.df(["TrijetMass"]).values
+
+    # Merge the two lists into one to get a single list (numpy array) of TrijetMass from both the signal and bkg trees
     dset_target_all = pandas.concat([signal.pandas.df(["TrijetMass"]), background.pandas.df(["TrijetMass"])]).values
 
     # Array of 19 columns (=# variables) and opts.entries)
@@ -164,11 +188,16 @@ def main():
         target_sig = None
     else:
         X_sig = dset_signal[:opts.entries, 0:nInputs]
+        Verbose("Read %d entries for %d variables from the signal tree" % ( len(X_sig), len(X_sig[0])), True)
+        
+        # Get all the TrijetMass values in the form of a list of lists (dimension=1). (actually it is a numpy.ndarray object)
         target_sig = dset_target_sig[:opts.entries, :]
 
+    # Set the background values now from the background tree    
     X_bkg = dset_background[:opts.entries, 0:nInputs]
-    target_bkg = dset_target_bkg[:opts.entries, :]
-    
+    target_bkg = dset_target_bkg[:opts.entries, :]  # Get all the TrijetMass values in the form of of a numpy.ndarray object)
+    Verbose("Read %d entries for %d variables from the background tree" % ( len(X_bkg), len(X_bkg[0])), False)
+
     # Create canvas
     colors = [ROOT.kAzure, ROOT.kOrange-2, ROOT.kMagenta, ROOT.kGreen+2, ROOT.kOrange+7, ROOT.kRed, ROOT.kRed, ROOT.kBlack]
     canvas = plot.CreateCanvas()
@@ -182,39 +211,40 @@ def main():
         canvas.SetLogy()
         ymaxFactor = 2
         
-    # load the models
+    # Load & compile the model
     modelFile = os.path.join(opts.dir, 'model_trained.h5')
-    Print("Loading model %s" % (hs + modelFile + ns), True)
+    Print("Loading model %s" % (ts + modelFile + ns), True)
     loaded_model = load_model(modelFile)
-
-    # Compile the model
     loaded_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 
-    # Predict
+
+    # Use the loaded model to generate output predictions for the input samples. Computation is done in batches.
     if opts.dataset == "QCD":
         Y_sig = None
     else:
-        Y_sig = loaded_model.predict(X_sig, verbose=1)
-    Y_bkg = loaded_model.predict(X_bkg, verbose=1)
-    
-    # Concatenate Y (predicted output) and target (top-quark mass)
-    # Ymass 0 column:   DNN output
-    # Ymass 1st column: top-quark mass
+        Y_sig = loaded_model.predict(X_sig, verbose=1) # get the DNN score
+    Y_bkg = loaded_model.predict(X_bkg, verbose=1) # get the DNN score
+    Print("Got %s%d predictions%s (DNN scores) for the signal and %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_sig),ns, hs, len(Y_bkg), ns), True)
+
+    # Concatenate Y (predicted output) and target (top-quark mass). Ymass_sig 0 column = DNN output, Ymass_sig 1st column = top-quark mass
     if opts.dataset == "QCD":
         Ymass_sig = None
     else:
-        Ymass_sig = numpy.concatenate((Y_sig, target_sig), axis=1)
-    Ymass_bkg = numpy.concatenate((Y_bkg, target_bkg), axis=1)
+        # Create a 2-column numpy array with: Column1 = DNN_score, Column2 = TrijetMass
+        Ymass_sig = numpy.concatenate((Y_sig, target_sig), axis=1) # axis=1 means side-by-side (axis=0 means append at the end of the first array)
+    Ymass_bkg = numpy.concatenate((Y_bkg, target_bkg), axis=1) # axis=1 means side-by-side (axis=0 means append at the end of the first array)
     
     # Get selected top candidates (pass the output working point)
     if opts.dataset == "QCD":
         Ymass_sig_sel = None
         massSel_sig   = None
     else:
+        Verbose("Creating a new container with ONLY the DNN score aboce the selected cut (opts.wp)", True)
         Ymass_sig_sel = Ymass_sig[Ymass_sig[:,0] >= opts.wp] # Select samples with DNN output >= opts.wp (column 0)
         massSel_sig   = Ymass_sig_sel[:, 1]                  # Get the top-quark mass (col 1) for the selected samples.
     Ymass_bkg_sel = Ymass_bkg[Ymass_bkg[:,0] >= opts.wp] # Select samples with DNN output >= opts.wp (column 0)
     massSel_bkg   = Ymass_bkg_sel[:, 1]                  # Get the top-quark mass (col 1) for the selected samples.
+    Print("Got %s%d predictions%s (DNN scores > %.2f) for the signal and %s%d predictions%s (DNN scores > %.2f ) for the bkg" % (ss, len(Ymass_sig_sel), ns, opts.wp, ss, len(Ymass_bkg_sel), ns, opts.wp), True)
 
     # Plot resutls
     nbins = 80 #100
@@ -226,9 +256,12 @@ def main():
     else:
         hNameF = 'non-matched'
     hNameT = 'truth-matched'
+
+    # Create the histograms
     histoT = ROOT.TH1F(hNameT, '', nbins, xmin, xmax)
     histoF = ROOT.TH1F(hNameF, '', nbins, xmin, xmax)
-    Print("Selected entries: %d" % (len(massSel_bkg)), True)
+
+    Verbose("Signal histogram has %d entries, background histogram has %d entries" % (len(massSel_sig), len(massSel_bkg)), True)
     
     if opts.dataset != "QCD":
         for m in massSel_sig:
@@ -237,6 +270,11 @@ def main():
         histoF.Fill(m)
     histoList.append(histoT)
     histoList.append(histoF)
+
+    # Create and append total histo
+    histoA = histoT.Clone("all candidates")
+    histoA.Add(histoF)
+    histoList.append(histoA)
     
     # Create legend
     leg = plot.CreateLegend(0.60, 0.70, 0.90, 0.90)
@@ -252,10 +290,14 @@ def main():
         else:
             index += 1
 
-        Print("Plotting histogram #%d: %s" % (index, h.GetName()), index==1)
+        Verbose("Plotting histogram #%d: %s" % (index, h.GetName()), index==1)
 
         # Normalize histograms to unity
-        h.Scale(1.0/(h.Integral()))
+        if h.Integral() > 0.0:
+            h.Scale(1.0/(h.Integral()))
+        else:
+            msg = "Cannot normalise histograml with 0 integral"
+            raise Exception (es + msg + ns)
         
         ymax = max(ymax, histoList[i].GetMaximum())
         h.GetXaxis().SetTitle("m_{top} (GeV)")
@@ -289,7 +331,7 @@ def main():
     dirName = plot.getDirName(opts.saveDir)
 
     # Save the histogram
-    Print("Saving plot as %s" % (opts.saveName), True)
+    Verbose("Saving plot as %s" % (opts.saveName), True)
     plot.SavePlot(canvas, dirName, opts.saveName, saveFormats=opts.saveFormats, verbose=False)
     return
 
