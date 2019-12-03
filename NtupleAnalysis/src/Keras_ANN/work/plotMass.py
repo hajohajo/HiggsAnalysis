@@ -135,19 +135,23 @@ def main():
 
     # Signal dataframe
     df_signal = signal.pandas.df(inputList, entrystop=opts.entries) # contains all TBranches (inputList) from the signal TTree 
-    nBranches = len(df_signal.values[0])
-    nEntries  = len(df_signal.values)
-    Print("Constructing the signal dataframe (Tree %s with %s%d variables%s each with %s%d entries%s)" % (hs + sigTree + ns, ts, nBranches, ns, ls, nEntries, ns), True)
+    if len(df_signal.values) > 0 :
+        nBranches = len(df_signal.values[0])
+        nEntries  = len(df_signal.values)
+        Verbose("Constructing the signal dataframe (Tree %s with %s%d variables%s each with %s%d entries%s)" % (hs + sigTree + ns, ts, nBranches, ns, ls, nEntries, ns), True)
 
     # Background dataframe
     df_background = background.pandas.df(inputList, entrystop=opts.entries) # contains all TBranches (inputList) from the background TTree 
     nBranches     = len(df_background.values[0])
     nEntries      = len(df_background.values)
-    Print("Constructing the background dataframe (Tree %s with %s%d variables%s each with %s%d entries%s)" % (hs + bkgTree + ns, ts, nBranches, ns, ls, nEntries, ns), True)
+    Verbose("Constructing the background dataframe (Tree %s with %s%d variables%s each with %s%d entries%s)" % (hs + bkgTree + ns, ts, nBranches, ns, ls, nEntries, ns), True)
 
     # Number of events to predict the output and plot the top-quark mass
     if opts.entries == None:
-        opts.entries = min(len(df_signal.index), len(df_background.index))
+        if len(df_signal.index) > 0:
+            opts.entries = min(len(df_signal.index), len(df_background.index))
+        else:
+            opts.entries = len(df_background.index)
         Print("Number of events: %d" % (opts.entries), True)
 
     # Signal and background datasets (just the values of the TBranches)
@@ -219,12 +223,14 @@ def main():
 
 
     # Use the loaded model to generate output predictions for the input samples. Computation is done in batches.
+    Y_bkg = loaded_model.predict(X_bkg, verbose=1) # get the DNN score
     if opts.dataset == "QCD":
         Y_sig = None
+        Print("Got %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_bkg), ns), True)
     else:
         Y_sig = loaded_model.predict(X_sig, verbose=1) # get the DNN score
-    Y_bkg = loaded_model.predict(X_bkg, verbose=1) # get the DNN score
-    Print("Got %s%d predictions%s (DNN scores) for the signal and %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_sig),ns, hs, len(Y_bkg), ns), True)
+        Print("Got %s%d predictions%s (DNN scores) for the signal and %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_sig),ns, hs, len(Y_bkg), ns), True)
+
 
     # Concatenate Y (predicted output) and target (top-quark mass). Ymass_sig 0 column = DNN output, Ymass_sig 1st column = top-quark mass
     if opts.dataset == "QCD":
@@ -235,16 +241,17 @@ def main():
     Ymass_bkg = numpy.concatenate((Y_bkg, target_bkg), axis=1) # axis=1 means side-by-side (axis=0 means append at the end of the first array)
     
     # Get selected top candidates (pass the output working point)
+    Ymass_bkg_sel = Ymass_bkg[Ymass_bkg[:,0] >= opts.wp] # Select samples with DNN output >= opts.wp (column 0)
+    massSel_bkg   = Ymass_bkg_sel[:, 1]                  # Get the top-quark mass (col 1) for the selected samples.
     if opts.dataset == "QCD":
         Ymass_sig_sel = None
         massSel_sig   = None
+        Print("Got %s%d predictions%s (DNN scores > %.2f ) for the bkg" % (ss, len(Ymass_bkg_sel), ns, opts.wp), True)
     else:
         Verbose("Creating a new container with ONLY the DNN score aboce the selected cut (opts.wp)", True)
         Ymass_sig_sel = Ymass_sig[Ymass_sig[:,0] >= opts.wp] # Select samples with DNN output >= opts.wp (column 0)
         massSel_sig   = Ymass_sig_sel[:, 1]                  # Get the top-quark mass (col 1) for the selected samples.
-    Ymass_bkg_sel = Ymass_bkg[Ymass_bkg[:,0] >= opts.wp] # Select samples with DNN output >= opts.wp (column 0)
-    massSel_bkg   = Ymass_bkg_sel[:, 1]                  # Get the top-quark mass (col 1) for the selected samples.
-    Print("Got %s%d predictions%s (DNN scores > %.2f) for the signal and %s%d predictions%s (DNN scores > %.2f ) for the bkg" % (ss, len(Ymass_sig_sel), ns, opts.wp, ss, len(Ymass_bkg_sel), ns, opts.wp), True)
+        Print("Got %s%d predictions%s (DNN scores > %.2f) for the signal and %s%d predictions%s (DNN scores > %.2f ) for the bkg" % (ss, len(Ymass_sig_sel), ns, opts.wp, ss, len(Ymass_bkg_sel), ns, opts.wp), True)
 
     # Plot resutls
     nbins = 80 #100
@@ -260,12 +267,14 @@ def main():
     # Create the histograms
     histoT = ROOT.TH1F(hNameT, '', nbins, xmin, xmax)
     histoF = ROOT.TH1F(hNameF, '', nbins, xmin, xmax)
-
-    Verbose("Signal histogram has %d entries, background histogram has %d entries" % (len(massSel_sig), len(massSel_bkg)), True)
     
     if opts.dataset != "QCD":
+        Verbose("Signal histogram has %d entries, background histogram has %d entries" % (len(massSel_sig), len(massSel_bkg)), True)
         for m in massSel_sig:
             histoT.Fill(m)
+    else:
+        Verbose("Background histogram has %d entries" % (len(massSel_bkg)), True)
+
     for m in massSel_bkg:
         histoF.Fill(m)
     histoList.append(histoT)
@@ -331,7 +340,7 @@ def main():
     dirName = plot.getDirName(opts.saveDir)
 
     # Save the histogram
-    Verbose("Saving plot as %s" % (opts.saveName), True)
+    Print("Saving plot as %s%s%s" % (ss, os.path.join(opts.saveDir, opts.saveName), ns), True)
     plot.SavePlot(canvas, dirName, opts.saveName, saveFormats=opts.saveFormats, verbose=False)
     return
 
@@ -358,6 +367,7 @@ action..........: The basic type of action to be taken when this argument is enc
     # Default Settings
     FILENAME    = "histograms-TT_19var.root"
     WP          = 0.0
+    DIR         = None
     SAVEDIR     = ""
     SAVEFORMATS = "pdf" #"png" does not work
     SAVENAME    = None
@@ -380,8 +390,8 @@ action..........: The basic type of action to be taken when this argument is enc
     parser.add_option("--entries", dest="entries", type=int, default=ENTRIES,
                       help="Number of entries to be used in filling the mass histogram [default: %s]" % ENTRIES)
 
-    parser.add_option("--dir", dest="dir", default=None,
-                      help="Directory where the model training file is located (\"model_trained.h5\") [default: %s]" % None)
+    parser.add_option("--dir", dest="dir", default=DIR,
+                      help="Directory where the model training file is located (\"model_trained.h5\") [default: %s]" % DIR)
 
     parser.add_option("--saveDir", dest="saveDir", type="string", default=SAVEDIR,
                       help="Output name directory [default: %s]" % SAVEDIR)
@@ -415,4 +425,6 @@ action..........: The basic type of action to be taken when this argument is enc
     else:
         opts.dataset = "dataset unknown"
 
+    if opts.dir == None:
+        raise Exception("No directory was defined where the model training file is located (\"model_trained.h5\")! Please define an input directory with the --dir option")
     main()

@@ -79,6 +79,19 @@ def Print(msg, printHeader=True):
     print "\t", msg
     return
 
+def PrintFlushed(msg, printHeader=True):
+    '''
+    Useful when printing progress in a loop
+    '''
+    msg = "\r\t" + msg
+    ERASE_LINE = '\x1b[2K'
+    if printHeader:
+        print "=== aux.py"
+    sys.stdout.write(ERASE_LINE)
+    sys.stdout.write(msg)
+    sys.stdout.flush()
+    return
+
 def main():
 
     # Apply TDR style
@@ -128,8 +141,8 @@ def main():
         doROC(opts.saveName, resultsList)
     elif opts.plotType.lower() == "var":
         for var in opts.variables:
-            if var != "TrijetMass":
-                continue
+            #if var != "TrijetMass":
+            #    continue
 
             # For-loop: All working points (DNN score)
             for wp in ["", "0p1", "0p3", "0p5", "0p7", "0p9"]:
@@ -146,7 +159,7 @@ def main():
         # For-loop: All variables
         for i, var in enumerate(opts.variables, 1): 
             opts.saveDir = _saveDir
-            Print("Plotting variable %s" % (var), i==1)
+            PrintFlushed("Plotting variable %d/%d: %s" % (i, len(opts.variables), var), i==1)
 
             # For-loop: All input directories
             for j, r in enumerate(resultsList, 1):
@@ -162,7 +175,7 @@ def main():
 
                 doVariablesWPs(var, [r], WPs, signal=True )
                 doVariablesWPs(var, [r], WPs, signal=False)
-            print
+        print
 
         # Recover the original save directory
         opts.saveDir = _saveDir
@@ -365,12 +378,14 @@ def doVariables(name, variable, resultsList, WP=""):
     gBkgList = []
     legList  = []
     gSvBList = []
+    gNameS   = variable + "_signal%s" % (WP)
+    gNameB   = variable + "_background%s" % (WP) 
     opts.saveName = variable + WP
 
     # For-loop: All Output-class objects
     for r in resultsList:
-        gSig, lSig = r.getGraphs(variable + "_signal%s" % (WP) )
-        gBkg, lBkg = r.getGraphs(variable + "_background%s" % (WP) )
+        gSig, lSig = r.getGraphs(gNameS)
+        gBkg, lBkg = r.getGraphs(gNameB)
         if opts.yMin == None:
             opts.yMin = r.getYMin()
         if opts.yMax == None and opts.yMax == None:
@@ -385,7 +400,12 @@ def doVariables(name, variable, resultsList, WP=""):
         
     # Plot the graph
     kwargs = GetVarKwargs(variable, opts)
-    gList = [gSigList[0], gBkgList[0]]
+    Verbose("len(gSigList) = %d, len(gBkgList) = %d" % (len(gSigList), len(gBkgList)), True)
+    if len(gSig) < 1 or len(gBkg) < 1:
+        Print("Skipping %s (len(gSigList) = %d, len(gBkgList) = %d)" % (opts.saveName, len(gSigList), len(gBkgList)), False)
+        return
+    else:
+        gList = [gSigList[0], gBkgList[0]]
 
     # For-loop: All TGraphs
     for i, g in enumerate(gList, 0):
@@ -411,8 +431,13 @@ def doVariables(name, variable, resultsList, WP=""):
             Verbose("%d) x = %0.3f, y = %0.3f" % (j, xVal, yVal), j==0)
 
         # Create the TGraph
-        Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
-        g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
+        Verbose("Creating the TGraph with len(x) = %d, len(y) = %d" % (len(x), len(y)), True)
+        if len(x) < 1:
+            msg = "Skipping variable %s (len(x) = %d, len(y) = %d)" % (opts.saveName, len(x), len(y))
+            Print(sh_e + msg + sh_n, False)
+            return
+        else:
+            g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
         gSvBList.append(g)
 
     # Make the plot
@@ -450,7 +475,9 @@ def doVariablesWPs(variable, resultsList, WPs = None, signal=True, defaultLegend
             g, l = r.getGraphs(variable + wp)
             if len(g) < 1 or len(g) > 1:
                 msg = "Cannot find graph for variable %s" % (sh_h + variable + wp + sh_n)
-                raise Exception(sh_e + msg + sh_n)
+                #raise Exception(sh_e + msg + sh_n)
+                Verbose(sh_e + msg + sh_n, True)
+                return
 
             if opts.yMin == None:
                 opts.yMin = r.getYMin()
@@ -495,7 +522,12 @@ def doVariablesWPs(variable, resultsList, WPs = None, signal=True, defaultLegend
 
         # Create the TGraph
         Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
-        g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
+        if len(x) < 1:
+            msg = "Skipping variable %s (len(x) = %d, len(y) = %d)" % (opts.saveName, len(x), len(y))
+            Print(sh_e + msg + sh_n, False)
+            return
+        else:
+            g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
         gSvBList.append(g)
 
     # Make the plot
@@ -1202,7 +1234,7 @@ if __name__ == "__main__":
     # opts.variables = ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
     #                   "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
     #                   "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
-    #                   "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
+    #                  "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
     #                   "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]
 
     # Call the main function
