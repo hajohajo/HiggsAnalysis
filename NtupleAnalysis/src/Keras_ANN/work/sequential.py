@@ -76,6 +76,7 @@ LAST USED:
 ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --standardise
 ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --decorrelate --standardise
 
+./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --inputVariables "TrijetPtDR,TrijetDijetPtDR,TrijetBjetMass,TrijetLdgJetBDisc,TrijetSubldgJetBDisc,TrijetBJetLdgJetMass,TrijetBJetSubldgJetMass,TrijetMass,TrijetDijetMass,TrijetBJetBDisc,TrijetSoftDrop_n2,TrijetLdgJetCvsL,TrijetSubldgJetCvsL,TrijetLdgJetPtD,TrijetSubldgJetPtD,TrijetLdgJetAxis2,TrijetSubldgJetAxis2,TrijetLdgJetMult,TrijetSubldgJetMult"
 
 GITHUB:
 https://github.com/skonstantinou/Keras_ANN/
@@ -578,35 +579,12 @@ def main(opts):
     signal     = uproot.open(opts.rootFileName)["treeS"]
     background = uproot.open(opts.rootFileName)["treeB"]
 
-    # Input list of discriminatin variables (TBranches)
-    inputList = []
-    inputList.append("TrijetPtDR")
-    inputList.append("TrijetDijetPtDR")
-    inputList.append("TrijetBjetMass")
-    inputList.append("TrijetLdgJetBDisc")
-    inputList.append("TrijetSubldgJetBDisc")
-    inputList.append("TrijetBJetLdgJetMass")
-    inputList.append("TrijetBJetSubldgJetMass")
-    inputList.append("TrijetMass")
-    inputList.append("TrijetDijetMass")
-    inputList.append("TrijetBJetBDisc")
-    inputList.append("TrijetSoftDrop_n2")
-    inputList.append("TrijetLdgJetCvsL")
-    inputList.append("TrijetSubldgJetCvsL")
-    inputList.append("TrijetLdgJetPtD")
-    inputList.append("TrijetSubldgJetPtD")
-    inputList.append("TrijetLdgJetAxis2")
-    inputList.append("TrijetSubldgJetAxis2")
-    inputList.append("TrijetLdgJetMult")
-    inputList.append("TrijetSubldgJetMult")
-    opts.inputList = inputList
-    nInputs = len(inputList)
-    
     # Construct signal and background dataframes using a list of TBranches (a Dataframe is a two dimensional structure representing data in python)
     # https://uproot.readthedocs.io/en/latest/ttree-handling.html#id7
-    Print("Constucting dataframes for signal and background with %d input variables:\n\t%s%s%s" % (nInputs, ss, "\n\t".join(inputList), ns), True)
-    df_signal = signal.pandas.df(inputList, entrystop=opts.entrystop) # call an array-fetching method to fill a Pandas DataFrame.
-    df_bkg    = background.pandas.df(inputList, entrystop=opts.entrystop)
+    nInputs   = len(opts.inputList)
+    Verbose("Constucting dataframes for signal and background with %d input variables:\n\t%s%s%s" % (nInputs, ss, "\n\t".join(opts.inputList), ns), True)
+    df_signal = signal.pandas.df(opts.inputList, entrystop=opts.entrystop) # call an array-fetching method to fill a Pandas DataFrame.
+    df_bkg    = background.pandas.df(opts.inputList, entrystop=opts.entrystop)
 
     # Get the index (row labels) of the DataFrame.
     nsignal = len(df_signal.index)    
@@ -674,8 +652,8 @@ def main(opts):
 
     # Construct the pandas DataFrames (2D size-mutable tabular data structure with labeled axes i.e. rows and columns)
     Verbose("Constructing pandas DataFrames for signal and background", True)
-    ds_signal = pandas.DataFrame(data=dset_signal,columns=inputList)
-    ds_bkg    = pandas.DataFrame(data=dset_bkg,columns=inputList)
+    ds_signal = pandas.DataFrame(data=dset_signal,columns=opts.inputList)
+    ds_bkg    = pandas.DataFrame(data=dset_bkg,columns=opts.inputList)
 
     # Construct pandas DataFrames (2D size-mutable tabular data structure with labeled axes i.e. rows and columns)
     Verbose("Constructing pandas DataFrames", True)
@@ -729,7 +707,7 @@ def main(opts):
     msg = "Model has a total of %s%d%s parameters (neuron weights and biases) " % (hs, nParams, ns)
     Print(msg, True)
     total_count, trainable_count, non_trainable_count  = GetModelParams(model)
-    nParams, nWeights, nBias = GetModelWeightsAndBiases(inputList, opts.neurons)
+    nParams, nWeights, nBias = GetModelWeightsAndBiases(opts.inputList, opts.neurons)
     opts.modelParams = total_count
     opts.modelParamsTrain = trainable_count
     opts.modelParamsNonTrainable = non_trainable_count
@@ -756,15 +734,17 @@ def main(opts):
     # more or less look like standard normally distributed data (e.g. Gaussian with 0 mean and unit variance).
     # https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
     if opts.standardise:
-        msg = "Standardize features by removing the mean and scaling to unit variance"
-        Print(hs + msg + ns, True)
+        msg  = "Standardize features by removing the mean and scaling to unit variance (i.e. Transform your data such that its distribution will have a mean value 0.0 and standard deviation of 1.0). "
+        msg += "In case of multivariate data, this is done feature-wise (in other words independently for each column of the data). "
+        msg += "Given the distribution of the data, each value in the dataset will have the mean value subtracted, and then divided by the standard deviation of the whole dataset (or feature in the multivariate case)." 
+        Print(hs + msg + ns, True)    
         scaler = StandardScaler()
 
         # Compute the mean and std to be used for later scaling
-        scaler.fit(X) #fixme-iro
+        #scaler.fit(X) #fixme-iro
         #scaler.fit(X_signal)
-        StandardScaler(copy=True, with_mean=True, with_std=True)
-        Verbose("X_signal before standardisation: %s" % X_signal, True)
+        #StandardScaler(copy=True, with_mean=True, with_std=True)
+        #Verbose("X_signal before standardisation: %s" % X_signal, True)
 
         # Fit to data, then transform it by performing standardization by centering and scaling (Mean and standard deviation were previously stored with StandardScaler())
         X_signal     = scaler.fit_transform(X_signal)
@@ -773,8 +753,8 @@ def main(opts):
 
     # Plot the input variables
     if opts.plotInputs:
-        Verbose("Plotting all %d input variables for signal and bacgkround" % (len(inputList)), True)
-        for i, var in enumerate(inputList, 0):
+        Verbose("Plotting all %d input variables for signal and bacgkround" % (len(opts.inputList)), True)
+        for i, var in enumerate(opts.inputList, 0):
             func.PlotInputs(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], var, "%s/%s" % (opts.saveDir, "inputs"), opts.saveFormats)
 
     # Split the datasets (X= 19 inputs, Y=output variable). Test size 0.5 means half for training half for testing
@@ -849,7 +829,7 @@ def main(opts):
     model.save(os.path.join(opts.saveDir, modelName))
         
     # write weights and architecture in txt file
-    func.WriteModel(model, model_json, inputList, os.path.join(opts.saveDir, "model.txt") )
+    func.WriteModel(model, model_json, opts.inputList, os.path.join(opts.saveDir, "model.txt") )
 
     # Produce method score (i.e. predict output value for given input dataset). Computation is done in batches.
     # https://stackoverflow.com/questions/49288199/batch-size-in-model-fit-and-model-predict
@@ -898,10 +878,10 @@ def main(opts):
     func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats)
 
     # For-loop: All branches to be plotted for various DNN score cuts (v. slow, especially for large number of "entrystop")
-    for i, var in enumerate(inputList, 0):
+    for i, var in enumerate(opts.inputList, 0):
         if var != "TrijetMass":
             continue
-        PrintFlushed("Variable %s (%d/%d)" % (var, i+1, len(inputList)), i==0)
+        PrintFlushed("Variable %s (%d/%d)" % (var, i+1, len(opts.inputList)), i==0)
         func.PlotAndWriteJSON(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
 
         Verbose("Plotting variable %s for DNN score 0.1" % (var), True)
@@ -1007,6 +987,8 @@ if __name__ == "__main__":
     CFGJSON      = "config.json"
     RESULTSJSON  = "results.json"
     PLOTINPUTS   = False
+    INPUTVARS    = "TrijetPtDR,TrijetDijetPtDR,TrijetBjetMass,TrijetLdgJetBDisc,TrijetSubldgJetBDisc,TrijetBJetLdgJetMass,TrijetBJetSubldgJetMass,TrijetMass,TrijetDijetMass,TrijetBJetBDisc,TrijetSoftDrop_n2,TrijetLdgJetCvsL,TrijetSubldgJetCvsL,TrijetLdgJetPtD,TrijetSubldgJetPtD,TrijetLdgJetAxis2,TrijetSubldgJetAxis2,TrijetLdgJetMult,TrijetSubldgJetMult"
+
 
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -1059,6 +1041,9 @@ if __name__ == "__main__":
     parser.add_option("--neurons", dest="neurons", type="string", default=NEURONS,
                       help="List of neurons to use for each sequential layer (comma-separated integers)  [default: %s]" % NEURONS)
 
+    parser.add_option("--inputVariables", dest="inputVariables", type="string", default=INPUTVARS,
+                      help="List of input variables (TBranches) to use for the classifier (comma-separated integers)  [default: %s]" % INPUTVARS)
+    
     parser.add_option("--entrystop", dest="entrystop", type="int", default=ENTRYSTOP,
                       help="Entry at which the (TBranch of TTree) reading stops. If ROOT file itoo big it may result to a \"memory error\", depending on the resources available in the machine used.  If \"None\", stop at the end of the branch. [default: %s]" % ENTRYSTOP)
 
@@ -1127,6 +1112,12 @@ if __name__ == "__main__":
         specs+= "_%s%s" % (opts.neurons[i], opts.activation[i])
     specs+= "_%sEpochs_%sBatchSize" % (opts.epochs, opts.batchSize)
 
+    # Input list of discriminatin variables (TBranches)
+    opts.inputList = opts.inputVariables.split(",")
+    if opts.inputList < 1:
+        raise Exception("At least one input variable needed to create the DNN. Only %d provided" % (len(opts.inputList)) )
+    Print("A total of %d input variables will be used:\n\t%s%s%s" % (len(opts.inputList), ss, "\n\t".join(opts.inputList), ns), True)
+
     # Get the current date and time
     now    = datetime.now()
     nDay   = now.strftime("%d")
@@ -1140,9 +1131,11 @@ if __name__ == "__main__":
         sName += "_MassDecorrelated"
     if opts.standardise:
         sName += "_Standardised"
+    # Add the number of input variables
+    sName += "_%dInputs" % (len(opts.inputList))
     # Add the time-stamp last
     sName += "_%s" % (nDate)
-
+    
     # Determine path for saving plots
     if opts.saveDir == None:
         usrName = getpass.getuser()
@@ -1153,7 +1146,7 @@ if __name__ == "__main__":
         else:
             myDir = os.path.join(os.getcwd())
         opts.saveDir = os.path.join(myDir, sName)
-
+    
     # Create dir if it does not exist
     if not os.path.exists(opts.saveDir):
         os.mkdir(opts.saveDir)    
