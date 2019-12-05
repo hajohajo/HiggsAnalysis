@@ -8,7 +8,7 @@ process = cms.Process("TTreeDump")
 dataVersion = "80Xdata"
 
 options, dataVersion = getOptionsDataVersion(dataVersion)
-print dataVersion
+print(dataVersion)
 
 
 process.maxEvents = cms.untracked.PSet(
@@ -35,7 +35,7 @@ process.source = cms.Source("PoolSource",
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, str(dataVersion.getGlobalTag()), '')
-print "GlobalTag="+dataVersion.getGlobalTag()
+print("GlobalTag="+dataVersion.getGlobalTag())
 
 # Set up electron ID (VID framework)
 # https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
@@ -47,7 +47,7 @@ for idmod in ['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_PH
     
 # Set up HBHE noise filter
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2
-print "Setting up HBHE noise filter"
+print("Setting up HBHE noise filter")
 process.load('CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi')
 process.HBHENoiseFilterResultProducer.minZeros = cms.int32(99999)
 process.HBHENoiseFilterResultProducer.IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(False)
