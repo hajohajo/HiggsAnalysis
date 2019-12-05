@@ -12,7 +12,7 @@ public:
   using value_type = Muon;
 
   MuonCollection() { initialize(); }
-  MuonCollection(const std::string& prefix): MuonGeneratedCollection(prefix) { initialize(); }
+  explicit MuonCollection(const std::string& prefix): MuonGeneratedCollection(prefix) { initialize(); }
   ~MuonCollection() {}
 
   void setupBranches(BranchManager& mgr);
@@ -61,6 +61,11 @@ public:
     if (!fCollection->muonIDDiscriminatorIsValid())
       return true;
     return fCollection->fMuonIDDiscriminator->value()[index()];
+  }
+  /// Operator defined for using std::sort on vector<Tau>
+  bool operator<(const Muon& muon) const {
+    // Descending order by tau pT
+    return (this->pt() > muon.pt());
   }
 };
 

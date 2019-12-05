@@ -97,7 +97,7 @@ public:
   void bookHistograms(TDirectory* dir, HistoWrapper& histoWrapper);
   /// Calculate scale factor for the event
   const float calculateSF(const std::vector<math::XYZTLorentzVector> cleanTopP4, 
-			  const std::vector<double> cleanTopMVA,
+			  const std::vector<float> cleanTopMVA,
 			  const std::vector<bool> cleanTopIsTagged, const std::vector<bool> cleanTopIsGenuine);
 
   /// Returns the size of the efficiency config items

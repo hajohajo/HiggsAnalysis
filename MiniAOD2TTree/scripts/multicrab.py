@@ -102,11 +102,12 @@ from CRABClient.UserUtilities import getConsoleLogLevel
 gitFound = False
 try: #sami please fix me-28Nov2017 (alex)
     import HiggsAnalysis.MiniAOD2TTree.tools.git as git
-    from HiggsAnalysis.MiniAOD2TTree.tools.datasets import *
+    #from HiggsAnalysis.MiniAOD2TTree.tools.datasets import *
+    from HiggsAnalysis.MiniAOD2TTree.tools.datasets import DatasetGroup
     gitfound = True
 except: #sami please fix me-28Nov2017 (alex)
-#    from datasets import *
     pass
+#from HiggsAnalysis.MiniAOD2TTree.tools.datasets import DatasetGroup
 
 #================================================================================================ 
 # Global Definitions
@@ -909,7 +910,7 @@ def PrintTaskSummary(reportDict):
     Verbose("PrintTaskSummary()")
     
     reports  = []    
-    msgAlign = "{:<3} {:<50} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16}"
+    msgAlign = "{:<3} {:<60} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16}"
     header   = msgAlign.format("#", "Task",
                                "%s%s" % (colors.GRAY  , "Idle"    ),
                                "%s%s" % (colors.RED   , "Failed"  ),
@@ -922,7 +923,7 @@ def PrintTaskSummary(reportDict):
                                "%s%s" % (colors.CYAN  , "Out"     ),
                                "%s%s" % (colors.WHITE , "Status"  ),
                                )
-    hLine = colors.WHITE + "="*175
+    hLine = colors.WHITE + "="*180
     reports.append(hLine)
     reports.append(header)
     reports.append(hLine)

@@ -68,7 +68,7 @@ def GetListOfEwkDatasets():
     Verbose("Getting list of EWK datasets")
     if 0: # TopSeleciton
         return  ["TT", "WJetsToQQ_HT_600ToInf", "SingleTop", "DYJetsToQQHT", "TTZToQQ",  "TTWJetsToQQ", "Diboson", "TTTT"]
-    else: # TopSelectionBDT
+    else: # TopSelectionMVA
         #return  ["TT", "TTTT", "SingleTop", "TTZToQQ", "TTWJetsToQQ", "DYJetsToQQHT", "WJetsToQQ_HT_600ToInf", "Diboson"]
         return  ["TT", "TTTT", "SingleTop", "ttX", "DYJetsToQQHT", "WJetsToQQ_HT_600ToInf"]
 

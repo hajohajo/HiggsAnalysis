@@ -11,9 +11,11 @@ EXAMPLES:
 ./plot_TaggingEfficiencyPaper.py -m /uscms_data/d3/skonstan/workspace/pseudo-multicrab/TopRecoAnalysis/BDTcutComparisonPlots_BjetPt40_MassCut400/TopRecoAnalysis_180320_BDT85 --folder topbdtSelection_ --url
 ./plot_TaggingEfficiencyPaper.py -m /uscms_data/d3/skonstan/workspace/pseudo-multicrab/TopRecoAnalysis/BDTcutComparisonPlots_BjetPt40_MassCut400/TopRecoAnalysis_180320_BDT85 --ratio
 ./plot_TaggingEfficiencyPaper.py -m /uscms_data/d3/skonstan/workspace/pseudo-multicrab/BDTcutComparisonPlots_180828_BjetPt40_MassCut400_NewBDTbjetPt40GeV/TopTaggerEfficiency_180827_BDT0p40 --analysisName TopTaggerEfficiency --ratio --url
+./plot_TaggingEfficiencyPaper.py -m /uscms_data/d3/skonstan/workspace/pseudo-multicrab/TopTaggerEfficiency/TopTaggerEfficiency_190106_084255_BDT0p40_TopMassCut400_noTopPtRew --analysisName TopTaggerEfficiency --ratio --url
+
 
 LAST USED:
-./plot_TaggingEfficiencyPaper.py -m /uscms_data/d3/skonstan/workspace/pseudo-multicrab/TopTaggerEfficiency/TopTaggerEfficiency_190106_084255_BDT0p40_TopMassCut400_noTopPtRew --analysisName TopTaggerEfficiency --ratio --url
+./plot_TaggingEfficiencyPaper.py -m /uscms_data/d3/skonstan/workspace/pseudo-multicrab/TopTaggerEfficiency/TopTaggerEfficiency_190106_084255_BDT0p40_TopMassCut400_noTopPtRew --analysisName TopTaggerEfficiency --url
 
 
 STATISTICS OPTIONS:
@@ -199,26 +201,20 @@ def GetHistoKwargs(opts):
     units = "GeV" # not GeV/c
 
     kwargs = {
-        #"xlabel"           : "generated top p_{T} (%s)" % (units),
-        # "xlabel"           : "candidate p_{T} (%s)" % (units),
         "xlabel"           : "p_{T} (%s)" % (units),
         "ylabel"           : "Efficiency / " + units,
-        # "ylabel"           : "Misidentification rate / " + units,
-        # "rebinX"           : 1,
-        # "rebinX"           : systematics._dataDrivenCtrlPlotBinning["LdgTrijetDijetMass_AfterAllSelections"],
-        "ratioYlabel"      : "Ratio ",
+        "ratioYlabel"      : "t#bar{t} / QCD ",
         "ratio"            : opts.ratio,
         "ratioInvert"      : True,
         "stackMCHistograms": False,
         "addMCUncertainty" : False,
         "addLuminosityText": False,
         "addCmsText"       : True,
-        #"cmsExtraText"     : "Preliminary",
-        "cmsExtraText"     : "Simulation",
-        #"opts"             : {"ymin": 0.0, "ymax": 1.0},
+        "cmsExtraText"     : "Simulation Preliminary",
         "opts"             : {"ymin": 0.0, "ymaxfactor": 1.2},
-        #"opts2"            : {"ymin": 0.6, "ymax": 1.4},
-        "opts2"            : {"ymin": 0.0, "ymax": 10.4},
+        "opts2"            : {"ymin": 0.0, "ymax": 12.4},
+        #"opts2"            : {"ymin": 0.0, "ymax": 10.4},
+        #"moveLegend"       : {"dx": -0.05, "dy": -0.0, "dh": -0.15},
         "moveLegend"       : {"dx": -0.05, "dy": -0.0, "dh": -0.15},
         "cutBoxY"          : {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True, "mainCanvas": True, "ratioCanvas": False}
         }
@@ -366,12 +362,14 @@ def PlotEfficiency(datasetsMgr, datasetsMgr40, intLumi):
     eff40_QCD = convert2TGraph(eff40_QCD)
 
     styles.ttStyle.apply(eff40_TT)
-    styles.qcdStyle.apply(eff40_QCD)
+    #styles.qcdStyle.apply(eff40_QCD)
+    #styles.fakeBStyle.apply(eff40_QCD)
+    styles.genuineBLineStyle.apply(eff40_QCD)
 
     # Append in list
     gEff40_TT  = histograms.HistoGraph(eff40_TT , "t#bar{t}", "lp", "P")
     #gEff40_QCD = histograms.HistoGraph(eff40_QCD, "QCD multijet", "lp", "P")
-    gEff40_QCD = histograms.HistoGraph(eff40_QCD, "QCD", "lp", "P")
+    gEff40_QCD = histograms.HistoGraph(eff40_QCD, "QCD multijet", "lp", "P")
     myList.append(gEff40_TT)
     myList.append(gEff40_QCD)
         

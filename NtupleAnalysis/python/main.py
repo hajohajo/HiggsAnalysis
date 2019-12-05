@@ -72,6 +72,10 @@ class PSet:
             setattr(pset, key, value)
         return pset
 
+    def write(self,filename):
+        with open(filename, 'w') as outfile:
+            json.dump(self._asDict(), outfile, sort_keys=True, indent=2)
+
     def __getattr__(self, name):
         return self._data[name]
 
@@ -149,6 +153,9 @@ class Analyzer:
 
     def config_(self):
         return self.__dict__["_pset"].serialize_()
+
+    def config(self):
+        return self.__dict__["_pset"]
 
 #================================================================================================
 # Class Definition
@@ -379,7 +386,9 @@ class Process:
             for dset in dsets:
                 isOnWhiteList = False
                 for item in whitelist:
-                    if item==dset.getName() or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
+                    wl_re = re.compile(item)
+                    match = wl_re.search(dset.getName())
+                    if match or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
                         isOnWhiteList = True
                 if not isOnWhiteList:
                     blacklist.append(dset.getName())
@@ -387,7 +396,9 @@ class Process:
         for dset in dsets:
             isOnBlackList = False
             for item in blacklist:
-                if item==dset.getName() or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
+                bl_re = re.compile(item)
+                match = bl_re.search(dset.getName())
+                if match or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
                     isOnBlackList = True
             if isOnBlackList:
                 self.Print("Ignoring dataset because of black/whitelist options: '%s' ..." % dset.getName(), True)
@@ -401,6 +412,25 @@ class Process:
     def setDatasets(self, datasets):
         self._datasets = datasets
 
+    def ordering(self,regexps):
+        orderedDatasets = []
+        for regexp in regexps:
+            select_re = re.compile(regexp)
+            for d in self._datasets:
+                match = select_re.search(d.getName())
+                if match and d not in orderedDatasets:
+                    orderedDatasets.append(d)
+        for d in self._datasets:
+            if d not in orderedDatasets:
+                orderedDatasets.append(d)
+        if not len(self._datasets) == len(orderedDatasets):
+            print "Problem with ordering, mismatch of the number of datasets"
+            print "    original length",len(self._datasets)
+            print "    ordered length ",len(orderedDatasets)
+            sys.exit()
+                                
+        self._datasets = orderedDatasets
+                                                                                                                                                                                                                                
     def getRuns(self):
         runmin = -1
         runmax = -1
@@ -457,6 +487,7 @@ class Process:
         if self._outputPostfix != "":
             outputDir += "_"+self._outputPostfix
 
+        config = None
         # Create output directory
         os.mkdir(outputDir)
         self.Print("Created output directory %s" % (sh_Note + outputDir + sh_Normal), True)
@@ -550,6 +581,7 @@ class Process:
                         if not isinstance(analyzer, Analyzer):
                             raise Exception("Analyzer %s was specified as a function, but returned object of %s instead of Analyzer" % (aname, analyzer.__class__.__name__))
                     inputList.Add(ROOT.TNamed("analyzer_"+aname, analyzer.className_()+":"+analyzer.config_()))
+                    config = analyzer.config()
                     # ttbar status for top pt corrections
                     ttbarStatus = "0"
                     useTopPtCorrection = analyzer.exists("useTopPtWeights") and analyzer.__getattr__("useTopPtWeights")
@@ -779,6 +811,7 @@ class Process:
 
         # Inform user of location of results
         self.Print("Results are in %s" % (sh_Success + outputDir + sh_Normal), True)
+        config.write(os.path.join(outputDir,"parameters.json"))
         return outputDir
     
     def PrintStatsTotal(self, readMbytes, cpuTimeTotal, realTimeTotal, readMbytesTotal):

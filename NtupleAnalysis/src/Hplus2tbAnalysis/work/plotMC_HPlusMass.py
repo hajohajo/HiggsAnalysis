@@ -327,7 +327,7 @@ def PlotMC(datasetsMgr, histo, intLumi):
         _format = "%0.0f " + _units
         _opts["xmax"] = 800
 
-    elif "trijetbdt_mass" in histo.lower():
+    elif "trijetmva_mass" in histo.lower():
         _rebinX = 2
         _units  = "GeV/c^{2}"
         _format = "%0.0f " + _units
@@ -350,7 +350,7 @@ def PlotMC(datasetsMgr, histo, intLumi):
         _cutBox = {"cutValue": 173.21, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         _opts["xmax"] = 505 
 
-    elif "bdtvalue" in histo.lower():
+    elif "mvavalue" in histo.lower():
         _format = "%0.1f"
 
     elif "foxwolframmoment" in histo.lower():
@@ -359,12 +359,12 @@ def PlotMC(datasetsMgr, histo, intLumi):
 
     elif "absdeltamvamax_mctruth_sameobjfakes" in histo.lower():
         _format = "%0.1f"
-        _xlabel = "|#Delta BDTG| response"
+        _xlabel = "|#Delta MVA| response"
 
-    elif "deltamvamin_mctruth_sameobjfakespassbdt" in histo.lower():
+    elif "deltamvamin_mctruth_sameobjfakespassmva" in histo.lower():
         _opts["xmax"] = 1
         _opts["xmin"] = -1
-    elif "bdtmultiplicity" in histo.lower():
+    elif "mvamultiplicity" in histo.lower():
         _opts["xmax"] = 15
 
 

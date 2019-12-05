@@ -190,9 +190,8 @@ def main():
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
 
-    allSelections.TopSelectionBDT.TopMVACutValue      = 0.40
-    allSelections.TopSelectionBDT.TopMVACutDirection  = ">="
-    allSelections.TopSelectionBDT.WeightFile          = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_14July2018.weight.xml"
+    allSelections.TopSelectionMVA.TopMVACutValue      = 0.40
+    allSelections.TopSelectionMVA.TopMVACutDirection  = ">="
     #BDTG_DeltaR0p4_BJetPt40_25Sept2018.weights.xml
     #BDTG_DeltaR0p3_DeltaPtOverPt0p50_BJetPt40_18Sept2018.weights.xml
     #BDTG_DeltaR0p3_BJetPt40_17July2018.weights.xml

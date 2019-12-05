@@ -215,11 +215,16 @@ def getFittedEfficiency(fitResult,err,plot,min,max):
         xerrl.append(0)
         xerrh.append(0)
         y.append(fitResult.Eval(i))
-	yerrl.append(err[i-1])	
-        if (fitResult.Eval(i) + err[i-1] < 1):
-	    yerrh.append(err[i-1])
+	if(math.isnan(err[i-1])):
+  	  yerrl.append(0.0)
 	else:
-	    yerrh.append(1-fitResult.Eval(i))
+          yerrl.append(err[i-1])
+        if (fitResult.Eval(i) + err[i-1] < 1):
+	  yerrh.append(err[i-1])
+	elif(math.isnan(err[i-1])):
+          yerrh.append(0.0)
+        else:
+	  yerrh.append(1-fitResult.Eval(i))
         ymin.append(fitResult.Eval(i) - yerrl[i-min])
         ymax.append(fitResult.Eval(i) + yerrh[i-min])
 

@@ -37,7 +37,8 @@ private:
   METSelection fMETSelection;
   Count cTopCleaningCounter;
   Count cTopTaggingSFCounter;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
+  HplusSelection fHplusSelection;
   // FatJetSelection fFatJetSelection;
   Count cSelected;
     
@@ -65,7 +66,8 @@ Hplus2tbAnalysis::Hplus2tbAnalysis(const ParameterSet& config, const TH1* skimCo
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter
     cTopCleaningCounter(fEventCounter.addCounter("top cleaning")),
     cTopTaggingSFCounter(fEventCounter.addCounter("top-tag SF")),
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fHplusSelection(config.getParameter<ParameterSet>("HplusSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events"))
 { }
@@ -86,6 +88,7 @@ void Hplus2tbAnalysis::book(TDirectory *dir) {
   fBJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
   fTopSelection.bookHistograms(dir);
+  fHplusSelection.bookHistograms(dir);
   // fFatJetSelection.bookHistograms(dir);
 
   // Book non-common histograms
@@ -117,8 +120,7 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
   int nVertices = fEvent.vertexInfo().value();
   fCommonPlots.setNvertices(nVertices);
   fCommonPlots.fillControlPlotsAfterTrigger(fEvent);
-
-
+  
   //================================================================================================   
   // 2) MET filters (to remove events with spurious sources of fake MET)
   //================================================================================================   
@@ -189,7 +191,7 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
     }
   cBTaggingSFCounter.increment();
   int isGenuineB = bjetData.isGenuineB();
-
+  if (0) std::cout<<isGenuineB<<std::endl;
 
   //================================================================================================
   // - MET selection
@@ -202,22 +204,40 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
   //================================================================================================
   // 10) Top selection
   //================================================================================================
-  if (0) std::cout << "=== Top (BDT) selection" << std::endl;
-  const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
-  if (!topData.passedAnyTwoTopsAndFreeB()) return;
-  if (topData.getAllCleanedTopsSize() != 2) return;
+  if (0) std::cout << "=== Top selection" << std::endl;
+  const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
+
+  if (fEvent.isMC()) 
+    {
+      fEventWeight.multiplyWeight(topData.getTopTaggingScaleFactorEventWeight());
+    }
+
+  if (0) std::cout << "=== Hplus2tb selection" << std::endl;
+  //const HplusSelectionNN::Data hplusData = fHplusSelection.analyze(fEvent, jetData, bjetData, topData)
+  const HplusSelection::Data hplusData = fHplusSelection.analyze(fEvent, jetData, bjetData, topData);
+  
+  if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
+  if (hplusData.getAllCleanedTopsSize() != 2) return; 
   cTopCleaningCounter.increment();
 
   // Apply top-tag SF
   if (fEvent.isMC()) 
     {
-      fEventWeight.multiplyWeight(topData.getTopTaggingScaleFactorEventWeight());
+      if (topData.getTopTaggingScaleFactorEventWeight() != hplusData.getTopTaggingScaleFactorEventWeight())
+   	{
+	  // std::cout<<"Hplus2tbAnalysis::Update top-tagging SF"<<std::endl;
+	  // std::cout<<"top: "<<topData.getTopTaggingScaleFactorEventWeight()<<std::endl;
+	  // std::cout<<"hplus: "<<hplusData.getTopTaggingScaleFactorEventWeight()<<std::endl;
+   	  fEventWeight.multiplyWeight(1./topData.getTopTaggingScaleFactorEventWeight());
+   	  fEventWeight.multiplyWeight(hplusData.getTopTaggingScaleFactorEventWeight());
+   	}
     }
+
   cTopTaggingSFCounter.increment();
 
-  // Fill histos after StandardSelections: Require any two tops with BDT > -1.0 and presence of free b-jet (not taken up by any of the two best (in MVA) tops)
-  fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, METData, QuarkGluonLikelihoodRatio::Data(), topData, bjetData.isGenuineB());
-  if (!topData.passedSelection()) return;  
+  // Fill histos after StandardSelections: Require any two tops with MVA > -1.0 and presence of free b-jet (not taken up by any of the two best (in MVA) tops)
+  //fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, bjetData, METData, topData);
+  if (!hplusData.passedSelection()) return;  
   // std::cout << "\nentry = " << entry << ", topData.getMVAmax1() = " << topData.getMVAmax1() << ", topData.getMVAmax2() = " << topData.getMVAmax2() << ", free-b pT = " << topData.getTetrajetBJet().pt() << std::endl;
 
   //================================================================================================
@@ -227,8 +247,9 @@ void Hplus2tbAnalysis::process(Long64_t entry) {
   cSelected.increment();
 
   // Fill histos after AllSelections: (After top-selections and top-tag SF)
-  fCommonPlots.fillControlPlotsAfterAllSelections(fEvent, isGenuineB);
-  fEventSaver.save();
+  //fCommonPlots.fillControlPlotsAfterAllSelections(fEvent);
 
+  fEventSaver.save();
+  
   return;
 }

@@ -755,7 +755,12 @@ def WalkEOSDir(taskName, pathOnEOS, opts): #fixme: bad code
         pathOnEOS = WalkEOSDir(taskName, pathOnEOS + "/" + subDir, opts)
     else:
         rootFiles = []
-        for d in dirContents:
+        for i, d in enumerate(dirContents, 1):
+            Verbose("%d) %s"  % (i, d), i==1)
+            if "_ext" in d and "_ext" not in taskName: #dirty fix - 20 June 2019
+                msg = "%d) %s for task %s. BREAK"  % (i, d, taskName)
+                Verbose(ErrorStyle() + msg + NormalStyle(), False)
+                break
             subDir = d 
             if "crab_"+taskName in subDir:
                 pathOnEOS = WalkEOSDir(taskName, pathOnEOS + "/" + subDir, opts)

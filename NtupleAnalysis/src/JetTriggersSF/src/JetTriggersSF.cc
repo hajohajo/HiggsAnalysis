@@ -27,7 +27,7 @@ public:
     
 private:
   // Input parameters
-  const DirectionalCut<double> cfg_PrelimTopMVACut;
+  //const DirectionalCut<double> cfg_PrelimTopMVACut;
   
   // Common plots
   CommonPlots fCommonPlots;
@@ -45,7 +45,7 @@ private:
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
   QuarkGluonLikelihoodRatio fQGLRSelection;
-  TopSelectionBDT fTopSelection;
+  TopSelectionMVA fTopSelection;
   FatJetSelection fFatJetSelection;
   Count cSelected;
   Count cTrigger_1BTag;
@@ -204,7 +204,7 @@ REGISTER_SELECTOR(JetTriggersSF);
 
 JetTriggersSF::JetTriggersSF(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    cfg_PrelimTopMVACut(config, "FakeBMeasurement.minTopMVACut"),
+    //cfg_PrelimTopMVACut(config, "FakeBMeasurement.minTopMVACut"),
     fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper), 
     cAllEvents(fEventCounter.addCounter("all events")),
     cControlTrigger(fEventCounter.addCounter("passed cntrl trg")),
@@ -218,7 +218,7 @@ JetTriggersSF::JetTriggersSF(const ParameterSet& config, const TH1* skimCounters
     cBTaggingSFCounter(fEventCounter.addCounter("b tag SF")),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter 
     fQGLRSelection(config.getParameter<ParameterSet>("QGLRSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fTopSelection(config.getParameter<ParameterSet>("TopSelectionBDT"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events")),
     cTrigger_1BTag(fEventCounter.addCounter("passed sig 1BTag")),
