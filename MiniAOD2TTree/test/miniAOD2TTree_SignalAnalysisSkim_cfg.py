@@ -41,7 +41,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, cms.string(dataVersion.getGlobalTag()), '')
 process.GlobalTag = GlobalTag(process.GlobalTag, str(dataVersion.getGlobalTag()), '')
-print "GlobalTag="+dataVersion.getGlobalTag()
+print("GlobalTag="+dataVersion.getGlobalTag())
 
 
 process.load("HiggsAnalysis/MiniAOD2TTree/PUInfo_cfi")
