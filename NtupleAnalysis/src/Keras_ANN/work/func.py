@@ -7,6 +7,12 @@ import math
 import array
 import json
 
+from sklearn.utils.class_weight import compute_sample_weight
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from sklearn.externals import joblib
+
 #================================================================================================   
 # Function definition
 #================================================================================================   
@@ -30,6 +36,41 @@ def Verbose(msg, printHeader=False, verbose=False):
         print "\t", msg
     return
    
+def GetOriginalDataFrame(scaler, df, inputList):
+    '''
+    https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler.inverse_transform
+    https://machinelearningmastery.com/normalize-standardize-time-series-data-python/
+    '''
+    df_original = df.copy()
+    features    = df_original[inputList]
+    features    = scaler.inverse_transform(features.values)
+    df_original[inputList] = features
+    Verbose("Before:\n%s" % (df["TrijetMass"]), True)
+    Verbose("After:\n%s" % (df_original["TrijetMass"]), True)
+    return df_original
+
+
+def GetStandardisedDataFrame(df, inputList):
+    '''
+    Standardization of a dataset is a common requirement for many machine learning estimators: they might behave badly if the individual features do not
+    more or less look like standard normally distributed data (e.g. Gaussian with 0 mean and unit variance).
+    https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
+    N.B: When normalizing the input one must remember to additionally save the parameters for when you'll need them in the deployed network version to scale the inputs there as well!
+         This is crucial since the network trained and learned in separating "standardised" input variables!
+         Excellent example her ("Why to normalise?"): https://stackoverflow.com/questions/48284427/why-should-we-normalize-data-for-deep-learning-in-keras
+
+    Snippet of code taken from:
+    https://stackoverflow.com/questions/38420847/apply-standardscaler-to-parts-of-a-data-set
+    '''    
+    df_scaled = df.copy()
+    features  = df_scaled[inputList]
+    scaler    = StandardScaler(copy=True, with_mean=True, with_std=True)
+    features  = scaler.fit_transform(features.values)
+    df_scaled[inputList] = features
+    Verbose("Before:\n%s" % (df["TrijetMass"]), True)
+    Verbose("After:\n%s" % (df_scaled["TrijetMass"]), True)
+    return scaler, df_scaled
+
 def convertHistoToGaph(histo, verbose=False):
 
     # Lists for values
@@ -199,7 +240,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
     resultsDict = {}
     resultsDict["signal"]     = signal
     resultsDict["background"] = bkg
-
+    
     normalizeToOne = False
     if "normalizeToOne" in kwargs:
         normalizeToOne = kwargs["normalizeToOne"]
@@ -229,7 +270,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
     if "yTitle" in kwargs:
         yTitle = kwargs["yTitle"]
     elif "output" in saveName.lower():
-        xTitle = "Entries"
+        xTitle = "DNN output" #"Entries"
     elif "efficiency" in saveName.lower():
         xTitle = "Efficiency"
     elif "significance" in saveName.lower():
@@ -400,7 +441,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
 
     # For-loop: All histograms
     for i, h in enumerate(hList, 0):
-        h.SetMinimum(yMin*0.85)        
+        #h.SetMinimum(yMin*0.85)        
         h.SetMaximum(yMax*1.15)
 
         h.GetXaxis().SetTitle(xTitle)
@@ -464,26 +505,26 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
 
     if "yTitle" in kwargs:
         yTitle = kwargs["yTitle"]
-    elif "output" in saveName.lower():
-        xTitle = "Entries"
+    #elif "output" in saveName.lower():
+        #xTitle = "Entries"
     elif "efficiency" in saveName.lower():
         xTitle = "Efficiency"
     elif "significance" in saveName.lower():
         xTitle = "Significance"
     else:
         pass    
-
+    
     if "xMin" in kwargs:
         xMin = kwargs['xMin']
     if "xMax" in kwargs:
         xMax = kwargs['xMax']
     if "nBins" in kwargs:
-
-        xBins = kwargs['nBins']
+        nBins = kwargs['nBins']
     
     # For-loop: 
     for i, key in enumerate(resultsDict.keys(), 0):
 
+        # print "nBins = %d, xMin = %.2f, xMax = %.2f" % (nBins, xMin, xMax)
         h = ROOT.TH1F(key, '', nBins, xMin, xMax)
         for j, x in enumerate(resultsDict[key], 0):
             

@@ -57,26 +57,13 @@ USAGE:
 
 
 EXAMPLES:
-./sequential.py --test --activation relu -s png,pdf,root,C
-./sequential.py --test --activation relu,relu,sigmoid --neurons 36,19,1 -s pdf
-./sequential.py --activation relu,relu,relu,relu,sigmoid --neurons 36,35,19,19,1 --epochs 10000 --batchSize 50000 -s pdf
-./sequential.py --activation relu,relu,sigmoid --neurons 36,19,1 --epochs 100 --batchSize 500 -s pdf --saveDir Test
 ./sequential.py --activation relu,relu,sigmoid --neurons 36,19,1 --epochs 10000 --batchSize 50000 -s pdf --log
-./sequential.py --activation relu,relu,sigmoid --neurons 19,190,1 --epochs 50 --batchSize 500 -s pdf --log --saveDir ~/public/html/Test
 ./sequential.py --activation relu,relu,sigmoid --neurons 19,190,1 --epochs 50 --batchSize 500 -s pdf --saveDir ~/public/html/Test
-./sequential.py --activation relu,sigmoid --neurons 100,1 --epochs 100 --batchSize 2000 -s pdf --entrystop 600000
-./sequential.py --activation relu,sigmoid --neurons 100,1 --epochs 100 --batchSize 2000 -s pdf --entrystop 600000 --decorrelate  
-./sequential.py --activation relu,sigmoid --neurons 100,1 --epochs 100 --batchSize 2000 -s pdf --entrystop 600000 --standardise
-./sequential.py --activation relu,sigmoid --neurons 100,1 --epochs 100 --batchSize 2000 -s pdf --entrystop 600000 --decorrelate --standardise
-
+./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --inputVariables "TrijetPtDR,TrijetDijetPtDR,TrijetBjetMass,TrijetLdgJetBDisc,TrijetSubldgJetBDisc,TrijetBJetLdgJetMass,TrijetBJetSubldgJetMass,TrijetMass,TrijetDijetMass,TrijetBJetBDisc,TrijetSoftDrop_n2,TrijetLdgJetCvsL,TrijetSubldgJetCvsL,TrijetLdgJetPtD,TrijetSubldgJetPtD,TrijetLdgJetAxis2,TrijetSubldgJetAxis2,TrijetLdgJetMult,TrijetSubldgJetMult"
 
 LAST USED:
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --decorrelate  
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --standardise
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --decorrelate --standardise
+./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 50000 -s pdf --entrystop 600000 --standardise --scaleBack
 
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --inputVariables "TrijetPtDR,TrijetDijetPtDR,TrijetBjetMass,TrijetLdgJetBDisc,TrijetSubldgJetBDisc,TrijetBJetLdgJetMass,TrijetBJetSubldgJetMass,TrijetMass,TrijetDijetMass,TrijetBJetBDisc,TrijetSoftDrop_n2,TrijetLdgJetCvsL,TrijetSubldgJetCvsL,TrijetLdgJetPtD,TrijetSubldgJetPtD,TrijetLdgJetAxis2,TrijetSubldgJetAxis2,TrijetLdgJetMult,TrijetSubldgJetMult"
 
 GITHUB:
 https://github.com/skonstantinou/Keras_ANN/
@@ -87,6 +74,7 @@ URL:
 https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden-layers-and-nodes-in-a-feedforward-neural-netw <----- Really good
 https://towardsdatascience.com/activation-functions-neural-networks-1cbd9f8d91d6
 https://theffork.com/activation-functions-in-neural-networks/?source=post_page-----4dfb9c7ce9c9----------------------
+http://www.faqs.org/faqs/ai-faq/neural-nets/part2/ <----- Really good
 https://github.com/Kulbear/deep-learning-nano-foundation/wiki/ReLU-and-Softmax-Activation-Functions
 https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html
 https://gombru.github.io/2018/05/23/cross_entropy_loss/
@@ -187,6 +175,65 @@ def Verbose(msg, printHeader=True, verbose=False):
     Print(msg, printHeader)
     return
 
+def PrintNetworkSummary(opts):
+    table    = []
+    msgAlign = "{:^10} {:^10} {:>12} {:>10}"
+    title    =  msgAlign.format("Layer #", "Neurons", "Activation", "Type")
+    hLine    = "="*len(title)
+    table.append(hLine)
+    table.append(title)
+    table.append(hLine)
+    for i, n in enumerate(opts.neurons, 0): 
+        layerType = "unknown"
+        if i == 0:
+            layerType = "input"
+        elif i+1 == len(opts.neurons):
+            layerType = "output"
+        else:
+            layerType = "hidden"
+        table.append( msgAlign.format(i+1, opts.neurons[i], opts.activation[i], layerType) )
+    table.append("")
+    for r in table:
+        Print(r, False)
+    return
+
+def GetDataFramesRowsColumns(df_sig, df_bkg):
+    nEntries_sig, nColumns_sig = GetDataFrameRowsColumns(df_sig)
+    nEntries_bkg, nColumns_bkg = GetDataFrameRowsColumns(df_bkg)
+
+    if nColumns_sig != nColumns_bkg:
+        msg = "The number of columns for signal (%d variables) does not match the correspondigng number for background (%d variables)" % (nColumns_sig, nColumns_bkg)
+        raise Exception(es + msg + ns)
+    else:
+        msg  = "The signal has a total %s%d entries%s for each variable." % (ts, nEntries_sig, ns)
+        msg += "The background has %s %d entries%s for each variable. " % (hs, nEntries_bkg, ns)
+        msg += "(%d variables in total)" % (nColumns_sig)
+        Verbose(msg, True)
+
+    return nEntries_sig, nColumns_sig, nEntries_bkg, nColumns_bkg
+
+def GetDataFrameRowsColumns(df):
+    '''
+    https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html
+    '''
+
+    # Get the index (row labels) of the DataFrame object (df).  
+    rows = df.index.values
+    Verbose("Printing indices (i.e. rows) of DataFrame:\n%s" % (rows), True)
+
+    # Get the data types in the DataFrame
+    dtypes = df.dtypes
+    Verbose("Printing dtypes of DataFrame:\n%s" % (dtypes), True)
+
+    # Get the columns (labels) of the DataFrame.
+    columns = df.columns.values 
+    Verbose("Printing column labels of DataFrame:\n%s" % (columns), True)
+
+    nRows    = rows.size    #len(rows)     # NOTE: This is the number of Entries for each TBranch (variable) in the TTree
+    nColumns = columns.size #len(columns)  # NOTE: This is the number of TBranches (i.e. variables) in the TTree
+    Verbose("DataFrame has %s%d rows%s and %s%d columns%s" % (ts, nRows, ns, hs, nColumns, ns), True)
+    return nRows, nColumns
+
 def split_list(a_list, firstHalf=True):
     half = len(a_list)//2
     if firstHalf:
@@ -196,8 +243,11 @@ def split_list(a_list, firstHalf=True):
 
 def GetModelWeightsAndBiases(inputList, neuronsList):
     '''
-    Customly-defined function to estimate the model
-    parameters (total, weights, biases)
+    https://keras.io/models/about-keras-models/
+
+    returns a dictionary containing the configuration of the model. 
+    The model can be reinstantiated from its config via:
+    model = Model.from_config(config)
     '''
     nParamsT  = 0
     nBiasT    = 0 
@@ -217,7 +267,7 @@ def GetModelWeightsAndBiases(inputList, neuronsList):
         nWeightsT += nWeights
         nBiasT += nBias
     return nParamsT, nWeightsT, nBiasT
-
+        
 def GetModelParams(model):
     '''
     https://stackoverflow.com/questions/45046525/how-can-i-get-the-number-of-trainable-parameters-of-a-model-in-keras
@@ -231,13 +281,26 @@ def GetModelParams(model):
     total_count = trainable_count + non_trainable_count
     return total_count, trainable_count, non_trainable_count
 
-def eval(model, x_test, y_test, opts):
+def GetModelConfiguration(myModel, verbose):
+    '''
+    NOTE: For some older releases of Keras the
+    Model.get_config() method returns a list instead of a dictionary.
+    This is fixed in newer releases. See details here:
+    https://github.com/keras-team/keras/pull/11133
+    '''
+    
+    config = myModel.get_config()
+    for i, c in enumerate(config, 1):
+        Verbose( "%d) %s " % (i, c), True)
+    return config
+
+def eval(myModel, x_test, y_test, opts):
     '''
     https://keras.io/models/model/#evaluate
 
     NOTE: computation is done in batches
     '''
-    metrics = model.evaluate(
+    metrics = myModel.evaluate(
         x=x_test,
         y=y_test,
         batch_size=opts.batchSize,
@@ -246,23 +309,34 @@ def eval(model, x_test, y_test, opts):
     )
     print "*"*100
     print ('Loss: {:.3f}, Accuracy: {:.3f}'.format(metrics[0], metrics[1]))
-    print "model.metrics_names = ", model.metrics_names
+    print "myModel.metrics_names = ", myModel.metrics_names
     print "len(metrics) = ", len(metrics)
     print 
     print "*"*100
     return
 
-def GetKwargs(var):
+def GetKwargs(var, standardise=False):
 
     kwargs  = {
         "normalizeToOne": True,
-        "xTitle" : "DNN Output",
+        "xTitle" : "DNN output",
         "yTitle" : "a.u.",
-        "xMin"   : 0.0,
-        "xMax"   : 1.0,
-        "nBins"  : 50,
+        "xMin"   :  0.0,
+        "xMax"   : +1.0,
+        "nBins"  : 200,
         "log"    : True,
         }
+
+    if "output" in var.lower() or var.lower() == "output":
+        kwargs["normalizeToOne"] = False
+        kwargs["nBins"]  = 50
+        kwargs["xMin"]   =  0.0
+        kwargs["xMax"]   = +1.0
+        kwargs["yMin"]   = +1e0
+        kwargs["xTitle"] = "DNN output"
+        kwargs["yTitle"] = "Entries"
+        kwargs["log"]    = True
+        return kwargs
 
     if var == "loss":
         kwargs["normalizeToOne"] = False
@@ -295,7 +369,7 @@ def GetKwargs(var):
     if var == "TrijetDijetPtDR":
         kwargs["xMin"]   =  0.0
         kwargs["xMax"]   = 800.0
-        kwargs["nBins"]  =  80
+        kwargs["nBins"]  = 160
         kwargs["xTitle"] = "p_{T}#DeltaR_{W}"
         kwargs["yMin"]   = 1e-3
         #kwargs["yTitle"] = "a.u. / %0.f"
@@ -303,7 +377,7 @@ def GetKwargs(var):
     if var == "TrijetBjetMass":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   = 100.0
-        kwargs["nBins"]  = 100
+        kwargs["nBins"]  = 200
         kwargs["xTitle"] = "m_{b} [GeV]"
         #kwargs["yTitle"] = "a.u. / %0.f GeV"
 
@@ -317,7 +391,7 @@ def GetKwargs(var):
     if var == "TrijetSubldgJetBDisc":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   =   1.0
-        kwargs["nBins"]  = 100
+        kwargs["nBins"]  = 200
         kwargs["xTitle"] = "b-tag discr."
         #kwargs["yTitle"] = "a.u. / %0.2f"
 
@@ -339,7 +413,7 @@ def GetKwargs(var):
     if var == "TrijetMass":
         kwargs["xMin"]   =    0.0
         kwargs["xMax"]   = 1000.0
-        kwargs["nBins"]  =  200
+        kwargs["nBins"]  =  500
         kwargs["xTitle"] = "m_{t} [GeV]"
         kwargs["yMin"]   = 1e-3
         #kwargs["yTitle"] = "a.u. / %0.0f GeV"
@@ -347,7 +421,7 @@ def GetKwargs(var):
     if var == "TrijetDijetMass":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   = 500.0
-        kwargs["nBins"]  = 100
+        kwargs["nBins"]  = 250
         kwargs["xTitle"] = "m_{W} [GeV]"
         kwargs["yMin"]   = 1e-3
         #kwargs["yTitle"] = "a.u. / %0.0f GeV"
@@ -355,14 +429,14 @@ def GetKwargs(var):
     if var == "TrijetBJetBDisc":
         kwargs["xMin"]   =  0.0
         kwargs["xMax"]   =  1.0
-        kwargs["nBins"]  = 100
+        kwargs["nBins"]  = 200
         kwargs["xTitle"] = "b-tag discr."
         #kwargs["yTitle"] = "a.u. / %0.2f"
 
     if var == "TrijetSoftDrop_n2":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   =   2.0
-        kwargs["nBins"]  = 200
+        kwargs["nBins"]  = 400
         kwargs["xTitle"] = "soft-drop n_{2}"
         kwargs["yMin"]   = 1e-3
         #kwargs["yTitle"] = "a.u. / %0.2f"
@@ -370,7 +444,7 @@ def GetKwargs(var):
     if var == "TrijetLdgJetCvsL":
         kwargs["xMin"]   =  -1.0
         kwargs["xMax"]   =  +1.0
-        kwargs["nBins"]  = 200*2
+        kwargs["nBins"]  = 400
         kwargs["xTitle"] = "CvsL discr."
         kwargs["yMin"]   = 1e-3
         kwargs["yMax"]   = 1e-1
@@ -379,7 +453,7 @@ def GetKwargs(var):
     if var == "TrijetSubldgJetCvsL":
         kwargs["xMin"]   =  -1.0
         kwargs["xMax"]   =  +1.0
-        kwargs["nBins"]  = 200*2
+        kwargs["nBins"]  = 400
         kwargs["xTitle"] = "CvsL discr."
         kwargs["yMin"]   = 1e-3
         kwargs["yMax"]   = 1e-1
@@ -388,46 +462,50 @@ def GetKwargs(var):
     if var == "TrijetLdgJetPtD":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   =   1.0
-        kwargs["nBins"]  = 100
+        kwargs["nBins"]  = 200
         kwargs["xTitle"] = "p_{T}D"
         #kwargs["yTitle"] = "a.u. / %0.2f"
 
     if var == "TrijetSubldgJetPtD":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   =   1.0
-        kwargs["nBins"]  = 100
+        kwargs["nBins"]  = 200
         kwargs["xTitle"] = "p_{T}D"
         #kwargs["yTitle"] = "a.u. / %0.2f"
 
     if var == "TrijetLdgJetAxis2":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   =   0.16
-        kwargs["nBins"]  = 160
+        kwargs["nBins"]  = 320
         kwargs["xTitle"] = "axis2"
         #kwargs["yTitle"] = "a.u. / %0.3f"
 
     if var == "TrijetSubldgJetAxis2":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   =   0.16
-        kwargs["nBins"]  = 160
+        kwargs["nBins"]  = 320
         kwargs["xTitle"] = "axis2"
         #kwargs["yTitle"] = "a.u. / %0.3f"
 
     if var == "TrijetLdgJetMult":
         kwargs["xMin"]  =  0.0
         kwargs["xMax"]   = 40.0
-        kwargs["nBins"]  = 40
+        kwargs["nBins"]  = 80
         kwargs["xTitle"] = "constituent multiplicity"
         #kwargs["yTitle"] = "a.u. / %0.0f"
 
     if var == "TrijetSubldgJetMult":
         kwargs["xMin"]   =  0.0
         kwargs["xMax"]   = 40.0
-        kwargs["nBins"]  = 40
+        kwargs["nBins"]  = 80
         kwargs["xTitle"] = "constituent multiplicity"
         #kwargs["yTitle@"] = "a.u. / %0.0f"
 
-    kwargs["nBins"]  *= 2
+    if standardise:
+        kwargs["xMin"]  = -5.0
+        kwargs["xMax"]  = +5.0
+        kwargs["nBins"] = 1000
+
     return kwargs
 
 
@@ -451,8 +529,21 @@ def GetTime(tStart):
     secs    = mins[1]               # seconds
     return days, hours, mins, secs
 
-def printDataset(myDset):
-    Verbose("%sPrinting 1 instance of the Numpy representation of the DataFrame%s:" % (ns, es), True)
+def SaveModelParameters(myModel, opts):
+    nParams = myModel.count_params()
+    msg = "Model has a total of %s%d%s parameters (neuron weights and biases) " % (hs, nParams, ns)
+    Print(msg, True)
+    total_count, trainable_count, non_trainable_count  = GetModelParams(myModel)
+    nParams, nWeights, nBias = GetModelWeightsAndBiases(opts.inputList, opts.neurons)
+    opts.modelParams = total_count
+    opts.modelParamsTrain = trainable_count
+    opts.modelParamsNonTrainable = non_trainable_count
+    opts.modelWeights = nWeights
+    opts.modelBiases  = nBias
+    return
+
+def PrintDataset(myDset):
+    Verbose("%sPrinting 1 instance of the Numpy representation of the DataFrame:%s" % (ns, es), True)
 
     # For-loop: All TBranch entries
     for vList in myDset:
@@ -460,6 +551,22 @@ def printDataset(myDset):
         for v in vList:
             Verbose(v, False)
         break
+    Verbose("%s" % (ns), True)
+    return
+
+def checkNumberOfLayers(opts):
+
+    opts.nLayers       = len(opts.neurons)+1
+    opts.nHiddenLayers = len(opts.neurons)-1
+
+    if opts.nHiddenLayers < 1:
+        msg = "The NN has %d hidden layers. It must have at least 1 hidden layer" % (opts.nHiddenLayers)
+        raise Exception(es + msg + ns)    
+    else:
+        msg = "The NN has %s%d hidden layers%s (in addition to input and output layers)." % (hs, opts.nHiddenLayers, ns)
+        Verbose(msg, True) 
+        msg = "[NOTE: One hidden layer is sufficient for the large majority of problems. In general, the optimal size of the hidden layer is usually between the size of the input and size of the output layers.]"
+        Verbose (msg, False)         
     return
 
 def checkNeuronsPerLayer(nsignal, opts):
@@ -471,23 +578,16 @@ def checkNeuronsPerLayer(nsignal, opts):
         # Skip first (input layer) and last (output) layers (i.e. do only hidden layers)
         if i==0 or i>=len(opts.neurons)-1:
             continue
-        
         # Determine in/out neurons and compare to min-max range allowed
-        #nIn  = opts.neurons[-1] #?
-        #nOut = opts.neurons[i]  #?
-        nN  = opts.neurons[i]
+        nN   = opts.neurons[i]
         nIn  = opts.neurons[0]
         nOut = opts.neurons[-1]
         dof  = (2*nsignal) * (nIn + nOut)     # 2*nsignal = number of samples in training data set
         nMax = (2*nsignal) / (2*(nIn + nOut))
         nMin = (2*nsignal) / (10*(nIn + nOut))
-        #if nOut > nMax or nOut < nMin:
-        #    msg = "The number of OUT neurons for layer #%d (IN=%d, OUT=%d) is not within the recommended range(%d-%d). This may result in over-fitting" % (i, nIn, nOut, nMin, nMax)
-        #    Print(hs + msg + ns, True)
         if nN > nIn or nN < nOut:
             msg = "The number of OUT neurons for layer #%d (%d neurons) is not within the recommended range(%d <= N <= %d). This may result in over-fitting" % (i, nN, nIn, nOut)
             Print(hs + msg + ns, True)
-
     return
 
 def writeCfgFile(opts):
@@ -556,13 +656,14 @@ def main(opts):
     style.setGridY(opts.gridY)
 
     # Open the ROOT file
+    Verbose("Opening ROOT file %s" %  (opts.rootFileName), True)
     ROOT.TFile.Open(opts.rootFileName)
 
     # Setting the seed for numpy-generated random numbers
     numpy.random.seed(opts.rndSeed)
-
     # Setting the seed for python random numbers
     rn.seed(opts.rndSeed)
+
 
     # Determine the number of threads running
     p = psutil.Process(os.getpid())
@@ -575,47 +676,47 @@ def main(opts):
     tf.set_random_seed(opts.rndSeed)
 
     # Open the signal and background TTrees with uproot (uproot allows one to read ROOT data, in python, without using ROOT)
-    Print("Opening the signal and background TTrees with uproot using ROOT file %s" % (ts + opts.rootFileName + ns), True)
+    Verbose("Opening the signal and background TTrees with uproot using ROOT file %s" % (ts + opts.rootFileName + ns), True)
     signal     = uproot.open(opts.rootFileName)["treeS"]
-    background = uproot.open(opts.rootFileName)["treeB"]
+    background = uproot.open(opts.rootFileName)["treeB"]    
 
     # Construct signal and background dataframes using a list of TBranches (a Dataframe is a two dimensional structure representing data in python)
     # https://uproot.readthedocs.io/en/latest/ttree-handling.html#id7
     nInputs   = len(opts.inputList)
     Verbose("Constucting dataframes for signal and background with %d input variables:\n\t%s%s%s" % (nInputs, ss, "\n\t".join(opts.inputList), ns), True)
-    df_signal = signal.pandas.df(opts.inputList, entrystop=opts.entrystop) # call an array-fetching method to fill a Pandas DataFrame.
-    df_bkg    = background.pandas.df(opts.inputList, entrystop=opts.entrystop)
-
-    # Get the index (row labels) of the DataFrame.
-    nsignal = len(df_signal.index)    
-    nbkg    = len(df_bkg.index)
-    Verbose("Signal has %s%d%s row labels. Background has %s%d%s row labels" % (ss, nsignal, ns, es, nbkg, ns), True)
-
-    # Apply rule-of-thumb to prevent over-fitting
-    checkNeuronsPerLayer(nsignal, opts)
-    
-    # Sanity check
-    columns = list(df_signal.columns.values)
-    Verbose("The signal columns are :\n\t%s%s%s" % (ss, "\n\t".join(columns), ns), True)    
-
-    # Sanity check:
+    df_sig = signal.pandas.df(opts.inputList, entrystop=opts.entrystop) # call an array-fetching method to fill a Pandas DataFrame.
+    df_bkg = background.pandas.df(opts.inputList, entrystop=opts.entrystop)
+    # For testing:
     if 0:
-        Print(df_signal['TrijetMass'], True)
-        Print(df_signal['TrijetMass'].values, True)
+        Print("Printing the signal DaaFrame: %s" % df_sig, True)
+        print
+        Print("Printing the background DataFrame: %s" % df_bkg, True)
+        print
+        Print(df_sig['TrijetMass'], True)
+        Print(df_sig['TrijetMass'].values, True)
+
+    # Get the number of entries and columns of the DataFrames. Perform sanity checks
+    nEntries_sig, nColumns_sig, nEntries_bkg, nColumns_bkg = GetDataFramesRowsColumns(df_sig, df_bkg)
+
+    # Entries will be limited to the number of entries available from the signal sample (much smaller than bkg sample)
+    nEntries = nEntries_sig
+
+    # Apply rule-of-thumb to prevent over-fitting!
+    checkNeuronsPerLayer(nEntries, opts)
     
     # Optional Numpy array of weights for the training samples, used for weighting the loss function (during training only). 
     sampleWeights = None
     if opts.decorrelate:
         msg = "De-correlating the mass by applying weights"
-        Print(ts + msg + ns, True)
+        Print(cs + msg + ns, True)
         # Return evenly spaced numbers over a specified interval.
         minPt       =    0.0
         maxPt       = 1000.0
         massBinning = numpy.linspace(minPt, maxPt, 500)
-        massRatio   = [s/b for s, b in zip(df_signal['TrijetMass'].values, df_bkg['TrijetMass'].values)] # unused. keep for reference
+        massRatio   = [s/b for s, b in zip(df_sig['TrijetMass'].values, df_bkg['TrijetMass'].values)] # unused. keep for reference
         # Use Mass as the variable to be decorrelated
         if 1:
-            #massEvents  = df_signal['TrijetMass'].values + df_bkg['TrijetMass'].values # WRONG! It adds the two arrays! does not extend! Use concatenate instead!
+            #massEvents  = df_sig['TrijetMass'].values + df_bkg['TrijetMass'].values # WRONG! It adds the two arrays! does not extend! Use concatenate instead!
             massEvents  = df_bkg['TrijetMass'].values
         else:
             massEvents  = split_list(df_bkg['TrijetMass'].values)
@@ -630,50 +731,40 @@ def main(opts):
         if 1:
             sampleWeights  = compute_sample_weight('balanced', digitizedMass) # Flatten-out both signal and bkg mass
         else:
-            signalWeights = numpy.ones(len( split_list(df_signal['TrijetMass'].values)))
+            signalWeights = numpy.ones(len( split_list(df_sig['TrijetMass'].values)))
             bkgWeights    = compute_sample_weight('balanced', digitizedMass) # Flatten-out both signal and bkg mass
             sampleWeights = numpy.concatenate( (signalWeights, bkgWeights), axis=0)
 
         # Flatten out only the bkg (and not the signal)
         #sampleWeights[isSignal==0]  = compute_sample_weight('balanced', digitizedMass[isSignal==0])
 
-    # Get a Numpy representation of the DataFrames for signal and background datasets
-    Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
-    dset_signal = df_signal.values
-    dset_bkg    = df_bkg.values
-    # Alternative fix in case of "memory error"
-    if 0: 
-        df_bkg   = df_bkg.iloc[0:nsignal] 
-        dset_bkg = df_bkg.values
+    # Assigning new column in our DataFrames DataFrames with label "signal". It takes value of "1" for signal and "0" for background.
+    # Total number of columns is now increased by 1 (19 + 1 = 20)
+    Verbose("Assigning a new column to our signal and bacbkround DataFrame labelled \"signal\" that will designate whether the entry is signal or not. Once this is done we can merge the DataFrames into a single oneOB", True)
+    df_sig = df_sig.assign(signal=1)
+    df_bkg = df_bkg.assign(signal=0)
+    Verbose("Printing tabular data for signal:\n%s%s%s"     % (ss, df_sig,ns), True)
+    Verbose("Printing tabular data for background:\n%s%s%s" % (hs, df_bkg,ns), True)
 
-    # Print datasets?
-    printDataset(dset_signal)
-    printDataset(dset_bkg)
-
-    # Construct the pandas DataFrames (2D size-mutable tabular data structure with labeled axes i.e. rows and columns)
-    Verbose("Constructing pandas DataFrames for signal and background", True)
-    ds_signal = pandas.DataFrame(data=dset_signal,columns=opts.inputList)
-    ds_bkg    = pandas.DataFrame(data=dset_bkg,columns=opts.inputList)
-
-    # Construct pandas DataFrames (2D size-mutable tabular data structure with labeled axes i.e. rows and columns)
-    Verbose("Constructing pandas DataFrames", True)
-    df_signal = df_signal.assign(signal=1)
-    df_bkg    = df_bkg.assign(signal=0)
-    Verbose("Printing tabular data for signal:\n%s%s%s" % (ss, ds_signal,ns), True)
-    Verbose("Printing tabular data for background:\n%s%s%s" % (ss, ds_bkg,ns), True)
-    
-    # Create dataframe lists
-    df_list = [df_signal, df_bkg]
-    df_all  = pandas.concat(df_list)
+    # Create a DataFrame list
+    df_all  = pandas.concat( [df_sig, df_bkg] )
+    Verbose("Printing the combined tabular data (signal first, background appended after signal):\n%s%s%s" % (ts, df_all, ns), True)
+    if opts.standardise:
+        msg  = "Standardize dataset features by removing the mean and scaling to unit variance (mean=0.0, stdDev=variance=1.0)."
+        Print(cs + msg + ns, True)    
+        scaler_sig, df_sig = func.GetStandardisedDataFrame(df_sig, opts.inputList)
+        scaler_bkg, df_bkg = func.GetStandardisedDataFrame(df_bkg, opts.inputList)
+        scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList)
 
     # Get a Numpy representation of the DataFrames for signal and background datasets (again, and AFTER assigning signal and background)
-    dset_signal = df_signal.values
-    dset_bkg    = df_bkg.values
-    dset_all    = df_all.values
+    Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
+    dset_sig = df_sig.values
+    dset_bkg = df_bkg.values
+    dset_all = df_all.values
 
     # Define keras model as a linear stack of layers. Add layers one at a time until we are happy with our network architecture.
     Verbose("Creating the sequential Keras model", True)
-    model = Sequential()
+    myModel = Sequential()
 
     # The best network structure is found through a process of trial and error experimentation. Generally, you need a network large enough to capture the structure of the problem.
     # The Dense function defines each layer - how many neurons and mathematical function to use.
@@ -687,75 +778,43 @@ def main(opts):
         Print("Adding %s, with %s%d neurons%s and activation function %s" % (ts + layer + ns, ls, n, ns, ls + opts.activation[iLayer] + ns), iLayer==0)
         if iLayer == 0:
             # Only first layer demands input_dim. For the rest it is implied.
-            model.add( Dense(opts.neurons[iLayer], input_dim = nInputs) ) #, weights = [np.zeros([692, 50]), np.zeros(50)] OR bias_initializer='zeros',  or bias_initializer=initializers.Constant(0.1)
-            model.add( Activation(opts.activation[iLayer]) )
-            # model.add( Dense(opts.neurons[iLayer], input_dim = nInputs, activation = opts.activation[iLayer]) ) # her majerty Soti requested to break this into 2 lines
+            myModel.add( Dense(opts.neurons[iLayer], input_dim = nInputs) ) #, weights = [np.zeros([692, 50]), np.zeros(50)] OR bias_initializer='zeros',  or bias_initializer=initializers.Constant(0.1)
+            myModel.add( Activation(opts.activation[iLayer]) )
+            # myModel.add( Dense(opts.neurons[iLayer], input_dim = nInputs, activation = opts.activation[iLayer]) ) # her majerty Soti requested to break this into 2 lines
         else:
             if 0: #opts.neurons[iLayer] < nInputs:
                 msg = "The number of  neurons (=%d) is less than the number of input variables (=%d). Please set the number of neurons to be at least the number of inputs!" % (opts.neurons[iLayer], nInputs)
                 raise Exception(es + msg + ns)  
-            model.add( Dense(opts.neurons[iLayer]))
-            model.add( Activation(opts.activation[iLayer]) )
-            # model.add( Dense(opts.neurons[iLayer], activation = opts.activation[iLayer]) ) 
+            myModel.add( Dense(opts.neurons[iLayer]))
+            myModel.add( Activation(opts.activation[iLayer]) )
+            # myModel.add( Dense(opts.neurons[iLayer], activation = opts.activation[iLayer]) ) 
 
-    # Print a summary representation of your model. 
+    # Print a summary representation of your model
     Print("Printing model summary:", True)
-    model.summary()
+    myModel.summary()
     
     # Get the number of parameters of the model
-    nParams = model.count_params()
-    msg = "Model has a total of %s%d%s parameters (neuron weights and biases) " % (hs, nParams, ns)
-    Print(msg, True)
-    total_count, trainable_count, non_trainable_count  = GetModelParams(model)
-    nParams, nWeights, nBias = GetModelWeightsAndBiases(opts.inputList, opts.neurons)
-    opts.modelParams = total_count
-    opts.modelParamsTrain = trainable_count
-    opts.modelParamsNonTrainable = non_trainable_count
-    opts.modelWeights = nWeights
-    opts.modelBiases  = nBias
+    SaveModelParameters(myModel, opts)
 
-    # Get a dictionary containing the configuration of the model. The model can be reinstantiated from its config via: model = Model.from_config(config)
-    if 0:
-        config = model.get_config()
-        for c in config:
-            print "c = ", c
-            print
-    
-    # Split data into input (X) and output (Y). (Note: dataset includes both signal and background sequentially)
-    # Use only 2*nsignal rows => First nSignal rows is the signal. Another (equal) nSignal rows for the bkg. 
-    # Therefore signal and bkg have exactly the same number
-    X = dset_all[:2*nsignal,0:nInputs] # rows: 0 -> 2*signal, columns: 0 -> 19
-    Y = dset_all[:2*nsignal,nInputs:]  # rows: 0 -> 2*signal, columns: 19 (isSignal = 0 or 1)
-    X_signal     = dset_signal[:nsignal, 0:nInputs]
-    X_background = dset_bkg[:nsignal, 0:nInputs]
-    Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_signal), ns, es, len(X_background), ns), True)
-
-    # Standardization of a dataset is a common requirement for many machine learning estimators: they might behave badly if the individual features do not
-    # more or less look like standard normally distributed data (e.g. Gaussian with 0 mean and unit variance).
-    # https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
-    if opts.standardise:
-        msg  = "Standardize features by removing the mean and scaling to unit variance (i.e. Transform your data such that its distribution will have a mean value 0.0 and standard deviation of 1.0). "
-        msg += "In case of multivariate data, this is done feature-wise (in other words independently for each column of the data). "
-        msg += "Given the distribution of the data, each value in the dataset will have the mean value subtracted, and then divided by the standard deviation of the whole dataset (or feature in the multivariate case)." 
-        Print(hs + msg + ns, True)    
-        scaler = StandardScaler()
-
-        # Compute the mean and std to be used for later scaling
-        #scaler.fit(X) #fixme-iro
-        #scaler.fit(X_signal)
-        #StandardScaler(copy=True, with_mean=True, with_std=True)
-        #Verbose("X_signal before standardisation: %s" % X_signal, True)
-
-        # Fit to data, then transform it by performing standardization by centering and scaling (Mean and standard deviation were previously stored with StandardScaler())
-        X_signal     = scaler.fit_transform(X_signal)
-        X_background = scaler.fit_transform(X_background)
-        Verbose("X_signal after standardisation: %s" % X_signal, True)
+    # Get a dictionary containing the configuration of the model. 
+    model_cfg = GetModelConfiguration(myModel, opts.verbose)
+        
+    # Split data into input (X) and output (Y), using an equal number for signal and background. 
+    # This is by creating the dataset with double the number of rows as is available for signal. Remember
+    # that the background entries were appended to those of the signal.
+    X     = dset_all[:2*nEntries, 0:nInputs] # rows: 0 -> 2*Entries_sig, columns: 0 -> 19 (all variables)
+    Y     = dset_all[:2*nEntries, nInputs:]  # rows: 0 -> 2*signal, everything after column 19 which is only the "signal" column (0 or 1)
+    X_sig = dset_sig[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable)
+    X_bkg = dset_bkg[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable)
+    Y_sig = dset_all[:nEntries, nInputs:]    # contains 1's (total of "nEntries" values)   - NOT USED
+    Y_bkg = dset_all[:nEntries, nInputs:]    # contains 0's (total ODof "nEntries" values) - N0T USED
+    Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_sig), ns, es, len(X_bkg), ns), True)
 
     # Plot the input variables
     if opts.plotInputs:
         Verbose("Plotting all %d input variables for signal and bacgkround" % (len(opts.inputList)), True)
         for i, var in enumerate(opts.inputList, 0):
-            func.PlotInputs(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], var, "%s/%s" % (opts.saveDir, "inputs"), opts.saveFormats)
+            func.PlotInputs(dset_sig[:, i:i+1], dset_bkg[:, i:i+1], var, "%s/%s" % (opts.saveDir, "inputs"), opts.saveFormats)
 
     # Split the datasets (X= 19 inputs, Y=output variable). Test size 0.5 means half for training half for testing
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state=opts.rndSeed, shuffle=True)
@@ -772,7 +831,7 @@ def main(opts):
     # [Loss function is used to understand how well the network is working (compare predicted label with actual label via some function)]
     # Optimizer function is related to a function used to optimise the weights
     Print("Compiling the model with the loss function %s and optimizer %s " % (ls + opts.lossFunction + ns, ts + opts.optimizer + ns), True)
-    model.compile(loss=opts.lossFunction, optimizer=opts.optimizer, metrics=['accuracy'])
+    myModel.compile(loss=opts.lossFunction, optimizer=opts.optimizer, metrics=['accuracy'])
     
     # Customise the optimiser settings?
     if 0: #opts.optimizer == "adam":  # does not work
@@ -792,16 +851,16 @@ def main(opts):
     # used to separate training into distinct phases, which is useful for logging and periodic evaluation.)
     try:
         Verbose("Number of threads before fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
-        seqModel = model.fit(X_train,
-                             Y_train,
-                             validation_data=(X_test, Y_test),
-                             epochs     = opts.epochs,    # a full pass over all of your training data
-                             batch_size = opts.batchSize, # a set of N samples (https://stats.stackexchange.com/questions/153531/what-is-batch-size-in-neural-network)
-                             shuffle    = False,
-                             verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
-                             callbacks  = callbacks,
-                             sample_weight=sampleWeights
-                             )
+        seqModel = myModel.fit(X_train,
+                               Y_train,
+                               validation_data=(X_test, Y_test),
+                               epochs     = opts.epochs,    # a full pass over all of your training data
+                               batch_size = opts.batchSize, # a set of N samples (https://stats.stackexchange.com/questions/153531/what-is-batch-size-in-neural-network)
+                               shuffle    = False,
+                               verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
+                               callbacks  = callbacks,
+                               sample_weight=sampleWeights
+                               )
         Verbose("Number of threads after fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
 
         # Retrieve  the training / validation loss / accuracy at each epoch
@@ -817,27 +876,27 @@ def main(opts):
 
     # Write the model
     modelName = "model_trained.h5"
-    model.save(os.path.join(opts.saveDir,  modelName) )
+    myModel.save(os.path.join(opts.saveDir,  modelName) )
         
     # serialize model to JSON (contains arcitecture of model)
-    model_json = model.to_json()
+    model_json = myModel.to_json() # myModel.to_yaml() (alternatively)
     with open(opts.saveDir + "/model_architecture.json", "w") as json_file:
         json_file.write(model_json)
         
     # serialize weights to HDF5
-    model.save_weights(os.path.join(opts.saveDir, 'model_weights.h5'), overwrite=True)
-    model.save(os.path.join(opts.saveDir, modelName))
+    myModel.save_weights(os.path.join(opts.saveDir, 'model_weights.h5'), overwrite=True)
+    myModel.save(os.path.join(opts.saveDir, modelName))
         
     # write weights and architecture in txt file
-    func.WriteModel(model, model_json, opts.inputList, os.path.join(opts.saveDir, "model.txt") )
+    func.WriteModel(myModel, model_json, opts.inputList, os.path.join(opts.saveDir, "model.txt") )
 
     # Produce method score (i.e. predict output value for given input dataset). Computation is done in batches.
     # https://stackoverflow.com/questions/49288199/batch-size-in-model-fit-and-model-predict
     Print("Generating output predictions for the input samples", True) # (e.g. Numpy array)
-    pred_train  = model.predict(X_train     , batch_size=None, verbose=1, steps=None)
-    pred_test   = model.predict(X_test      , batch_size=None, verbose=1, steps=None)
-    pred_signal = model.predict(X_signal    , batch_size=None, verbose=1, steps=None)
-    pred_bkg    = model.predict(X_background, batch_size=None, verbose=1, steps=None)    
+    pred_train  = myModel.predict(X_train, batch_size=None, verbose=1, steps=None)
+    pred_test   = myModel.predict(X_test , batch_size=None, verbose=1, steps=None)
+    pred_signal = myModel.predict(X_sig  , batch_size=None, verbose=1, steps=None)
+    pred_bkg    = myModel.predict(X_bkg  , batch_size=None, verbose=1, steps=None)    
     # pred_train = model.predict(x, batch_size=None, verbose=0, steps=None, callbacks=None, max_queue_size=10, workers=1, use_multiprocessing=False) # Keras version 2.2.5 or later (https://keras.io/models/model/)
 
     # Join a sequence of arrays (X and Y) along an existing axis (1). In other words, add the ouput variable (Y) to the input variables (X)
@@ -854,10 +913,10 @@ def main(opts):
     x_test_B  = XY_test[XY_test[:,nInputs] == 0];   x_test_B  = x_test_B[:,0:nInputs]
     
     # Produce method score for signal (training and test) and background (training and test)
-    pred_train_S =  model.predict(x_train_S, batch_size=None, verbose=1, steps=None)
-    pred_train_B =  model.predict(x_train_B, batch_size=None, verbose=1, steps=None)
-    pred_test_S  =  model.predict(x_test_S , batch_size=None, verbose=1, steps=None)
-    pred_test_B  =  model.predict(x_test_B , batch_size=None, verbose=1, steps=None)
+    pred_train_S =  myModel.predict(x_train_S, batch_size=None, verbose=1, steps=None)
+    pred_train_B =  myModel.predict(x_train_B, batch_size=None, verbose=1, steps=None)
+    pred_test_S  =  myModel.predict(x_test_S , batch_size=None, verbose=1, steps=None)
+    pred_test_B  =  myModel.predict(x_test_B , batch_size=None, verbose=1, steps=None)
 
     # Inform user of early stop
     stopEpoch = earlystop.stopped_epoch
@@ -869,35 +928,60 @@ def main(opts):
     # Create json files
     writeCfgFile(opts)
     writeGitFile(opts)
-    jsonWr  = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)
+    jsonWr = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)
 
     # Plot selected output and save to JSON file for future use
-    func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"       , jsonWr, opts.saveFormats)
-    func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred"   , jsonWr, opts.saveFormats)
-    func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats)
-    func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats)
+#     print "\n"
+#     print "="*100
+#     print "pred_signal = ", pred_signal
+#     print
+#     print "="*100
+#     print "pred_bkg = ", pred_bkg
+    func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"       , jsonWr, opts.saveFormats)#, **GetKwargs("Output"     ))
+    func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred"   , jsonWr, opts.saveFormats)# , **GetKwargs("OutputPred" ))
+    func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats)# , **GetKwargs("OutputTrain"))
+    func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats)# , **GetKwargs("OutputTest" ))
+
+    # Scale back the data to the original representation
+    if opts.scaleBack:
+        msg = "Performing inverse-transform to all variables to get their original representation"
+        Print(cs + msg + ns, True)
+        df_sig = func.GetOriginalDataFrame(scaler_sig, df_sig, opts.inputList)
+        df_bkg = func.GetOriginalDataFrame(scaler_bkg, df_bkg, opts.inputList)
+        df_all = func.GetOriginalDataFrame(scaler_all, df_all, opts.inputList)
+        # Re-define the datasets using the inverse_transformed DataFrames
+        dset_sig = df_sig.values
+        dset_bkg = df_bkg.values
+        dset_all = df_all.values
 
     # For-loop: All branches to be plotted for various DNN score cuts (v. slow, especially for large number of "entrystop")
+    if opts.scaleBack:
+        stdPlots = False
+    else:
+        stdPlots = opts.standardise 
+
     for i, var in enumerate(opts.inputList, 0):
+        PrintFlushed("Variable %s (%d/%d)" % (var, i+1, len(opts.inputList)), i==0)
         if var != "TrijetMass":
             continue
-        PrintFlushed("Variable %s (%d/%d)" % (var, i+1, len(opts.inputList)), i==0)
-        func.PlotAndWriteJSON(dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+
+        Verbose("Plotting variable %s (irrespective of DNN score)" % (var), True)
+        func.PlotAndWriteJSON(dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.1" % (var), True)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.3" % (var), True)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.5" % (var), True)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.7" % (var), True)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.7, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.7, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.9" % (var), True)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.9, dset_signal[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.9, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
     print
 
     # Plot overtraining test
@@ -933,7 +1017,7 @@ def main(opts):
     style.setLogY(True)
     func.PlotROC(gDict, opts.saveDir, "ROC", opts.saveFormats)
 
-    # Write the  resultsJSON file!
+    # Write the resultsJSON file!
     jsonWr.write(opts.resultsJSON)
     
     # Print total time elapsed
@@ -971,6 +1055,7 @@ if __name__ == "__main__":
     SAVEFORMATS  = "png"
     URL          = False
     STANDARDISE  = False
+    SCALEBACK    = False
     DECORRELATE  = False
     ENTRYSTOP    = None
     VERBOSE      = False
@@ -1000,7 +1085,10 @@ if __name__ == "__main__":
                       help="Use the mass to calculate weights to decorrelated the mass from the training. This is done by reweighting the branches so that signal and background have similar mass distribution [default: %s]" % DECORRELATE)
 
     parser.add_option("--standardise", dest="standardise", action="store_true", default=STANDARDISE,
-                      help="Standardizing a dataset involves rescaling the distribution of values so that the mean of observed values is 0 and the standard deviation is 1. This can be thought of as subtracting the mean value or centering the data. [default: %s]" % STANDARDISE)
+                      help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1. This can be thought of as subtracting the mean value or centering the data. [default: %s]" % STANDARDISE)
+
+    parser.add_option("--scaleBack", dest="scaleBack", action="store_true", default=SCALEBACK,
+                      help="Scale back the data to the original representation (before the standardisation). i.e. Performing inverse-transform to all variables to get their original representation. [default: %s]" % SCALEBACK)
 
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE, 
                       help="Enable verbose mode (for debugging purposes mostly) [default: %s]" % VERBOSE)
@@ -1131,6 +1219,9 @@ if __name__ == "__main__":
         sName += "_MassDecorrelated"
     if opts.standardise:
         sName += "_Standardised"
+        if opts.scaleBack:
+            sName += "_ScaleBack"
+
     # Add the number of input variables
     sName += "_%dInputs" % (len(opts.inputList))
     # Add the time-stamp last
@@ -1162,26 +1253,8 @@ if __name__ == "__main__":
         sys.stdout = log_file
         Print("Log file %s created" % (ls + opts.logFile + ns), True)
 
-    # Inform user
-    table    = []
-    msgAlign = "{:^10} {:^10} {:>12} {:>10}"
-    title    =  msgAlign.format("Layer #", "Neurons", "Activation", "Type")
-    hLine    = "="*len(title)
-    table.append(hLine)
-    table.append(title)
-    table.append(hLine)
-    for i, n in enumerate(opts.neurons, 0): 
-        layerType = "unknown"
-        if i == 0:
-            layerType = "input"
-        elif i+1 == len(opts.neurons):
-            layerType = "output"
-        else:
-            layerType = "hidden"
-        table.append( msgAlign.format(i+1, opts.neurons[i], opts.activation[i], layerType) )
-    table.append("")
-    for r in table:
-        Print(r, False)
+    # Inform user of network stup
+    PrintNetworkSummary(opts)
 
     # See https://keras.io/activations/
     actList = ["elu", "softmax", "selu", "softplus", "softsign", "PReLU", "LeakyReLU",
@@ -1211,23 +1284,12 @@ if __name__ == "__main__":
     # See https://keras.io/optimizers/. Also https://www.dlology.com/blog/quick-notes-on-how-to-choose-optimizer-in-keras/
     optList = ["sgd", "rmsprop", "adagrad", "adadelta", "adam", "adamax", "nadam"]
     # optList = ["SGD", "RMSprop", "Adagrad", "Adadelta", "Adam", "Adamax", "Nadam"]
-    # Sanity checks
     if opts.optimizer not in optList:
         msg = "Unsupported loss function %s. Please select on of the following:%s\n\t%s" % (opts.optimizer, ss, "\n\t".join(optList))
         raise Exception(es + msg + ns)    
 
-    # Determine number of layers
-    opts.nLayers = len(opts.neurons)+1
-    opts.nHiddenLayers = len(opts.neurons)-1
-    # Sanity check
-    if opts.nHiddenLayers < 1:
-        msg = "The NN has %d hidden layers. It must have at least 1 hidden layer" % (opts.nHiddenLayers)
-        raise Exception(es + msg + ns)    
-    else:
-        msg = "The NN has %s%d hidden layers%s (in addition to input and output layers)." % (hs, opts.nHiddenLayers, ns)
-        Print(msg, True) 
-        msg = "[NOTE: One hidden layer is sufficient for the large majority of problems. In general, the optimal size of the hidden layer is usually between the size of the input and size of the output layers.]"
-        Verbose (msg, False)         
+    # Determine and check the number of layers
+    checkNumberOfLayers(opts)
 
     # Get some basic information
     opts.keras      = keras.__version__
@@ -1240,8 +1302,13 @@ if __name__ == "__main__":
 
     # Call the main function
     Print("Hostname is %s" % (ls + opts.hostname + ns), True)
-    Print("Using Keras %s" % (ss + opts.keras + ns), True)
-    Print("Using Tensorflow %s" % (ss + tf.__version__ + ns), False)
+    Print("Using Keras %s" % (ls + opts.keras + ns), False)
+    Print("Using Tensorflow %s" % (ls + opts.tensorflow + ns), False)
+
+    # Sanity check
+    if not opts.standardise:
+        opts.scaleBack = False
+
     main(opts)
 
     Print("All output saved under directory %s" % (ls + opts.saveDir + ns), True)
@@ -1253,5 +1320,3 @@ if __name__ == "__main__":
 
     if opts.notBatchMode:
         raw_input("=== sequential.py: Press any key to quit ROOT ...")
-
-#  LocalWords:  decorelate

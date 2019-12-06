@@ -7,16 +7,8 @@ unmatched) that pass a given working point.
 
 
 EXAMPLES:
-./plotTopMass.py 
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var.root --saveDir /publicweb/a/aattikis/Mass 
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var.root --saveDir /publicweb/a/aattikis/TT --dir Keras_3Layers_50relu_50relu_1sigmoid_100Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_27Nov2019_07h39m25s
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var.root --dir Keras_3Layers_50relu_50relu_1sigmoid_100Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_27Nov2019_07h39m25s --saveDir /publicweb/a/aattikis/ALEX --entries 100000
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root --dir Keras_3Layers_50relu_50relu_1sigmoid_100Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_27Nov2019_07h39m25s --saveDir /publicweb/a/aattikis/ALEX --entries 100000
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --dir Keras_3Layers_50relu_50relu_1sigmoid_100Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_27Nov2019_07h39m25s --saveDir /publicweb/a/aattikis/ALEX --entries 100000
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-QCD_7Jets_3BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s
 ./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s
 ./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-QCD_7Jets_3BJets.root --saveDir /publicweb/a/aattikis/QCD --entries 200000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s --wp 0.5
-
 
 LAST USED:
 ./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_200Epochs_2000BatchSize_800000Entrystop_29Nov2019_05h12m17s --wp 0.0
@@ -103,6 +95,7 @@ def main():
 
     # Definitions
     filename = opts.filename
+    Verbose("Opening ROOT file %s" %  (opts.filename), True)
     tfile    = ROOT.TFile.Open(filename)    
     sigTree  = "treeS"
     bkgTree  = "treeB"
@@ -128,10 +121,11 @@ def main():
     inputList.append("TrijetSubldgJetCvsL")
     inputList.append("TrijetLdgJetPtD")
     inputList.append("TrijetSubldgJetPtD")
-    inputList.append("TrijetLdgJetAxis2")
+    inputList.append("TrijetLdgJetAxis2") 
     inputList.append("TrijetSubldgJetAxis2")
     inputList.append("TrijetLdgJetMult")
     inputList.append("TrijetSubldgJetMult")
+    opts.inputList = inputList
     nInputs = len(inputList)
 
     # Signal dataframe
@@ -155,10 +149,6 @@ def main():
             opts.entries = len(df_background.index)
         Print("Number of events: %d" % (opts.entries), True)
 
-    # Signal and background datasets (just the values of the TBranches)
-    dset_signal     = df_signal.values
-    dset_background = df_background.values
-
     # Print information
     if 0:
         # Print: index, variable1, variable2, ...
@@ -171,10 +161,23 @@ def main():
         print df_signal.columns
     
     # Concatinate signal + background datasets
-    df_list = [df_signal, df_background]
-    df_all  = pandas.concat(df_list)
-    dataset = df_all.values
+    df_all  = pandas.concat( [df_signal, df_background] )
     
+    # Standardization of datasets? 
+    if opts.standardise:
+        msg  = "Standardize dataset features by removing the mean and scaling to unit variance (mean=0.0, stdDev=variance=1.0)."
+        Print(cs + msg + ns, True)    
+        if not df_signal.empty: 
+            scaler_sig, df_signal     = func.GetStandardisedDataFrame(df_signal    , opts.inputList)
+        if not df_background.empty: 
+            scaler_bkg, df_background = func.GetStandardisedDataFrame(df_background, opts.inputList)
+        scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList)
+
+    # Get a Numpy representation of the DataFrames for signal and background datasets
+    Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
+    dset_signal     = df_signal.values
+    dset_background = df_background.values
+
     # Target (top-quark mass) datasets (list of all mass values)
     # (i.e. Get the list of TrijetMass values from the signal tree)
     if opts.dataset == "QCD":
@@ -195,19 +198,14 @@ def main():
         X_sig = dset_signal[:opts.entries, 0:nInputs]
         Verbose("Read %d entries for %d variables from the signal tree" % ( len(X_sig), len(X_sig[0])), True)
         
-        # Get all the TrijetMass values in the form of a list of lists (dimension=1). (actually it is a numpy.ndarray object)
+        # Get all the TrijetMass values in the form of a list of lists (dimension=1)
         target_sig = dset_target_sig[:opts.entries, :]
 
     # Set the background values now from the background tree    
-    X_bkg = dset_background[:opts.entries, 0:nInputs]
+    X_bkg      = dset_background[:opts.entries, 0:nInputs]
     target_bkg = dset_target_bkg[:opts.entries, :]  # Get all the TrijetMass values in the form of of a numpy.ndarray object)
     Verbose("Read %d entries for %d variables from the background tree" % ( len(X_bkg), len(X_bkg[0])), False)
 
-
-    # Standardization of datasets? 
-    if opts.standardise:
-        msg = "Cannot proceed with loading & executing the model. Script not supported yet for standardised input as the input must first be stantardised and the inverse transformed"
-        raise Exception(es + msg + ns)
     # Create canvas
     colors = [ROOT.kAzure, ROOT.kOrange-2, ROOT.kMagenta, ROOT.kGreen+2, ROOT.kOrange+7, ROOT.kRed, ROOT.kRed, ROOT.kBlack]
     canvas = plot.CreateCanvas()
@@ -237,6 +235,22 @@ def main():
         Y_sig = loaded_model.predict(X_sig, verbose=1) # get the DNN score
         Print("Got %s%d predictions%s (DNN scores) for the signal and %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_sig),ns, hs, len(Y_bkg), ns), True)
 
+
+    # Scale back the data to the original representation
+    if opts.scaleBack:
+        msg = "Performing inverse-transform to all variables to get their original representation"
+        Print(cs + msg + ns, True)
+        if not df_signal.empty: 
+            df_signal     = func.GetOriginalDataFrame(scaler_sig, df_signal, opts.inputList)
+        if not df_background.empty: 
+            df_background = func.GetOriginalDataFrame(scaler_bkg, df_background, opts.inputList)
+        df_all = func.GetOriginalDataFrame(scaler_all, df_all, opts.inputList)
+        # Re-define the datasets using the inverse_transformed DataFrames
+        dset_sig = df_signal.values
+        dset_bkg = df_background.values
+        dset_all = df_all.values
+        target_sig = dset_target_sig[:opts.entries, :]
+        target_bkg = dset_target_bkg[:opts.entries, :]
 
     # Concatenate Y (predicted output) and target (top-quark mass). Ymass_sig 0 column = DNN output, Ymass_sig 1st column = top-quark mass
     if opts.dataset == "QCD":
@@ -377,11 +391,12 @@ action..........: The basic type of action to be taken when this argument is enc
     DIR         = None
     SAVEDIR     = ""
     SAVEFORMATS = "pdf" #"png" does not work
-    STANDARDISE  = False
+    STANDARDISE = False
     SAVENAME    = None
     LOGY        = False
     ENTRIES     = None
     VERBOSE     = False
+    SCALEBACK   = False
 
    # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -394,6 +409,9 @@ action..........: The basic type of action to be taken when this argument is enc
 
     parser.add_option("--standardise", dest="standardise", action="store_true", default=STANDARDISE,
                       help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1. This can be thought of as subtracting the mean value or centering the data. [default: %s]" % STANDARDISE)
+
+    parser.add_option("--scaleBack", dest="scaleBack", action="store_true", default=SCALEBACK,
+                      help="Scale back the data to the original representation (before the standardisation). i.e. Performing inverse-transform to all variables to get their original representation. [default: %s]" % SCALEBACK)
 
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE,
                       help="Enable verbose mode (for debugging purposes mostly) [default: %s]" % VERBOSE)
@@ -454,8 +472,12 @@ action..........: The basic type of action to be taken when this argument is enc
         opts.standardise = True
     else:
         pass
-        
+
+    # Sanity checks        
     if opts.standardise: 
-        Print("Must standardise the input variables before applying the the deployed network", True)
+        Verbose("Must standardise the input variables before applying the the deployed network", True)
+
+    if not opts.standardise:
+        opts.scaleBack = False
 
     main()
