@@ -31,6 +31,7 @@ import keras
 import ROOT
 import array
 import math
+import json
 import sys
 import os
 import uproot
@@ -202,6 +203,11 @@ def main():
     target_bkg = dset_target_bkg[:opts.entries, :]  # Get all the TrijetMass values in the form of of a numpy.ndarray object)
     Verbose("Read %d entries for %d variables from the background tree" % ( len(X_bkg), len(X_bkg[0])), False)
 
+
+    # Standardization of datasets? 
+    if opts.standardise:
+        msg = "Cannot proceed with loading & executing the model. Script not supported yet for standardised input as the input must first be stantardised and the inverse transformed"
+        raise Exception(es + msg + ns)
     # Create canvas
     colors = [ROOT.kAzure, ROOT.kOrange-2, ROOT.kMagenta, ROOT.kGreen+2, ROOT.kOrange+7, ROOT.kRed, ROOT.kRed, ROOT.kBlack]
     canvas = plot.CreateCanvas()
@@ -246,12 +252,12 @@ def main():
     if opts.dataset == "QCD":
         Ymass_sig_sel = None
         massSel_sig   = None
-        Print("Got %s%d predictions%s (DNN scores > %.2f ) for the bkg" % (ss, len(Ymass_bkg_sel), ns, opts.wp), True)
+        Print("Got %s%d predictions%s (DNN scores >= %.2f ) for the bkg" % (ss, len(Ymass_bkg_sel), ns, opts.wp), True)
     else:
         Verbose("Creating a new container with ONLY the DNN score aboce the selected cut (opts.wp)", True)
         Ymass_sig_sel = Ymass_sig[Ymass_sig[:,0] >= opts.wp] # Select samples with DNN output >= opts.wp (column 0)
         massSel_sig   = Ymass_sig_sel[:, 1]                  # Get the top-quark mass (col 1) for the selected samples.
-        Print("Got %s%d predictions%s (DNN scores > %.2f) for the signal and %s%d predictions%s (DNN scores > %.2f ) for the bkg" % (ss, len(Ymass_sig_sel), ns, opts.wp, ss, len(Ymass_bkg_sel), ns, opts.wp), True)
+        Print("Got %s%d predictions%s (DNN scores >= %.2f) for the signal and %s%d predictions%s (DNN scores >= %.2f ) for the bkg" % (ss, len(Ymass_sig_sel), ns, opts.wp, ss, len(Ymass_bkg_sel), ns, opts.wp), True)
 
     # Plot resutls
     nbins = 80 #100
@@ -294,7 +300,7 @@ def main():
     hList = []
     for i,h in enumerate(histoList, 0):
 
-        if h.Integral() <= 0.0:
+        if h.Integral() <= 0.0:            
             continue
         else:
             index += 1
@@ -312,7 +318,7 @@ def main():
         h.GetXaxis().SetTitle("m_{top} (GeV)")
         h.GetYaxis().SetTitle("a.u. / %.0f GeV" % (width))
         plot.ApplyStyle(h, colors[i])
-        if index==1 :
+        if index==1:
             h.SetFillColor(colors[i])
             h.SetFillStyle(1001)
             leg.AddEntry(h, "%s %s"  % (h.GetName(),  opts.dataset), "f")
@@ -322,8 +328,9 @@ def main():
             h.Draw("HIST same")
         hList.append(h)
         
+
     # For-loop: All drawn Histograms
-    for h in hList:
+    for i,h in enumerate(hList, 1):
         h.SetMaximum(ymax*ymaxFactor)
     leg.Draw("same")
     
@@ -370,6 +377,7 @@ action..........: The basic type of action to be taken when this argument is enc
     DIR         = None
     SAVEDIR     = ""
     SAVEFORMATS = "pdf" #"png" does not work
+    STANDARDISE  = False
     SAVENAME    = None
     LOGY        = False
     ENTRIES     = None
@@ -383,6 +391,9 @@ action..........: The basic type of action to be taken when this argument is enc
 
     parser.add_option("--wp", dest="wp", type=float, default=WP,
                       help="Neural Network output working point [default: %s]" % WP)
+
+    parser.add_option("--standardise", dest="standardise", action="store_true", default=STANDARDISE,
+                      help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1. This can be thought of as subtracting the mean value or centering the data. [default: %s]" % STANDARDISE)
 
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE,
                       help="Enable verbose mode (for debugging purposes mostly) [default: %s]" % VERBOSE)
@@ -424,7 +435,27 @@ action..........: The basic type of action to be taken when this argument is enc
         opts.dataset = "QCD"
     else:
         opts.dataset = "dataset unknown"
-
+    
+    # Sanity check
     if opts.dir == None:
         raise Exception("No directory was defined where the model training file is located (\"model_trained.h5\")! Please define an input directory with the --dir option")
+
+    # is the input standardised?
+    cfgFile = os.path.join(opts.dir, "config.json")
+    if os.path.exists(cfgFile):
+        f = open(cfgFile, "r")
+        config = json.load(f)
+        f.close()
+        if "standardised datasets" in config:
+            opts.standardise = (config["standardised datasets"] == "True")
+        else:
+            pass
+    elif "_Standardised" in opts.dir:
+        opts.standardise = True
+    else:
+        pass
+        
+    if opts.standardise: 
+        Print("Must standardise the input variables before applying the the deployed network", True)
+
     main()
