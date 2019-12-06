@@ -168,7 +168,7 @@ def main():
     # Standardization of datasets? 
     if opts.standardise:
         msg  = "Standardize dataset features by removing the mean and scaling to unit variance (mean=0.0, stdDev=variance=1.0)."
-        Print(cs + msg + ns, True)    
+        Verbose(cs + msg + ns, True)    
         if not df_signal.empty: 
             scaler_sig, df_signal = func.GetStandardisedDataFrame(df_signal, opts.inputList)
         if not df_background.empty: 
