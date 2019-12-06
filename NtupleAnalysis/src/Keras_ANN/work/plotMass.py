@@ -9,9 +9,11 @@ unmatched) that pass a given working point.
 EXAMPLES:
 ./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s
 ./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-QCD_7Jets_3BJets.root --saveDir /publicweb/a/aattikis/QCD --entries 200000 --dir Keras_3Layers_50relu_50relu_1sigmoid_10Epochs_2000BatchSize_600000Entrystop_MassDecorrelated_Standardised_27Nov2019_10h55m55s --wp 0.5
+./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_200Epochs_2000BatchSize_800000Entrystop_29Nov2019_05h12m17s --wp 0.0
+
 
 LAST USED:
-./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Today --entries 500000 --dir Keras_3Layers_50relu_50relu_1sigmoid_200Epochs_2000BatchSize_800000Entrystop_29Nov2019_05h12m17s --wp 0.0
+./plotMass.py --filename /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root --saveDir /publicweb/a/aattikis/Mass --dir Keras_3Layers_50relu_50relu_1sigmoid_200Epochs_50000BatchSize_600000Entrystop_Standardised_ScaleBack_19Inputs_06Dec2019_04h14m03s --wp 0.1 --standardise --logY
 
 '''
 #================================================================================================ 
@@ -168,7 +170,7 @@ def main():
         msg  = "Standardize dataset features by removing the mean and scaling to unit variance (mean=0.0, stdDev=variance=1.0)."
         Print(cs + msg + ns, True)    
         if not df_signal.empty: 
-            scaler_sig, df_signal     = func.GetStandardisedDataFrame(df_signal    , opts.inputList)
+            scaler_sig, df_signal = func.GetStandardisedDataFrame(df_signal, opts.inputList)
         if not df_background.empty: 
             scaler_bkg, df_background = func.GetStandardisedDataFrame(df_background, opts.inputList)
         scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList)
@@ -183,9 +185,21 @@ def main():
     if opts.dataset == "QCD":
         dset_target_sig = None
     else:
-        dset_target_sig = signal.pandas.df(["TrijetMass"]).values
+        dset_target_sig = signal.pandas.df(["TrijetMass"]).values #default
+        if not opts.scaleBack:
+            msg = "Datasetes are standardised but will not scaleback quantities before plotting"
+            Verbose(cs + msg + ns, True)
+            df = signal.pandas.df(["TrijetMass"])
+            scaler, df_scaled = func.GetStandardisedDataFrame(df, ["TrijetMass"])
+            dset_target_sig = df_scaled.values
+
     # Get the list of TrijetMass values from the background tree
-    dset_target_bkg = background.pandas.df(["TrijetMass"]).values
+    dset_target_bkg = background.pandas.df(["TrijetMass"]).values #default
+    if not opts.scaleBack:
+        df = background.pandas.df(["TrijetMass"])
+        scaler, df_scaled = func.GetStandardisedDataFrame(df, ["TrijetMass"])
+        dset_target_bkg = df_scaled.values
+    
 
     # Merge the two lists into one to get a single list (numpy array) of TrijetMass from both the signal and bkg trees
     dset_target_all = pandas.concat([signal.pandas.df(["TrijetMass"]), background.pandas.df(["TrijetMass"])]).values
@@ -218,10 +232,10 @@ def main():
     if (opts.logY):
         canvas.SetLogy()
         ymaxFactor = 2
-        
+
     # Load & compile the model
     modelFile = os.path.join(opts.dir, 'model_trained.h5')
-    Print("Loading model %s" % (ts + modelFile + ns), True)
+    Verbose("Loading model %s" % (ts + modelFile + ns), True)
     loaded_model = load_model(modelFile)
     loaded_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 
@@ -230,16 +244,16 @@ def main():
     Y_bkg = loaded_model.predict(X_bkg, verbose=1) # get the DNN score
     if opts.dataset == "QCD":
         Y_sig = None
-        Print("Got %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_bkg), ns), True)
+        Verbose("Got %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_bkg), ns), True)
     else:
         Y_sig = loaded_model.predict(X_sig, verbose=1) # get the DNN score
-        Print("Got %s%d predictions%s (DNN scores) for the signal and %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_sig),ns, hs, len(Y_bkg), ns), True)
+        Verbose("Got %s%d predictions%s (DNN scores) for the signal and %s%d predictions%s (DNN scores) for the bkg" % (hs, len(Y_sig),ns, hs, len(Y_bkg), ns), True)
 
 
     # Scale back the data to the original representation
     if opts.scaleBack:
-        msg = "Performing inverse-transform to all variables to get their original representation"
-        Print(cs + msg + ns, True)
+        msg = "Will inverse-transform to all variables to get their original representation"
+        Verbose(cs + msg + ns, True)
         if not df_signal.empty: 
             df_signal     = func.GetOriginalDataFrame(scaler_sig, df_signal, opts.inputList)
         if not df_background.empty: 
@@ -249,7 +263,8 @@ def main():
         dset_sig = df_signal.values
         dset_bkg = df_background.values
         dset_all = df_all.values
-        target_sig = dset_target_sig[:opts.entries, :]
+        if opts.dataset != "QCD":
+            target_sig = dset_target_sig[:opts.entries, :]
         target_bkg = dset_target_bkg[:opts.entries, :]
 
     # Concatenate Y (predicted output) and target (top-quark mass). Ymass_sig 0 column = DNN output, Ymass_sig 1st column = top-quark mass
@@ -266,18 +281,29 @@ def main():
     if opts.dataset == "QCD":
         Ymass_sig_sel = None
         massSel_sig   = None
-        Print("Got %s%d predictions%s (DNN scores >= %.2f ) for the bkg" % (ss, len(Ymass_bkg_sel), ns, opts.wp), True)
+        Verbose("Got %s%d predictions%s (DNN scores >= %.2f ) for the bkg" % (ss, len(Ymass_bkg_sel), ns, opts.wp), True)
     else:
         Verbose("Creating a new container with ONLY the DNN score aboce the selected cut (opts.wp)", True)
         Ymass_sig_sel = Ymass_sig[Ymass_sig[:,0] >= opts.wp] # Select samples with DNN output >= opts.wp (column 0)
         massSel_sig   = Ymass_sig_sel[:, 1]                  # Get the top-quark mass (col 1) for the selected samples.
-        Print("Got %s%d predictions%s (DNN scores >= %.2f) for the signal and %s%d predictions%s (DNN scores >= %.2f ) for the bkg" % (ss, len(Ymass_sig_sel), ns, opts.wp, ss, len(Ymass_bkg_sel), ns, opts.wp), True)
-
+        Verbose("Got %s%d predictions%s (DNN scores >= %.2f) for the signal and %s%d predictions%s (DNN scores >= %.2f ) for the bkg" % (ss, len(Ymass_sig_sel), ns, opts.wp, ss, len(Ymass_bkg_sel), ns, opts.wp), True)
+        
     # Plot resutls
-    nbins = 80 #100
-    xmin  = 0
-    xmax  = 800 #1000
+    if opts.logY:
+        nbins = 1000
+        xmin  = 0
+        xmax  = 1000    
+    else:
+        nbins = 250
+        xmin  = 100
+        xmax  = 600
     width = float(xmax)/nbins
+    if opts.standardise and not opts.scaleBack:
+        nbins = 200
+        xmin  = -5.0
+        xmax  = +5.0
+        width = float(xmax)/nbins
+
     if opts.dataset == "QCD":
         hNameF = ''
     else:
@@ -303,7 +329,8 @@ def main():
     # Create and append total histo
     histoA = histoT.Clone("all candidates")
     histoA.Add(histoF)
-    histoList.append(histoA)
+    if opts.dataset != "QCD":
+        histoList.append(histoA)
     
     # Create legend
     leg = plot.CreateLegend(0.60, 0.70, 0.90, 0.90)
@@ -343,9 +370,16 @@ def main():
         hList.append(h)
         
 
-    # For-loop: All drawn Histograms
+    # Store ymax for future use
+    ymax_ = ymax*ymaxFactor
+    if opts.logY:
+        ymax_ = 1.05
+
+    # For-loop: All drawn Histograms        
     for i,h in enumerate(hList, 1):
-        h.SetMaximum(ymax*ymaxFactor)
+        h.SetMaximum(ymax_)
+
+    # Draw the legend
     leg.Draw("same")
     
     # Additional text
@@ -354,7 +388,7 @@ def main():
         tex.Draw()
     
     # Draw line to indicate the real value of the top-quark mass
-    graph = plot.CreateGraph([173., 173.], [0, ymax*ymaxFactor])
+    graph = plot.CreateGraph([173., 173.], [0, ymax_])
     graph.Draw("same")
 
     # Output directory
