@@ -824,6 +824,7 @@ def GetVarKwargs(var, opts):
         kwargs["opts"]["xmax"]   = 800.0
         kwargs["xlabel"] = "m_{t} [GeV]"
         kwargs["yMin"]   = 1e-3
+        kwargs["cutBox"] = {"cutValue":  173.2, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
         #kwargs["ylabel"] = "a.u. / %0.0f GeV"
 
     if var == "TrijetDijetMass":

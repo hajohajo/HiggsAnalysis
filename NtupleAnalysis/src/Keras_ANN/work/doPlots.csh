@@ -3,12 +3,12 @@
 #================================================================================================
 # Ensure all script arguments are passed from command line
 #================================================================================================
-if ($#argv != 2) then
-    echo "=== You must give exactly 1 argument:"
+if ($#argv < 1) then
+    echo "=== You must give at least 1 argument ($#argv provided):"
     echo "1=PSEUDO_MCRAB_DIR"
     echo "\n=== For example:"
     echo "./doPlots.csh <DIRS> <SAVE_DIR>"
-    echo "./doPlots.csh results /publicweb/a/aattikis/results"
+    echo "./doPlots.csh results /publicweb/a/aattikis/results" # results contains multiple Keras_* directories
     echo
     exit 1
 endif
@@ -18,7 +18,12 @@ endif
 #================================================================================================
 set INITIAL  = `echo $USER | cut -c1-1`
 set DIRS     = ${1}
-set SAVE_DIR = ${2}
+if ("${2}" == "") then
+    set SAVE_DIR = /publicweb/a/aattikis/${DIRS}
+else
+    set SAVE_DIR = ${2}
+endif
+
 set FORMATS  = png #pdf,C,png 
 set VERBOSE  = "" #--verbose
 

@@ -393,8 +393,10 @@ class Output:
         label+= " %sep" % (self.epochs) # this is not very relevant since we have early-stop enabled
         if hasattr(self, 'standardisedDatasets'):
             self.Verbose("dir = %s, st = \"%s\", type(st) = %s" % (self.getDirectoryBase(), self.standardisedDatasets.encode('UTF8'), type(self.standardisedDatasets.encode('UTF8'))), True)
-            if self.standardisedDatasets.encode('UTF8') == "True":
-                label+= " S"
+            if self.standardisedDatasets.encode('UTF8') == "None":
+                pass
+            else:
+                label+= " %s" % (self.standardisedDatasets.encode('UTF8'))
             if self.decorrelateMass.encode('UTF8') == "True":
                 label+= " M"
         # self.optimizer

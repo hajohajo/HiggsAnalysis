@@ -60,9 +60,11 @@ EXAMPLES:
 ./sequential.py --activation relu,relu,sigmoid --neurons 36,19,1 --epochs 10000 --batchSize 50000 -s pdf --log
 ./sequential.py --activation relu,relu,sigmoid --neurons 19,190,1 --epochs 50 --batchSize 500 -s pdf --saveDir ~/public/html/Test
 ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --inputVariables "TrijetPtDR,TrijetDijetPtDR,TrijetBjetMass,TrijetLdgJetBDisc,TrijetSubldgJetBDisc,TrijetBJetLdgJetMass,TrijetBJetSubldgJetMass,TrijetMass,TrijetDijetMass,TrijetBJetBDisc,TrijetSoftDrop_n2,TrijetLdgJetCvsL,TrijetSubldgJetCvsL,TrijetLdgJetPtD,TrijetSubldgJetPtD,TrijetLdgJetAxis2,TrijetSubldgJetAxis2,TrijetLdgJetMult,TrijetSubldgJetMult"
+./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 50000 -s pdf --entrystop 600000 --standardise --scaleBack
+
 
 LAST USED:
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 50000 -s pdf --entrystop 600000 --standardise --scaleBack
+./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 5 --batchSize 20000 -s pdf --entrystop 20000 --standardise Robust
 
 
 GITHUB:
@@ -136,8 +138,8 @@ import socket
 # https://en.wikipedia.org/wiki/ANSI_escape_code#Colors  
 ss = "\033[92m"
 ns = "\033[0;0m"
-ts = "\033[0;35m"   
-hs = "\033[1;34m"
+ts = "\033[1;34m"
+hs = "\033[0;35m"   
 ls = "\033[0;33m"
 es = "\033[1;31m"
 cs = "\033[0;44m\033[1;37m"
@@ -193,6 +195,8 @@ def PrintNetworkSummary(opts):
             layerType = "hidden"
         table.append( msgAlign.format(i+1, opts.neurons[i], opts.activation[i], layerType) )
     table.append("")
+
+    Print("Will construct a DNN with the following architecture", True)
     for r in table:
         Print(r, False)
     return
@@ -531,8 +535,6 @@ def GetTime(tStart):
 
 def SaveModelParameters(myModel, opts):
     nParams = myModel.count_params()
-    msg = "Model has a total of %s%d%s parameters (neuron weights and biases) " % (hs, nParams, ns)
-    Print(msg, True)
     total_count, trainable_count, non_trainable_count  = GetModelParams(myModel)
     nParams, nWeights, nBias = GetModelWeightsAndBiases(opts.inputList, opts.neurons)
     opts.modelParams = total_count
@@ -540,6 +542,14 @@ def SaveModelParameters(myModel, opts):
     opts.modelParamsNonTrainable = non_trainable_count
     opts.modelWeights = nWeights
     opts.modelBiases  = nBias
+
+    ind  = "{:<6} {:<30}"
+    msg  = "The model has a total of %s%d parameters%s (neuron weights and biases):" % (hs, opts.modelParams, ns)
+    msg += "\n\t" + ind.format("%d" % opts.modelWeights, "Weights")
+    msg += "\n\t" + ind.format("%d" % opts.modelBiases, "Biases")
+    msg += "\n\t" + ind.format("%d" % opts.modelParamsTrain, "Trainable")
+    msg += "\n\t" + ind.format("%d" % opts.modelParamsNonTrainable, "Non-trainable")
+    Print(msg, True)
     return
 
 def PrintDataset(myDset):
@@ -618,6 +628,7 @@ def writeCfgFile(opts):
     jsonWr.addParameter("test sample" , opts.testSample)
     jsonWr.addParameter("ROOT file" , opts.rootFileName)
     jsonWr.addParameter("input variables", len(opts.inputList))
+    jsonWr.addParameter("elapsed time", opts.elapsedTime)
     for i,b in enumerate(opts.inputList, 1):
         jsonWr.addParameter("var%d"% i, b)
     jsonWr.write(opts.cfgJSON)
@@ -750,11 +761,12 @@ def main(opts):
     df_all  = pandas.concat( [df_sig, df_bkg] )
     Verbose("Printing the combined tabular data (signal first, background appended after signal):\n%s%s%s" % (ts, df_all, ns), True)
     if opts.standardise:
-        msg  = "Standardize dataset features by removing the mean and scaling to unit variance (mean=0.0, stdDev=variance=1.0)."
-        Print(cs + msg + ns, True)    
-        scaler_sig, df_sig = func.GetStandardisedDataFrame(df_sig, opts.inputList)
-        scaler_bkg, df_bkg = func.GetStandardisedDataFrame(df_bkg, opts.inputList)
-        scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList)
+        msg  = "Standardising dataset features with the %sScaler%s" % (ls + opts.standardise, ns)
+        Print(msg, True)    
+        # WARNING! Don't cheat - fit only on training https://scikit-learn.org/stable/modules/neural_networks_supervised.html)
+        scaler_sig, df_sig = func.GetStandardisedDataFrame(df_sig, opts.inputList, scalerType=opts.standardise)
+        scaler_bkg, df_bkg = func.GetStandardisedDataFrame(df_bkg, opts.inputList, scalerType=opts.standardise)
+        scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList, scalerType=opts.standardise)
 
     # Get a Numpy representation of the DataFrames for signal and background datasets (again, and AFTER assigning signal and background)
     Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
@@ -775,7 +787,7 @@ def main(opts):
         else:            
             layer += " (hidden layer)" # A layer of nodes that produce the output variables.
             
-        Print("Adding %s, with %s%d neurons%s and activation function %s" % (ts + layer + ns, ls, n, ns, ls + opts.activation[iLayer] + ns), iLayer==0)
+        Print("Adding %s, with %s%d neurons%s and activation function %s" % (hs + layer + ns, ls, n, ns, ls + opts.activation[iLayer] + ns), iLayer==0)
         if iLayer == 0:
             # Only first layer demands input_dim. For the rest it is implied.
             myModel.add( Dense(opts.neurons[iLayer], input_dim = nInputs) ) #, weights = [np.zeros([692, 50]), np.zeros(50)] OR bias_initializer='zeros',  or bias_initializer=initializers.Constant(0.1)
@@ -790,8 +802,9 @@ def main(opts):
             # myModel.add( Dense(opts.neurons[iLayer], activation = opts.activation[iLayer]) ) 
 
     # Print a summary representation of your model
-    Print("Printing model summary:", True)
-    myModel.summary()
+    if opts.verbose:
+        Print("Printing model summary:", True)
+        myModel.summary()
     
     # Get the number of parameters of the model
     SaveModelParameters(myModel, opts)
@@ -802,10 +815,10 @@ def main(opts):
     # Split data into input (X) and output (Y), using an equal number for signal and background. 
     # This is by creating the dataset with double the number of rows as is available for signal. Remember
     # that the background entries were appended to those of the signal.
-    X     = dset_all[:2*nEntries, 0:nInputs] # rows: 0 -> 2*Entries_sig, columns: 0 -> 19 (all variables)
-    Y     = dset_all[:2*nEntries, nInputs:]  # rows: 0 -> 2*signal, everything after column 19 which is only the "signal" column (0 or 1)
-    X_sig = dset_sig[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable)
-    X_bkg = dset_bkg[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable)
+    X     = dset_all[:2*nEntries, 0:nInputs] # rows: 0 -> 2*Entries, columns: 0 -> 19 (all variables but not the "signal" column)
+    Y     = dset_all[:2*nEntries, nInputs:]  # rows: 0 -> 2*Entries, column : 20  [i.e. everything after column 19 which is only the "signal" column (0 or 1)]
+    X_sig = dset_sig[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
+    X_bkg = dset_bkg[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeB"
     Y_sig = dset_all[:nEntries, nInputs:]    # contains 1's (total of "nEntries" values)   - NOT USED
     Y_bkg = dset_all[:nEntries, nInputs:]    # contains 0's (total ODof "nEntries" values) - N0T USED
     Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_sig), ns, es, len(X_bkg), ns), True)
@@ -830,7 +843,7 @@ def main(opts):
 
     # [Loss function is used to understand how well the network is working (compare predicted label with actual label via some function)]
     # Optimizer function is related to a function used to optimise the weights
-    Print("Compiling the model with the loss function %s and optimizer %s " % (ls + opts.lossFunction + ns, ts + opts.optimizer + ns), True)
+    Print("Compiling the model with the loss function %s and optimizer %s " % (ls + opts.lossFunction + ns, ls + opts.optimizer + ns), True)
     myModel.compile(loss=opts.lossFunction, optimizer=opts.optimizer, metrics=['accuracy'])
     
     # Customise the optimiser settings?
@@ -888,11 +901,13 @@ def main(opts):
     myModel.save(os.path.join(opts.saveDir, modelName))
         
     # write weights and architecture in txt file
-    func.WriteModel(myModel, model_json, opts.inputList, os.path.join(opts.saveDir, "model.txt") )
-
+    modelFilename = os.path.join(opts.saveDir, "model.txt")
+    Print("Writing the model (weights and architecture) in the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
+    func.WriteModel(myModel, model_json, opts.inputList, modelFilename, verbose=False)
+          
     # Produce method score (i.e. predict output value for given input dataset). Computation is done in batches.
     # https://stackoverflow.com/questions/49288199/batch-size-in-model-fit-and-model-predict
-    Print("Generating output predictions for the input samples", True) # (e.g. Numpy array)
+    Print("Generating output predictions (numpy arrays) for the input samples", True)
     pred_train  = myModel.predict(X_train, batch_size=None, verbose=1, steps=None)
     pred_test   = myModel.predict(X_test , batch_size=None, verbose=1, steps=None)
     pred_signal = myModel.predict(X_sig  , batch_size=None, verbose=1, steps=None)
@@ -905,18 +920,18 @@ def main(opts):
 
     # Pick events with output = 1
     Verbose("Select events/samples which have an output variable Y (last column) equal to 1 (i.e. prediction is combatible with signal)", True)
-    x_train_S = XY_train[XY_train[:,nInputs] == 1]; x_train_S = x_train_S[:,0:nInputs]
-    x_test_S  = XY_test[XY_test[:,nInputs] == 1];   x_test_S  = x_test_S[:,0:nInputs]
+    X_train_S = XY_train[XY_train[:,nInputs] == 1]; X_train_S = X_train_S[:,0:nInputs]
+    X_test_S  = XY_test[XY_test[:,nInputs] == 1];   X_test_S  = X_test_S[:,0:nInputs]
 
     Verbose("Select events/samples which have an output variable Y (last column) equal to 0 (i.e. prediction is NOT combatible with signal)", False)
-    x_train_B = XY_train[XY_train[:,nInputs] == 0]; x_train_B = x_train_B[:,0:nInputs]
-    x_test_B  = XY_test[XY_test[:,nInputs] == 0];   x_test_B  = x_test_B[:,0:nInputs]
+    X_train_B = XY_train[XY_train[:,nInputs] == 0]; X_train_B = X_train_B[:,0:nInputs]
+    X_test_B  = XY_test[XY_test[:,nInputs] == 0];   X_test_B  = X_test_B[:,0:nInputs]
     
     # Produce method score for signal (training and test) and background (training and test)
-    pred_train_S =  myModel.predict(x_train_S, batch_size=None, verbose=1, steps=None)
-    pred_train_B =  myModel.predict(x_train_B, batch_size=None, verbose=1, steps=None)
-    pred_test_S  =  myModel.predict(x_test_S , batch_size=None, verbose=1, steps=None)
-    pred_test_B  =  myModel.predict(x_test_B , batch_size=None, verbose=1, steps=None)
+    pred_train_S =  myModel.predict(X_train_S, batch_size=None, verbose=1, steps=None)
+    pred_train_B =  myModel.predict(X_train_B, batch_size=None, verbose=1, steps=None)
+    pred_test_S  =  myModel.predict(X_test_S , batch_size=None, verbose=1, steps=None)
+    pred_test_B  =  myModel.predict(X_test_B , batch_size=None, verbose=1, steps=None)
 
     # Inform user of early stop
     stopEpoch = earlystop.stopped_epoch
@@ -925,18 +940,11 @@ def main(opts):
         opts.epochs = stopEpoch
         Print(cs + msg + ns, True)
 
-    # Create json files
-    writeCfgFile(opts)
+    # Create json file
     writeGitFile(opts)
     jsonWr = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)
 
     # Plot selected output and save to JSON file for future use
-#     print "\n"
-#     print "="*100
-#     print "pred_signal = ", pred_signal
-#     print
-#     print "="*100
-#     print "pred_bkg = ", pred_bkg
     func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"       , jsonWr, opts.saveFormats)#, **GetKwargs("Output"     ))
     func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred"   , jsonWr, opts.saveFormats)# , **GetKwargs("OutputPred" ))
     func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats)# , **GetKwargs("OutputTrain"))
@@ -944,8 +952,8 @@ def main(opts):
 
     # Scale back the data to the original representation
     if opts.scaleBack:
-        msg = "Performing inverse-transform to all variables to get their original representation"
-        Print(cs + msg + ns, True)
+        msg = "Performing inverse-transform (%s) to all variables to get their original representation" % (hs + "scaleBack" + ns)
+        Print(msg, True)
         df_sig = func.GetOriginalDataFrame(scaler_sig, df_sig, opts.inputList)
         df_bkg = func.GetOriginalDataFrame(scaler_bkg, df_bkg, opts.inputList)
         df_all = func.GetOriginalDataFrame(scaler_all, df_all, opts.inputList)
@@ -1022,8 +1030,10 @@ def main(opts):
     
     # Print total time elapsed
     days, hours, mins, secs = GetTime(tStart)
-    Print("Total elapsed time is %s days, %s hours, %s mins, %s secs" % (days[0], hours[0], mins[0], secs), True)
-    
+    dt = "%s days, %s hours, %s mins, %s secs" % (days[0], hours[0], mins[0], secs)
+    Print("Total elapsed time is %s" % (hs + dt + ns), True)
+    opts.elapsedTime = dt
+    writeCfgFile(opts)
     return 
 
 #================================================================================================ 
@@ -1032,7 +1042,7 @@ def main(opts):
 if __name__ == "__main__":
     '''
     https://docs.python.org/3/library/argparse.html
- 
+    
     name or flags...: Either a name or a list of option strings, e.g. foo or -f, --foo.
     action..........: The basic type of action to be taken when this argument is encountered at the command line.
     nargs...........: The number of command-line arguments that should be consumed.
@@ -1054,8 +1064,8 @@ if __name__ == "__main__":
     SAVEDIR      = None
     SAVEFORMATS  = "png"
     URL          = False
-    STANDARDISE  = False
-    SCALEBACK    = False
+    STANDARDISE  = None
+    SCALEBACK    = True
     DECORRELATE  = False
     ENTRYSTOP    = None
     VERBOSE      = False
@@ -1084,8 +1094,8 @@ if __name__ == "__main__":
     parser.add_option("--decorrelate", dest="decorrelate", action="store_true", default=DECORRELATE,
                       help="Use the mass to calculate weights to decorrelated the mass from the training. This is done by reweighting the branches so that signal and background have similar mass distribution [default: %s]" % DECORRELATE)
 
-    parser.add_option("--standardise", dest="standardise", action="store_true", default=STANDARDISE,
-                      help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1. This can be thought of as subtracting the mean value or centering the data. [default: %s]" % STANDARDISE)
+    parser.add_option("--standardise", dest="standardise", default=STANDARDISE,
+                      help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1 (e.g. StandardScaler) [default: %s]" % STANDARDISE)
 
     parser.add_option("--scaleBack", dest="scaleBack", action="store_true", default=SCALEBACK,
                       help="Scale back the data to the original representation (before the standardisation). i.e. Performing inverse-transform to all variables to get their original representation. [default: %s]" % SCALEBACK)
@@ -1124,7 +1134,7 @@ if __name__ == "__main__":
                       help="The \"batch size\" to be used (= a number of samples processed before the model is updated). Batch size impacts learning significantly; typically networks train faster with mini-batches. However, the batch size has a direct impact on the variance of gradients (the larger the batch the better the appoximation and the larger the memory usage). [default: %s]" % BATCHSIZE)
 
     parser.add_option("--activation", dest="activation", type="string", default=ACTIVATION,
-                      help="Type of transfer function that will be used to map the output of one layer to another [default: %s]" % ACTIVATION)
+"                      help="Type of transfer function that will be used to map the output of one layer to another [default: %s]" % ACTIVATION)
 
     parser.add_option("--neurons", dest="neurons", type="string", default=NEURONS,
                       help="List of neurons to use for each sequential layer (comma-separated integers)  [default: %s]" % NEURONS)
@@ -1204,7 +1214,6 @@ if __name__ == "__main__":
     opts.inputList = opts.inputVariables.split(",")
     if opts.inputList < 1:
         raise Exception("At least one input variable needed to create the DNN. Only %d provided" % (len(opts.inputList)) )
-    Print("A total of %d input variables will be used:\n\t%s%s%s" % (len(opts.inputList), ss, "\n\t".join(opts.inputList), ns), True)
 
     # Get the current date and time
     now    = datetime.now()
@@ -1217,8 +1226,13 @@ if __name__ == "__main__":
         sName  = "Keras_%s_%s" % (specs, str(opts.entrystop) + "Entrystop")
     if opts.decorrelate:
         sName += "_MassDecorrelated"
-    if opts.standardise:
-        sName += "_Standardised"
+    if opts.standardise != None:
+        scalerTypes = ["Standard", "Robust", "MinMax"]
+        if not opts.standardise in scalerTypes:
+            msg = "Unsupported scaler type \"%s\". Please select one of the following (case-sensitive): %s" % (opts.standardise, ", ".join(scalerTypes) )
+            raise Exception(es + msg + ns)
+        #sName += "_Standardised"
+        sName += "_%sScaler" % (opts.standardise)
         if opts.scaleBack:
             sName += "_ScaleBack"
 
@@ -1255,6 +1269,7 @@ if __name__ == "__main__":
 
     # Inform user of network stup
     PrintNetworkSummary(opts)
+    Print("A total of %s%d input variables%s will be used:\n\t%s%s%s" % (ls, len(opts.inputList),ns, ls, "\n\t".join(opts.inputList), ns), True)
 
     # See https://keras.io/activations/
     actList = ["elu", "softmax", "selu", "softplus", "softsign", "PReLU", "LeakyReLU",
@@ -1301,9 +1316,9 @@ if __name__ == "__main__":
     opts.gitDiff    = subprocess.check_output(["git", "diff"])
 
     # Call the main function
-    Print("Hostname is %s" % (ls + opts.hostname + ns), True)
-    Print("Using Keras %s" % (ls + opts.keras + ns), False)
-    Print("Using Tensorflow %s" % (ls + opts.tensorflow + ns), False)
+    Print("Hostname is %s" % (hs + opts.hostname + ns), True)
+    Print("Using Keras %s" % (hs + opts.keras + ns), False)
+    Print("Using Tensorflow %s" % (hs + opts.tensorflow + ns), False)
 
     # Sanity check
     if not opts.standardise:
@@ -1311,7 +1326,7 @@ if __name__ == "__main__":
 
     main(opts)
 
-    Print("All output saved under directory %s" % (ls + opts.saveDir + ns), True)
+    Print("Directory %s created" % (ls + opts.saveDir + ns), True)
 
     # Restore "stdout" to its original state and close the log file
     if opts.log:

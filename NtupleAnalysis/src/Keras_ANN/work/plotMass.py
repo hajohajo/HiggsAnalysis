@@ -166,14 +166,14 @@ def main():
     df_all  = pandas.concat( [df_signal, df_background] )
     
     # Standardization of datasets? 
-    if opts.standardise:
-        msg  = "Standardize dataset features by removing the mean and scaling to unit variance (mean=0.0, stdDev=variance=1.0)."
-        Verbose(cs + msg + ns, True)    
+    if opts.standardise != None:
+        msg  = "Standardising dataset features with the %sScaler%s" % (ls + opts.standardise, ns)
+        Print(msg, True)    
         if not df_signal.empty: 
-            scaler_sig, df_signal = func.GetStandardisedDataFrame(df_signal, opts.inputList)
+            scaler_sig, df_signal = func.GetStandardisedDataFrame(df_signal, opts.inputList, scalerType=opts.standardise)
         if not df_background.empty: 
-            scaler_bkg, df_background = func.GetStandardisedDataFrame(df_background, opts.inputList)
-        scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList)
+            scaler_bkg, df_background = func.GetStandardisedDataFrame(df_background, opts.inputList, scalerType=opts.standardise)
+        scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList, scalerType=opts.standardise)
 
     # Get a Numpy representation of the DataFrames for signal and background datasets
     Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
@@ -186,16 +186,16 @@ def main():
         dset_target_sig = None
     else:
         dset_target_sig = signal.pandas.df(["TrijetMass"]).values #default
-        if not opts.scaleBack:
-            msg = "Datasetes are standardised but will not scaleback quantities before plotting"
-            Verbose(cs + msg + ns, True)
+        if opts.standardise and not opts.scaleBack:
+            msg = "Datasets are standardised but will not scaleback quantities before plotting"
+            Print(cs + msg + ns, False)
             df = signal.pandas.df(["TrijetMass"])
             scaler, df_scaled = func.GetStandardisedDataFrame(df, ["TrijetMass"])
             dset_target_sig = df_scaled.values
 
     # Get the list of TrijetMass values from the background tree
     dset_target_bkg = background.pandas.df(["TrijetMass"]).values #default
-    if not opts.scaleBack:
+    if opts.standardise and not opts.scaleBack:
         df = background.pandas.df(["TrijetMass"])
         scaler, df_scaled = func.GetStandardisedDataFrame(df, ["TrijetMass"])
         dset_target_bkg = df_scaled.values
@@ -294,7 +294,7 @@ def main():
         xmin  = 0
         xmax  = 1000    
     else:
-        nbins = 250
+        nbins = 100
         xmin  = 100
         xmax  = 600
     width = float(xmax)/nbins
@@ -425,12 +425,12 @@ action..........: The basic type of action to be taken when this argument is enc
     DIR         = None
     SAVEDIR     = ""
     SAVEFORMATS = "pdf" #"png" does not work
-    STANDARDISE = False
+    STANDARDISE = None
     SAVENAME    = None
     LOGY        = False
     ENTRIES     = None
     VERBOSE     = False
-    SCALEBACK   = False
+    SCALEBACK   = True #False
 
    # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -441,8 +441,8 @@ action..........: The basic type of action to be taken when this argument is enc
     parser.add_option("--wp", dest="wp", type=float, default=WP,
                       help="Neural Network output working point [default: %s]" % WP)
 
-    parser.add_option("--standardise", dest="standardise", action="store_true", default=STANDARDISE,
-                      help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1. This can be thought of as subtracting the mean value or centering the data. [default: %s]" % STANDARDISE)
+    parser.add_option("--standardise", dest="standardise", default=STANDARDISE,
+                      help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1 (e.g. StandardScaler) [default: %s]" % STANDARDISE)
 
     parser.add_option("--scaleBack", dest="scaleBack", action="store_true", default=SCALEBACK,
                       help="Scale back the data to the original representation (before the standardisation). i.e. Performing inverse-transform to all variables to get their original representation. [default: %s]" % SCALEBACK)
@@ -499,19 +499,22 @@ action..........: The basic type of action to be taken when this argument is enc
         config = json.load(f)
         f.close()
         if "standardised datasets" in config:
-            opts.standardise = (config["standardised datasets"] == "True")
+            opts.standardise = (config["standardised datasets"])
         else:
             pass
-    elif "_Standardised" in opts.dir:
-        opts.standardise = True
+    #elif "_RobustScaler_" in opts.dir:
+    #    opts.standardise = True
     else:
         pass
 
     # Sanity checks        
-    if opts.standardise: 
-        Verbose("Must standardise the input variables before applying the the deployed network", True)
-
-    if not opts.standardise:
+    if opts.standardise == None:
         opts.scaleBack = False
+    else:
+        Print("Must standardise the input variables before applying the the deployed network", True)
+        if opts.scaleBack:
+            msg = "Performing inverse-transform (%s) to all variables to get their original representation" % (hs + "scaleBack" + ns)
+            Print(msg, True)
+            opts.scaleBack = True
 
     main()

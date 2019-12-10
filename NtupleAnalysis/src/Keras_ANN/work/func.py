@@ -6,9 +6,11 @@ import plot
 import math
 import array
 import json
+import pandas
 
 from sklearn.utils.class_weight import compute_sample_weight
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
@@ -50,7 +52,7 @@ def GetOriginalDataFrame(scaler, df, inputList):
     return df_original
 
 
-def GetStandardisedDataFrame(df, inputList):
+def GetStandardisedDataFrame(df, inputList, scalerType="robust"):
     '''
     Standardization of a dataset is a common requirement for many machine learning estimators: they might behave badly if the individual features do not
     more or less look like standard normally distributed data (e.g. Gaussian with 0 mean and unit variance).
@@ -59,17 +61,59 @@ def GetStandardisedDataFrame(df, inputList):
          This is crucial since the network trained and learned in separating "standardised" input variables!
          Excellent example her ("Why to normalise?"): https://stackoverflow.com/questions/48284427/why-should-we-normalize-data-for-deep-learning-in-keras
 
+    with_mean = True 
+    If True, center the data before scaling. 
+
+    with_std = True
+    If True, scale the data to unit variance (or equivalently, unit standard deviation).
+
+
+    The standard score of a sample x is calculated as:
+    z = (x - u) / s
+    where u is the mean of the training samples or zero if "with_mean=False", 
+    and s is the standard deviation of the training samples or one if "with_std=False".
+
     Snippet of code taken from:
     https://stackoverflow.com/questions/38420847/apply-standardscaler-to-parts-of-a-data-set
+
+    PLEASE READ: 
+    https://jovianlin.io/feature-scaling/
+    https://scikit-learn.org/stable/auto_examples/preprocessing/plot_all_scaling.html
+    https://jovianlin.io/feature-scaling/
     '''    
-    df_scaled = df.copy()
-    features  = df_scaled[inputList]
-    scaler    = StandardScaler(copy=True, with_mean=True, with_std=True)
-    features  = scaler.fit_transform(features.values)
-    df_scaled[inputList] = features
+    scalerTypres = ["standard", "robust", "minmax"]
+    if scalerType.lower() == "standard":
+        df_scaled = df.copy()
+        features  = df_scaled[inputList]
+        # Assumes that your data is normally distributed within each feature!     https://jovianlin.io/feature-scaling/
+        scaler    = StandardScaler(copy=True, with_mean=True, with_std=True)
+        features  = scaler.fit_transform(features.values)
+        df_scaled[inputList] = features
+    elif scalerType.lower() == "robust":
+        df_scaled = df.copy()
+        features  = df_scaled[inputList]
+        # Scale features using statistics that are robust to outliers
+        #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(25.0, 75.0), copy=True)
+        #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(30.0, 70.0), copy=True)
+        #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(10.0, 90.0), copy=True)
+        scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(5.0, 95.0), copy=True)
+        features  = scaler.fit_transform(features.values)
+        df_scaled[inputList] = features
+    elif scalerType.lower() == "minmax": 
+        df_scaled = df.copy()
+        features  = df_scaled[inputList]
+        # It shrinks the range such that it is now between 0 and 1 (or -1 to 1 if there exist negative values).
+        scaler    = MinMaxScaler(feature_range=(0, 1), copy=True)
+        features  = scaler.fit_transform(features.values)
+        df_scaled[inputList] = features
+    else:
+        msg = "Unsupported scaler type \"%s\". Please select one of the following:%s" % (scalerType, ", ".join(scalerTypes) )
+        raise Exception(msg)
+
     Verbose("Before:\n%s" % (df["TrijetMass"]), True)
     Verbose("After:\n%s" % (df_scaled["TrijetMass"]), True)
     return scaler, df_scaled
+
 
 def convertHistoToGaph(histo, verbose=False):
 
@@ -990,7 +1034,7 @@ def PlotOvertrainingTest(Y_train_S, Y_test_S, Y_train_B, Y_test_B, saveDir, save
     return htrain_s1, htest_s1, htrain_b1, htest_b1
 
 
-def WriteModel(model, model_json, inputList, output):
+def WriteModel(model, model_json, inputList, output, verbose=False):
     '''
     Write model weights and architecture in txt file
     '''
@@ -1045,5 +1089,7 @@ def WriteModel(model, model_json, inputList, output):
                 # Store bias values (shifts the activation function : output[i] = (Sum(weights[i,j]*inputs[j]) + bias[i]))
                 biases = model.layers[index].get_weights()[1]
                 fout.write(str(biases) + '\n')
-        Print('Writing model in file %s' % (output), True)
+
+        if verbose:
+            Print('Writing model in file %s' % (output), True)
         return
