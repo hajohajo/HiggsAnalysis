@@ -93,10 +93,10 @@ def GetStandardisedDataFrame(df, inputList, scalerType="robust"):
         df_scaled = df.copy()
         features  = df_scaled[inputList]
         # Scale features using statistics that are robust to outliers
-        #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(25.0, 75.0), copy=True)
+        scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(25.0, 75.0), copy=True)
         #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(30.0, 70.0), copy=True)
         #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(10.0, 90.0), copy=True)
-        scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(5.0, 95.0), copy=True)
+        #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(5.0, 95.0), copy=True)
         features  = scaler.fit_transform(features.values)
         df_scaled[inputList] = features
     elif scalerType.lower() == "minmax": 
@@ -301,8 +301,8 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
     xMin   = 0.0
     xMax   = 1.0
     nBins  = 50
-    xTitle = "DNN output"
-    yTitle = "Entries"
+    xTitle = "x-title"
+    yTitle = "y-title"
     log    = True
 
     if "log" in kwargs:
@@ -310,18 +310,8 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
     
     if "xTitle" in kwargs:
         xTitle = kwargs["xTitle"]
-
     if "yTitle" in kwargs:
         yTitle = kwargs["yTitle"]
-    elif "output" in saveName.lower():
-        xTitle = "DNN output" #"Entries"
-    elif "efficiency" in saveName.lower():
-        xTitle = "Efficiency"
-    elif "significance" in saveName.lower():
-        xTitle = "Significance"
-    else:
-        pass    
-
     if "xMin" in kwargs:
         xMin = kwargs['xMin']
     if "xMax" in kwargs:
@@ -331,7 +321,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
     
     # For-loop: 
     for i, key in enumerate(resultsDict.keys(), 0):
-
+        # Print("Constructing histogram %s" % (key), i==0)
         h = ROOT.TH1F(key, '', nBins, xMin, xMax)
         for j, x in enumerate(resultsDict[key], 0):
             h.Fill(x)
@@ -347,7 +337,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
         plot.ApplyStyle(h, i+1)
 
         if normalizeToOne:
-            if "ymax" in kwargs:
+            if "yMax" in kwargs:
                 yMax = kwargs["yMax"]
             else:
                 yMax = 1.0
@@ -356,7 +346,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
             else:
                 yMin = 1e-4
 
-            if h.Integral()>0.0:
+            if h.Integral() > 0.0:
                 h.Scale(1./h.Integral())
         hList.append(h)
 
@@ -367,9 +357,8 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
 
     # For-loop: All histograms
     for i, h in enumerate(hList, 0):
-        h.SetMinimum(yMin*0.85)        
-        h.SetMaximum(yMax*1.15)
-
+        h.SetMaximum(yMax) #*1.15)
+        h.SetMinimum(yMin) #*0.85)    
         h.GetXaxis().SetTitle(xTitle)
         h.GetYaxis().SetTitle(yTitle)
             
@@ -400,7 +389,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
 def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
     resultsDict = {}
-    resultsDict["signal"]     = signal
+    resultsDict["signal"] = signal
     resultsDict["background"] = bkg
 
     normalizeToOne = False
@@ -415,7 +404,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
     hList  = []
     gList  = []
     yMin   = 100000
-    yMax   = -1
+    yMax   = None
     xMin   = 0.0
     xMax   = 1.0
     nBins  = 50
@@ -431,63 +420,54 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
 
     if "yTitle" in kwargs:
         yTitle = kwargs["yTitle"]
-    elif "output" in saveName.lower():
-        xTitle = "Entries"
-    elif "efficiency" in saveName.lower():
-        xTitle = "Efficiency"
-    elif "significance" in saveName.lower():
-        xTitle = "Significance"
-    else:
-        pass    
-
     if "xMin" in kwargs:
         xMin = kwargs['xMin']
     if "xMax" in kwargs:
         xMax = kwargs['xMax']
+    if "yMin" in kwargs:
+        yMin = kwargs['yMin']
+    if "yMax" in kwargs:
+        yMax = kwargs['yMax']
     if "nBins" in kwargs:
         xBins = kwargs['nBins']
     
-    # For-loop: 
+    # For-loop: All results
     for i, key in enumerate(resultsDict.keys(), 0):
-
+        # Print("Constructing histogram %s" % (key), i==0)
         h = ROOT.TH1F(key, '', nBins, xMin, xMax)
+        
+        # For-loop: All Entries
         for j, x in enumerate(resultsDict[key], 0):
             h.Fill(x)
             try:
-                yMin = min(x[0], yMin)
+                yMin_ = min(x[0], yMin)
             except:
                 pass
                 
         # Save maximum
-        yMax = max(h.GetMaximum(), yMax)
+        yMax_ = max(h.GetMaximum(), yMax)
 
         # Customise & append to list
         plot.ApplyStyle(h, i+1)
 
         if normalizeToOne:
-            if "ymax" in kwargs:
-                yMax = kwargs["yMax"]
-            else:
-                yMax = 1.0
-            if "yMin" in kwargs:
-                yMin = kwargs["yMin"]
-            else:
-                yMin = 1e-4
-
             if h.Integral()>0.0:
                 h.Scale(1./h.Integral())
         hList.append(h)
 
-    if yMin <= 0.0:
-        yMin = 100
     if log:
+        # print "yMin = %s, yMax = %s" % (yMin, yMax)
         canvas.SetLogy()
+
+    if yMax == None:
+        yMax = yMax_
 
     # For-loop: All histograms
     for i, h in enumerate(hList, 0):
-        #h.SetMinimum(yMin*0.85)        
-        h.SetMaximum(yMax*1.15)
-
+        # h.SetMinimum(yMin_* 0.85)        
+        # h.SetMaximum(yMax_* 1.15)
+        h.SetMaximum(yMin)  # no guarantees when converted to TGraph!
+        h.SetMaximum(yMax)  # no guarantees when converted to TGraph!
         h.GetXaxis().SetTitle(xTitle)
         h.GetYaxis().SetTitle(yTitle)
             
@@ -518,7 +498,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
 def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
     resultsDict = {}
-    resultsDict["signal"]     = signal
+    resultsDict["signal"] = signal
     resultsDict["background"] = bkg
 
     normalizeToOne = False
@@ -533,7 +513,7 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
     hList  = []
     gList  = []
     yMin   = 100000
-    yMax   = -1
+    yMax   = None
     xMin   = 0.0
     xMax   = 1.0
     nBins  = 50
@@ -543,27 +523,20 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
 
     if "log" in kwargs:
         log = kwargs["log"]
-    
     if "xTitle" in kwargs:
         xTitle = kwargs["xTitle"]
-
     if "yTitle" in kwargs:
         yTitle = kwargs["yTitle"]
-    #elif "output" in saveName.lower():
-        #xTitle = "Entries"
-    elif "efficiency" in saveName.lower():
-        xTitle = "Efficiency"
-    elif "significance" in saveName.lower():
-        xTitle = "Significance"
-    else:
-        pass    
-    
     if "xMin" in kwargs:
         xMin = kwargs['xMin']
     if "xMax" in kwargs:
         xMax = kwargs['xMax']
     if "nBins" in kwargs:
         nBins = kwargs['nBins']
+    if "yMax" in kwargs:
+        yMax = kwargs["yMax"]
+    if "yMin" in kwargs:
+        yMin = kwargs["yMin"]
     
     # For-loop: 
     for i, key in enumerate(resultsDict.keys(), 0):
@@ -590,39 +563,33 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
             # Fill the histogram
             h.Fill(x)
             try:
-                yMin = min(x[0], yMin)
+                yMin_ = min(x[0], yMin)
             except:
                 pass
                 
         # Save maximum
-        yMax = max(h.GetMaximum(), yMax)
+        yMax_ = max(h.GetMaximum(), yMax)
 
         # Customise & append to list
         plot.ApplyStyle(h, i+1)
 
         if normalizeToOne:
-            if "ymax" in kwargs:
-                yMax = kwargs["yMax"]
-            else:
-                yMax = 1.0
-            if "yMin" in kwargs:
-                yMin = kwargs["yMin"]
-            else:
-                yMin = 1e-4
-
             if h.Integral()>0.0:
                 h.Scale(1./h.Integral())
         hList.append(h)
 
-    if yMin <= 0.0:
-        yMin = 100
+    if yMax == None:
+        yMax = yMax_
+
     if log:
         canvas.SetLogy()
 
     # For-loop: All histograms
     for i, h in enumerate(hList, 0):
-        h.SetMinimum(yMin*0.85)        
-        h.SetMaximum(yMax*1.15)
+        #h.SetMinimum(yMin*0.85)        
+        #h.SetMaximum(yMax*1.15)
+        h.SetMinimum(yMin)
+        h.SetMaximum(yMax)
 
         h.GetXaxis().SetTitle(xTitle)
         h.GetYaxis().SetTitle(yTitle)
@@ -697,8 +664,6 @@ def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormat
         tgraph.GetXaxis().SetLimits(kwargs["xMin"], kwargs["xMax"])
     else:
         tgraph.GetXaxis().SetLimits(-0.05, 1.0)
-    #tgraph.SetMaximum(1.1)
-    #tgraph.SetMinimum(0)
     tgraph.Draw("AC")
         
     # Create legend

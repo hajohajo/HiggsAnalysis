@@ -332,15 +332,36 @@ def GetKwargs(var, standardise=False):
         }
 
     if "output" in var.lower() or var.lower() == "output":
-        kwargs["normalizeToOne"] = False
+        kwargs["normalizeToOne"] = True
         kwargs["nBins"]  = 50
         kwargs["xMin"]   =  0.0
-        kwargs["xMax"]   = +1.0
-        kwargs["yMin"]   = +1e0
+        kwargs["xMax"]   =  1.0
+        kwargs["yMin"]   =  1e-5
+        kwargs["yMax"]   =  2.0
         kwargs["xTitle"] = "DNN output"
-        kwargs["yTitle"] = "Entries"
+        kwargs["yTitle"] = "a.u."
         kwargs["log"]    = True
         return kwargs
+
+    if "efficiency" in var:
+        kwargs["normalizeToOne"] = False
+        kwargs["xMin"]   = 0.0
+        kwargs["xMax"]   = 1.0
+        kwargs["nBins"]  = 200
+        kwargs["xTitle"] = "DNN output"
+        kwargs["yTitle"] = "efficiency" # (\varepsilon)"
+        kwargs["yMin"]   = 0.0
+        kwargs["log"]    = False
+
+    if var == "significance":
+        kwargs["normalizeToOne"] = False
+        kwargs["xMin"]   = 0.0
+        kwargs["xMax"]   = 1.0
+        kwargs["nBins"]  = 200
+        kwargs["xTitle"] = "DNN output"
+        kwargs["yTitle"] = "significance"
+        kwargs["yMin"]   = 0.0
+        kwargs["log"]    = False
 
     if var == "loss":
         kwargs["normalizeToOne"] = False
@@ -367,7 +388,7 @@ def GetKwargs(var, standardise=False):
         kwargs["xMax"]   = 800.0
         kwargs["nBins"]  =  80
         kwargs["xTitle"] = "p_{T}#DeltaR_{t}"
-        kwargs["yMin"]   = 1e-3
+        kwargs["yMin"]   = 1e-3        
         #kwargs["yTitle"] = "a.u. / %0.0f"
 
     if var == "TrijetDijetPtDR":
@@ -415,11 +436,12 @@ def GetKwargs(var, standardise=False):
         #kwargs["yTitle"] = "a.u. / %0.0f GeV"
 
     if var == "TrijetMass":
-        kwargs["xMin"]   =    0.0
-        kwargs["xMax"]   = 1000.0
-        kwargs["nBins"]  =  500
+        kwargs["xMin"]   =   0.0
+        kwargs["xMax"]   = 900.0
+        kwargs["nBins"]  = 450 #500
         kwargs["xTitle"] = "m_{t} [GeV]"
         kwargs["yMin"]   = 1e-3
+        kwargs["yMax"]   = 1.0
         #kwargs["yTitle"] = "a.u. / %0.0f GeV"
 
     if var == "TrijetDijetMass":
@@ -715,20 +737,26 @@ def main(opts):
     # Apply rule-of-thumb to prevent over-fitting!
     checkNeuronsPerLayer(nEntries, opts)
     
+    
     # Optional Numpy array of weights for the training samples, used for weighting the loss function (during training only). 
     sampleWeights = None
     if opts.decorrelate:
-        msg = "De-correlating the mass by applying weights"
+        msg = "De-correlating the mass by applying weights (sample reweighting). Reweight for the training of the background mass distribution to match the signal one" #iro-fixme
         Print(cs + msg + ns, True)
-        # Return evenly spaced numbers over a specified interval.
-        minPt       =    0.0
-        maxPt       = 1000.0
-        massBinning = numpy.linspace(minPt, maxPt, 500)
+
+        # Get evenly spaced numbers over a specified interval
+        minPt =    0.0
+        maxPt = 1000.0
+        nBins =  500
+        massBinning = numpy.linspace(minPt, maxPt, nBins)
+        #print "massBinning = ", massBinning
         massRatio   = [s/b for s, b in zip(df_sig['TrijetMass'].values, df_bkg['TrijetMass'].values)] # unused. keep for reference
+
         # Use Mass as the variable to be decorrelated
         if 1:
             #massEvents  = df_sig['TrijetMass'].values + df_bkg['TrijetMass'].values # WRONG! It adds the two arrays! does not extend! Use concatenate instead!
-            massEvents  = df_bkg['TrijetMass'].values
+            #massEvents  = df_bkg['TrijetMass'].values
+            massEvents  = pandas.concat( [df_sig, df_bkg] )['TrijetMass'].values[:1*nEntries] # only use the test data (half of total)
         else:
             massEvents  = split_list(df_bkg['TrijetMass'].values)
             
@@ -736,11 +764,18 @@ def main(opts):
         # the situation if value is over the maximum bin edge, so you'll want to clip your values (or adjust the binning) accordingly
         # In other words; get the bin indices (convert values to bin indices according to the massBinning variable)
         digitizedMass = digitize( numpy.clip(massEvents, minPt, maxPt-1.0), bins=massBinning, right=False ) # binIndices
-        
+
         # These are the weights you can give to keras.fit() function in parameter "sample_weight". The idea is to reweight the braches to get 
         # both signal and bkg to have similar mass (decouple mass from learning) 
         if 1:
-            sampleWeights  = compute_sample_weight('balanced', digitizedMass) # Flatten-out both signal and bkg mass
+            # The "balanced" mode uses the values of y to automatically adjust weights inversely proportional to variable frequencies in the input data as n_samples / (n_classes * np.bincount(y))
+            sampleWeights = compute_sample_weight('balanced', y=digitizedMass) # Flatten-out both signal and bkg mass
+            # align = "{:>15} {:>15} {:>15}"
+            # print align.format("mass", "bin", "weight")
+            # for i, m in enumerate(massEvents, 0):
+            #     b  = digitizedMass[i] 
+            #     w  = sampleWeights.tolist()[i]
+            #     print align.format("%.1f" % m, "%d" % b, "%.1f" % w)
         else:
             signalWeights = numpy.ones(len( split_list(df_sig['TrijetMass'].values)))
             bkgWeights    = compute_sample_weight('balanced', digitizedMass) # Flatten-out both signal and bkg mass
@@ -764,7 +799,7 @@ def main(opts):
         msg  = "Standardising dataset features with the %sScaler%s" % (ls + opts.standardise, ns)
         Print(msg, True)    
         # WARNING! Don't cheat - fit only on training https://scikit-learn.org/stable/modules/neural_networks_supervised.html)
-        scaler_sig, df_sig = func.GetStandardisedDataFrame(df_sig, opts.inputList, scalerType=opts.standardise)
+        scaler_sig, df_sig = func.GetStandardisedDataFrame(df_sig, opts.inputList, scalerType=opts.standardise) # fixme - iro - should fit/transform only the TEST data
         scaler_bkg, df_bkg = func.GetStandardisedDataFrame(df_bkg, opts.inputList, scalerType=opts.standardise)
         scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList, scalerType=opts.standardise)
 
@@ -829,8 +864,8 @@ def main(opts):
         for i, var in enumerate(opts.inputList, 0):
             func.PlotInputs(dset_sig[:, i:i+1], dset_bkg[:, i:i+1], var, "%s/%s" % (opts.saveDir, "inputs"), opts.saveFormats)
 
-    # Split the datasets (X= 19 inputs, Y=output variable). Test size 0.5 means half for training half for testing
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state=opts.rndSeed, shuffle=True)
+    # Split the datasets (X= 19 inputs, Y=output variable). test_size 0.5 means half for training half for testing
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
     opts.testSample  = len(X_test)
     opts.trainSample = len(X_train)
 
@@ -872,7 +907,7 @@ def main(opts):
                                shuffle    = False,
                                verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
                                callbacks  = callbacks,
-                               sample_weight=sampleWeights
+                               sample_weight=sampleWeights # optional array of the same length as X_train, containing weights to apply to the model's loss for each sample.
                                )
         Verbose("Number of threads after fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
 
@@ -908,11 +943,10 @@ def main(opts):
     # Produce method score (i.e. predict output value for given input dataset). Computation is done in batches.
     # https://stackoverflow.com/questions/49288199/batch-size-in-model-fit-and-model-predict
     Print("Generating output predictions (numpy arrays) for the input samples", True)
-    pred_train  = myModel.predict(X_train, batch_size=None, verbose=1, steps=None)
-    pred_test   = myModel.predict(X_test , batch_size=None, verbose=1, steps=None)
-    pred_signal = myModel.predict(X_sig  , batch_size=None, verbose=1, steps=None)
-    pred_bkg    = myModel.predict(X_bkg  , batch_size=None, verbose=1, steps=None)    
-    # pred_train = model.predict(x, batch_size=None, verbose=0, steps=None, callbacks=None, max_queue_size=10, workers=1, use_multiprocessing=False) # Keras version 2.2.5 or later (https://keras.io/models/model/)
+    pred_train  = myModel.predict(X_train, batch_size=None, verbose=1, steps=None) # DNN score for training data (for both signal & bkg)
+    pred_test   = myModel.predict(X_test , batch_size=None, verbose=1, steps=None) # DNN score for test data (for both signal & bkg)
+    pred_signal = myModel.predict(X_sig  , batch_size=None, verbose=1, steps=None) # DNN score for training data (for both signal)
+    pred_bkg    = myModel.predict(X_bkg  , batch_size=None, verbose=1, steps=None) # DNN score for training data (for both bkg)   
 
     # Join a sequence of arrays (X and Y) along an existing axis (1). In other words, add the ouput variable (Y) to the input variables (X)
     XY_train = numpy.concatenate((X_train, Y_train), axis=1)
@@ -945,10 +979,10 @@ def main(opts):
     jsonWr = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)
 
     # Plot selected output and save to JSON file for future use
-    func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"       , jsonWr, opts.saveFormats)#, **GetKwargs("Output"     ))
-    func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred"   , jsonWr, opts.saveFormats)# , **GetKwargs("OutputPred" ))
-    func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats)# , **GetKwargs("OutputTrain"))
-    func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats)# , **GetKwargs("OutputTest" ))
+    func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"       , jsonWr, opts.saveFormats, **GetKwargs("Output"     )) # DNN score (predicted): Signal Vs Bkg
+    func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred"   , jsonWr, opts.saveFormats, **GetKwargs("OutputPred" )) # DNN score (sig+bkg)  : Train Vs Predict
+    func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats, **GetKwargs("OutputTrain")) # DNN score (training) : Sig Vs Bkg
+    func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats, **GetKwargs("OutputTest" )) # DNN score (predicted): Sig Vs Bkg  
 
     # Scale back the data to the original representation
     if opts.scaleBack:
@@ -969,26 +1003,26 @@ def main(opts):
         stdPlots = opts.standardise 
 
     for i, var in enumerate(opts.inputList, 0):
-        PrintFlushed("Variable %s (%d/%d)" % (var, i+1, len(opts.inputList)), i==0)
         if var != "TrijetMass":
             continue
+        PrintFlushed("Variable %s (%d/%d)" % (var, i+1, len(opts.inputList)), i==0)
 
         Verbose("Plotting variable %s (irrespective of DNN score)" % (var), True)
         func.PlotAndWriteJSON(dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
-        Verbose("Plotting variable %s for DNN score 0.1" % (var), True)
+        Verbose("Plotting variable %s for DNN score 0.1" % (var), False)
         func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
-        Verbose("Plotting variable %s for DNN score 0.3" % (var), True)
+        Verbose("Plotting variable %s for DNN score 0.3" % (var), False)
         func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
-        Verbose("Plotting variable %s for DNN score 0.5" % (var), True)
+        Verbose("Plotting variable %s for DNN score 0.5" % (var), False)
         func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
-        Verbose("Plotting variable %s for DNN score 0.7" % (var), True)
+        Verbose("Plotting variable %s for DNN score 0.7" % (var), False)
         func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.7, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
-        Verbose("Plotting variable %s for DNN score 0.9" % (var), True)
+        Verbose("Plotting variable %s for DNN score 0.9" % (var), False)
         func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.9, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
     print
 
@@ -1001,12 +1035,13 @@ def main(opts):
     # Write efficiencies (signal and bkg)
     xVals_S, xErrs_S, effVals_S, effErrs_S  = func.GetEfficiency(htest_s)
     xVals_B, xErrs_B, effVals_B, effErrs_B  = func.GetEfficiency(htest_b)
-    func.PlotTGraph(xVals_S, xErrs_S, effVals_S, effErrs_S, opts.saveDir, "EfficiencySig", jsonWr, opts.saveFormats)
-    func.PlotTGraph(xVals_B, xErrs_B, effVals_B, effErrs_B, opts.saveDir, "EfficiencyBkg", jsonWr, opts.saveFormats)
+    func.PlotTGraph(xVals_S, xErrs_S, effVals_S, effErrs_S, opts.saveDir, "EfficiencySig", jsonWr, opts.saveFormats, **GetKwargs("efficiency") )
+    func.PlotTGraph(xVals_B, xErrs_B, effVals_B, effErrs_B, opts.saveDir, "EfficiencyBkg", jsonWr, opts.saveFormats, **GetKwargs("efficiency") )
 
     xVals, xErrs, sig_def, sig_alt = func.GetSignificance(htest_s, htest_b)
-    func.PlotTGraph(xVals, xErrs, sig_def, effErrs_B, opts.saveDir, "SignificanceA", jsonWr, opts.saveFormats)
-    func.PlotTGraph(xVals, xErrs, sig_alt, effErrs_B, opts.saveDir, "SignificanceB", jsonWr, opts.saveFormats)
+    func.PlotTGraph(xVals, xErrs, sig_def, effErrs_B, opts.saveDir, "SignificanceA", jsonWr, opts.saveFormats, **GetKwargs("significance") )
+    func.PlotTGraph(xVals, xErrs, sig_alt, effErrs_B, opts.saveDir, "SignificanceB", jsonWr, opts.saveFormats, **GetKwargs("significance") )
+
     # Metrics
     xErr = [0.0 for i in range(0, opts.epochs)]
     yErr = [0.0 for i in range(0, opts.epochs)]
@@ -1031,7 +1066,7 @@ def main(opts):
     # Print total time elapsed
     days, hours, mins, secs = GetTime(tStart)
     dt = "%s days, %s hours, %s mins, %s secs" % (days[0], hours[0], mins[0], secs)
-    Print("Total elapsed time is %s" % (hs + dt + ns), True)
+    Print("Elapsed time: %s" % (hs + dt + ns), True)
     opts.elapsedTime = dt
     writeCfgFile(opts)
     return 
@@ -1065,7 +1100,7 @@ if __name__ == "__main__":
     SAVEFORMATS  = "png"
     URL          = False
     STANDARDISE  = None
-    SCALEBACK    = True
+    SCALEBACK    = False
     DECORRELATE  = False
     ENTRYSTOP    = None
     VERBOSE      = False
@@ -1134,7 +1169,7 @@ if __name__ == "__main__":
                       help="The \"batch size\" to be used (= a number of samples processed before the model is updated). Batch size impacts learning significantly; typically networks train faster with mini-batches. However, the batch size has a direct impact on the variance of gradients (the larger the batch the better the appoximation and the larger the memory usage). [default: %s]" % BATCHSIZE)
 
     parser.add_option("--activation", dest="activation", type="string", default=ACTIVATION,
-"                      help="Type of transfer function that will be used to map the output of one layer to another [default: %s]" % ACTIVATION)
+                      help="Type of transfer function that will be used to map the output of one layer to another [default: %s]" % ACTIVATION)
 
     parser.add_option("--neurons", dest="neurons", type="string", default=NEURONS,
                       help="List of neurons to use for each sequential layer (comma-separated integers)  [default: %s]" % NEURONS)
