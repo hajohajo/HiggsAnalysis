@@ -537,9 +537,9 @@ def GetKwargs(var, standardise=False):
         #kwargs["yTitle@"] = "a.u. / %0.0f"
 
     if standardise:
-        kwargs["xMin"]  = -5.0
-        kwargs["xMax"]  = +5.0
-        kwargs["nBins"] = 1000
+        kwargs["xMin"]  =  -5.0
+        kwargs["xMax"]  =  +5.0
+        kwargs["nBins"] = 500 #1000
 
     return kwargs
 
@@ -800,10 +800,6 @@ def main(opts):
         #sampleWeights_all = numpy.concatenate((split_list(sampleWeights_sig), split_list(sampleWeights_bkg)), axis=0) # iro - xenios - OVERWRITE weights
         sampleWeights_all = numpy.concatenate((sampleWeights_sig, sampleWeights_bkg), axis=0) # iro - xenios - OVERWRITE weights
         sampleWeights_val = numpy.concatenate((split_list(sampleWeights_sig, False), split_list(sampleWeights_bkg, False)), axis=0) # iro - xenios - OVERWRITE weights
-        print "="*100
-        print "len(sampleWeights_all) = ", len(sampleWeights_all)
-        print "len(sampleWeights_sig) = ", len(sampleWeights_sig)
-        print "len(sampleWeights_bkg) = ", len(sampleWeights_bkg)
         '''
         for i,w in enumerate(sampleWeights_all, 0):
             s = "N/A"
@@ -896,46 +892,43 @@ def main(opts):
     # Split data into input (X) and output (Y), using an equal number for signal and background. 
     # This is by creating the dataset with double the number of rows as is available for signal. Remember
     # that the background entries were appended to those of the signal.
-    X     = dset_all[:2*nEntries, 0:nInputs] # rows: 0 -> 2*Entries, columns: 0 -> 19 (all variables but not the "signal" column)
-    Y     = dset_all[:2*nEntries, nInputs:]  # rows: 0 -> 2*Entries, column : 20  [i.e. everything after column 19 which is only the "signal" column (0 or 1)]
-    #X_sig = dset_sig[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
-    #X_bkg = dset_bkg[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeB"
-    X_sig = dset_all[0:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
+    X     = dset_all[:2*nEntries, 0:nInputs]           # rows: 0 -> 2*Entries, columns: 0 -> 19 (all variables but not the "signal" column)
+    Y     = dset_all[:2*nEntries, nInputs:]            # rows: 0 -> 2*Entries, column : 20  [i.e. everything after column 19 which is only the "signal" column (0 or 1)]
+    X_sig = dset_all[0:nEntries, 0:nInputs]            # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
     X_bkg = dset_all[nEntries:2*nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeB"
-
-    Y_sig = dset_all[:nEntries, nInputs:]    # contains 1's (total of "nEntries" values)   - NOT USED
-    Y_bkg = dset_all[:nEntries, nInputs:]    # contains 0's (total ODof "nEntries" values) - N0T USED
+    Y_sig = dset_all[:nEntries, nInputs:]              # contains 1's (total of "nEntries" values)   - NOT USED
+    Y_bkg = dset_all[:nEntries, nInputs:]              # contains 0's (total ODof "nEntries" values) - N0T USED
     Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_sig), ns, es, len(X_bkg), ns), True)
 
     # Split the datasets (X= 19 inputs, Y=output variable). test_size 0.5 means half for training half for testing. Shuffle the entry order?
-    X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(X, Y, sampleWeights_all, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
-    align = "{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}"
-    print "="*110
-    title = align.format("index", "X_train", "X_test", "Y_train", "Y_test", "W_train", "W_test")
-    print title
-    print "="*110
-    x_tr = X_train[0:nEntries, 7].tolist()
-    x_te = X_test[0:nEntries, 7].tolist() # fixme - index ambiguous! 
-    y_tr = Y_train[0:nEntries, 0].tolist()
-    y_te = Y_test[0:nEntries, 0].tolist()
-    w_tr = W_train.tolist()
-    w_te = W_test.tolist()
-    #w_all= sampleWeights_all.tolist()
-    #w_s  = sampleWeights_sig.tolist()
-    #w_b  = sampleWeights_bkg.tolist()
-    #w_all= sampleWeights_all.tolist()
-    
-    '''
-    # For-loop: All entries
-    for i,x in enumerate(x_tr, 0):
+    if opts.decorrelate:
+        X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(X, Y, sampleWeights_all, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
+        align = "{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}"
+        print "="*110
+        title = align.format("index", "X_train", "X_test", "Y_train", "Y_test", "W_train", "W_test")
+        print title
+        print "="*110
+        x_tr = X_train[0:nEntries, 7].tolist()
+        x_te = X_test[0:nEntries, 7].tolist() # fixme - index ambiguous! 
+        y_tr = Y_train[0:nEntries, 0].tolist()
+        y_te = Y_test[0:nEntries, 0].tolist()
+        w_tr = W_train.tolist()
+        w_te = W_test.tolist()
+        
+        '''
+        # For-loop: All entries
+        for i,x in enumerate(x_tr, 0):
         msg = align.format("%d" % i, "%.2f" %  x_tr[i], "%.2f" %  x_te[i], "%.2f" %  y_tr[i], "%.2f" %  y_te[i], "%.2f" % w_tr[i], "%.2f" % w_te[i])
         if i < (nEntries/2):
-            print ss + msg + ns
+        print ss + msg + ns
         else:
-            print es + msg + ns
+        print es + msg + ns
+        print "="*100
+        '''
+    else:
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
 
-    print "="*100
-    '''
+    # Save size of test & training samples for future reference
     opts.testSample  = len(X_test)
     opts.trainSample = len(X_train)
 
@@ -967,55 +960,57 @@ def main(opts):
     # Fit the model with our data
     # (An "epoch" is an arbitrary cutoff, generally defined as "one iteration of training on the whole dataset", 
     # used to separate training into distinct phases, which is useful for logging and periodic evaluation.)
-    try:
-        Verbose("Number of threads before fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
-        seqModel = myModel.fit(X_train,
-                               Y_train,
-                               validation_data=(X_test, Y_test, W_test), # apply sample weights to validation data also
-                               #validation_data=(X_test, Y_test),
-                               epochs     = opts.epochs,    # a full pass over all of your training data
-                               batch_size = opts.batchSize, # a set of N samples (https://stats.stackexchange.com/questions/153531/what-is-batch-size-in-neural-network)
-                               shuffle    = False,
-                               verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
-                               callbacks  = callbacks,
-                               sample_weight=W_train # optional array of the same length as X_train, containing weights to apply to the model's loss for each sample.
-                               )
-        Verbose("Number of threads after fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
+    sampleWeights  = None
+    validationData = (X_test, Y_test)
+    if opts.decorrelate:
+        # Optional array of the same length as X_train, containing weights to apply to the model's loss for each sample.
+        sampleWeights  = W_train
+        # Apply sample weights to validation data also
+        validationData = (X_test, Y_test, W_test)
+    else:
+        pass
+    Verbose("Number of threads before fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
+    seqModel = myModel.fit(X_train,
+                           Y_train,
+                           validation_data=validationData,
+                           epochs     = opts.epochs,    # a full pass over all of your training data
+                           batch_size = opts.batchSize, # a set of N samples (https://stats.stackexchange.com/questions/153531/what-is-batch-size-in-neural-network)
+                           shuffle    = False,
+                           verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
+                           callbacks  = callbacks,
+                           sample_weight=sampleWeights
+                           )
+    Verbose("Number of threads after fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
         
-        # Retrieve  the training / validation loss / accuracy at each epoch
-        Verbose("The available history objects of the model are: %s" % (", ".join(seqModel.history.keys())), True)
-        # For plotting: https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
-        trainLossList = seqModel.history['loss']
-        trainAccList  = seqModel.history['acc']
-        valLossList   = seqModel.history['val_loss']
-        valAccList    = seqModel.history['val_acc']
-        epochList     = range(opts.epochs)
-
-    except KeyboardInterrupt: #(KeyboardInterrupt, SystemExit):
-        msg = "Manually interrupted the training (keyboard interrupt)!"
-        Print(es + msg + ns, True)
+    # Retrieve  the training / validation loss / accuracy at each epoch
+    Verbose("The available history objects of the model are: %s" % (", ".join(seqModel.history.keys())), True)
+    # For plotting: https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
+    trainLossList = seqModel.history['loss']
+    trainAccList  = seqModel.history['acc']
+    valLossList   = seqModel.history['val_loss']
+    valAccList    = seqModel.history['val_acc']
+    epochList     = range(opts.epochs)
 
     # Plot the input variables
     if opts.plotInputs:
-
+        std_ = (opts.standardise != None)
         Verbose("Plotting all %d input variables for signal and bacgkround" % (len(opts.inputList)), True)
         for i, var in enumerate(opts.inputList, 0):
             if var != "TrijetMass":
                 continue
             
             # Get the lists
-            sigList   = X[0:nEntries, i:i+1] # first nEntries is signal. i:i+1 get the column (variable) of inteerest
+            sigList   = X[0:nEntries, i:i+1]          # first nEntries is signal. i:i+1 get the column (variable) of inteerest
             bkgList   = X[nEntries:2*nEntries, i:i+1] # after the first nEntries there is an equal number of background entries
             trainList = X_train[0:nEntries, i:i+1]
             testList  = X_test[0:nEntries, i:i+1]
 
             # Make the plots
-            func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg")   , opts.saveFormats, pType="sigVbkg"   , standardise=stdPlots, w1=sampleWeights_sig, w2=sampleWeights_bkg)
-            func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest"), opts.saveFormats, pType="trainVtest", standardise=stdPlots)
+            func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg")   , opts.saveFormats, pType="sigVbkg"   , standardise=std_)
+            func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest"), opts.saveFormats, pType="trainVtest", standardise=std_)
             if opts.decorrelate:
-                # NOTE: We don't weigh the test samples! just the training ones!
-                #func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest_weighted"), opts.saveFormats, pType="trainVtest", standardise=stdPlots, w1=sampleWeights_all, w2=sampleWeights_val)
-                func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest_weighted"), opts.saveFormats, pType="trainVtest", standardise=stdPlots, w1=W_train, w2=W_test)
+                func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg_weighted")   , opts.saveFormats, pType="sigVbkg"   , standardise=std_, w1=sampleWeights_sig, w2=sampleWeights_bkg)
+                func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest_weighted"), opts.saveFormats, pType="trainVtest", standardise=std_, w1=W_train, w2=W_test)
 
     # Write the model
     modelName = "model_trained.h5"
@@ -1091,6 +1086,7 @@ def main(opts):
     func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred"   , jsonWr, opts.saveFormats, **GetKwargs("OutputPred" )) # DNN score (sig+bkg)  : Train Vs Predict
     func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats, **GetKwargs("OutputTrain")) # DNN score (training) : Sig Vs Bkg
     func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats, **GetKwargs("OutputTest" )) # DNN score (predicted): Sig Vs Bkg  
+
 
     # Scale back the data to the original representation
     if opts.scaleBack:
