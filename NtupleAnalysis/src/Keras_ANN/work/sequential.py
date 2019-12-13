@@ -341,6 +341,15 @@ def GetKwargs(var, standardise=False):
         kwargs["xTitle"] = "DNN output"
         kwargs["yTitle"] = "a.u."
         kwargs["log"]    = True
+        if var.lower() == "output":
+            kwargs["legHeader"]  = "all data"
+        if var.lower() == "outputpred":
+            kwargs["legHeader"]  = "all data"
+            kwargs["legEntries"] = ["train", "test"]
+        if var.lower() == "outputtrain":
+            kwargs["legHeader"]  = "training data"
+        if var.lower() == "outputtest":
+            kwargs["legHeader"]  = "test data"
         return kwargs
 
     if "efficiency" in var:
@@ -688,6 +697,11 @@ def main(opts):
     style.setGridX(opts.gridX)
     style.setGridY(opts.gridY)
 
+    if opts.scaleBack:
+        stdPlots = False
+    else:
+        stdPlots = opts.standardise 
+
     # Open the ROOT file
     Verbose("Opening ROOT file %s" %  (opts.rootFileName), True)
     ROOT.TFile.Open(opts.rootFileName)
@@ -730,59 +744,88 @@ def main(opts):
 
     # Get the number of entries and columns of the DataFrames. Perform sanity checks
     nEntries_sig, nColumns_sig, nEntries_bkg, nColumns_bkg = GetDataFramesRowsColumns(df_sig, df_bkg)
-
-    # Entries will be limited to the number of entries available from the signal sample (much smaller than bkg sample)
-    nEntries = nEntries_sig
+    # Entries will be limited to the number of entries available from the signal and background samples
+    nEntries = min(nEntries_sig, nEntries_bkg)
 
     # Apply rule-of-thumb to prevent over-fitting!
     checkNeuronsPerLayer(nEntries, opts)
-    
-    
+
     # Optional Numpy array of weights for the training samples, used for weighting the loss function (during training only). 
-    sampleWeights = None
+    sampleWeights_all = None
+    sampleWeights_sig = None
+    sampleWeights_bkg = None
+    sampleWeights_val = None
     if opts.decorrelate:
         msg = "De-correlating the mass by applying weights (sample reweighting). Reweight for the training of the background mass distribution to match the signal one" #iro-fixme
         Print(cs + msg + ns, True)
 
         # Get evenly spaced numbers over a specified interval
-        minPt =    0.0
-        maxPt = 1000.0
-        nBins =  500
-        massBinning = numpy.linspace(minPt, maxPt, nBins)
-        #print "massBinning = ", massBinning
-        massRatio   = [s/b for s, b in zip(df_sig['TrijetMass'].values, df_bkg['TrijetMass'].values)] # unused. keep for reference
+        xMin  =    0.0
+        xMax  = 1000.0
+        nBins = 1000
+        massBinning = numpy.linspace(xMin, xMax, nBins)
+        # print "massBinning = ", massBinning
+        # massRatio   = [s/b for s, b in zip(df_sig['TrijetMass'].values, df_bkg['TrijetMass'].values)] # unused. keep for reference #entry-by-entry weights!
 
         # Use Mass as the variable to be decorrelated
-        if 1:
-            #massEvents  = df_sig['TrijetMass'].values + df_bkg['TrijetMass'].values # WRONG! It adds the two arrays! does not extend! Use concatenate instead!
-            #massEvents  = df_bkg['TrijetMass'].values
-            massEvents  = pandas.concat( [df_sig, df_bkg] )['TrijetMass'].values[:1*nEntries] # only use the test data (half of total)
-        else:
-            massEvents  = split_list(df_bkg['TrijetMass'].values)
-            
+        massEvents_all = pandas.concat( [split_list(df_sig), split_list(df_bkg)] )['TrijetMass'].values
+        # massEvents_all = pandas.concat( [df_sig, df_bkg] )['TrijetMass'].values
+        massEvents_sig = df_sig['TrijetMass'].values
+        massEvents_bkg = df_bkg['TrijetMass'].values
+        # massEvents  = df_bkg['TrijetMass'].values
+        # massEvensts  = pandas.concat( [df_sig, df_bkg] )['TrijetMass'].values#[0:nEntries] # only use the test data (half of total) 
+        # massEvents  = df_all['TrijetMass'].values[nEntries:2*nEntries] # only use the bkg data
+        # massEvents  = split_list(df_bkg['TrijetMass'].values) # half-size
+        
+    
         # Digitize will return numbers from 1 to len(bins) depending on which bin the event belongs to. However it won't handle
         # the situation if value is over the maximum bin edge, so you'll want to clip your values (or adjust the binning) accordingly
         # In other words; get the bin indices (convert values to bin indices according to the massBinning variable)
-        digitizedMass = digitize( numpy.clip(massEvents, minPt, maxPt-1.0), bins=massBinning, right=False ) # binIndices
+        digitizedMass_all = digitize( numpy.clip(massEvents_all, xMin, xMax-1.0), bins=massBinning, right=False )
+        digitizedMass_sig = digitize( numpy.clip(massEvents_sig, xMin, xMax-1.0), bins=massBinning, right=False )
+        digitizedMass_bkg = digitize( numpy.clip(massEvents_bkg, xMin, xMax-1.0), bins=massBinning, right=False )
 
         # These are the weights you can give to keras.fit() function in parameter "sample_weight". The idea is to reweight the braches to get 
         # both signal and bkg to have similar mass (decouple mass from learning) 
-        if 1:
-            # The "balanced" mode uses the values of y to automatically adjust weights inversely proportional to variable frequencies in the input data as n_samples / (n_classes * np.bincount(y))
-            sampleWeights = compute_sample_weight('balanced', y=digitizedMass) # Flatten-out both signal and bkg mass
-            # align = "{:>15} {:>15} {:>15}"
-            # print align.format("mass", "bin", "weight")
-            # for i, m in enumerate(massEvents, 0):
-            #     b  = digitizedMass[i] 
-            #     w  = sampleWeights.tolist()[i]
-            #     print align.format("%.1f" % m, "%d" % b, "%.1f" % w)
-        else:
-            signalWeights = numpy.ones(len( split_list(df_sig['TrijetMass'].values)))
-            bkgWeights    = compute_sample_weight('balanced', digitizedMass) # Flatten-out both signal and bkg mass
-            sampleWeights = numpy.concatenate( (signalWeights, bkgWeights), axis=0)
+        # The "balanced" mode uses the values of y to automatically adjust weights inversely proportional to variable frequencies in the input data as n_samples / (n_classes * np.bincount(y))
+        sampleWeights_all = compute_sample_weight('balanced', y=digitizedMass_all) # Flatten-out both signal and bkg mass
+        sampleWeights_sig = compute_sample_weight('balanced', y=digitizedMass_sig) # Flatten-out signal only
+        sampleWeights_bkg = compute_sample_weight('balanced', y=digitizedMass_bkg) # Flatten-out bkg only
+        # sigWeights    = numpy.ones(nEntries/2) #numpy.ones(len( split_list(df_sig['TrijetMass'].values)))
+        # bkgWeights    = compute_sample_weight('balanced', y=digitizedMass) # Flatten-out both signal and bkg mass
+        # bkgWeights    = numpy.array(split_list(massRatio), dtype=numpy.float32) 
+        # sampleWeights = numpy.concatenate( (sigWeights, bkgWeights), axis=0)
+        # sampleWeights = numpy.concatenate( (sigWeights, ), axis=0)
 
-        # Flatten out only the bkg (and not the signal)
-        #sampleWeights[isSignal==0]  = compute_sample_weight('balanced', digitizedMass[isSignal==0])
+        #sampleWeights_all = numpy.concatenate((split_list(sampleWeights_sig), split_list(sampleWeights_bkg)), axis=0) # iro - xenios - OVERWRITE weights
+        sampleWeights_all = numpy.concatenate((sampleWeights_sig, sampleWeights_bkg), axis=0) # iro - xenios - OVERWRITE weights
+        sampleWeights_val = numpy.concatenate((split_list(sampleWeights_sig, False), split_list(sampleWeights_bkg, False)), axis=0) # iro - xenios - OVERWRITE weights
+        print "="*100
+        print "len(sampleWeights_all) = ", len(sampleWeights_all)
+        print "len(sampleWeights_sig) = ", len(sampleWeights_sig)
+        print "len(sampleWeights_bkg) = ", len(sampleWeights_bkg)
+        '''
+        for i,w in enumerate(sampleWeights_all, 0):
+            s = "N/A"
+            b = "N/A"
+            if i < nEntries:
+                s = "%.2f" % sampleWeights_sig[i]
+                b = "%.2f" % sampleWeights_bkg[i]
+            print "%d) all = %.2f, sig = %s, bkg = %s" % (i, w, s, b)
+        print "="*100
+        '''
+
+        '''
+        align = "{:>5} {:>15} {:>15} {:>15}"
+        Verbose(align.format("index", "mass", "bin", "weight"), True)
+        for i, m in enumerate(massEvents, 0):
+            b  = digitizedMass[i] 
+            #w  = sampleWeights.tolist()[i]
+            w  = bkgWeights.tolist()[i]
+            Verbose(align.format("%d" % i, "%.1f" % m, "%d" % b, "%.1f" % w), False)
+        for i, w in enumerate(sampleWeights, 0):
+            Verbose("%d) w = %.2f" % (i, w), i==0)
+        '''
 
     # Assigning new column in our DataFrames DataFrames with label "signal". It takes value of "1" for signal and "0" for background.
     # Total number of columns is now increased by 1 (19 + 1 = 20)
@@ -805,9 +848,12 @@ def main(opts):
 
     # Get a Numpy representation of the DataFrames for signal and background datasets (again, and AFTER assigning signal and background)
     Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
-    dset_sig = df_sig.values
-    dset_bkg = df_bkg.values
+    #dset_sig = df_sig.values
+    #dset_bkg = df_bkg.values
     dset_all = df_all.values
+
+    # For future use
+    jsonWr = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)    
 
     # Define keras model as a linear stack of layers. Add layers one at a time until we are happy with our network architecture.
     Verbose("Creating the sequential Keras model", True)
@@ -852,20 +898,44 @@ def main(opts):
     # that the background entries were appended to those of the signal.
     X     = dset_all[:2*nEntries, 0:nInputs] # rows: 0 -> 2*Entries, columns: 0 -> 19 (all variables but not the "signal" column)
     Y     = dset_all[:2*nEntries, nInputs:]  # rows: 0 -> 2*Entries, column : 20  [i.e. everything after column 19 which is only the "signal" column (0 or 1)]
-    X_sig = dset_sig[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
-    X_bkg = dset_bkg[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeB"
+    #X_sig = dset_sig[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
+    #X_bkg = dset_bkg[:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeB"
+    X_sig = dset_all[0:nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
+    X_bkg = dset_all[nEntries:2*nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeB"
+
     Y_sig = dset_all[:nEntries, nInputs:]    # contains 1's (total of "nEntries" values)   - NOT USED
     Y_bkg = dset_all[:nEntries, nInputs:]    # contains 0's (total ODof "nEntries" values) - N0T USED
     Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_sig), ns, es, len(X_bkg), ns), True)
 
-    # Plot the input variables
-    if opts.plotInputs:
-        Verbose("Plotting all %d input variables for signal and bacgkround" % (len(opts.inputList)), True)
-        for i, var in enumerate(opts.inputList, 0):
-            func.PlotInputs(dset_sig[:, i:i+1], dset_bkg[:, i:i+1], var, "%s/%s" % (opts.saveDir, "inputs"), opts.saveFormats)
+    # Split the datasets (X= 19 inputs, Y=output variable). test_size 0.5 means half for training half for testing. Shuffle the entry order?
+    X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(X, Y, sampleWeights_all, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
+    align = "{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}"
+    print "="*110
+    title = align.format("index", "X_train", "X_test", "Y_train", "Y_test", "W_train", "W_test")
+    print title
+    print "="*110
+    x_tr = X_train[0:nEntries, 7].tolist()
+    x_te = X_test[0:nEntries, 7].tolist() # fixme - index ambiguous! 
+    y_tr = Y_train[0:nEntries, 0].tolist()
+    y_te = Y_test[0:nEntries, 0].tolist()
+    w_tr = W_train.tolist()
+    w_te = W_test.tolist()
+    #w_all= sampleWeights_all.tolist()
+    #w_s  = sampleWeights_sig.tolist()
+    #w_b  = sampleWeights_bkg.tolist()
+    #w_all= sampleWeights_all.tolist()
+    
+    '''
+    # For-loop: All entries
+    for i,x in enumerate(x_tr, 0):
+        msg = align.format("%d" % i, "%.2f" %  x_tr[i], "%.2f" %  x_te[i], "%.2f" %  y_tr[i], "%.2f" %  y_te[i], "%.2f" % w_tr[i], "%.2f" % w_te[i])
+        if i < (nEntries/2):
+            print ss + msg + ns
+        else:
+            print es + msg + ns
 
-    # Split the datasets (X= 19 inputs, Y=output variable). test_size 0.5 means half for training half for testing
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
+    print "="*100
+    '''
     opts.testSample  = len(X_test)
     opts.trainSample = len(X_train)
 
@@ -901,17 +971,20 @@ def main(opts):
         Verbose("Number of threads before fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
         seqModel = myModel.fit(X_train,
                                Y_train,
-                               validation_data=(X_test, Y_test),
+                               validation_data=(X_test, Y_test, W_test), # apply sample weights to validation data also
+                               #validation_data=(X_test, Y_test),
                                epochs     = opts.epochs,    # a full pass over all of your training data
                                batch_size = opts.batchSize, # a set of N samples (https://stats.stackexchange.com/questions/153531/what-is-batch-size-in-neural-network)
                                shuffle    = False,
                                verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
                                callbacks  = callbacks,
-                               sample_weight=sampleWeights # optional array of the same length as X_train, containing weights to apply to the model's loss for each sample.
+                               sample_weight=W_train # optional array of the same length as X_train, containing weights to apply to the model's loss for each sample.
                                )
         Verbose("Number of threads after fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
-
+        
         # Retrieve  the training / validation loss / accuracy at each epoch
+        Verbose("The available history objects of the model are: %s" % (", ".join(seqModel.history.keys())), True)
+        # For plotting: https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
         trainLossList = seqModel.history['loss']
         trainAccList  = seqModel.history['acc']
         valLossList   = seqModel.history['val_loss']
@@ -921,6 +994,28 @@ def main(opts):
     except KeyboardInterrupt: #(KeyboardInterrupt, SystemExit):
         msg = "Manually interrupted the training (keyboard interrupt)!"
         Print(es + msg + ns, True)
+
+    # Plot the input variables
+    if opts.plotInputs:
+
+        Verbose("Plotting all %d input variables for signal and bacgkround" % (len(opts.inputList)), True)
+        for i, var in enumerate(opts.inputList, 0):
+            if var != "TrijetMass":
+                continue
+            
+            # Get the lists
+            sigList   = X[0:nEntries, i:i+1] # first nEntries is signal. i:i+1 get the column (variable) of inteerest
+            bkgList   = X[nEntries:2*nEntries, i:i+1] # after the first nEntries there is an equal number of background entries
+            trainList = X_train[0:nEntries, i:i+1]
+            testList  = X_test[0:nEntries, i:i+1]
+
+            # Make the plots
+            func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg")   , opts.saveFormats, pType="sigVbkg"   , standardise=stdPlots, w1=sampleWeights_sig, w2=sampleWeights_bkg)
+            func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest"), opts.saveFormats, pType="trainVtest", standardise=stdPlots)
+            if opts.decorrelate:
+                # NOTE: We don't weigh the test samples! just the training ones!
+                #func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest_weighted"), opts.saveFormats, pType="trainVtest", standardise=stdPlots, w1=sampleWeights_all, w2=sampleWeights_val)
+                func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest_weighted"), opts.saveFormats, pType="trainVtest", standardise=stdPlots, w1=W_train, w2=W_test)
 
     # Write the model
     modelName = "model_trained.h5"
@@ -939,14 +1034,28 @@ def main(opts):
     modelFilename = os.path.join(opts.saveDir, "model.txt")
     Print("Writing the model (weights and architecture) in the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
     func.WriteModel(myModel, model_json, opts.inputList, modelFilename, verbose=False)
-          
+
+    #https://keras.io/visualization/
+    #https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
+    molelFilename = modelFilename.replace(".txt", ".png")
+    Print("plot a graph of the model and save it to the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
+    #from IPython.display import SVG
+    #from keras.utils import model_to_dot
+    #SVG(model_to_dot(myModel).create(prog='dot', format='svg'))
+    #import pydotplus
+    #from keras.utils.vis_utils import model_to_dot
+    #keras.utils.vis_utils.pydot = pydot
+    if "fnal" not in opts.hostname:
+        from keras.utils import plot_model
+        plot_model(myModel, to_file=modelFilename)
+
     # Produce method score (i.e. predict output value for given input dataset). Computation is done in batches.
     # https://stackoverflow.com/questions/49288199/batch-size-in-model-fit-and-model-predict
     Print("Generating output predictions (numpy arrays) for the input samples", True)
-    pred_train  = myModel.predict(X_train, batch_size=None, verbose=1, steps=None) # DNN score for training data (for both signal & bkg)
-    pred_test   = myModel.predict(X_test , batch_size=None, verbose=1, steps=None) # DNN score for test data (for both signal & bkg)
-    pred_signal = myModel.predict(X_sig  , batch_size=None, verbose=1, steps=None) # DNN score for training data (for both signal)
-    pred_bkg    = myModel.predict(X_bkg  , batch_size=None, verbose=1, steps=None) # DNN score for training data (for both bkg)   
+    pred_train  = myModel.predict(X_train, batch_size=None, verbose=1, steps=None) # DNN output for training data (for both signal & bkg)
+    pred_test   = myModel.predict(X_test , batch_size=None, verbose=1, steps=None) # DNN output for test data (for both signal & bkg)
+    pred_signal = myModel.predict(X_sig  , batch_size=None, verbose=1, steps=None) # DNN output for signal only (all data)
+    pred_bkg    = myModel.predict(X_bkg  , batch_size=None, verbose=1, steps=None) # DNN output for data only (all data)
 
     # Join a sequence of arrays (X and Y) along an existing axis (1). In other words, add the ouput variable (Y) to the input variables (X)
     XY_train = numpy.concatenate((X_train, Y_train), axis=1)
@@ -976,10 +1085,9 @@ def main(opts):
 
     # Create json file
     writeGitFile(opts)
-    jsonWr = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)
 
     # Plot selected output and save to JSON file for future use
-    func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"       , jsonWr, opts.saveFormats, **GetKwargs("Output"     )) # DNN score (predicted): Signal Vs Bkg
+    func.PlotAndWriteJSON(pred_signal , pred_bkg    , opts.saveDir, "Output"       , jsonWr, opts.saveFormats, **GetKwargs("Output"     )) # DNN score (predicted): Signal Vs Bkg (all data)
     func.PlotAndWriteJSON(pred_train  , pred_test   , opts.saveDir, "OutputPred"   , jsonWr, opts.saveFormats, **GetKwargs("OutputPred" )) # DNN score (sig+bkg)  : Train Vs Predict
     func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats, **GetKwargs("OutputTrain")) # DNN score (training) : Sig Vs Bkg
     func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats, **GetKwargs("OutputTest" )) # DNN score (predicted): Sig Vs Bkg  
@@ -992,45 +1100,47 @@ def main(opts):
         df_bkg = func.GetOriginalDataFrame(scaler_bkg, df_bkg, opts.inputList)
         df_all = func.GetOriginalDataFrame(scaler_all, df_all, opts.inputList)
         # Re-define the datasets using the inverse_transformed DataFrames
-        dset_sig = df_sig.values
-        dset_bkg = df_bkg.values
+        #dset_sig = df_sig.values
+        #dset_bkg = df_bkg.values
         dset_all = df_all.values
 
     # For-loop: All branches to be plotted for various DNN score cuts (v. slow, especially for large number of "entrystop")
-    if opts.scaleBack:
-        stdPlots = False
-    else:
-        stdPlots = opts.standardise 
-
     for i, var in enumerate(opts.inputList, 0):
         if var != "TrijetMass":
             continue
-        PrintFlushed("Variable %s (%d/%d)" % (var, i+1, len(opts.inputList)), i==0)
+        PrintFlushed("Variable %s (%d/%d)" % (var, i, len(opts.inputList)), i==0)
 
         Verbose("Plotting variable %s (irrespective of DNN score)" % (var), True)
-        func.PlotAndWriteJSON(dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        #func.PlotAndWriteJSON(dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        func.PlotAndWriteJSON(dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.1" % (var), False)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.3" % (var), False)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.5" % (var), False)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.7" % (var), False)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.7, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.7, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.7, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
 
         Verbose("Plotting variable %s for DNN score 0.9" % (var), False)
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.9, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.9, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.9, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
     print
+
 
     # Plot overtraining test
     htrain_s, htest_s, htrain_b, htest_b = func.PlotOvertrainingTest(pred_train_S, pred_test_S, pred_train_B, pred_test_B, opts.saveDir, "OvertrainingTest", opts.saveFormats)
 
     # Plot summary plot (efficiency & singificance)
-    func.PlotEfficiency(htest_s, htest_b, opts.saveDir, "Summary", opts.saveFormats)
+    func.PlotEfficiency(htest_s, htest_b, opts.saveDir, "Summary", opts.saveFormats) # fixme - iro
 
     # Write efficiencies (signal and bkg)
     xVals_S, xErrs_S, effVals_S, effErrs_S  = func.GetEfficiency(htest_s)
@@ -1038,18 +1148,19 @@ def main(opts):
     func.PlotTGraph(xVals_S, xErrs_S, effVals_S, effErrs_S, opts.saveDir, "EfficiencySig", jsonWr, opts.saveFormats, **GetKwargs("efficiency") )
     func.PlotTGraph(xVals_B, xErrs_B, effVals_B, effErrs_B, opts.saveDir, "EfficiencyBkg", jsonWr, opts.saveFormats, **GetKwargs("efficiency") )
 
-    xVals, xErrs, sig_def, sig_alt = func.GetSignificance(htest_s, htest_b)
+    #xVals, xErrs, sig_def, sig_alt = func.GetSignificance(htest_s, htest_b)
     func.PlotTGraph(xVals, xErrs, sig_def, effErrs_B, opts.saveDir, "SignificanceA", jsonWr, opts.saveFormats, **GetKwargs("significance") )
     func.PlotTGraph(xVals, xErrs, sig_alt, effErrs_B, opts.saveDir, "SignificanceB", jsonWr, opts.saveFormats, **GetKwargs("significance") )
 
     # Metrics
     xErr = [0.0 for i in range(0, opts.epochs)]
     yErr = [0.0 for i in range(0, opts.epochs)]
-    func.PlotTGraph(epochList[0:opts.epochs], xErr, trainLossList[0:opts.epochs-1], yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
-    func.PlotTGraph(epochList[0:opts.epochs], xErr, trainAccList[0:opts.epochs-1] , yErr , opts.saveDir, "TrainAccuracy", jsonWr, opts.saveFormats, **GetKwargs("acc") )
-    func.PlotTGraph(epochList[0:opts.epochs], xErr, valLossList[0:opts.epochs-1]  , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
-    func.PlotTGraph(epochList[0:opts.epochs], xErr, valAccList[0:opts.epochs-1]   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
-
+    if 0:
+        func.PlotTGraph(epochList[0:opts.epochs], xErr, trainLossList[0:opts.epochs-1], yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        func.PlotTGraph(epochList[0:opts.epochs], xErr, trainAccList[0:opts.epochs-1] , yErr , opts.saveDir, "TrainAccuracy", jsonWr, opts.saveFormats, **GetKwargs("acc") )
+        func.PlotTGraph(epochList[0:opts.epochs], xErr, valLossList[0:opts.epochs-1]  , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        func.PlotTGraph(epochList[0:opts.epochs], xErr, valAccList[0:opts.epochs-1]   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
+        
     # Plot ROC curve
     gSig = func.GetROC(htest_s, htest_b)
     if 0:
@@ -1116,7 +1227,7 @@ if __name__ == "__main__":
     OPTIMIZER    = 'adam'
     CFGJSON      = "config.json"
     RESULTSJSON  = "results.json"
-    PLOTINPUTS   = False
+    PLOTINPUTS   = True
     INPUTVARS    = "TrijetPtDR,TrijetDijetPtDR,TrijetBjetMass,TrijetLdgJetBDisc,TrijetSubldgJetBDisc,TrijetBJetLdgJetMass,TrijetBJetSubldgJetMass,TrijetMass,TrijetDijetMass,TrijetBJetBDisc,TrijetSoftDrop_n2,TrijetLdgJetCvsL,TrijetSubldgJetCvsL,TrijetLdgJetPtD,TrijetSubldgJetPtD,TrijetLdgJetAxis2,TrijetSubldgJetAxis2,TrijetLdgJetMult,TrijetSubldgJetMult"
 
 

@@ -7,6 +7,7 @@ import math
 import array
 import json
 import pandas
+import numpy 
 
 from sklearn.utils.class_weight import compute_sample_weight
 from sklearn.preprocessing import StandardScaler
@@ -231,27 +232,65 @@ def PlotOutput(Y_train, Y_test, saveDir, saveName, isSB, saveFormats):
     canvas.Close()
     return
 
-def PlotInputs(signal, bkg, var, saveDir, saveFormats):
+def PlotInputs(signal, bkg, var, saveDir, saveFormats, pType="sigVbkg", standardise=False, w1=numpy.array([]), w2=numpy.array([])):
+
+    # Define plot type
+    if pType == "sigVbkg":
+        h1 = "signal"
+        h2 = "background"
+    elif pType == "testVtrain":
+        h1 = "train data"
+        h2 = "test data"        
+    elif pType == "trainVtest":
+        h1 = "test data"
+        h2 = "train data"
+    else:
+        Print("Unknown plot type \"%s\". Using dummie names/legends for histograms" % (pType), True)
+        h1 = "h1"
+        h2 = "h2"
+        
     ROOT.gStyle.SetOptStat(0)
 
     # Create canvas
     canvas = plot.CreateCanvas()
     canvas.cd()
     
-    info = plot.GetHistoInfo(var)
+    # Convert weights numpy arrays to list
+    w1 = w1.tolist()
+    w2 = w2.tolist()
+
+    # Definitions 
+    info  = plot.GetHistoInfo(var)
+    nBins = info["nbins"]
+    xMin  = info["xmin"]
+    xMax  = info["xmax"]
+    if standardise:
+        xMin  = -5.0
+        xMax  = +5.0
+        nBins = 500
+
     # Create histograms
-    hsignal = ROOT.TH1F('signal', '', info["nbins"], info["xmin"], info["xmax"])
-    hbkg    = ROOT.TH1F('bkg'   , '', info["nbins"], info["xmin"], info["xmax"])
+    hsignal = ROOT.TH1F(h1, '', nBins, xMin, xMax)
+    hbkg    = ROOT.TH1F(h2, '', nBins, xMin, xMax)
 
-    # Fill histograms
-    for r in signal:
-        hsignal.Fill(r)
+    # Fill histogram (signal)
+    for i, r in enumerate(signal, 0):
+        if len(w1) == 0: 
+            hsignal.Fill(r)
+        else:
+            hsignal.Fill(r, w1[i])
+            
+    # Fill histogram (bkg)    
+    for j, r in enumerate(bkg, 0):
+        if len(w2) == 0:
+            hbkg.Fill(r)
+        else:
+            hbkg.Fill(r, w2[j])
 
-    for r in bkg:
-        hbkg.Fill(r)
-
-    if 1:
+    if hsignal.Integral() > 0:
         hsignal.Scale(1./hsignal.Integral())
+
+    if hbkg.Integral() > 0:
         hbkg.Scale(1./hbkg.Integral())
 
     ymax = max(hsignal.GetMaximum(), hbkg.GetMaximum())
@@ -271,120 +310,14 @@ def PlotInputs(signal, bkg, var, saveDir, saveFormats):
 
     # Create legend
     leg=plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
-    leg.AddEntry(hsignal, "Truth-matched","f") #"pl"
-    leg.AddEntry(hbkg, "Unmatched","l") #"pl"
+    leg.AddEntry(hsignal, h1, "f") 
+    leg.AddEntry(hbkg   , h2, "l") 
     leg.Draw()
 
-    plot.SavePlot(canvas, saveDir, var, saveFormats, True)
+    plot.SavePlot(canvas, saveDir, var, saveFormats, False)
     canvas.Close()
     return
-        
-def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
-    resultsDict = {}
-    resultsDict["signal"]     = signal
-    resultsDict["background"] = bkg
-    
-    normalizeToOne = False
-    if "normalizeToOne" in kwargs:
-        normalizeToOne = kwargs["normalizeToOne"]
-
-   # Create canvas
-    ROOT.gStyle.SetOptStat(0)
-    canvas = plot.CreateCanvas()
-    canvas.cd()
-
-    hList  = []
-    gList  = []
-    yMin   = 100000
-    yMax   = -1
-    xMin   = 0.0
-    xMax   = 1.0
-    nBins  = 50
-    xTitle = "x-title"
-    yTitle = "y-title"
-    log    = True
-
-    if "log" in kwargs:
-        log = kwargs["log"]
-    
-    if "xTitle" in kwargs:
-        xTitle = kwargs["xTitle"]
-    if "yTitle" in kwargs:
-        yTitle = kwargs["yTitle"]
-    if "xMin" in kwargs:
-        xMin = kwargs['xMin']
-    if "xMax" in kwargs:
-        xMax = kwargs['xMax']
-    if "nBins" in kwargs:
-        xBins = kwargs['nBins']
-    
-    # For-loop: 
-    for i, key in enumerate(resultsDict.keys(), 0):
-        # Print("Constructing histogram %s" % (key), i==0)
-        h = ROOT.TH1F(key, '', nBins, xMin, xMax)
-        for j, x in enumerate(resultsDict[key], 0):
-            h.Fill(x)
-            try:
-                yMin = min(x[0], yMin)
-            except:
-                pass
-                
-        # Save maximum
-        yMax = max(h.GetMaximum(), yMax)
-
-        # Customise & append to list
-        plot.ApplyStyle(h, i+1)
-
-        if normalizeToOne:
-            if "yMax" in kwargs:
-                yMax = kwargs["yMax"]
-            else:
-                yMax = 1.0
-            if "yMin" in kwargs:
-                yMin = kwargs["yMin"]
-            else:
-                yMin = 1e-4
-
-            if h.Integral() > 0.0:
-                h.Scale(1./h.Integral())
-        hList.append(h)
-
-    if yMin <= 0.0:
-        yMin = 100
-    if log:
-        canvas.SetLogy()
-
-    # For-loop: All histograms
-    for i, h in enumerate(hList, 0):
-        h.SetMaximum(yMax) #*1.15)
-        h.SetMinimum(yMin) #*0.85)    
-        h.GetXaxis().SetTitle(xTitle)
-        h.GetYaxis().SetTitle(yTitle)
-            
-        if i==0:
-            h.Draw("HIST")
-        else:
-            h.Draw("HIST SAME")
-    
-    # Create legend
-    leg = plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
-    for h in hList:
-        leg.AddEntry(h, h.GetName(),"l")
-    leg.Draw()
-
-    plot.SavePlot(canvas, saveDir, saveName, saveFormats)
-    canvas.Close()
-
-    # Create TGraph
-    for h in hList:
-        gList.append(convertHistoToGaph(h))
-
-    # Write the Tgraph into the JSON file
-    for gr in gList:
-        gName = "%s_%s" % (saveName, gr.GetName())
-        jsonWr.addGraph(gName, gr)
-    return
 
 def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
@@ -477,9 +410,16 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
             h.Draw("HIST SAME")
     
     # Create legend
-    leg = plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
-    for h in hList:
-        leg.AddEntry(h, h.GetName(),"l")
+    leg = plot.CreateLegend(0.70, 0.76, 0.90, 0.90)
+    if "legHeader" in kwargs:
+        leg.SetHeader(kwargs["legHeader"])
+
+    # For-loop: All histograms
+    for i, h in enumerate(hList, 0):
+        if "legEntries" in kwargs:
+            leg.AddEntry(h, kwargs["legEntries"][i], "l")
+        else:
+            leg.AddEntry(h, h.GetName(), "l")
     leg.Draw()
 
     plot.SavePlot(canvas, saveDir, saveName, saveFormats)
@@ -690,6 +630,8 @@ def GetEfficiency(histo):
     yVals    = []
     yErrs    = []
     yTmp     = ROOT.Double(0.0)
+    if intVals == 0.0:
+        Print("WARNING! The integral of histogram \"%s\" is zero!" % (histo.GetName()), True)
     
     # For-loop: All bins
     for i in range(0, nbins+1):
@@ -698,10 +640,17 @@ def GetEfficiency(histo):
             continue
         xErr = histo.GetBinWidth(i)*0.5
         intBin = histo.IntegralAndError(i, nbins+1, yTmp, "")
-        yVals.append(intBin/intVals)
+        if intVals > 0:
+            yVals.append(intBin/intVals)
+        else:
+            yVals.append(0.0)
         xVals.append(xVal)
         xErrs.append(xErr)
-        yErrs.append(yTmp/intVals)
+        if intVals > 0:
+            yErrs.append(yTmp/intVals)
+        else:
+            yVals.append(0.0)
+
     return xVals, xErrs, yVals, yErrs
 
 
@@ -822,10 +771,12 @@ def PlotEfficiency(htest_s, htest_b, saveDir, saveName, saveFormats):
     
     # Normalize significance
     h_signifScaled0 = h_signif0.Clone("signif0")
-    h_signifScaled0.Scale(1./float(maxSignif))
+    if maxSignif > 0:
+        h_signifScaled0.Scale(1./float(maxSignif))
 
     h_signifScaled1 = h_signif1.Clone("signif1")
-    h_signifScaled1.Scale(1./float(maxSignif))
+    if maxSignif > 0:
+        h_signifScaled1.Scale(1./float(maxSignif))
 
     #Significance: Get new maximum
     ymax = max(h_signifScaled0.GetMaximum(), h_signifScaled1.GetMaximum())

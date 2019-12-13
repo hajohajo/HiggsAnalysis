@@ -94,6 +94,9 @@ def PrintFlushed(msg, printHeader=True):
 
 def main():
 
+    Print("Setting ROOT gErrorIngoreLevel to ROOT.kError (suppress warnings due to multiple canvases with same name)", True)
+    ROOT.gErrorIgnoreLevel = ROOT.kError
+
     # Apply TDR style
     style = tdrstyle.TDRStyle()
 
@@ -114,8 +117,12 @@ def main():
 
     # Definitions
     resultsList = []
+    Print("Filtering the directory list to keep only Keras base directories and not subdirectories", True)
+    opts.dirList = list(filter(lambda d: "Keras" in os.path.basename(d), opts.dirList))
+
+    # For-loop: All directories
     for i,d in enumerate(opts.dirList, 1):
-        
+
         dirs = glob.glob(d)
         dirs.sort()
         if len(dirs) == 0:
@@ -123,10 +130,11 @@ def main():
         directory = dirs[-1]
 
         Verbose("Picked %s" % directory, True)
+        Print("Creating \"Results\" object from directory %s" % os.path.basename(directory), i==1)
         resultsList.append(_results.Output(directory, excludePoints=[]))
         if opts.refName != None:
             if opts.refName in d:
-                opts.refIndex = i-1 #iro
+                opts.refIndex = i-1
 
     # Do comparison plot
     msg  = "Creating comparison plots (%d) using the following results directories:%s\n\t%s" % (len(opts.dirList), sh_t, "\n\t".join([os.path.basename(d) for d in opts.dirList]) )
@@ -152,6 +160,7 @@ def main():
                     pfix = ""
                 doVariablesWPs(var, resultsList, [wp], signal=True , defaultLegend=True, postFix=pfix)
                 doVariablesWPs(var, resultsList, [wp], signal=False, defaultLegend=True, postFix=pfix)
+
     elif opts.plotType.lower() == "var-wp":
         _saveDir = opts.saveDir
         WPs = ["", "0p1", "0p3", "0p5", "0p7", "0p9"]
@@ -605,6 +614,8 @@ def doPlot(legList, graphList, saveName, **kwargs):
     # Create a plot-base object
     Verbose("Creating the plot-base object", True)
     # plot = plots.PlotBase(hgList, saveFormats=[])
+    if len(hgList) < 1:
+        return
     plot = plots.ComparisonManyPlot(hgList[0], hgList[1:], saveFormats=[])
 
     # Apply histo style
@@ -635,7 +646,11 @@ def doPlot(legList, graphList, saveName, **kwargs):
     # Save plots and return
     Verbose("Saving the plot as %s" % (saveName), True)
     SavePlot(plot, opts.saveDir, saveName, opts.saveFormats)
-
+    
+    for g in hgList:
+        #g.getRootHisto().Delete()
+        g.getRootGraph().Delete()
+    
     Verbose("Plots saved under directory %s"% (sh_s + aux.convertToURL(opts.saveDir, opts.url) + sh_n), True)
     return
 

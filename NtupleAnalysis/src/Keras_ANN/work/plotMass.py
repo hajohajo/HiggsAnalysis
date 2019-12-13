@@ -290,9 +290,9 @@ def main():
         
     # Plot resutls
     if opts.logY:
-        nbins = 1000
+        nbins = 450 #1000
         xmin  = 0
-        xmax  = 1000    
+        xmax  = 900 #1000    
     else:
         nbins = 100
         xmin  = 100
@@ -499,15 +499,10 @@ action..........: The basic type of action to be taken when this argument is enc
         config = json.load(f)
         f.close()
         if "standardised datasets" in config:
-            opts.standardise = (config["standardised datasets"])
-        else:
-            pass
-    #elif "_RobustScaler_" in opts.dir:
-    #    opts.standardise = True
-    else:
-        pass
+            if config["standardised datasets"] != "None":
+                opts.standardise = (config["standardised datasets"])
 
-    # Sanity checks        
+    # Sanity checks 
     if opts.standardise == None:
         opts.scaleBack = False
     else:

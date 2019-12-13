@@ -30,7 +30,7 @@ set VERBOSE   = "" #"--verbose"
 set ROOTFILE1 = /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root
 #set ROOTFILE1 = /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root
 set ROOTFILE2 = /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-QCD_7Jets_3BJets.root
-set LOGY      = "" #"--logY"
+set LOGY      = "--logY"
 set ENTRIES   = 600000
 
 
