@@ -166,7 +166,7 @@ class Output:
         # Create list of variable to retrieve    
         vList = ["timestamp", "layers", "optimizer", "loss function", "epochs", "neurons", "hidden layers", "batch size",  "model", "activation functions", 
                  "rndSeed", "train sample", "model parameters (trainable)", "python version", "test sample", "model weights", "model parameters (total)",
-                 "host name", "standardised datasets", "keras version", "decorrelate mass", "model biases", "model parameters (non-trainable)",
+                 "host name", "standardised datasets", "keras version", "decorrelate", "model biases", "model parameters (non-trainable)",
                  "ROOT file", "input variables"]
         iErr  = -1
         for v in vList:
@@ -397,12 +397,8 @@ class Output:
                 pass
             else:
                 label+= " %s" % (self.standardisedDatasets.encode('UTF8'))
-            if self.decorrelateMass.encode('UTF8') == "True":
-                label+= " M"
-        # self.optimizer
-        # self.hiddenLayers
-        # self.lossFunction
-        # self.model
+            if self.decorrelate.encode('UTF8') != "None":
+                label+= " RW"
         return label
 
     def getResultsFile(self):

@@ -238,13 +238,6 @@ def GetDataFrameRowsColumns(df):
     Verbose("DataFrame has %s%d rows%s and %s%d columns%s" % (ts, nRows, ns, hs, nColumns, ns), True)
     return nRows, nColumns
 
-def split_list(a_list, firstHalf=True):
-    half = len(a_list)//2
-    if firstHalf:
-        return a_list[:half]
-    else:
-        return a_list[half:]
-
 def GetModelWeightsAndBiases(inputList, neuronsList):
     '''
     https://keras.io/models/about-keras-models/
@@ -446,8 +439,8 @@ def GetKwargs(var, standardise=False):
 
     if var == "TrijetMass":
         kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   = 900.0
-        kwargs["nBins"]  = 450 #500
+        kwargs["xMax"]   = 900 #900.0
+        kwargs["nBins"]  = 180 #450
         kwargs["xTitle"] = "m_{t} [GeV]"
         kwargs["yMin"]   = 1e-3
         kwargs["yMax"]   = 1.0
@@ -645,7 +638,7 @@ def writeCfgFile(opts):
     jsonWr.addParameter("model weights", opts.modelWeights)
     jsonWr.addParameter("model biases", opts.modelBiases)
     jsonWr.addParameter("standardised datasets", opts.standardise)
-    jsonWr.addParameter("decorrelate mass",  opts.decorrelate)
+    jsonWr.addParameter("decorrelate",  opts.decorrelate)
     jsonWr.addParameter("rndSeed", opts.rndSeed)
     jsonWr.addParameter("layers", len(opts.neurons))
     jsonWr.addParameter("hidden layers", len(opts.neurons)-2)
@@ -750,78 +743,12 @@ def main(opts):
     # Apply rule-of-thumb to prevent over-fitting!
     checkNeuronsPerLayer(nEntries, opts)
 
-    # Optional Numpy array of weights for the training samples, used for weighting the loss function (during training only). 
-    sampleWeights_all = None
-    sampleWeights_sig = None
-    sampleWeights_bkg = None
-    sampleWeights_val = None
-    if opts.decorrelate:
-        msg = "De-correlating the mass by applying weights (sample reweighting). Reweight for the training of the background mass distribution to match the signal one" #iro-fixme
+    # Optional numpy array of weights for the training & testing samples, used for weighting the loss function (during training only). 
+    # Can be used to decorrelate a variable before training; alternative approach to adversarial neural network (ANN) for combatting mass sculpting
+    if opts.decorrelate != None:        
+        msg = "Applying sample reweighting so that signal and background distributions of variable \"%s\" match"  % opts.decorrelate
         Print(cs + msg + ns, True)
-
-        # Get evenly spaced numbers over a specified interval
-        xMin  =    0.0
-        xMax  = 1000.0
-        nBins = 1000
-        massBinning = numpy.linspace(xMin, xMax, nBins)
-        # print "massBinning = ", massBinning
-        # massRatio   = [s/b for s, b in zip(df_sig['TrijetMass'].values, df_bkg['TrijetMass'].values)] # unused. keep for reference #entry-by-entry weights!
-
-        # Use Mass as the variable to be decorrelated
-        massEvents_all = pandas.concat( [split_list(df_sig), split_list(df_bkg)] )['TrijetMass'].values
-        # massEvents_all = pandas.concat( [df_sig, df_bkg] )['TrijetMass'].values
-        massEvents_sig = df_sig['TrijetMass'].values
-        massEvents_bkg = df_bkg['TrijetMass'].values
-        # massEvents  = df_bkg['TrijetMass'].values
-        # massEvensts  = pandas.concat( [df_sig, df_bkg] )['TrijetMass'].values#[0:nEntries] # only use the test data (half of total) 
-        # massEvents  = df_all['TrijetMass'].values[nEntries:2*nEntries] # only use the bkg data
-        # massEvents  = split_list(df_bkg['TrijetMass'].values) # half-size
-        
-    
-        # Digitize will return numbers from 1 to len(bins) depending on which bin the event belongs to. However it won't handle
-        # the situation if value is over the maximum bin edge, so you'll want to clip your values (or adjust the binning) accordingly
-        # In other words; get the bin indices (convert values to bin indices according to the massBinning variable)
-        digitizedMass_all = digitize( numpy.clip(massEvents_all, xMin, xMax-1.0), bins=massBinning, right=False )
-        digitizedMass_sig = digitize( numpy.clip(massEvents_sig, xMin, xMax-1.0), bins=massBinning, right=False )
-        digitizedMass_bkg = digitize( numpy.clip(massEvents_bkg, xMin, xMax-1.0), bins=massBinning, right=False )
-
-        # These are the weights you can give to keras.fit() function in parameter "sample_weight". The idea is to reweight the braches to get 
-        # both signal and bkg to have similar mass (decouple mass from learning) 
-        # The "balanced" mode uses the values of y to automatically adjust weights inversely proportional to variable frequencies in the input data as n_samples / (n_classes * np.bincount(y))
-        sampleWeights_all = compute_sample_weight('balanced', y=digitizedMass_all) # Flatten-out both signal and bkg mass
-        sampleWeights_sig = compute_sample_weight('balanced', y=digitizedMass_sig) # Flatten-out signal only
-        sampleWeights_bkg = compute_sample_weight('balanced', y=digitizedMass_bkg) # Flatten-out bkg only
-        # sigWeights    = numpy.ones(nEntries/2) #numpy.ones(len( split_list(df_sig['TrijetMass'].values)))
-        # bkgWeights    = compute_sample_weight('balanced', y=digitizedMass) # Flatten-out both signal and bkg mass
-        # bkgWeights    = numpy.array(split_list(massRatio), dtype=numpy.float32) 
-        # sampleWeights = numpy.concatenate( (sigWeights, bkgWeights), axis=0)
-        # sampleWeights = numpy.concatenate( (sigWeights, ), axis=0)
-
-        #sampleWeights_all = numpy.concatenate((split_list(sampleWeights_sig), split_list(sampleWeights_bkg)), axis=0) # iro - xenios - OVERWRITE weights
-        sampleWeights_all = numpy.concatenate((sampleWeights_sig, sampleWeights_bkg), axis=0) # iro - xenios - OVERWRITE weights
-        sampleWeights_val = numpy.concatenate((split_list(sampleWeights_sig, False), split_list(sampleWeights_bkg, False)), axis=0) # iro - xenios - OVERWRITE weights
-        '''
-        for i,w in enumerate(sampleWeights_all, 0):
-            s = "N/A"
-            b = "N/A"
-            if i < nEntries:
-                s = "%.2f" % sampleWeights_sig[i]
-                b = "%.2f" % sampleWeights_bkg[i]
-            print "%d) all = %.2f, sig = %s, bkg = %s" % (i, w, s, b)
-        print "="*100
-        '''
-
-        '''
-        align = "{:>5} {:>15} {:>15} {:>15}"
-        Verbose(align.format("index", "mass", "bin", "weight"), True)
-        for i, m in enumerate(massEvents, 0):
-            b  = digitizedMass[i] 
-            #w  = sampleWeights.tolist()[i]
-            w  = bkgWeights.tolist()[i]
-            Verbose(align.format("%d" % i, "%.1f" % m, "%d" % b, "%.1f" % w), False)
-        for i, w in enumerate(sampleWeights, 0):
-            Verbose("%d) w = %.2f" % (i, w), i==0)
-        '''
+        weights = func.doSampleReweighing(df_sig, df_bkg, "TrijetMass", _verbose=opts.verbose, **GetKwargs("TrijetMass"))
 
     # Assigning new column in our DataFrames DataFrames with label "signal". It takes value of "1" for signal and "0" for background.
     # Total number of columns is now increased by 1 (19 + 1 = 20)
@@ -901,13 +828,8 @@ def main(opts):
     Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_sig), ns, es, len(X_bkg), ns), True)
 
     # Split the datasets (X= 19 inputs, Y=output variable). test_size 0.5 means half for training half for testing. Shuffle the entry order?
-    if opts.decorrelate:
-        X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(X, Y, sampleWeights_all, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
-        align = "{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}"
-        print "="*110
-        title = align.format("index", "X_train", "X_test", "Y_train", "Y_test", "W_train", "W_test")
-        print title
-        print "="*110
+    if opts.decorrelate != None:
+        X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(X, Y, weights["all"], test_size=0.5, random_state = opts.rndSeed, shuffle=True)
         x_tr = X_train[0:nEntries, 7].tolist()
         x_te = X_test[0:nEntries, 7].tolist() # fixme - index ambiguous! 
         y_tr = Y_train[0:nEntries, 0].tolist()
@@ -915,16 +837,18 @@ def main(opts):
         w_tr = W_train.tolist()
         w_te = W_test.tolist()
         
-        '''
-        # For-loop: All entries
-        for i,x in enumerate(x_tr, 0):
-        msg = align.format("%d" % i, "%.2f" %  x_tr[i], "%.2f" %  x_te[i], "%.2f" %  y_tr[i], "%.2f" %  y_te[i], "%.2f" % w_tr[i], "%.2f" % w_te[i])
-        if i < (nEntries/2):
-        print ss + msg + ns
-        else:
-        print es + msg + ns
-        print "="*100
-        '''
+        #align = "{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}"
+        #print "="*110
+        #title = align.format("index", "X_train", "X_test", "Y_train", "Y_test", "W_train", "W_test")
+        #print title
+        #print "="*110        # For-loop: All entries
+        # for i,x in enumerate(x_tr, 0):
+        #     msg = align.format("%d" % i, "%.2f" %  x_tr[i], "%.2f" %  x_te[i], "%.2f" %  y_tr[i], "%.2f" %  y_te[i], "%.2f" % w_tr[i], "%.2f" % w_te[i])
+        #     if i < (nEntries/2):
+        #         print ss + msg + ns
+        #     else:
+        #         print es + msg + ns
+        # print "="*100
     else:
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
 
@@ -962,7 +886,7 @@ def main(opts):
     # used to separate training into distinct phases, which is useful for logging and periodic evaluation.)
     sampleWeights  = None
     validationData = (X_test, Y_test)
-    if opts.decorrelate:
+    if opts.decorrelate != None:
         # Optional array of the same length as X_train, containing weights to apply to the model's loss for each sample.
         sampleWeights  = W_train
         # Apply sample weights to validation data also
@@ -996,8 +920,8 @@ def main(opts):
         std_ = (opts.standardise != None)
         Verbose("Plotting all %d input variables for signal and bacgkround" % (len(opts.inputList)), True)
         for i, var in enumerate(opts.inputList, 0):
-            if var != "TrijetMass":
-                continue
+            #if var != "TrijetMass":
+            #    continue
             
             # Get the lists
             sigList   = X[0:nEntries, i:i+1]          # first nEntries is signal. i:i+1 get the column (variable) of inteerest
@@ -1008,8 +932,8 @@ def main(opts):
             # Make the plots
             func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg")   , opts.saveFormats, pType="sigVbkg"   , standardise=std_)
             func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest"), opts.saveFormats, pType="trainVtest", standardise=std_)
-            if opts.decorrelate:
-                func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg_weighted")   , opts.saveFormats, pType="sigVbkg"   , standardise=std_, w1=sampleWeights_sig, w2=sampleWeights_bkg)
+            if opts.decorrelate != None:
+                func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg_weighted")   , opts.saveFormats, pType="sigVbkg"   , standardise=std_, w1=weights["sig"], w2=weights["bkg"])
                 func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest_weighted"), opts.saveFormats, pType="trainVtest", standardise=std_, w1=W_train, w2=W_test)
 
     # Write the model
@@ -1208,7 +1132,7 @@ if __name__ == "__main__":
     URL          = False
     STANDARDISE  = None
     SCALEBACK    = False
-    DECORRELATE  = False
+    DECORRELATE  = None
     ENTRYSTOP    = None
     VERBOSE      = False
     RNDSEED      = 1234
@@ -1233,8 +1157,8 @@ if __name__ == "__main__":
     parser.add_option("--notBatchMode", dest="notBatchMode", action="store_true", default=NOTBATCHMODE, 
                       help="Disable batch mode (opening of X window) [default: %s]" % NOTBATCHMODE)
 
-    parser.add_option("--decorrelate", dest="decorrelate", action="store_true", default=DECORRELATE,
-                      help="Use the mass to calculate weights to decorrelated the mass from the training. This is done by reweighting the branches so that signal and background have similar mass distribution [default: %s]" % DECORRELATE)
+    parser.add_option("--decorrelate", dest="decorrelate", default=DECORRELATE,
+                      help="Calculate weights to decorrelate a variable from the training. This is done by reweighting the branches so that signal and background have similar mass distributions [default: %s]" % DECORRELATE)
 
     parser.add_option("--standardise", dest="standardise", default=STANDARDISE,
                       help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1 (e.g. StandardScaler) [default: %s]" % STANDARDISE)
@@ -1356,6 +1280,10 @@ if __name__ == "__main__":
     opts.inputList = opts.inputVariables.split(",")
     if opts.inputList < 1:
         raise Exception("At least one input variable needed to create the DNN. Only %d provided" % (len(opts.inputList)) )
+    if opts.decorrelate != None:
+        if opts.decorrelate not in opts.inputList:
+            msg = "Cannot apply sample reweighting. The input variable \"%s\" is not in the inputList." % (opts.decorrelate)
+            raise Exception(es + msg + ns)
 
     # Get the current date and time
     now    = datetime.now()
@@ -1366,8 +1294,8 @@ if __name__ == "__main__":
     nDate  = "%s%s%s_%s" % (nDay, nMonth, nYear, nTime)
     if opts.entrystop != None:
         sName  = "Keras_%s_%s" % (specs, str(opts.entrystop) + "Entrystop")
-    if opts.decorrelate:
-        sName += "_MassDecorrelated"
+    if opts.decorrelate != None:
+        sName += "_%sDecorrelated" % opts.decorrelate
     if opts.standardise != None:
         scalerTypes = ["Standard", "Robust", "MinMax"]
         if not opts.standardise in scalerTypes:

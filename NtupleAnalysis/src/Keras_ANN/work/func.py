@@ -38,7 +38,115 @@ def Verbose(msg, printHeader=False, verbose=False):
     else:
         print "\t", msg
     return
-   
+
+
+def split_list(a_list, firstHalf=True):
+    half = len(a_list)//2
+    if firstHalf:
+        return a_list[:half]
+    else:
+        return a_list[half:]
+
+def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
+    '''
+     Optional numpy array of weights for the training & testing samples, used for weighting the loss function (during training only)
+     Can be used to decorrelate a variable before training; alternative approach to adversarial neural network (ANN) for combatting mass sculpting
+
+    df_sig is the signal dataFrame
+    df_bkg is the bkg dataFrame
+    
+    '''
+    msg = "De-correlating the variable \"%s\" by applying sample reweighting" % (varName)
+    Verbose(msg, True, _verbose)
+
+    # Definitions
+    weights = {}
+    events  = {}
+    digi    = {}
+    xMin    = kwargs["xMin"]
+    xMax    = kwargs["xMax"]
+    nBins   = kwargs["nBins"]
+    myBins  = numpy.linspace(xMin, xMax, nBins)
+ 
+    # Use Mass as the variable to be decorrelated
+    events["all"] = pandas.concat( [df_sig, df_bkg] )[varName].values
+    # events["all"] = pandas.concat( [split_list(df_sig), split_list(df_bkg)] )[varName].values
+    events["sig"] = df_sig[varName].values
+    events["bkg"] = df_bkg[varName].values
+    #events["s/b"] = [float(s)/float(b) for s,b in zip(df_sig[varName].values, df_bkg[varName].values)]
+    #events["s/b"] = [float(s)/float(b) for s,b in zip(events["sig"], events["bkg"])]
+    
+    # test-start
+    hSig     = ROOT.TH1F("sig", "", nBins, xMin, xMax)
+    hBkg     = ROOT.TH1F("bkg", "", nBins, xMin, xMax)
+    hWeights = ROOT.TH1F("s/b", "", nBins, xMin, xMax)
+
+    # For-loop: 
+    for s,b in zip(events["sig"], events["bkg"]):
+        # print "s = %s, b = %s" % (s, b)
+        hSig.Fill(s)
+        hBkg.Fill(b)
+    hWeights = hSig.Clone("s/b")
+    hWeights.Divide(hBkg)
+    #for i in range(0, nBins+1):
+    #    print "s = %s, b = %s, w = %s" % (hSig.GetBinContent(i), hBkg.GetBinContent(i), hWeights.GetBinContent(i)) 
+    # test-end
+
+    # Digitize will return numbers from 1 to len(bins) depending on which bin the event belongs to. However it won't handle
+    # the situation if value is over the maximum bin edge, so you'll want to clip your values (or adjust the binning) accordingly
+    # In other words; get the bin indices (convert values to bin indices according to the myBins variable)
+    digi["all"] = numpy.digitize( numpy.clip(events["all"], xMin, xMax-1.0), bins=myBins, right=False )
+    digi["sig"] = numpy.digitize( numpy.clip(events["sig"], xMin, xMax-1.0), bins=myBins, right=False )
+    digi["bkg"] = numpy.digitize( numpy.clip(events["bkg"], xMin, xMax-1.0), bins=myBins, right=False )
+    # test-start
+    events["s/b"] = []
+    for i, value in enumerate(events["bkg"], 0):
+        bin    = hWeights.FindBin( value )
+        weight = hWeights.GetBinContent(bin)
+        events["s/b"].append(weight)
+        #print "value = %s, weight = %s" % (value, weight)
+    # test-end
+    #digi["s/b"] = [float(s)/float(b) for s,b in zip(digi["sig"], digi["bkg"])]
+    #digi["s/b"] = numpy.digitize( numpy.clip(events["s/b"], xMin, xMax-1.0), bins=myBins, right=False )
+
+    # These are the weights you can give to keras.fit() function in parameter "sample_weight". The idea is to reweight the braches to get 
+    # both signal and bkg to have similar mass (decouple mass from learning) 
+    # The "balanced" mode uses the values of y to automatically adjust weights inversely proportional to variable frequencies in the input data as n_samples / (n_classes * np.bincount(y))
+    # weights["sig"] = compute_sample_weight('balanced', y=digi["sig"]) # Flatten-out signal only
+    weights["sig"] = numpy.ones(len(events["sig"]))  # an array of 1's of specific sig => leaves original distribution unchanged
+    # weights["bkg"] = compute_sample_weight(class_weight='balanced', y=digi["bkg"])  # Flattens out bkg only (uniform distribution)
+    #weights["bkg"] = numpy.asarray(events["bkg"], dtype=numpy.float32)  # smears a bit the bkg distribution
+    weights["bkg"] = numpy.asarray(events["s/b"], dtype=numpy.float32)  
+    #weights["bkg"] = numpy.asarray(digi["s/b"]) # brings core of bkg closer to signal
+    if 1:
+        weights["all"] = numpy.concatenate((weights["sig"], weights["bkg"]), axis=0) # Flatten-out both signal and bkg variable
+    else:
+        Print("WARNING! This option flattens out ALL variables resulting in no distinction between signal and background! And hence a useless DNN", True)
+        weights["all"] = compute_sample_weight(class_weight='balanced', y=digi["all"]) 
+
+
+    align = "{:>5} {:>15} {:>10} {:>15} {:>15} {:>15}"
+    title = align.format("index", varName, "bin", "weight", "weight (s)", "weight (b)")
+    hLine = "="*100
+    Verbose(hLine, False, _verbose)
+    Verbose("{:^100}".format("%s (%d bins, xMin = %.1f, xMax = %.1f)" % (varName, nBins, xMin, xMax) ))
+    Verbose(title, False, _verbose)
+    Verbose(hLine, False, _verbose)
+    # For-loop: All weight information
+    for i,w in enumerate(weights["all"], 0):
+        s = "-"
+        b = "-"
+        v = events["all"][i]
+        d = digi["all"][i]
+        if i < len(weights["all"])/2:
+            s = "%.2f" % weights["sig"][i]
+            b = "%.2f" % weights["bkg"][i]
+        msg = align.format("%d" % i, "%.2f" % v, "%d" % d, "%.2f" % w , "%s" % s, "%s" % b)
+        Verbose(msg, False, _verbose)
+    Verbose(hLine, False, _verbose)
+
+    return weights
+
 def GetOriginalDataFrame(scaler, df, inputList):
     '''
     https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler.inverse_transform
