@@ -920,8 +920,6 @@ def main(opts):
         std_ = (opts.standardise != None)
         Verbose("Plotting all %d input variables for signal and bacgkround" % (len(opts.inputList)), True)
         for i, var in enumerate(opts.inputList, 0):
-            #if var != "TrijetMass":
-            #    continue
             
             # Get the lists
             sigList   = X[0:nEntries, i:i+1]          # first nEntries is signal. i:i+1 get the column (variable) of inteerest
@@ -1072,14 +1070,13 @@ def main(opts):
     func.PlotTGraph(xVals, xErrs, sig_def, effErrs_B, opts.saveDir, "SignificanceA", jsonWr, opts.saveFormats, **GetKwargs("significance") )
     func.PlotTGraph(xVals, xErrs, sig_alt, effErrs_B, opts.saveDir, "SignificanceB", jsonWr, opts.saveFormats, **GetKwargs("significance") )
 
-    # Metrics
+    # Plot some metrics
     xErr = [0.0 for i in range(0, opts.epochs)]
     yErr = [0.0 for i in range(0, opts.epochs)]
-    if 0:
-        func.PlotTGraph(epochList[0:opts.epochs], xErr, trainLossList[0:opts.epochs-1], yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
-        func.PlotTGraph(epochList[0:opts.epochs], xErr, trainAccList[0:opts.epochs-1] , yErr , opts.saveDir, "TrainAccuracy", jsonWr, opts.saveFormats, **GetKwargs("acc") )
-        func.PlotTGraph(epochList[0:opts.epochs], xErr, valLossList[0:opts.epochs-1]  , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
-        func.PlotTGraph(epochList[0:opts.epochs], xErr, valAccList[0:opts.epochs-1]   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
+    func.PlotTGraph(epochList[0:opts.epochs], xErr, trainLossList[0:opts.epochs-1], yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+    func.PlotTGraph(epochList[0:opts.epochs], xErr, trainAccList[0:opts.epochs-1] , yErr , opts.saveDir, "TrainAccuracy", jsonWr, opts.saveFormats, **GetKwargs("acc") )
+    func.PlotTGraph(epochList[0:opts.epochs], xErr, valLossList[0:opts.epochs-1]  , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+    func.PlotTGraph(epochList[0:opts.epochs], xErr, valAccList[0:opts.epochs-1]   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
         
     # Plot ROC curve
     gSig = func.GetROC(htest_s, htest_b)

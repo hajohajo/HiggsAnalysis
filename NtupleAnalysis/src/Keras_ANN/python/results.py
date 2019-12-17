@@ -410,11 +410,12 @@ class Output:
         legList   = []
         # For-loop: All x-results (should be same size as y-results)
         for i, k in enumerate(self.resultsX.keys(), 0):
-            #self.Print("Setting graph name to %s" % (sh_a + k + sh_n), i==0)
+            self.Verbose("Setting graph name to %s" % (sh_a + k + sh_n), i==0)
             if keyword!=None:
                 #if keyword not in k:
                 if keyword != k:
-                    #msg = "Cannot find keyword %s in results file %s" % (sh_h + keyword + sh_e, sh_h + os.path.join(self.getDirectoryBase() , self.getResultsFile()) + sh_e)
+                    msg = "Cannot find keyword %s in results file %s" % (sh_h + keyword + sh_e, sh_h + os.path.join(self.getDirectoryBase() , self.getResultsFile()) + sh_e)
+                    self.Verbose(msg, True)
                     #raise Exception(sh_e + msg + sh_n)
                     continue 
             xArray = array.array("d", self.resultsX[k])

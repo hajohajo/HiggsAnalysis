@@ -128,10 +128,29 @@
 #done
 
 
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf &
-sleep 15
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --decorrelate &
-sleep 15
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --standardise &
-sleep 15
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --decorrelate --standardise &
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --decorrelate &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --standardise &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --decorrelate --standardise &
+
+
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 1000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 2000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 50000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &

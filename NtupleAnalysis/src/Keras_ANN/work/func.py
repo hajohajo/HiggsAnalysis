@@ -73,10 +73,9 @@ def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
     # events["all"] = pandas.concat( [split_list(df_sig), split_list(df_bkg)] )[varName].values
     events["sig"] = df_sig[varName].values
     events["bkg"] = df_bkg[varName].values
-    #events["s/b"] = [float(s)/float(b) for s,b in zip(df_sig[varName].values, df_bkg[varName].values)]
-    #events["s/b"] = [float(s)/float(b) for s,b in zip(events["sig"], events["bkg"])]
-    
-    # test-start
+    events["s/b"] = [] # filled at later stage (once reweighting histo is obtained)
+
+    # Create histograms to divide them and get a ratio histograms for reweighting
     hSig     = ROOT.TH1F("sig", "", nBins, xMin, xMax)
     hBkg     = ROOT.TH1F("bkg", "", nBins, xMin, xMax)
     hWeights = ROOT.TH1F("s/b", "", nBins, xMin, xMax)
@@ -88,9 +87,6 @@ def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
         hBkg.Fill(b)
     hWeights = hSig.Clone("s/b")
     hWeights.Divide(hBkg)
-    #for i in range(0, nBins+1):
-    #    print "s = %s, b = %s, w = %s" % (hSig.GetBinContent(i), hBkg.GetBinContent(i), hWeights.GetBinContent(i)) 
-    # test-end
 
     # Digitize will return numbers from 1 to len(bins) depending on which bin the event belongs to. However it won't handle
     # the situation if value is over the maximum bin edge, so you'll want to clip your values (or adjust the binning) accordingly
@@ -98,16 +94,17 @@ def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
     digi["all"] = numpy.digitize( numpy.clip(events["all"], xMin, xMax-1.0), bins=myBins, right=False )
     digi["sig"] = numpy.digitize( numpy.clip(events["sig"], xMin, xMax-1.0), bins=myBins, right=False )
     digi["bkg"] = numpy.digitize( numpy.clip(events["bkg"], xMin, xMax-1.0), bins=myBins, right=False )
-    # test-start
-    events["s/b"] = []
+    # For-loop: All background entries
     for i, value in enumerate(events["bkg"], 0):
+        # Find the bin the variable value corresponds to in the weights histogram
         bin    = hWeights.FindBin( value )
+
+        # Get the weight corresponding to the determined bin number
         weight = hWeights.GetBinContent(bin)
+
+        # Save the weight for this specific entry
         events["s/b"].append(weight)
         #print "value = %s, weight = %s" % (value, weight)
-    # test-end
-    #digi["s/b"] = [float(s)/float(b) for s,b in zip(digi["sig"], digi["bkg"])]
-    #digi["s/b"] = numpy.digitize( numpy.clip(events["s/b"], xMin, xMax-1.0), bins=myBins, right=False )
 
     # These are the weights you can give to keras.fit() function in parameter "sample_weight". The idea is to reweight the braches to get 
     # both signal and bkg to have similar mass (decouple mass from learning) 

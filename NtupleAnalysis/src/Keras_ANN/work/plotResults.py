@@ -130,7 +130,7 @@ def main():
         directory = dirs[-1]
 
         Verbose("Picked %s" % directory, True)
-        Print("Creating \"Results\" object from directory %s" % os.path.basename(directory), i==1)
+        Verbose("Creating \"Results\" object from directory %s" % os.path.basename(directory), i==1)
         resultsList.append(_results.Output(directory, excludePoints=[]))
         if opts.refName != None:
             if opts.refName in d:
@@ -547,7 +547,7 @@ def doVariablesWPs(variable, resultsList, WPs = None, signal=True, defaultLegend
 def doMetrics(name, metric, resultsList):
     
     # Do the comparison plot
-    Verbose("Creating the expected plots", True)
+    Verbose("Creating the expected plots for metric \"%s\"" % (metric), True)
     grList  = []
     legList = []
     opts.saveName = metric
@@ -555,6 +555,9 @@ def doMetrics(name, metric, resultsList):
     # For-loop: All Output-class objects
     for r in resultsList:
         gr, leg = r.getGraphs(metric)
+        if len(gr) < 1:
+            msg = "Could not find metric \"%s\" for directory \"%s\"" % (metric, r.getDirectoryBase())
+            Print(sh_e + msg + sh_n, True)
         if opts.yMin == None:
             opts.yMin = r.getYMin()
         if opts.yMax == None and opts.yMax == None:
@@ -841,6 +844,7 @@ def GetVarKwargs(var, opts):
         kwargs["yMin"]   = 1e-3
         kwargs["cutBox"] = {"cutValue":  173.2, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
         #kwargs["ylabel"] = "a.u. / %0.0f GeV"
+        kwargs["moveLegend"] = legNE
 
     if var == "TrijetDijetMass":
         kwargs["opts"]["xmin"]   =   0.0

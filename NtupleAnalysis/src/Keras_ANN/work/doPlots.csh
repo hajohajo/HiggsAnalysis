@@ -24,7 +24,7 @@ else
     set SAVE_DIR = ${2}
 endif
 
-set FORMATS  = png #pdf,C,png 
+set FORMATS  = pdf,C,png 
 set VERBOSE  = "" #--verbose
 
 echo "=== Variables (WPs)"
