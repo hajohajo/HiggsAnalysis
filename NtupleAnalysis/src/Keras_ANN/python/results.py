@@ -154,15 +154,22 @@ class Output:
     def getCfgFileBase(self):
         return self.cfgFile
 
+    def setVerbose(self, verbose):
+        self.verbose = verbose
+        return
+
     def storeCfgFiles(self):
-        
+
         # Open & load configuration json file
-        msg = "Opening file %s" % (self.cfgFilePath)
+        msg = "Opening configuration json file %s" % (sh_h + self.cfgFilePath + sh_n)
         self.Verbose(msg, True)
         f = open(self.cfgFilePath, "r")
+
+        self.Verbose("Loading json file %s" % (self.cfgFilePath), True)
         config = json.load(f)
         f.close()
-
+        self.Verbose("Loaded and closed json file %s" % (sh_s + self.cfgFilePath + sh_n), True)
+        
         # Create list of variable to retrieve    
         vList = ["timestamp", "layers", "optimizer", "loss function", "epochs", "neurons", "hidden layers", "batch size",  "model", "activation functions", 
                  "rndSeed", "train sample", "model parameters (trainable)", "python version", "test sample", "model weights", "model parameters (total)",
@@ -190,11 +197,16 @@ class Output:
             self.printAttributes()
 
         # Open results file
-        msg = "Opening file '%s'" % (self.resultsFile)
+        msg = "Opening results json file %s" % (sh_h + self.resultsPath + sh_n)
         self.Verbose(msg, True)
         f = open(self.resultsPath, "r")
-        results = json.load(f)
-        f.close()
+        try:
+            results = json.load(f) 
+        except:
+            msg = "Failed to open the results json file %s. Please validate the json file. Also, be aware of that any variable with value \"nan\" will cause error when loading." % (f)
+            raise Exception(msg)
+        f.close() 
+        self.Verbose("Loaded and closed json file %s" % (sh_s + self.resultsPath + sh_n), True)
 
         # For-loop: All keys in json file
         self.Verbose("Reading results from %s:" % (sh_h + self.resultsFile + sh_n), True)

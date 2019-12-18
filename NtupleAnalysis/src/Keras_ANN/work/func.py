@@ -39,7 +39,6 @@ def Verbose(msg, printHeader=False, verbose=False):
         print "\t", msg
     return
 
-
 def split_list(a_list, firstHalf=True):
     half = len(a_list)//2
     if firstHalf:
@@ -108,39 +107,39 @@ def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
 
     # These are the weights you can give to keras.fit() function in parameter "sample_weight". The idea is to reweight the braches to get 
     # both signal and bkg to have similar mass (decouple mass from learning) 
+    weights["sig"] = numpy.ones(len(events["sig"]))                    # an array of 1's of specific sig => leaves original distribution unchanged
+    weights["bkg"] = numpy.asarray(events["s/b"], dtype=numpy.float32) # reweight bkg so that it matches the signal distribution (ala PU-reweight)
     # The "balanced" mode uses the values of y to automatically adjust weights inversely proportional to variable frequencies in the input data as n_samples / (n_classes * np.bincount(y))
-    # weights["sig"] = compute_sample_weight('balanced', y=digi["sig"]) # Flatten-out signal only
-    weights["sig"] = numpy.ones(len(events["sig"]))  # an array of 1's of specific sig => leaves original distribution unchanged
+    # weights["sig"] = compute_sample_weight('balanced', y=digi["sig"]) # Flattens out signal (uniform distribution instead of resonance peak)
     # weights["bkg"] = compute_sample_weight(class_weight='balanced', y=digi["bkg"])  # Flattens out bkg only (uniform distribution)
-    #weights["bkg"] = numpy.asarray(events["bkg"], dtype=numpy.float32)  # smears a bit the bkg distribution
-    weights["bkg"] = numpy.asarray(events["s/b"], dtype=numpy.float32)  
-    #weights["bkg"] = numpy.asarray(digi["s/b"]) # brings core of bkg closer to signal
-    if 1:
+    if 1: 
+        # Correct way of performing sample reweighting for matching background to signal distribution for given variable
         weights["all"] = numpy.concatenate((weights["sig"], weights["bkg"]), axis=0) # Flatten-out both signal and bkg variable
     else:
         Print("WARNING! This option flattens out ALL variables resulting in no distinction between signal and background! And hence a useless DNN", True)
         weights["all"] = compute_sample_weight(class_weight='balanced', y=digi["all"]) 
 
-
-    align = "{:>5} {:>15} {:>10} {:>15} {:>15} {:>15}"
-    title = align.format("index", varName, "bin", "weight", "weight (s)", "weight (b)")
-    hLine = "="*100
-    Verbose(hLine, False, _verbose)
-    Verbose("{:^100}".format("%s (%d bins, xMin = %.1f, xMax = %.1f)" % (varName, nBins, xMin, xMax) ))
-    Verbose(title, False, _verbose)
-    Verbose(hLine, False, _verbose)
-    # For-loop: All weight information
-    for i,w in enumerate(weights["all"], 0):
-        s = "-"
-        b = "-"
-        v = events["all"][i]
-        d = digi["all"][i]
-        if i < len(weights["all"])/2:
-            s = "%.2f" % weights["sig"][i]
-            b = "%.2f" % weights["bkg"][i]
+    # Construct table for information printout
+    if _verbose:
+        align = "{:>5} {:>15} {:>10} {:>15} {:>15} {:>15}"
+        title = align.format("index", varName, "bin", "weight", "weight (s)", "weight (b)")
+        hLine = "="*100
+        Verbose(hLine, False, _verbose)
+        Verbose("{:^100}".format("%s (%d bins, xMin = %.1f, xMax = %.1f)" % (varName, nBins, xMin, xMax) ))
+        Verbose(title, False, _verbose)
+        Verbose(hLine, False, _verbose)
+        # For-loop: All weight information
+        for i,w in enumerate(weights["all"], 0):
+            s = "-"
+            b = "-"
+            v = events["all"][i]
+            d = digi["all"][i]
+            if i < len(weights["all"])/2:
+                s = "%.2f" % weights["sig"][i]
+                b = "%.2f" % weights["bkg"][i]
         msg = align.format("%d" % i, "%.2f" % v, "%d" % d, "%.2f" % w , "%s" % s, "%s" % b)
         Verbose(msg, False, _verbose)
-    Verbose(hLine, False, _verbose)
+        Verbose(hLine, False, _verbose)
 
     return weights
 
@@ -565,7 +564,6 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
     xTitle = "DNN output"
     yTitle = "Entries"
     log    = True
-
     if "log" in kwargs:
         log = kwargs["log"]
     if "xTitle" in kwargs:
@@ -586,11 +584,11 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
     # For-loop: 
     for i, key in enumerate(resultsDict.keys(), 0):
 
-        # print "nBins = %d, xMin = %.2f, xMax = %.2f" % (nBins, xMin, xMax)
-        h = ROOT.TH1F(key, '', nBins, xMin, xMax)
+        h = ROOT.TH1F("%s_%s_%s" % (key, saveName, "WP" + str(cutValue)), '', nBins, xMin, xMax)
         for j, x in enumerate(resultsDict[key], 0):
-            
-            score = None
+
+            #print "key = %s, x = %.2f, nBins = %d, xMin = %.2f, xMax = %.2f" % (key, x, nBins, xMin, xMax)
+            score  = None
             if key == "signal":
                 score = sigOutput[j]
             elif key == "background":
@@ -606,7 +604,8 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
                 Verbose("%d) DNN score for %s is %.3f" % (j, key, score), False)
 
             # Fill the histogram
-            h.Fill(x)
+            if len(x) > 0:
+                h.Fill(x)
             try:
                 yMin_ = min(x[0], yMin)
             except:
@@ -647,7 +646,7 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
     # Create legend
     leg = plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
     for h in hList:
-        leg.AddEntry(h, h.GetName(),"l")
+        leg.AddEntry(h, h.GetName().split("_")[0],"l")
     leg.Draw()
     
     postfix = "_%s%s" % ("WP", str(cutValue).replace(".", "p"))
@@ -659,10 +658,20 @@ def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveD
         gList.append(convertHistoToGaph(h))
 
     # Write the Tgraph into the JSON file
+    sample = "NA"
     for gr in gList:
-        gName = "%s_%s" % (saveName, gr.GetName()) + postfix
+        # gr.GetName() is too long since it must be unique (memory replacement issues). Make it simples
+        if "signal" in gr.GetName().lower():
+            sample = "signal"
+        elif "background" in gr.GetName().lower():
+            sample = "background"
+        else:
+            sample = "unknown"            
+
+        #gName = "%s_%s" % (saveName, gr.GetName()) + postfix @ 
+        gName = "%s_%s" % (saveName, sample) + postfix
         jsonWr.addGraph(gName, gr)
-    return
+    return hList
 
 def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
@@ -950,7 +959,10 @@ def PlotROC(graphMap, saveDir, saveName, saveFormats):
         gr_name = graphMap["name"][i]
         plot.ApplyStyle(gr, i+2)
         gr.GetXaxis().SetTitle("Signal Efficiency")
-        gr.GetYaxis().SetTitle("Misidentification rate")
+        gr.GetYaxis().SetTitle("Background Efficiency") # "Misidentification rate"
+        #gr.SetMinimum(0.0)
+        #gr.SetMaximum(1.0)
+        #gr.GetXaxis().SetRangeUser(0.0, 1.0)
         if i == 0:
             gr.Draw("apl")
         else:
@@ -1044,10 +1056,6 @@ def PlotOvertrainingTest(Y_train_S, Y_test_S, Y_train_B, Y_test_B, saveDir, save
     for h in hList:
         h.SetMaximum(ymax*2)        
         h.Draw(DrawStyle(h.GetName())+" SAME")
-
-    #graph = plot.CreateGraph([0.5, 0.5], [0, ymax*2])
-    #graph.Draw("same")
-    #leg.Draw()
     
     # Save & close canvas
     plot.SavePlot(canvas, saveDir, saveName, saveFormats)

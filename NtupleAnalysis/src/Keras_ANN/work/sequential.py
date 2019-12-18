@@ -177,6 +177,27 @@ def Verbose(msg, printHeader=True, verbose=False):
     Print(msg, printHeader)
     return
 
+def PrintXYTestTrain(x_tr, x_te, y_tr, y_te, w_tr, w_te, nEntries, verbose=False):
+    if not verbose:
+        return
+    table = []
+    align = "{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}"
+    table.append("="*110)
+    title = align.format("index", "X_train", "X_test", "Y_train", "Y_test", "W_train", "W_test")
+    table.append(title)
+    table.append("="*110)
+    # For-loop: All entries
+    for i,x in enumerate(x_tr, 0):
+        msg = align.format("%d" % i, "%.2f" %  x_tr[i], "%.2f" %  x_te[i], "%.2f" %  y_tr[i], "%.2f" %  y_te[i], "%.2f" % w_tr[i], "%.2f" % w_te[i])
+        if i < (nEntries/2):
+            table.append(ss + msg + ns)
+        else:
+            table.append(es + msg + ns)
+    table.append("="*100)
+    for i,r in enumerate(table, 0):
+        Print(r, i==0)
+    return
+
 def PrintNetworkSummary(opts):
     table    = []
     msgAlign = "{:^10} {:^10} {:>12} {:>10}"
@@ -354,6 +375,17 @@ def GetKwargs(var, standardise=False):
         kwargs["yTitle"] = "efficiency" # (\varepsilon)"
         kwargs["yMin"]   = 0.0
         kwargs["log"]    = False
+
+    if "roc" in var:
+        kwargs["normalizeToOne"] = False
+        kwargs["xMin"]   = 0.0
+        kwargs["xMax"]   = 1.0
+        kwargs["nBins"]  = 200
+        kwargs["xTitle"] = "signal efficiency"
+        kwargs["yTitle"] = "background efficiency"
+        kwargs["yMin"]   = 1e-4
+        kwargs["yMax"]   = 10
+        kwargs["log"]    = True
 
     if var == "significance":
         kwargs["normalizeToOne"] = False
@@ -771,8 +803,6 @@ def main(opts):
 
     # Get a Numpy representation of the DataFrames for signal and background datasets (again, and AFTER assigning signal and background)
     Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
-    #dset_sig = df_sig.values
-    #dset_bkg = df_bkg.values
     dset_all = df_all.values
 
     # For future use
@@ -831,30 +861,22 @@ def main(opts):
     if opts.decorrelate != None:
         X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(X, Y, weights["all"], test_size=0.5, random_state = opts.rndSeed, shuffle=True)
         x_tr = X_train[0:nEntries, 7].tolist()
-        x_te = X_test[0:nEntries, 7].tolist() # fixme - index ambiguous! 
+        x_te = X_test[0:nEntries, 7].tolist() # iro - fixme: index ambiguous! 
         y_tr = Y_train[0:nEntries, 0].tolist()
         y_te = Y_test[0:nEntries, 0].tolist()
         w_tr = W_train.tolist()
         w_te = W_test.tolist()
-        
-        #align = "{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}"
-        #print "="*110
-        #title = align.format("index", "X_train", "X_test", "Y_train", "Y_test", "W_train", "W_test")
-        #print title
-        #print "="*110        # For-loop: All entries
-        # for i,x in enumerate(x_tr, 0):
-        #     msg = align.format("%d" % i, "%.2f" %  x_tr[i], "%.2f" %  x_te[i], "%.2f" %  y_tr[i], "%.2f" %  y_te[i], "%.2f" % w_tr[i], "%.2f" % w_te[i])
-        #     if i < (nEntries/2):
-        #         print ss + msg + ns
-        #     else:
-        #         print es + msg + ns
-        # print "="*100
+        PrintXYTestTrain(x_tr, x_te, y_tr, y_te, w_tr, w_te, nEntries, opts.verbose)
     else:
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
 
     # Save size of test & training samples for future reference
     opts.testSample  = len(X_test)
     opts.trainSample = len(X_train)
+    # batch size equal to the training batch size (See https://machinelearningmastery.com/use-different-batch-sizes-training-predicting-python-keras/)
+    if opts.batchSize == None:
+        opts.batchSize = len(X_train)/2
+
 
     # Early stop? Stop training when a monitored quantity has stopped improving.
     # Show patience of "50" epochs with a change in the loss function smaller than "min_delta" before stopping procedure
@@ -863,13 +885,15 @@ def main(opts):
     earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=50)
     callbacks = [earlystop]
 
+
     # [Loss function is used to understand how well the network is working (compare predicted label with actual label via some function)]
     # Optimizer function is related to a function used to optimise the weights
     Print("Compiling the model with the loss function %s and optimizer %s " % (ls + opts.lossFunction + ns, ls + opts.optimizer + ns), True)
     myModel.compile(loss=opts.lossFunction, optimizer=opts.optimizer, metrics=['accuracy'])
     
+
     # Customise the optimiser settings?
-    if 0: #opts.optimizer == "adam":  # does not work
+    if 0: #opts.optimizer == "adam":  # does not work (required more recent version of Keras?)
         # Default parameters follow those provided in the original paper.
         # learning_rate: float >= 0. Learning rate.
         # beta_1: float, 0 < beta < 1. Generally close to 1.
@@ -877,9 +901,6 @@ def main(opts):
         # amsgrad: boolean. Whether to apply the AMSGrad variant of this algorithm from the paper "On the Convergence of Adam and Beyond".
         keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
 
-    # batch size equal to the training batch size (See https://machinelearningmastery.com/use-different-batch-sizes-training-predicting-python-keras/)
-    if opts.batchSize == None:
-        opts.batchSize = len(X_train)/2
 
     # Fit the model with our data
     # (An "epoch" is an arbitrary cutoff, generally defined as "one iteration of training on the whole dataset", 
@@ -889,8 +910,7 @@ def main(opts):
     if opts.decorrelate != None:
         # Optional array of the same length as X_train, containing weights to apply to the model's loss for each sample.
         sampleWeights  = W_train
-        # Apply sample weights to validation data also
-        validationData = (X_test, Y_test, W_test)
+        validationData = (X_test, Y_test, W_test) # sample weights for validation data
     else:
         pass
     Verbose("Number of threads before fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
@@ -900,7 +920,7 @@ def main(opts):
                            epochs     = opts.epochs,    # a full pass over all of your training data
                            batch_size = opts.batchSize, # a set of N samples (https://stats.stackexchange.com/questions/153531/what-is-batch-size-in-neural-network)
                            shuffle    = False,
-                           verbose    = 1, # 0=silent, 1=progress, 2=mention the number of epoch
+                           verbose    = 1,              # 0=silent, 1=progress, 2=mention the number of epoch
                            callbacks  = callbacks,
                            sample_weight=sampleWeights
                            )
@@ -938,16 +958,15 @@ def main(opts):
     modelName = "model_trained.h5"
     myModel.save(os.path.join(opts.saveDir,  modelName) )
         
-    # serialize model to JSON (contains arcitecture of model)
-    model_json = myModel.to_json() # myModel.to_yaml() (alternatively)
+    # Serialize model to JSON (contains arcitecture of model)
+    model_json = myModel.to_json() # myModel.to_yaml()
     with open(opts.saveDir + "/model_architecture.json", "w") as json_file:
         json_file.write(model_json)
-        
-    # serialize weights to HDF5
+    # Serialize weights to HDF5
     myModel.save_weights(os.path.join(opts.saveDir, 'model_weights.h5'), overwrite=True)
     myModel.save(os.path.join(opts.saveDir, modelName))
         
-    # write weights and architecture in txt file
+    # Write weights and architecture in txt file
     modelFilename = os.path.join(opts.saveDir, "model.txt")
     Print("Writing the model (weights and architecture) in the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
     func.WriteModel(myModel, model_json, opts.inputList, modelFilename, verbose=False)
@@ -956,15 +975,10 @@ def main(opts):
     #https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
     molelFilename = modelFilename.replace(".txt", ".png")
     Print("plot a graph of the model and save it to the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
-    #from IPython.display import SVG
-    #from keras.utils import model_to_dot
-    #SVG(model_to_dot(myModel).create(prog='dot', format='svg'))
-    #import pydotplus
-    #from keras.utils.vis_utils import model_to_dot
-    #keras.utils.vis_utils.pydot = pydot
     if "fnal" not in opts.hostname:
         from keras.utils import plot_model
         plot_model(myModel, to_file=modelFilename)
+
 
     # Produce method score (i.e. predict output value for given input dataset). Computation is done in batches.
     # https://stackoverflow.com/questions/49288199/batch-size-in-model-fit-and-model-predict
@@ -1009,56 +1023,93 @@ def main(opts):
     func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats, **GetKwargs("OutputTrain")) # DNN score (training) : Sig Vs Bkg
     func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats, **GetKwargs("OutputTest" )) # DNN score (predicted): Sig Vs Bkg  
 
-
     # Scale back the data to the original representation
     if opts.scaleBack:
         msg = "Performing inverse-transform (%s) to all variables to get their original representation" % (hs + "scaleBack" + ns)
         Print(msg, True)
-        df_sig = func.GetOriginalDataFrame(scaler_sig, df_sig, opts.inputList)
-        df_bkg = func.GetOriginalDataFrame(scaler_bkg, df_bkg, opts.inputList)
-        df_all = func.GetOriginalDataFrame(scaler_all, df_all, opts.inputList)
-        # Re-define the datasets using the inverse_transformed DataFrames
-        #dset_sig = df_sig.values
-        #dset_bkg = df_bkg.values
+        df_sig   = func.GetOriginalDataFrame(scaler_sig, df_sig, opts.inputList)
+        df_bkg   = func.GetOriginalDataFrame(scaler_bkg, df_bkg, opts.inputList)
+        df_all   = func.GetOriginalDataFrame(scaler_all, df_all, opts.inputList)
         dset_all = df_all.values
+
+    rocDict = {}
+    WPs     = [float(x)/float(20) for x in range(0, 20, 1)]
 
     # For-loop: All branches to be plotted for various DNN score cuts (v. slow, especially for large number of "entrystop")
     for i, var in enumerate(opts.inputList, 0):
         if var != "TrijetMass":
             continue
-        PrintFlushed("Variable %s (%d/%d)" % (var, i, len(opts.inputList)), i==0)
-
-        Verbose("Plotting variable %s (irrespective of DNN score)" % (var), True)
-        #func.PlotAndWriteJSON(dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        else:
+            PrintFlushed("Variable %s (%d/%d)" % (var, i, len(opts.inputList)), True) #i==0
+        
+        Verbose("Plotting variable %s (DNN score = 0.0)" % (var), True)
         func.PlotAndWriteJSON(dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+        
+        # Definitions
+        xMin     = 140.0
+        xMax     = 200.0
+        xVals    = []
+        xErrs    = []
+        yVals    = []
+        yErrs    = []
+        print
+        # For-loop: All Working Points (WPs)
+        for wp in WPs:
+            PrintFlushed("Plotting variable %s (DNN score = %.2f)" % (var, wp), wp==0.0)
+            hList = func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, wp, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+            rocDict[wp] = hList
 
-        Verbose("Plotting variable %s for DNN score 0.1" % (var), False)
-        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.1, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+            sig_all  = 0
+            sig_pass = 0
+            bkg_all  = 0
+            bkg_pass = 0
 
-        Verbose("Plotting variable %s for DNN score 0.3" % (var), False)
-        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.3, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+            for j, x in enumerate(dset_all[0:nEntries, i:i+1], 0):
+                sig_all += 1
+                if pred_signal[j] < wp:
+                    continue
+                if x < xMin:
+                    continue
+                if x > xMax:
+                    continue
+                #print "x_s = %.2f, DNN = %.2f" % (x, pred_signal[j])
+                sig_pass+=1
 
-        Verbose("Plotting variable %s for DNN score 0.5" % (var), False)
-        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.5, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
+            for k, x in enumerate(dset_all[nEntries:2*nEntries, i:i+1], 0):
+                bkg_all += 1
+                if pred_bkg[k] < wp:
+                    continue
+                if x < xMin:
+                    continue
+                if x > xMax:
+                    continue
+                #print "x_b = %.2f, DNN = %.2f" % (x, pred_bkg[k])
+                bkg_pass+=1
+               
+            xValue = 0.0
+            yValue = 0.0
+            if sig_all > 0.0:
+                xValue = float(sig_pass)/float(sig_all)
+            if bkg_all > 0.0:
+                yValue = float(bkg_pass)/float(bkg_all)
+            xVals.append(xValue)
+            xErrs.append(0.001)
+            yVals.append(yValue)
+            yErrs.append(0.001)
+            #print "%.2f WP) all_s = %.1f, pass_s = %.1f, x = %.2f | all_b = %.2f, pass_b = %.2f, y = %.2f" % (wp, sig_all, sig_pass, xValue, bkg_all, bkg_pass, yValue)
 
-        Verbose("Plotting variable %s for DNN score 0.7" % (var), False)
-        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.7, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.7, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
-
-        Verbose("Plotting variable %s for DNN score 0.9" % (var), False)
-        #func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.9, dset_sig[:, i:i+1], dset_bkg[:, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
-        func.PlotAndWriteJSON_DNNscore(pred_signal, pred_bkg, 0.9, dset_all[0:nEntries, i:i+1], dset_all[nEntries:2*nEntries, i:i+1], opts.saveDir, var , jsonWr, opts.saveFormats, **GetKwargs(var, stdPlots))
-    print
-
+        gr = plot.GetGraph(xVals, yVals, xErrs, xErrs, yErrs, yErrs)
+        gDict = {"graph" : [gr], "name" : [os.path.basename(opts.saveDir)]}
+        rocName = "ROC_%s_GE%.0f_LE%.0f" % (var, xMin, xMax)
+        #func.PlotROC(gDict, opts.saveDir, rocName, opts.saveFormats)
+        func.PlotTGraph(xVals, xErrs, yVals, yErrs, opts.saveDir, rocName, jsonWr, opts.saveFormats, **GetKwargs("roc") )
+        print
 
     # Plot overtraining test
     htrain_s, htest_s, htrain_b, htest_b = func.PlotOvertrainingTest(pred_train_S, pred_test_S, pred_train_B, pred_test_B, opts.saveDir, "OvertrainingTest", opts.saveFormats)
 
     # Plot summary plot (efficiency & singificance)
-    func.PlotEfficiency(htest_s, htest_b, opts.saveDir, "Summary", opts.saveFormats) # fixme - iro
+    func.PlotEfficiency(htest_s, htest_b, opts.saveDir, "Summary", opts.saveFormats)
 
     # Write efficiencies (signal and bkg)
     xVals_S, xErrs_S, effVals_S, effErrs_S  = func.GetEfficiency(htest_s)
@@ -1079,13 +1130,8 @@ def main(opts):
     func.PlotTGraph(epochList[0:opts.epochs], xErr, valAccList[0:opts.epochs-1]   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
         
     # Plot ROC curve
-    gSig = func.GetROC(htest_s, htest_b)
-    if 0:
-        gBkg = func.GetROC(htest_b, htest_s)
-        gDict = {"graph" : [gSig, gBkg], "name" : ["signal", "bkg"]}
-    else:
-        gDict = {"graph" : [gSig], "name" : [os.path.basename(opts.saveDir)]}
-    style.setLogY(True)
+    gSig  = func.GetROC(htest_s, htest_b)
+    gDict = {"graph" : [gSig], "name" : [os.path.basename(opts.saveDir)]}
     func.PlotROC(gDict, opts.saveDir, "ROC", opts.saveFormats)
 
     # Write the resultsJSON file!
