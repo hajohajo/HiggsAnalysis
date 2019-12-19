@@ -1033,7 +1033,7 @@ def main(opts):
         dset_all = df_all.values
 
     rocDict = {}
-    WPs     = [float(x)/float(20) for x in range(0, 20, 1)]
+    WPs     = [float(x)/float(40) for x in range(0, 40, 1)]
 
     # For-loop: All branches to be plotted for various DNN score cuts (v. slow, especially for large number of "entrystop")
     for i, var in enumerate(opts.inputList, 0):

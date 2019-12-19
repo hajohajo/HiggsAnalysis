@@ -149,9 +149,6 @@ def main():
         doROC(opts.saveName, resultsList)
     elif opts.plotType.lower() == "var":
         for var in opts.variables:
-            #if var != "TrijetMass":
-            #    continue
-
             # For-loop: All working points (DNN score)
             for wp in ["", "0p1", "0p3", "0p5", "0p7", "0p9"]:
                 if wp != "":
@@ -190,7 +187,9 @@ def main():
         opts.saveDir = _saveDir
 
     elif "metric" in opts.plotType.lower():
-        for metric in ["TrainAccuracy", "ValAccuracy", "TrainLoss", "ValLoss"]:
+        #for metric in ["TrainAccuracy", "ValAccuracy", "TrainLoss", "ValLoss"]: #tmp
+        for metric in ["ROC_TrijetMass_GE140_LE200", "TrainAccuracy", "ValAccuracy", "TrainLoss", "ValLoss"]: #tmp
+            print "plotResults.py: %s (fixme) - temporary" % (metric)
             doMetrics(opts.saveName, metric, resultsList)
     else:
         pass
@@ -636,7 +635,6 @@ def doPlot(legList, graphList, saveName, **kwargs):
     # Apply style and set label
     Verbose("Applying the histogram styles (forEachHisto)", True)
     plot.histoMgr.forEachHisto(sty)
-    #if opts.plotType != "var":
     if 0:
         plot.setLegendHeader("Sequential Model")
 
@@ -717,6 +715,16 @@ def GetMetricKwargs(metric, opts):
         Print("This does not work! Bug-fixing required!", True)
         kwargs["cutBoxY"] = {"cutValue": opts.cutLineY, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False} 
 
+    if "roc" in metric.lower():
+        kwargs["xlabel"] = "#epsilon_{s}"
+        kwargs["ylabel"] = "#epsilon_{b}"
+        kwargs["opts"]["ymin"] = 1e-4
+        kwargs["opts"]["ymax"] = 5.0
+        kwargs["opts"]["xmin"] = 0.0
+        kwargs["opts"]["ymax"] = 1.0
+        kwargs["log"] = True
+        kwargs["moveLegend"] = legNW
+        
     if "loss" in metric.lower():
         kwargs["xlabel"] = "epoch"
         kwargs["ylabel"] = "loss"
