@@ -157,33 +157,33 @@
 
 
 
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 1000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # worst
-sleep 10
-
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 2000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &  # second best (!)
-sleep 10
-
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &
-sleep 10
-
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 50000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # second best (tie with 2000)
-sleep 10
-
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # best by far
-sleep 10
-
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 1000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # worst
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 2000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &  # second best (!)
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 50000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # second best (tie with 2000)
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # best by far
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &
 
 
 
 # 19 Dec 2019
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log & 
-sleep 5
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --standardise Robust --scaleBack & # best by far
-sleep 5
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # best by far
-sleep 5
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack & # best by far
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log & 
+# sleep 5
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --standardise Robust --scaleBack & # best by far
+# sleep 5
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # best by far
+# sleep 5
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack & # best by far
 
 sleep 15
 nohup ./sequential.py --activation relu,relu,sigmoid --neurons 100,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log & 
