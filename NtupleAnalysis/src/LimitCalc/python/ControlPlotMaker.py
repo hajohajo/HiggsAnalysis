@@ -51,6 +51,7 @@ class ControlPlotMaker:
 
         self._opts = opts
         self._config = config
+        self._verbose = verbose
         if config.OptionSqrtS == None:
             raise Exception(ShellStyles.ErrorLabel()+"Please set the parameter OptionSqrtS = <integer_value_in_TeV> in the config file!"+ShellStyles.NormalStyle())
         self._dirname = dirname
@@ -61,33 +62,46 @@ class ControlPlotMaker:
         #myEvaluator = SignalAreaEvaluator()
 
         # Make control plots
-        print "\n"+ShellStyles.HighlightStyle()+"Generating control plots"+ShellStyles.NormalStyle()
-        # Loop over mass points
+        self.Verbose(ShellStyles.HighlightStyle() + "Generating control plots" + ShellStyles.NormalStyle(), True)
+
         massPoints = []
         massPoints.extend(self._config.MassPoints)
         massPoints.append(-1) # for plotting with no signal
+        nMasses = len(massPoints)
+        nPlots  = len(self._config.ControlPlots)
+        counter = 0
+
+        # Loop over mass points
         for m in massPoints:
-            print "... mass = %d GeV"%m
+            self.Verbose("Making control plots for mass = %d GeV" % m, True)
+
             # Initialize flow plot
+            self.Print("Initialising selection-flow plot maker", True)
             selectionFlow = SelectionFlowPlotMaker(self._opts, self._config, m)
             myBlindedStatus = False
-            for i in range(0,len(self._config.ControlPlots)):
+
+            for i in range(0, nPlots):
+                counter += 1
+                msg = "Control Plot %d/%d (m=%s GeV)"  % (counter, nMasses*nPlots, str(m))
+                self.PrintFlushed(ShellStyles.AltStyle() + msg + ShellStyles.NormalStyle(), counter==1)
+
                 if observation.getControlPlotByIndex(i) != None:
                     myCtrlPlot = self._config.ControlPlots[i]
-                    print "......", myCtrlPlot.title
                     myMassSuffix = "_M%d"%m
                     # Initialize histograms
-                    hSignal = None
-                    hQCD = None
-                    hQCDdata = None
+                    hSignal   = None
+                    hQCD      = None
+                    hQCDdata  = None
                     hEmbedded = None
-                    hEWKfake = None
-                    hData = None
-                    # Loop over dataset columns to find histograms
+                    hEWKfake  = None
+                    hData     = None
                     myStackList = []
+
+                    # For-loop; All dataset columns (to find histograms)
                     for c in self._datasetGroups:
                         if (m < 0 or c.isActiveForMass(m,self._config)) and not c.typeIsEmptyColumn() and not c.getControlPlotByIndex(i) == None:
                             h = c.getControlPlotByIndex(i)["shape"].Clone()
+                            self.Verbose("Processing histogram with name \"%s\"" % (h.GetName()), True)
                             if c.typeIsSignal():
                                 #print "signal:",c.getLabel()
                                 # Scale light H+ signal
@@ -290,7 +304,45 @@ class ControlPlotMaker:
             # Do selection flow plot
             selectionFlow.makePlot(self._dirname,m,len(self._config.ControlPlots),self._luminosity)
         #myEvaluator.save(dirname)
-        print "Control plots done"
+        print
+        self.Verbose("Control plots done", True)
+        return
+
+    def GetFName(self):
+        fName = __file__.split("/")[-1]
+        fName = fName.replace(".pyc", ".py")
+        return fName
+
+    def Verbose(self, msg, printHeader=True):
+        '''
+        Calls Print() only if verbose options is set to true
+        '''
+        if not self._verbose:
+            return
+        Print(msg, printHeader)
+        return
+
+    def Print(self, msg, printHeader=True):
+        '''
+        Simple print function. If verbose option is enabled prints, otherwise does nothing
+        '''
+        fName = __file__.split("/")[-1]
+        fName = fName.replace(".pyc", ".py")
+        if printHeader:
+            print "=== ", fName
+        print "\t", msg
+        return
+
+    def PrintFlushed(self, msg, printHeader=True):
+        '''
+        Useful when printing progress in a loop
+        '''
+        msg = "\r\t" + msg
+        if printHeader:
+            print "=== ", self.GetFName()
+        sys.stdout.write(msg)
+        sys.stdout.flush()
+        return
 
     def _applyBlinding(self,myObject,blindedRange = []):
         myMin = None

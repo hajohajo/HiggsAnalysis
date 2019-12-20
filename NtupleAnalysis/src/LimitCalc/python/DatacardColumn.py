@@ -689,7 +689,7 @@ class DatacardColumn():
                     dset += "_ext1"
                     if not dsetMgr.hasDataset(dset):
                         msg  = "Cannot find merged dataset by key '%s' or '%s' in multicrab dir! " % (oldKey,dset)
-                        msg += "Did you forget to merge the root files with hplusMergeHistograms.py ?"
+                        msg += "Did you forget to merge the root files with hplusMergeHistograms.py? "
                         msg += "Did you misspell the dataset name? You must use the exact name given in \"_datasetMerge\" dictionary defined in \"plots.py\""
                         dsetMgr.PrintInfo()
                         raise Exception(sh_e + msg + sh_n)

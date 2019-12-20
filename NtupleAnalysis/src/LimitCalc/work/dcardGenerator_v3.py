@@ -31,6 +31,7 @@ EXAMPLES:
 
 LAST USED:
 ./dcardGenerator_v3.py --analysisType HToHW --datacard datacard_HToHW.py --dir limits2019/ --barlowBeeston
+./dcardGenerator_v3.py --analysisType HToTauNu --datacard datacard_HToTauNu.py --dir limits_HIG-18-014 --barlowBeeston
 
 
 '''
