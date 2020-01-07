@@ -483,20 +483,20 @@ styles = [
     Style(23, ROOT.kGreen+2),
     Style(24, ROOT.kMagenta),
     Style(28, ROOT.kCyan),
-    Style(29, ROOT.kYellow+2),
-    Style(30, ROOT.kOrange+9),
+    Style(35, ROOT.kGray),
+    Style(25, ROOT.kBlack),
+    Style(29, ROOT.kYellow-2),
     Style(31, ROOT.kOrange+3),
     Style(32, ROOT.kMagenta+3),
     Style(33, ROOT.kGray+2),
     Style(34, ROOT.kBlue+3),
     Style(35, ROOT.kOrange+1),
-    Style(35, ROOT.kGray),
     Style(35, ROOT.kTeal),
-    Style(35, ROOT.kViolet),
     Style(35, ROOT.kOrange+2),
+    Style(35, ROOT.kViolet),
+    Style(30, ROOT.kOrange+9),
     Style(36, ROOT.kCyan-5),
     Style(22, ROOT.kBlue),
-    Style(25, ROOT.kBlack)
     ]
 
 stylesCompound = [ 

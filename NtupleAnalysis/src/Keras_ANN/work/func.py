@@ -6,6 +6,15 @@ import plot
 import math
 import array
 import json
+import pandas
+import numpy 
+
+from sklearn.utils.class_weight import compute_sample_weight
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from sklearn.externals import joblib
 
 #================================================================================================   
 # Function definition
@@ -18,7 +27,199 @@ def Print(msg, printHeader=False):
     else:
         print "\t", msg
     return
-   
+
+def Verbose(msg, printHeader=False, verbose=False):
+    if not verbose:
+        return
+    fName = __file__.split("/")[-1]
+    if printHeader==True:
+        print "=== ", fName
+        print "\t", msg
+    else:
+        print "\t", msg
+    return
+
+def split_list(a_list, firstHalf=True):
+    half = len(a_list)//2
+    if firstHalf:
+        return a_list[:half]
+    else:
+        return a_list[half:]
+
+def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
+    '''
+     Optional numpy array of weights for the training & testing samples, used for weighting the loss function (during training only)
+     Can be used to decorrelate a variable before training; alternative approach to adversarial neural network (ANN) for combatting mass sculpting
+
+    df_sig is the signal dataFrame
+    df_bkg is the bkg dataFrame
+    
+    '''
+    msg = "De-correlating the variable \"%s\" by applying sample reweighting" % (varName)
+    Verbose(msg, True, _verbose)
+
+    # Definitions
+    weights = {}
+    events  = {}
+    digi    = {}
+    xMin    = kwargs["xMin"]
+    xMax    = kwargs["xMax"]
+    nBins   = kwargs["nBins"]
+    myBins  = numpy.linspace(xMin, xMax, nBins)
+ 
+    # Use Mass as the variable to be decorrelated
+    events["all"] = pandas.concat( [df_sig, df_bkg] )[varName].values
+    # events["all"] = pandas.concat( [split_list(df_sig), split_list(df_bkg)] )[varName].values
+    events["sig"] = df_sig[varName].values
+    events["bkg"] = df_bkg[varName].values
+    events["s/b"] = [] # filled at later stage (once reweighting histo is obtained)
+
+    # Create histograms to divide them and get a ratio histograms for reweighting
+    hSig     = ROOT.TH1F("sig", "", nBins, xMin, xMax)
+    hBkg     = ROOT.TH1F("bkg", "", nBins, xMin, xMax)
+    hWeights = ROOT.TH1F("s/b", "", nBins, xMin, xMax)
+
+    # For-loop: 
+    for s,b in zip(events["sig"], events["bkg"]):
+        # print "s = %s, b = %s" % (s, b)
+        hSig.Fill(s)
+        hBkg.Fill(b)
+    hWeights = hSig.Clone("s/b")
+    hWeights.Divide(hBkg)
+
+    # Digitize will return numbers from 1 to len(bins) depending on which bin the event belongs to. However it won't handle
+    # the situation if value is over the maximum bin edge, so you'll want to clip your values (or adjust the binning) accordingly
+    # In other words; get the bin indices (convert values to bin indices according to the myBins variable)
+    digi["all"] = numpy.digitize( numpy.clip(events["all"], xMin, xMax-1.0), bins=myBins, right=False )
+    digi["sig"] = numpy.digitize( numpy.clip(events["sig"], xMin, xMax-1.0), bins=myBins, right=False )
+    digi["bkg"] = numpy.digitize( numpy.clip(events["bkg"], xMin, xMax-1.0), bins=myBins, right=False )
+    # For-loop: All background entries
+    for i, value in enumerate(events["bkg"], 0):
+        # Find the bin the variable value corresponds to in the weights histogram
+        bin    = hWeights.FindBin( value )
+
+        # Get the weight corresponding to the determined bin number
+        weight = hWeights.GetBinContent(bin)
+
+        # Save the weight for this specific entry
+        events["s/b"].append(weight)
+        #print "value = %s, weight = %s" % (value, weight)
+
+    # These are the weights you can give to keras.fit() function in parameter "sample_weight". The idea is to reweight the braches to get 
+    # both signal and bkg to have similar mass (decouple mass from learning) 
+    weights["sig"] = numpy.ones(len(events["sig"]))                    # an array of 1's of specific sig => leaves original distribution unchanged
+    weights["bkg"] = numpy.asarray(events["s/b"], dtype=numpy.float32) # reweight bkg so that it matches the signal distribution (ala PU-reweight)
+    # The "balanced" mode uses the values of y to automatically adjust weights inversely proportional to variable frequencies in the input data as n_samples / (n_classes * np.bincount(y))
+    # weights["sig"] = compute_sample_weight('balanced', y=digi["sig"]) # Flattens out signal (uniform distribution instead of resonance peak)
+    # weights["bkg"] = compute_sample_weight(class_weight='balanced', y=digi["bkg"])  # Flattens out bkg only (uniform distribution)
+    if 1: 
+        # Correct way of performing sample reweighting for matching background to signal distribution for given variable
+        weights["all"] = numpy.concatenate((weights["sig"], weights["bkg"]), axis=0) # Flatten-out both signal and bkg variable
+    else:
+        Print("WARNING! This option flattens out ALL variables resulting in no distinction between signal and background! And hence a useless DNN", True)
+        weights["all"] = compute_sample_weight(class_weight='balanced', y=digi["all"]) 
+
+    # Construct table for information printout
+    if _verbose:
+        align = "{:>5} {:>15} {:>10} {:>15} {:>15} {:>15}"
+        title = align.format("index", varName, "bin", "weight", "weight (s)", "weight (b)")
+        hLine = "="*100
+        Verbose(hLine, False, _verbose)
+        Verbose("{:^100}".format("%s (%d bins, xMin = %.1f, xMax = %.1f)" % (varName, nBins, xMin, xMax) ))
+        Verbose(title, False, _verbose)
+        Verbose(hLine, False, _verbose)
+        # For-loop: All weight information
+        for i,w in enumerate(weights["all"], 0):
+            s = "-"
+            b = "-"
+            v = events["all"][i]
+            d = digi["all"][i]
+            if i < len(weights["all"])/2:
+                s = "%.2f" % weights["sig"][i]
+                b = "%.2f" % weights["bkg"][i]
+        msg = align.format("%d" % i, "%.2f" % v, "%d" % d, "%.2f" % w , "%s" % s, "%s" % b)
+        Verbose(msg, False, _verbose)
+        Verbose(hLine, False, _verbose)
+
+    return weights
+
+def GetOriginalDataFrame(scaler, df, inputList):
+    '''
+    https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler.inverse_transform
+    https://machinelearningmastery.com/normalize-standardize-time-series-data-python/
+    '''
+    df_original = df.copy()
+    features    = df_original[inputList]
+    features    = scaler.inverse_transform(features.values)
+    df_original[inputList] = features
+    Verbose("Before:\n%s" % (df["TrijetMass"]), True)
+    Verbose("After:\n%s" % (df_original["TrijetMass"]), True)
+    return df_original
+
+
+def GetStandardisedDataFrame(df, inputList, scalerType="robust"):
+    '''
+    Standardization of a dataset is a common requirement for many machine learning estimators: they might behave badly if the individual features do not
+    more or less look like standard normally distributed data (e.g. Gaussian with 0 mean and unit variance).
+    https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
+    N.B: When normalizing the input one must remember to additionally save the parameters for when you'll need them in the deployed network version to scale the inputs there as well!
+         This is crucial since the network trained and learned in separating "standardised" input variables!
+         Excellent example her ("Why to normalise?"): https://stackoverflow.com/questions/48284427/why-should-we-normalize-data-for-deep-learning-in-keras
+
+    with_mean = True 
+    If True, center the data before scaling. 
+
+    with_std = True
+    If True, scale the data to unit variance (or equivalently, unit standard deviation).
+
+
+    The standard score of a sample x is calculated as:
+    z = (x - u) / s
+    where u is the mean of the training samples or zero if "with_mean=False", 
+    and s is the standard deviation of the training samples or one if "with_std=False".
+
+    Snippet of code taken from:
+    https://stackoverflow.com/questions/38420847/apply-standardscaler-to-parts-of-a-data-set
+
+    PLEASE READ: 
+    https://jovianlin.io/feature-scaling/
+    https://scikit-learn.org/stable/auto_examples/preprocessing/plot_all_scaling.html
+    https://jovianlin.io/feature-scaling/
+    '''    
+    scalerTypres = ["standard", "robust", "minmax"]
+    if scalerType.lower() == "standard":
+        df_scaled = df.copy()
+        features  = df_scaled[inputList]
+        # Assumes that your data is normally distributed within each feature!     https://jovianlin.io/feature-scaling/
+        scaler    = StandardScaler(copy=True, with_mean=True, with_std=True)
+        features  = scaler.fit_transform(features.values)
+        df_scaled[inputList] = features
+    elif scalerType.lower() == "robust":
+        df_scaled = df.copy()
+        features  = df_scaled[inputList]
+        # Scale features using statistics that are robust to outliers
+        scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(25.0, 75.0), copy=True)
+        #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(30.0, 70.0), copy=True)
+        #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(10.0, 90.0), copy=True)
+        #scaler    = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(5.0, 95.0), copy=True)
+        features  = scaler.fit_transform(features.values)
+        df_scaled[inputList] = features
+    elif scalerType.lower() == "minmax": 
+        df_scaled = df.copy()
+        features  = df_scaled[inputList]
+        # It shrinks the range such that it is now between 0 and 1 (or -1 to 1 if there exist negative values).
+        scaler    = MinMaxScaler(feature_range=(0, 1), copy=True)
+        features  = scaler.fit_transform(features.values)
+        df_scaled[inputList] = features
+    else:
+        msg = "Unsupported scaler type \"%s\". Please select one of the following:%s" % (scalerType, ", ".join(scalerTypes) )
+        raise Exception(msg)
+
+    Verbose("Before:\n%s" % (df["TrijetMass"]), True)
+    Verbose("After:\n%s" % (df_scaled["TrijetMass"]), True)
+    return scaler, df_scaled
+
+
 def convertHistoToGaph(histo, verbose=False):
 
     # Lists for values
@@ -135,27 +336,65 @@ def PlotOutput(Y_train, Y_test, saveDir, saveName, isSB, saveFormats):
     canvas.Close()
     return
 
-def PlotInputs(signal, bkg, var, saveDir, saveFormats):
+def PlotInputs(signal, bkg, var, saveDir, saveFormats, pType="sigVbkg", standardise=False, w1=numpy.array([]), w2=numpy.array([])):
+
+    # Define plot type
+    if pType == "sigVbkg":
+        h1 = "signal"
+        h2 = "background"
+    elif pType == "testVtrain":
+        h1 = "train data"
+        h2 = "test data"        
+    elif pType == "trainVtest":
+        h1 = "test data"
+        h2 = "train data"
+    else:
+        Print("Unknown plot type \"%s\". Using dummie names/legends for histograms" % (pType), True)
+        h1 = "h1"
+        h2 = "h2"
+        
     ROOT.gStyle.SetOptStat(0)
 
     # Create canvas
     canvas = plot.CreateCanvas()
     canvas.cd()
     
-    info = plot.GetHistoInfo(var)
+    # Convert weights numpy arrays to list
+    w1 = w1.tolist()
+    w2 = w2.tolist()
+
+    # Definitions 
+    info  = plot.GetHistoInfo(var)
+    nBins = info["nbins"]
+    xMin  = info["xmin"]
+    xMax  = info["xmax"]
+    if standardise:
+        xMin  = -5.0
+        xMax  = +5.0
+        nBins = 500
+
     # Create histograms
-    hsignal = ROOT.TH1F('signal', '', info["nbins"], info["xmin"], info["xmax"])
-    hbkg    = ROOT.TH1F('bkg'   , '', info["nbins"], info["xmin"], info["xmax"])
+    hsignal = ROOT.TH1F(h1, '', nBins, xMin, xMax)
+    hbkg    = ROOT.TH1F(h2, '', nBins, xMin, xMax)
 
-    # Fill histograms
-    for r in signal:
-        hsignal.Fill(r)
+    # Fill histogram (signal)
+    for i, r in enumerate(signal, 0):
+        if len(w1) == 0: 
+            hsignal.Fill(r)
+        else:
+            hsignal.Fill(r, w1[i])
+            
+    # Fill histogram (bkg)    
+    for j, r in enumerate(bkg, 0):
+        if len(w2) == 0:
+            hbkg.Fill(r)
+        else:
+            hbkg.Fill(r, w2[j])
 
-    for r in bkg:
-        hbkg.Fill(r)
-
-    if 1:
+    if hsignal.Integral() > 0:
         hsignal.Scale(1./hsignal.Integral())
+
+    if hbkg.Integral() > 0:
         hbkg.Scale(1./hbkg.Integral())
 
     ymax = max(hsignal.GetMaximum(), hbkg.GetMaximum())
@@ -175,18 +414,19 @@ def PlotInputs(signal, bkg, var, saveDir, saveFormats):
 
     # Create legend
     leg=plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
-    leg.AddEntry(hsignal, "Truth-matched","f") #"pl"
-    leg.AddEntry(hbkg, "Unmatched","l") #"pl"
+    leg.AddEntry(hsignal, h1, "f") 
+    leg.AddEntry(hbkg   , h2, "l") 
     leg.Draw()
 
-    plot.SavePlot(canvas, saveDir, var, saveFormats, True)
+    plot.SavePlot(canvas, saveDir, var, saveFormats, False)
     canvas.Close()
     return
-        
+
+
 def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
     resultsDict = {}
-    resultsDict["signal"]     = signal
+    resultsDict["signal"] = signal
     resultsDict["background"] = bkg
 
     normalizeToOne = False
@@ -201,7 +441,7 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
     hList  = []
     gList  = []
     yMin   = 100000
-    yMax   = -1
+    yMax   = None
     xMin   = 0.0
     xMax   = 1.0
     nBins  = 50
@@ -217,63 +457,54 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
 
     if "yTitle" in kwargs:
         yTitle = kwargs["yTitle"]
-    elif "output" in saveName.lower():
-        xTitle = "Entries"
-    elif "efficiency" in saveName.lower():
-        xTitle = "Efficiency"
-    elif "significance" in saveName.lower():
-        xTitle = "Significance"
-    else:
-        pass    
-
     if "xMin" in kwargs:
         xMin = kwargs['xMin']
     if "xMax" in kwargs:
         xMax = kwargs['xMax']
+    if "yMin" in kwargs:
+        yMin = kwargs['yMin']
+    if "yMax" in kwargs:
+        yMax = kwargs['yMax']
     if "nBins" in kwargs:
         xBins = kwargs['nBins']
     
-    # For-loop: 
+    # For-loop: All results
     for i, key in enumerate(resultsDict.keys(), 0):
-
+        # Print("Constructing histogram %s" % (key), i==0)
         h = ROOT.TH1F(key, '', nBins, xMin, xMax)
+        
+        # For-loop: All Entries
         for j, x in enumerate(resultsDict[key], 0):
             h.Fill(x)
             try:
-                yMin = min(x[0], yMin)
+                yMin_ = min(x[0], yMin)
             except:
                 pass
                 
         # Save maximum
-        yMax = max(h.GetMaximum(), yMax)
+        yMax_ = max(h.GetMaximum(), yMax)
 
         # Customise & append to list
         plot.ApplyStyle(h, i+1)
 
         if normalizeToOne:
-            if "ymax" in kwargs:
-                yMax = kwargs["yMax"]
-            else:
-                yMax = 1.0
-            if "yMin" in kwargs:
-                yMin = kwargs["yMin"]
-            else:
-                yMin = 1e-4
-
             if h.Integral()>0.0:
                 h.Scale(1./h.Integral())
         hList.append(h)
 
-    if yMin <= 0.0:
-        yMin = 100
     if log:
+        # print "yMin = %s, yMax = %s" % (yMin, yMax)
         canvas.SetLogy()
+
+    if yMax == None:
+        yMax = yMax_
 
     # For-loop: All histograms
     for i, h in enumerate(hList, 0):
-        h.SetMinimum(yMin*0.85)        
-        h.SetMaximum(yMax*1.15)
-
+        # h.SetMinimum(yMin_* 0.85)        
+        # h.SetMaximum(yMax_* 1.15)
+        h.SetMaximum(yMin)  # no guarantees when converted to TGraph!
+        h.SetMaximum(yMax)  # no guarantees when converted to TGraph!
         h.GetXaxis().SetTitle(xTitle)
         h.GetYaxis().SetTitle(yTitle)
             
@@ -283,9 +514,16 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
             h.Draw("HIST SAME")
     
     # Create legend
-    leg = plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
-    for h in hList:
-        leg.AddEntry(h, h.GetName(),"l")
+    leg = plot.CreateLegend(0.70, 0.76, 0.90, 0.90)
+    if "legHeader" in kwargs:
+        leg.SetHeader(kwargs["legHeader"])
+
+    # For-loop: All histograms
+    for i, h in enumerate(hList, 0):
+        if "legEntries" in kwargs:
+            leg.AddEntry(h, kwargs["legEntries"][i], "l")
+        else:
+            leg.AddEntry(h, h.GetName(), "l")
     leg.Draw()
 
     plot.SavePlot(canvas, saveDir, saveName, saveFormats)
@@ -301,7 +539,141 @@ def PlotAndWriteJSON(signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwar
         jsonWr.addGraph(gName, gr)
     return
 
-def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormats):
+def PlotAndWriteJSON_DNNscore(sigOutput, bkgOutput, cutValue, signal, bkg, saveDir, saveName, jsonWr, saveFormats, **kwargs):
+
+    resultsDict = {}
+    resultsDict["signal"] = signal
+    resultsDict["background"] = bkg
+
+    normalizeToOne = False
+    if "normalizeToOne" in kwargs:
+        normalizeToOne = kwargs["normalizeToOne"]
+
+   # Create canvas
+    ROOT.gStyle.SetOptStat(0)
+    canvas = plot.CreateCanvas()
+    canvas.cd()
+
+    hList  = []
+    gList  = []
+    yMin   = 100000
+    yMax   = None
+    xMin   = 0.0
+    xMax   = 1.0
+    nBins  = 50
+    xTitle = "DNN output"
+    yTitle = "Entries"
+    log    = True
+    if "log" in kwargs:
+        log = kwargs["log"]
+    if "xTitle" in kwargs:
+        xTitle = kwargs["xTitle"]
+    if "yTitle" in kwargs:
+        yTitle = kwargs["yTitle"]
+    if "xMin" in kwargs:
+        xMin = kwargs['xMin']
+    if "xMax" in kwargs:
+        xMax = kwargs['xMax']
+    if "nBins" in kwargs:
+        nBins = kwargs['nBins']
+    if "yMax" in kwargs:
+        yMax = kwargs["yMax"]
+    if "yMin" in kwargs:
+        yMin = kwargs["yMin"]
+    
+    # For-loop: 
+    for i, key in enumerate(resultsDict.keys(), 0):
+
+        h = ROOT.TH1F("%s_%s_%s" % (key, saveName, "WP" + str(cutValue)), '', nBins, xMin, xMax)
+        for j, x in enumerate(resultsDict[key], 0):
+
+            #print "key = %s, x = %.2f, nBins = %d, xMin = %.2f, xMax = %.2f" % (key, x, nBins, xMin, xMax)
+            score  = None
+            if key == "signal":
+                score = sigOutput[j]
+            elif key == "background":
+                score = bkgOutput[j]
+            else:
+                raise Exception("This should not be reached")
+    
+            # Check if DNN score satisfies cut
+            if score < cutValue:
+                Verbose("%d) DNN score for %s is %.3f" % (j, key, score), False)
+                continue
+            else:
+                Verbose("%d) DNN score for %s is %.3f" % (j, key, score), False)
+
+            # Fill the histogram
+            if len(x) > 0:
+                h.Fill(x)
+            try:
+                yMin_ = min(x[0], yMin)
+            except:
+                pass
+                
+        # Save maximum
+        yMax_ = max(h.GetMaximum(), yMax)
+
+        # Customise & append to list
+        plot.ApplyStyle(h, i+1)
+
+        if normalizeToOne:
+            if h.Integral()>0.0:
+                h.Scale(1./h.Integral())
+        hList.append(h)
+
+    if yMax == None:
+        yMax = yMax_
+
+    if log:
+        canvas.SetLogy()
+
+    # For-loop: All histograms
+    for i, h in enumerate(hList, 0):
+        #h.SetMinimum(yMin*0.85)        
+        #h.SetMaximum(yMax*1.15)
+        h.SetMinimum(yMin)
+        h.SetMaximum(yMax)
+
+        h.GetXaxis().SetTitle(xTitle)
+        h.GetYaxis().SetTitle(yTitle)
+            
+        if i==0:
+            h.Draw("HIST")
+        else:
+            h.Draw("HIST SAME")
+    
+    # Create legend
+    leg = plot.CreateLegend(0.6, 0.75, 0.9, 0.85)
+    for h in hList:
+        leg.AddEntry(h, h.GetName().split("_")[0],"l")
+    leg.Draw()
+    
+    postfix = "_%s%s" % ("WP", str(cutValue).replace(".", "p"))
+    plot.SavePlot(canvas, saveDir, saveName + postfix, saveFormats)
+    canvas.Close()
+
+    # Create TGraph
+    for h in hList:
+        gList.append(convertHistoToGaph(h))
+
+    # Write the Tgraph into the JSON file
+    sample = "NA"
+    for gr in gList:
+        # gr.GetName() is too long since it must be unique (memory replacement issues). Make it simples
+        if "signal" in gr.GetName().lower():
+            sample = "signal"
+        elif "background" in gr.GetName().lower():
+            sample = "background"
+        else:
+            sample = "unknown"            
+
+        #gName = "%s_%s" % (saveName, gr.GetName()) + postfix @ 
+        gName = "%s_%s" % (saveName, sample) + postfix
+        jsonWr.addGraph(gName, gr)
+    return hList
+
+def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormats, **kwargs):
 
     # Create a TGraph object
     graph = plot.GetGraph(xVals, yVals, xErrs, xErrs, yErrs, yErrs)
@@ -321,6 +693,7 @@ def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormat
                                     array.array("d", yErrs),
                                     array.array("d", yErrs))
     tgraph.SetName(saveName)
+    legName = None
     if "efficiency" in saveName.lower():
         legName = "efficiency"
         if saveName.lower().endswith("sig"):
@@ -337,15 +710,21 @@ def PlotTGraph(xVals, xErrs, yVals, yErrs, saveDir, saveName, jsonWr, saveFormat
         plot.ApplyStyle(tgraph, ROOT.kOrange)
         
     # Draw the TGraph
-    tgraph.GetXaxis().SetLimits(-0.05, 1.0)
-    #tgraph.SetMaximum(1.1)
-    #tgraph.SetMinimum(0)
+    if "xTitle" in kwargs:
+        tgraph.GetXaxis().SetTitle(kwargs["xTitle"])
+    if "yTitle" in kwargs:
+        tgraph.GetYaxis().SetTitle(kwargs["yTitle"])
+    if "xMin" in kwargs and "xMax" in kwargs:
+        tgraph.GetXaxis().SetLimits(kwargs["xMin"], kwargs["xMax"])
+    else:
+        tgraph.GetXaxis().SetLimits(-0.05, 1.0)
     tgraph.Draw("AC")
         
     # Create legend
     leg = plot.CreateLegend(0.60, 0.70, 0.85, 0.80)
-    leg.AddEntry(tgraph, legName, "l")
-    leg.Draw()
+    if legName != None:
+        leg.AddEntry(tgraph, legName, "l")
+        leg.Draw()
 
     plot.SavePlot(canvas, saveDir, saveName, saveFormats)
     canvas.Close()
@@ -365,6 +744,8 @@ def GetEfficiency(histo):
     yVals    = []
     yErrs    = []
     yTmp     = ROOT.Double(0.0)
+    if intVals == 0.0:
+        Print("WARNING! The integral of histogram \"%s\" is zero!" % (histo.GetName()), True)
     
     # For-loop: All bins
     for i in range(0, nbins+1):
@@ -373,10 +754,17 @@ def GetEfficiency(histo):
             continue
         xErr = histo.GetBinWidth(i)*0.5
         intBin = histo.IntegralAndError(i, nbins+1, yTmp, "")
-        yVals.append(intBin/intVals)
+        if intVals > 0:
+            yVals.append(intBin/intVals)
+        else:
+            yVals.append(0.0)
         xVals.append(xVal)
         xErrs.append(xErr)
-        yErrs.append(yTmp/intVals)
+        if intVals > 0:
+            yErrs.append(yTmp/intVals)
+        else:
+            yVals.append(0.0)
+
     return xVals, xErrs, yVals, yErrs
 
 
@@ -497,10 +885,12 @@ def PlotEfficiency(htest_s, htest_b, saveDir, saveName, saveFormats):
     
     # Normalize significance
     h_signifScaled0 = h_signif0.Clone("signif0")
-    h_signifScaled0.Scale(1./float(maxSignif))
+    if maxSignif > 0:
+        h_signifScaled0.Scale(1./float(maxSignif))
 
     h_signifScaled1 = h_signif1.Clone("signif1")
-    h_signifScaled1.Scale(1./float(maxSignif))
+    if maxSignif > 0:
+        h_signifScaled1.Scale(1./float(maxSignif))
 
     #Significance: Get new maximum
     ymax = max(h_signifScaled0.GetMaximum(), h_signifScaled1.GetMaximum())
@@ -569,7 +959,10 @@ def PlotROC(graphMap, saveDir, saveName, saveFormats):
         gr_name = graphMap["name"][i]
         plot.ApplyStyle(gr, i+2)
         gr.GetXaxis().SetTitle("Signal Efficiency")
-        gr.GetYaxis().SetTitle("Misidentification rate")
+        gr.GetYaxis().SetTitle("Background Efficiency") # "Misidentification rate"
+        #gr.SetMinimum(0.0)
+        #gr.SetMaximum(1.0)
+        #gr.GetXaxis().SetRangeUser(0.0, 1.0)
         if i == 0:
             gr.Draw("apl")
         else:
@@ -663,10 +1056,6 @@ def PlotOvertrainingTest(Y_train_S, Y_test_S, Y_train_B, Y_test_B, saveDir, save
     for h in hList:
         h.SetMaximum(ymax*2)        
         h.Draw(DrawStyle(h.GetName())+" SAME")
-
-    #graph = plot.CreateGraph([0.5, 0.5], [0, ymax*2])
-    #graph.Draw("same")
-    #leg.Draw()
     
     # Save & close canvas
     plot.SavePlot(canvas, saveDir, saveName, saveFormats)
@@ -674,7 +1063,7 @@ def PlotOvertrainingTest(Y_train_S, Y_test_S, Y_train_B, Y_test_B, saveDir, save
     return htrain_s1, htest_s1, htrain_b1, htest_b1
 
 
-def WriteModel(model, model_json, inputList, output):
+def WriteModel(model, model_json, inputList, output, verbose=False):
     '''
     Write model weights and architecture in txt file
     '''
@@ -729,5 +1118,7 @@ def WriteModel(model, model_json, inputList, output):
                 # Store bias values (shifts the activation function : output[i] = (Sum(weights[i,j]*inputs[j]) + bias[i]))
                 biases = model.layers[index].get_weights()[1]
                 fout.write(str(biases) + '\n')
-        Print('Writing model in file %s' % (output), True)
+
+        if verbose:
+            Print('Writing model in file %s' % (output), True)
         return

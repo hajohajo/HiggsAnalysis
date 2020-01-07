@@ -23,13 +23,13 @@ def produceCustomisations(process, isData):
     reproduceMET(process, isData)
 #    reproduceJEC(process)
     produceJets(process, isData)
-    print "=== Customisations done"
+    print("=== Customisations done")
 
 # AK8 Customisations
 def produceAK8Customisations(process, isData):
     process.AK8CustomisationsSequence = cms.Sequence()
     produceAK8JEC(process, isData)
-    print "=== AK8 Customisations done"
+    print("=== AK8 Customisations done")
 
 def produceAK8JEC(process, isData):
     from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
@@ -97,7 +97,7 @@ def reproduceJEC(process):
     https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2016#Jets
     https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetAnalysis
     '''
-    print "=== Customisation: reproducing jet collections with latest JEC"
+    print("=== Customisation: reproducing jet collections with latest JEC")
     from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
     updateJetCollection(
         process,
@@ -128,7 +128,7 @@ def reproduceElectronID(process):
     For instructions and more details see:
     https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
     '''
-    print "=== Customisation: reproducing electron ID discriminators"
+    print("=== Customisation: reproducing electron ID discriminators")
     switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
     # define which IDs we want to produce and add them to the VID producer
     for idmod in ['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff',
@@ -143,7 +143,7 @@ def reproduceMETNoiseFilters(process):
     For instructions and more details see:
     https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2
     '''
-    print "=== Customisation: reproducing HBHE noise filter"
+    print("=== Customisation: reproducing HBHE noise filter")
     process.load('CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi')
     process.HBHENoiseFilterResultProducer.minZeros = cms.int32(99999)
     process.HBHENoiseFilterResultProducer.IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(False)

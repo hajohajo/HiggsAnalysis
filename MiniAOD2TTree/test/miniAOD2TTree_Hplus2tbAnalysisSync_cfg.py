@@ -101,11 +101,11 @@ process.GlobalTag = GlobalTag(process.GlobalTag, str(dataVersion.getGlobalTag())
 #================================================================================================  
 msgAlign = "{:<10} {:<55} {:<25} {:<25}"
 title    =  msgAlign.format("Data", "Global Tag", "Trigger Source", "Trigger Tag")
-print "="*len(title)
-print title
-print "="*len(title)
-print msgAlign.format(dataVersion.version, dataVersion.getGlobalTag(), dataVersion.getMETFilteringProcess(), dataVersion.getTriggerProcess())
-print 
+print("="*len(title))
+print(title)
+print("="*len(title))
+print(msgAlign.format(dataVersion.version, dataVersion.getGlobalTag(), dataVersion.getMETFilteringProcess(), dataVersion.getTriggerProcess()))
+print()
 
 
 
@@ -127,7 +127,7 @@ process.load("HiggsAnalysis/MiniAOD2TTree/MET_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/METNoiseFilter_cfi")
 
 process.METNoiseFilter.triggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getMETFilteringProcess())) 
-print "check tau",process.Taus_TauPOGRecommendation[0]
+print("check tau",process.Taus_TauPOGRecommendation[0])
 process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
     OutputFileName      = cms.string("miniaod2tree.root"),
     PUInfoInputFileName = process.PUInfo.OutputFileName,
@@ -236,7 +236,7 @@ produceCustomisations(process, dataVersion.isData()) # This produces process.Cus
 # https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 
-print "=== Adding Electron MVA: ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values"
+print("=== Adding Electron MVA: ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values")
 switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 
 for idmod in ['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff']:

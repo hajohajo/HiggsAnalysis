@@ -6,28 +6,20 @@ or even for comparing exclusion limits of different channels.
 
 
 USAGE:
-./plotOutputs.py  [opts]
+./plotResults.py  [opts]
 
 
 EXAMPLES:
-./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --dirs new5,new6,new7,new8 --saveDir /publicweb/a/aattikis/new5_6_7_8
-./plotOutputs.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2,new3 --refIndex 3 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 3 --dirs new1,new2,new3 --saveDir /publicweb/a/aattikis/Test 
-./plotOutputs.py -s png --logY --plotType output --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 8 --dirs new1,new2,new3,new4 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --logY --plotType output --dirs new1,new8,new9 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new1,new8,new9 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new1,new8,new9 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new1,new8,new9 --saveDir /publicweb/a/aattikis/Test
-./plotOutputs.py -s png --plotType roc --logY -saveDir /publicweb/a/aattikis/Test --logX --xMin 0.6 --yMin 6e-3 --yMax 1e-1 --dirs new2,new8,new9,new10,new11
-./plotOutputs.py -s png --plotType roc --xMin 0.01 --logY --dirs new9,new10,new11 --saveDir /publicweb/a/aattikis/BDT --refName BDT --cutLineX 0.93
-./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test  --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT --cutLineX 0.93
-./plotOutputs.py -s png --logY --plotType output --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType efficiency --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test && ./plotOutputs.py -s png --plotType roc --logY --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test
+./plotResults.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --dirs new5,new6,new7,new8 --saveDir /publicweb/a/aattikis/new5_6_7_8
+./plotResults.py -s png --logY --plotType output --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType efficiency --yMin 0.0 --yMax 1.0 --dirs new1,new2,new3,new4 --refIndex 8 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 8 --dirs new1,new2,new3,new4 --saveDir /publicweb/a/aattikis/Test
+./plotResults.py -s png --logY --plotType output --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType efficiency --dirs new10,new11 --refIndex 0 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType significance --yMin 0.0 --yMaxFactor 1.1 --refIndex 0 --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test && ./plotResults.py -s png --plotType roc --logY --dirs new10,new11 --saveDir /publicweb/a/aattikis/Test
 
 
 LAST USED:
-./plotOutputs.py -s png --plotType roc --logY --saveDir /publicweb/a/aattikis/Test --dirs 500k_sample,Keras_BDTG2018_Aug2018 --cutLineX 0.93 --xMin 0.0
-./plotOutputs.py -s png --plotType var --logY --saveDir /publicweb/a/aattikis/SotiSoti --dirs Keras_Test --yMin 0.5e-3 --yMax 1.0
-./plotOutputs.py -s pdf,C,png --plotType var --saveDir /publicweb/a/aattikis/DNN --dirs Keras_3Layers_19relu_190relu_1sigmoid_500Epochs_5000BatchSize_21-Nov-2019_07h21m34s --yMin 0.5e-3 --yMaxFactor 2.0 --boldText
-./plotOutputs.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDTG
-
-./plotOutputs.py --plotType significance --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotOutputs.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotOutputs.py --plotType efficiency --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT
+./plotResults.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDTG
+./plotResults.py --plotType significance --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotResults.py --plotType roc --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT && ./plotResults.py --plotType efficiency --logY --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs 500k_sample,Keras_BDTG2018_Aug2018 --refName BDT
+/plotResults.py --plotType metric --saveDir /publicweb/a/aattikis/Keras --cutLineX 0.93 --xMin 0.0 --dirs Keras_3Layers_19relu_20relu_1sigmoid_20Epochs_1000BatchSize_10000Entrystop_22-Nov-2019_10h27m10s,Keras_3Layers_19relu_40relu_1sigmoid_20Epochs_1000BatchSize_10000Entrystop_22-Nov-2019_10h26m20s,Keras_3Layers_19relu_100relu_1sigmoid_20Epochs_1000BatchSize_600000Entrystop_22-Nov_2019_10h37m38s --yMaxFactor 1.2
+./plotResults.py --plotType var --saveDir /publicweb/a/aattikis/Test --cutLineX 0.93 --xMin 0.0 --dirs results
 
 '''
 #================================================================================================
@@ -87,7 +79,23 @@ def Print(msg, printHeader=True):
     print "\t", msg
     return
 
+def PrintFlushed(msg, printHeader=True):
+    '''
+    Useful when printing progress in a loop
+    '''
+    msg = "\r\t" + msg
+    ERASE_LINE = '\x1b[2K'
+    if printHeader:
+        print "=== aux.py"
+    sys.stdout.write(ERASE_LINE)
+    sys.stdout.write(msg)
+    sys.stdout.flush()
+    return
+
 def main():
+
+    Print("Setting ROOT gErrorIngoreLevel to ROOT.kError (suppress warnings due to multiple canvases with same name)", True)
+    ROOT.gErrorIgnoreLevel = ROOT.kError
 
     # Apply TDR style
     style = tdrstyle.TDRStyle()
@@ -109,8 +117,12 @@ def main():
 
     # Definitions
     resultsList = []
+    Print("Filtering the directory list to keep only Keras base directories and not subdirectories", True)
+    opts.dirList = list(filter(lambda d: "Keras" in os.path.basename(d), opts.dirList))
+
+    # For-loop: All directories
     for i,d in enumerate(opts.dirList, 1):
-        
+
         dirs = glob.glob(d)
         dirs.sort()
         if len(dirs) == 0:
@@ -118,10 +130,11 @@ def main():
         directory = dirs[-1]
 
         Verbose("Picked %s" % directory, True)
+        Verbose("Creating \"Results\" object from directory %s" % os.path.basename(directory), i==1)
         resultsList.append(_results.Output(directory, excludePoints=[]))
         if opts.refName != None:
             if opts.refName in d:
-                opts.refIndex = i-1 #iro
+                opts.refIndex = i-1
 
     # Do comparison plot
     msg  = "Creating comparison plots (%d) using the following results directories:%s\n\t%s" % (len(opts.dirList), sh_t, "\n\t".join([os.path.basename(d) for d in opts.dirList]) )
@@ -134,13 +147,50 @@ def main():
         doSignificance(opts.saveName, resultsList) 
     elif "roc" in opts.plotType.lower():
         doROC(opts.saveName, resultsList)
-    elif "var" in opts.plotType.lower():
-        for var in ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
-                    "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
-                    "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
-                    "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
-                    "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]:
-            doVariables(opts.saveName, var, resultsList)
+    elif opts.plotType.lower() == "var":
+        for var in opts.variables:
+            # For-loop: All working points (DNN score)
+            for wp in ["", "0p1", "0p3", "0p5", "0p7", "0p9"]:
+                if wp != "":
+                    pfix = "_%s" % wp
+                else:
+                    pfix = ""
+                doVariablesWPs(var, resultsList, [wp], signal=True , defaultLegend=True, postFix=pfix)
+                doVariablesWPs(var, resultsList, [wp], signal=False, defaultLegend=True, postFix=pfix)
+
+    elif opts.plotType.lower() == "var-wp":
+        _saveDir = opts.saveDir
+        WPs = ["", "0p1", "0p3", "0p5", "0p7", "0p9"]
+
+        # For-loop: All variables
+        for i, var in enumerate(opts.variables, 1): 
+            opts.saveDir = _saveDir
+            PrintFlushed("Plotting variable %d/%d: %s" % (i, len(opts.variables), var), i==1)
+
+            # For-loop: All input directories
+            for j, r in enumerate(resultsList, 1):
+                opts.saveDir = os.path.join(_saveDir, r.getDirectoryBase())
+
+                # For-loop: All working points (DNN score)
+                for wp in WPs:
+                    if wp == "":
+                        myWP = ""
+                    else:
+                        myWP = "_WP%s" % (wp)
+                    doVariables(opts.saveName, var, [r], myWP )
+
+                doVariablesWPs(var, [r], WPs, signal=True )
+                doVariablesWPs(var, [r], WPs, signal=False)
+        print
+
+        # Recover the original save directory
+        opts.saveDir = _saveDir
+
+    elif "metric" in opts.plotType.lower():
+        #for metric in ["TrainAccuracy", "ValAccuracy", "TrainLoss", "ValLoss"]: #tmp
+        for metric in ["ROC_TrijetMass_GE140_LE200", "TrainAccuracy", "ValAccuracy", "TrainLoss", "ValLoss"]: #tmp
+            print "plotResults.py: %s (fixme) - temporary" % (metric)
+            doMetrics(opts.saveName, metric, resultsList)
     else:
         pass
     
@@ -158,7 +208,6 @@ def doOutput(name, resultsList):
 
     # For-loop: All Output-class objects
     for r in resultsList:
-        print r.getDirectory()
         gSig, lSig = r.getGraphs(opts.plotName + "_signal")
         gBkg, lBkg = r.getGraphs(opts.plotName + "_background")
         if opts.yMin == None:
@@ -329,7 +378,7 @@ def doROC(name, resultsList):
     doPlot(legList, gSvBList, opts.saveName, **kwargs)
     return
 
-def doVariables(name, variable, resultsList):
+def doVariables(name, variable, resultsList, WP=""):
     
     # Do the comparison plot
     Verbose("Creating the expected plots", True)
@@ -337,16 +386,21 @@ def doVariables(name, variable, resultsList):
     gBkgList = []
     legList  = []
     gSvBList = []
-    opts.saveName = variable
+    gNameS   = variable + "_signal%s" % (WP)
+    gNameB   = variable + "_background%s" % (WP) 
+    opts.saveName = variable + WP
 
     # For-loop: All Output-class objects
     for r in resultsList:
-        gSig, lSig = r.getGraphs(variable + "_signal")
-        gBkg, lBkg = r.getGraphs(variable + "_background")
+        gSig, lSig = r.getGraphs(gNameS)
+        gBkg, lBkg = r.getGraphs(gNameB)
         if opts.yMin == None:
             opts.yMin = r.getYMin()
         if opts.yMax == None and opts.yMax == None:
-            opts.yMax = r.getYMax()*1.10
+            if  r.getYMax() != None:
+                opts.yMax = r.getYMax()*1.10
+            else:
+                opts.yMax = 1.0
         gSigList.extend(gSig)
         gBkgList.extend(gBkg)
         legList.extend(["signal"]) 
@@ -354,10 +408,14 @@ def doVariables(name, variable, resultsList):
         
     # Plot the graph
     kwargs = GetVarKwargs(variable, opts)
-    gList = [gSigList[0], gBkgList[0]]
+    Verbose("len(gSigList) = %d, len(gBkgList) = %d" % (len(gSigList), len(gBkgList)), True)
+    if len(gSig) < 1 or len(gBkg) < 1:
+        Print("Skipping %s (len(gSigList) = %d, len(gBkgList) = %d)" % (opts.saveName, len(gSigList), len(gBkgList)), False)
+        return
+    else:
+        gList = [gSigList[0], gBkgList[0]]
 
     # For-loop: All TGraphs
-    #for i, g in enumerate(gSigList, 0):
     for i, g in enumerate(gList, 0):
         x  = []
         y  = []
@@ -381,13 +439,163 @@ def doVariables(name, variable, resultsList):
             Verbose("%d) x = %0.3f, y = %0.3f" % (j, xVal, yVal), j==0)
 
         # Create the TGraph
-        Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
-        g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
+        Verbose("Creating the TGraph with len(x) = %d, len(y) = %d" % (len(x), len(y)), True)
+        if len(x) < 1:
+            msg = "Skipping variable %s (len(x) = %d, len(y) = %d)" % (opts.saveName, len(x), len(y))
+            Print(sh_e + msg + sh_n, False)
+            return
+        else:
+            g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
         gSvBList.append(g)
 
     # Make the plot
     Verbose("Making the plot", True)
     doPlot(legList, gSvBList, opts.saveName, **kwargs)
+    return
+
+def doVariablesWPs(variable, resultsList, WPs = None, signal=True, defaultLegend=False, postFix=""):
+    
+    dset = "signal"
+    if signal:
+        dset = "background"
+
+    # Do the comparison plot
+    Verbose("Creating the expected plots", True)
+    grList   = []
+    legList  = []
+    gSvBList = []
+    if WPs  == None:
+        WPList = ["_%s" % dset] + ["_%s_WP%s" % (dset, wp.replace(".", "p")) for wp in ["0p1", "0p3", "0p5", "0p7", "0p9"] ]
+    else:
+        WPList = ["_%s_WP%s" % (dset, wp.replace(".", "p")) for wp in WPs]    
+    opts.saveName = variable + "_WPs_" + dset  + postFix
+    
+    # For-loop: All results
+    for i, r in enumerate(resultsList, 1):
+
+        # For-loop: All Working Points (DNN score)
+        for j, wp in enumerate(WPList, 1):
+            
+            # Special case
+            if wp.endswith("_WP"):
+                wp = wp.replace("_WP", "")
+
+            g, l = r.getGraphs(variable + wp)
+            if len(g) < 1 or len(g) > 1:
+                msg = "Cannot find graph for variable %s" % (sh_h + variable + wp + sh_n)
+                #raise Exception(sh_e + msg + sh_n)
+                Verbose(sh_e + msg + sh_n, True)
+                return
+
+            if opts.yMin == None:
+                opts.yMin = r.getYMin()
+            if opts.yMax == None and opts.yMax == None:
+                if  r.getYMax() != None:
+                    opts.yMax = r.getYMax()*1.10
+            else:
+                opts.yMax = 1.0
+
+            # Append graph to list
+            grList.append(g[0])
+            if defaultLegend:
+                legList.extend(l)
+            elif "_WP" in wp:
+                legList.append(dset + " (%s)" % wp.split("_")[-1].replace("WP", "").replace("0p", "0."))
+            else:
+                legList.append(dset)
+
+    # Plot the graph
+    kwargs = GetVarKwargs(variable, opts)
+    kwargs["moveLegend"] = {"dx": -0.55, "dy": -0.05, "dh": -0.1}
+
+    # For-loop: All TGraphs
+    for i, g in enumerate(grList, 0):
+        x  = []
+        y  = []
+        N  = g.GetN()
+
+        # For-loop: All points in graph
+        for j in range(0, N):
+            xVal = g.GetX()[j]
+            yVal = g.GetY()[j]
+
+            if xVal <= opts.xMin:
+                continue
+
+            # Protection: don't include (x,y) = (0.0, 0.0)
+            if xVal !=0.0 and yVal !=0.0:
+                x.append(xVal)
+                y.append(yVal)
+            Verbose("%d) x = %0.3f, y = %0.3f" % (j, xVal, yVal), j==0)
+
+        # Create the TGraph
+        Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
+        if len(x) < 1:
+            msg = "Skipping variable %s (len(x) = %d, len(y) = %d)" % (opts.saveName, len(x), len(y))
+            Print(sh_e + msg + sh_n, False)
+            return
+        else:
+            g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
+        gSvBList.append(g)
+
+    # Make the plot
+    Verbose("Making the plot", True)
+    doPlot(legList, gSvBList, opts.saveName, **kwargs)    
+    return
+
+def doMetrics(name, metric, resultsList):
+    
+    # Do the comparison plot
+    Verbose("Creating the expected plots for metric \"%s\"" % (metric), True)
+    grList  = []
+    legList = []
+    opts.saveName = metric
+
+    # For-loop: All Output-class objects
+    for r in resultsList:
+        gr, leg = r.getGraphs(metric)
+        if len(gr) < 1:
+            msg = "Could not find metric \"%s\" for directory \"%s\"" % (metric, r.getDirectoryBase())
+            Print(sh_e + msg + sh_n, True)
+        if opts.yMin == None:
+            opts.yMin = r.getYMin()
+        if opts.yMax == None and opts.yMax == None:
+            opts.yMax = r.getYMax()*1.10
+        grList.extend(gr)
+        legList.extend(leg)
+        
+    # Plot the graph
+    kwargs = GetMetricKwargs(metric, opts)
+    gList  = []
+
+    # For-loop: All TGraphs
+    for i, g in enumerate(grList, 0):
+        x  = []
+        y  = []
+        N  = g.GetN()
+
+        # For-loop: All points in graph
+        for j in range(0, N):
+            xVal = g.GetX()[j]
+            yVal = g.GetY()[j]
+
+            if xVal <= opts.xMin:
+                continue
+
+            # Protection: don't include (x,y) = (0.0, 0.0)
+            if xVal !=0.0 and yVal !=0.0:
+                x.append(xVal)
+                y.append(yVal)
+            Verbose("%d) x = %0.3f, y = %0.3f" % (j, xVal, yVal), j==0)
+
+        # Create the TGraph
+        Verbose("Creating the TGraph with len(x) = %d, len(x) = %d" % (len(x), len(y)), True)
+        g = ROOT.TGraph(len(x), array.array('d', x), array.array('d',y))
+        gList.append(g)
+
+    # Make the plot
+    Verbose("Making the plot", True)
+    doPlot(legList, gList, opts.saveName, **kwargs)
     return
 
 def doPlot(legList, graphList, saveName, **kwargs):
@@ -402,15 +610,15 @@ def doPlot(legList, graphList, saveName, **kwargs):
             gName = legList[i]
         else:
             gName = "#font[42]{%s}" % legList[i]
-        hg = histograms.HistoGraph(graphList[i], gName, drawStyle="L", legendStyle="l")
+        hg = histograms.HistoGraph(graphList[i], gName, drawStyle="CP", legendStyle="lp")
         hgList.append(hg)
 
     # Create a plot-base object
     Verbose("Creating the plot-base object", True)
     # plot = plots.PlotBase(hgList, saveFormats=[])
-    #hgList.insert(0, hgList.pop(opts.refIndex))
+    if len(hgList) < 1:
+        return
     plot = plots.ComparisonManyPlot(hgList[0], hgList[1:], saveFormats=[])
-    #plot = plots.ComparisonManyPlot(hgList[-1], hgList[:-1], saveFormats=[])
 
     # Apply histo style
     Verbose("Applying the histogram styles (generator)", True)
@@ -427,18 +635,22 @@ def doPlot(legList, graphList, saveName, **kwargs):
     # Apply style and set label
     Verbose("Applying the histogram styles (forEachHisto)", True)
     plot.histoMgr.forEachHisto(sty)
-    if opts.plotType != "var":
-        plot.setLegendHeader("Sequential Model (Keras)")
+    if 0:
+        plot.setLegendHeader("Sequential Model")
 
     # Draw the plot
     Verbose("Drawing the plot", True)
     plots.drawPlot(plot, saveName, **kwargs)
     if opts.removeLegend:
         plot.removeLegend()
-
+        
     # Save plots and return
     Verbose("Saving the plot as %s" % (saveName), True)
     SavePlot(plot, opts.saveDir, saveName, opts.saveFormats)
+    
+    for g in hgList:
+        #g.getRootHisto().Delete()
+        g.getRootGraph().Delete()
     
     Verbose("Plots saved under directory %s"% (sh_s + aux.convertToURL(opts.saveDir, opts.url) + sh_n), True)
     return
@@ -452,12 +664,98 @@ def GetKwargsRatio(kwargs):
     tdrstyle.TDRStyle().setLogY(False)
     return kwargs
 
+def GetMetricKwargs(metric, opts):
+    dh = -0.12 + (len(opts.dirList)-3)*0.04
+    legNW  = {"dx": -0.53, "dy": -0.05, "dh": dh}
+    legNE  = {"dx": -0.40, "dy": -0.05, "dh": dh}
+    legSW  = {"dx": -0.53, "dy": -0.35, "dh": dh}
+    legSE  = {"dx": -0.40, "dy": -0.35, "dh": dh}
+    if opts.paper:
+        #histograms.cmsTextMode = histograms.CMSMode.PAPER
+        cmsExtraText = ""
+    else:
+        #histograms.cmsTextMode = histograms.CMSMode.PRELIMINARY
+        #histograms.cmsTextMode = histograms.CMSMode.UNPUBLISHED
+        cmsExtraText = "Simulation" #"Preliminary"
+
+    kwargs  = {
+        "xlabel"           : "DNN Output",
+        "ylabel"           : "Entries",
+        "addMCUncertainty" : False,
+        "addLuminosityText": False,
+        "addCmsText"       : True,
+        "cmsExtraText"     : cmsExtraText,
+        "cmsTextPosition"  : "outframe",
+        "opts"             : {"xmin": opts.xMin, "xmax": opts.xMax},#, "ymin": opts.yMin, "ymax": opts.yMax},
+        "log"              : opts.logY,
+        "moveLegend"       : legNE,
+        "xtitlesize"       : 0.1,
+        "ytitlesize"       : 0.1,
+        "cutBox"           : {"cutValue":  0.0, "fillColor": 16, "box": False, "line": False , "cutGreaterThan": False},
+        #"cutBoxY"          : {"cutValue": 1000.0, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}  # does not work!
+        }
+
+    # General settings
+    if opts.yMaxFactor:
+        kwargs["opts"]["ymaxfactor"] = opts.yMaxFactor
+        #del kwargs["opts"]["ymax"]
+    else:
+        kwargs["opts"]["ymax"] = opts.yMax
+    if opts.logY:# and kwargs["opts"]["ymin"] <= 0.0:
+        msg = "Cannot have log-y enabled and y-min set to 0.0. Setting to y-min to 1.0."
+        #Print(sh_h + msg + sh_n, True)
+        kwargs["opts"]["ymin"] = 1e-2
+    if opts.logX and kwargs["opts"]["xmin"] <= 0.0:
+        msg = "Cannot have log-x enabled and y-min set to <=0.0. Setting to x-min to 1e-2"
+        Print(sh_h + msg + sh_n, True)
+        kwargs["opts"]["xmin"] = 1e-2
+    if opts.cutLineX != None:
+        kwargs["cutBox"]  = {"cutValue": opts.cutLineX, "fillColor": 16, "box": False, "line": True , "cutGreaterThan": False}
+    if opts.cutLineY != None:
+        Print("This does not work! Bug-fixing required!", True)
+        kwargs["cutBoxY"] = {"cutValue": opts.cutLineY, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False} 
+
+    if "roc" in metric.lower():
+        kwargs["xlabel"] = "#epsilon_{s}"
+        kwargs["ylabel"] = "#epsilon_{b}"
+        kwargs["opts"]["ymin"] = 1e-4
+        kwargs["opts"]["ymax"] = 5.0
+        kwargs["opts"]["xmin"] = 0.0
+        kwargs["opts"]["ymax"] = 1.0
+        kwargs["log"] = True
+        kwargs["moveLegend"] = legNW
+        
+    if "loss" in metric.lower():
+        kwargs["xlabel"] = "epoch"
+        kwargs["ylabel"] = "loss"
+        kwargs["opts"]["ymin"] = 0.0
+        kwargs["opts"]["ymax"] = 1.0
+
+    if "accuracy" in metric.lower():
+        kwargs["xlabel"] = "epoch"
+        kwargs["opts"]["ymin"] = 0.0
+        kwargs["opts"]["ymax"] = 1.0
+        kwargs["ylabel"] = "accuracy"
+        kwargs["moveLegend"] = legSE
+
+    # No need for this since we plot TGraphs
+    if opts.xMin == None:
+        del kwargs["opts"]["xmin"]
+    else:
+        kwargs["opts"]["xmin"] = opts.xMin
+    if opts.xMax == None:
+        del kwargs["opts"]["xmax"]
+    else:
+        kwargs["opts"]["xmax"] = opts.xMax
+
+    return kwargs
+
 def GetVarKwargs(var, opts):
     dh = -0.12 + (len(opts.dirList)-3)*0.04
     legNW  = {"dx": -0.53, "dy": -0.05, "dh": dh}
-    legSW  = {"dx": -0.53, "dy": -0.30, "dh": dh}
     legNE  = {"dx": -0.05, "dy": -0.05, "dh": dh}
-    legSE  = {"dx": -0.18, "dy": -0.45, "dh": dh}
+    legSW  = {"dx": -0.53, "dy": -0.35, "dh": dh}
+    legSE  = {"dx": -0.18, "dy": -0.35, "dh": dh}
     if opts.paper:
         #histograms.cmsTextMode = histograms.CMSMode.PAPER
         cmsExtraText = ""
@@ -550,9 +848,11 @@ def GetVarKwargs(var, opts):
     if var == "TrijetMass":
         kwargs["opts"]["xmin"]   =   0.0
         kwargs["opts"]["xmax"]   = 800.0
-        kwargs["xlabel"] = "m_{W} [GeV]"
+        kwargs["xlabel"] = "m_{t} [GeV]"
         kwargs["yMin"]   = 1e-3
+        kwargs["cutBox"] = {"cutValue":  173.2, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
         #kwargs["ylabel"] = "a.u. / %0.0f GeV"
+        kwargs["moveLegend"] = legNE
 
     if var == "TrijetDijetMass":
         kwargs["opts"]["xmin"]   =   0.0
@@ -890,7 +1190,7 @@ if __name__ == "__main__":
         raise Exception(sh_e + msg + sh_n)
     else:
         msg = "Analysis type is %s" % (sh_t + opts.analysisType + sh_n)
-        Print(msg, True)        
+        Verbose(msg, True)        
 
     # Sanity checks
     opts.excludePoints = []
@@ -919,7 +1219,7 @@ if __name__ == "__main__":
         Verbose("index = %d, dir = %s" % (i, d), i==0)
         
     # Check plot type
-    plotTypes = ["output", "prediction", "training", "testing", "efficiency", "significance", "roc", "var"]
+    plotTypes = ["output", "prediction", "training", "testing", "efficiency", "significance", "roc", "var", "var-wp", "metric"]
     plotNames = {}
     plotNames["output"]       = "Output"
     plotNames["prediction"]   = "OutputPred"
@@ -928,8 +1228,9 @@ if __name__ == "__main__":
     plotNames["efficiency"]   = "Efficiency"
     plotNames["significance"] = "Significance"
     plotNames["roc"]          = "ROC"
-    plotNames["var"]          = "TrijetLdgJetBDisc"
-
+    plotNames["var"]          = "TrijetLdgJetBDisc" #dubmie
+    plotNames["var-wp"]       = "TrijetLdgJetBDisc" #dumbie
+    plotNames["metric"]       = "metric"
 
     if opts.plotType.lower() not in plotTypes:
         msg = "Unsupported plot type  \"%s\". Please select from the following:" % (", ".join(plotTypes))
@@ -955,9 +1256,17 @@ if __name__ == "__main__":
     else:
         opts.saveFormats = [opts.saveFormats]
     opts.saveFormats = ["." + s for s in opts.saveFormats]
+    
+    # Define the variables (top-tagging)
+    opts.variables = ["TrijetMass"]
+    # opts.variables = ["TrijetPtDR", "TrijetDijetPtDR", "TrijetBjetMass", "TrijetLdgJetBDisc",
+    #                   "TrijetSubldgJetBDisc", "TrijetBJetLdgJetMass", "TrijetBJetSubldgJetMass",
+    #                   "TrijetMass", "TrijetDijetMass", "TrijetBJetBDisc","TrijetSoftDrop_n2",
+    #                  "TrijetLdgJetCvsL", "TrijetSubldgJetCvsL", "TrijetLdgJetPtD", "TrijetSubldgJetPtD",
+    #                   "TrijetLdgJetAxis2", "TrijetSubldgJetAxis2", "TrijetLdgJetMult","TrijetSubldgJetMult"]
 
     # Call the main function
     main()
     
     if not opts.batchMode:
-        raw_input("=== plotOutputs.py: Press any key to quit ROOT ...")
+        raw_input("=== plotResults.py: Press any key to quit ROOT ...")

@@ -29,10 +29,12 @@
 # done
 
 # v1
-# for n in 19 20 50 100 500 1000 5000; do 
+#for n in 19 20 50 100 500 1000 5000; do 
+# for n in 25 50 100 200 1000; do 
 #     echo "=== Neurons = ${n}"
 #     sleep 15
-#     nohup ./sequential.py --activation relu,relu,sigmoid --neurons 19,$n,1 --epochs 10000 --batchSize 64 --log -s pdf &
+#     #nohup ./sequential.py --activation relu,relu,sigmoid --neurons 19,$n,1 --epochs 10000 --batchSize 64 --log -s pdf &
+#     nohup ./sequential.py --activation relu,relu,sigmoid --neurons 19,$n,1 --epochs 500 --batchSize 1024 -s pdf --entrystop 800000 --log -s pdf &
 # done
 
 # v2
@@ -58,17 +60,17 @@
 # done
 
 # v5
-nohup ./sequential.py --activation relu,relu,sigmoid --neurons 19,500,1 --epochs 1000 --batchSize 32 --log -s pdf &
-sleep 15
-nohup ./sequential.py --activation relu,relu,relu,sigmoid --neurons 19,500,250,1 --epochs 1000 --batchSize 32 --log -s pdf &
-sleep 15
-nohup ./sequential.py --activation relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,1 --epochs 1000 --batchSize 32 --log -s pdf &
-sleep 15
-nohup ./sequential.py --activation relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,1 --epochs 1000 --batchSize 32 --log -s pdf &
-sleep 15
-nohup ./sequential.py --activation relu,relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,30,1 --epochs 1000 --batchSize 32 --log -s pdf &
-sleep 15
-nohup ./sequential.py --activation relu,relu,relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,30,19,1 --epochs 1000 --batchSize 32 --log -s pdf &
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 19,500,1 --epochs 1000 --batchSize 32 --log -s pdf &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,relu,sigmoid --neurons 19,500,250,1 --epochs 1000 --batchSize 32 --log -s pdf &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,1 --epochs 1000 --batchSize 32 --log -s pdf &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,1 --epochs 1000 --batchSize 32 --log -s pdf &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,30,1 --epochs 1000 --batchSize 32 --log -s pdf &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,30,19,1 --epochs 1000 --batchSize 32 --log -s pdf &
 
 # v6
 # for n in 19 38 57 95 190 1900; do
@@ -117,3 +119,77 @@ nohup ./sequential.py --activation relu,relu,relu,relu,relu,relu,relu,sigmoid --
 # nohup ./sequential.py --activation relu,relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,30,1 --epochs 1000 --batchSize 32 --log -s pdf --lossFunction "poisson" "cosine_proximity" &
 # sleep 20
 # nohup ./sequential.py --activation relu,relu,relu,relu,relu,relu,sigmoid --neurons 19,500,250,125,60,30,1 --epochs 1000 --batchSize 32 --log -s pdf --lossFunction "is_categorical_crossentropy" &
+
+# LAST
+#for bs in 256 512 1024 2048 4096 8192; do 
+#    echo "=== BatchSize = ${bs}"
+#    sleep 15
+#    nohup ./sequential.py --activation relu,relu,sigmoid --neurons 19,500,1 --epochs 200 --batchSize ${bs} -s pdf --entrystop 800000 --log -s pdf &
+#done
+
+
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --decorrelate &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --standardise &
+# sleep 15
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 800000 --log -s pdf --decorrelate --standardise &
+
+
+
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 1000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 2000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack & # worst
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 50000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack &
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack & # second best
+# sleep 10
+# 
+# nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack & # best by far
+
+
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 1000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # worst
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 2000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &  # second best (!)
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 50000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # second best (tie with 2000)
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # best by far
+sleep 10
+
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass &
+
+
+
+# 19 Dec 2019
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log & 
+sleep 5
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --standardise Robust --scaleBack & # best by far
+sleep 5
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # best by far
+sleep 5
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack & # best by far
+
+sleep 15
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 100,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log & 
+sleep 5
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 100,50,1 --epochs 500 --batchSize 20000 -s pdf --entrystop 800000 --log --standardise Robust --scaleBack & # best by far
+sleep 5
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 100,50,1 --epochs 500 --batchSize 100000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass & # best by far
+sleep 5
+nohup ./sequential.py --activation relu,relu,sigmoid --neurons 100,50,1 --epochs 500 --batchSize 800000 -s pdf --entrystop 800000 --log --decorrelate TrijetMass --standardise Robust --scaleBack & # best by far

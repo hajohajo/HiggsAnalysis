@@ -148,29 +148,48 @@ class Output:
             raise Exception(sh_e + msg + sh_n)
         return
 
+    def getCfgFile(self):
+        return os.path.join(self.getDirectoryBase(), self.cfgFile)
+
+    def getCfgFileBase(self):
+        return self.cfgFile
+
+    def setVerbose(self, verbose):
+        self.verbose = verbose
+        return
+
     def storeCfgFiles(self):
-        
+
         # Open & load configuration json file
-        msg = "Opening file %s" % (self.cfgFilePath)
+        msg = "Opening configuration json file %s" % (sh_h + self.cfgFilePath + sh_n)
         self.Verbose(msg, True)
         f = open(self.cfgFilePath, "r")
+
+        self.Verbose("Loading json file %s" % (self.cfgFilePath), True)
         config = json.load(f)
         f.close()
-
+        self.Verbose("Loaded and closed json file %s" % (sh_s + self.cfgFilePath + sh_n), True)
+        
         # Create list of variable to retrieve    
-        vList = ["timestamp", "layers", "optimizer", "loss function", "epochs", "neurons", "hidden layers", "batch size",  "model", "activation functions"]
+        vList = ["timestamp", "layers", "optimizer", "loss function", "epochs", "neurons", "hidden layers", "batch size",  "model", "activation functions", 
+                 "rndSeed", "train sample", "model parameters (trainable)", "python version", "test sample", "model weights", "model parameters (total)",
+                 "host name", "standardised datasets", "keras version", "decorrelate", "model biases", "model parameters (non-trainable)",
+                 "ROOT file", "input variables"]
         iErr  = -1
         for v in vList:
             if v in config:
                 if hasattr(self, v):
                     raise Exception("Output instance already has attribute %s" % (v))
                 else:
+                    # remove spaces
                     aName = v.title().replace(" ", "")
+                    # make all characters lower case except first from every new word (e.g. "python version" -> 'pythonVersion")
                     aName = aName[0].lower() + aName[1:]
+                    self.Verbose("Storing parameter %s from file %s." % (sh_h + aName + sh_n, sh_h + self.getCfgFile() + sh_n), False)
                     setattr(self, "%s" % aName, config[v])
             else:
                 iErr+=1
-                msg = "Cannot find variable %s in file %s." % (sh_h + v + sh_n, sh_a + self.cfgFile + sh_n)
+                msg = "Cannot find variable %s in file %s." % (sh_a + v + sh_n, sh_a + self.getCfgFile() + sh_n)
                 self.Print(msg, iErr == 0)
 
         # Print all object attributes?
@@ -178,11 +197,16 @@ class Output:
             self.printAttributes()
 
         # Open results file
-        msg = "Opening file '%s'" % (self.resultsFile)
+        msg = "Opening results json file %s" % (sh_h + self.resultsPath + sh_n)
         self.Verbose(msg, True)
         f = open(self.resultsPath, "r")
-        results = json.load(f)
-        f.close()
+        try:
+            results = json.load(f) 
+        except:
+            msg = "Failed to open the results json file %s. Please validate the json file. Also, be aware of that any variable with value \"nan\" will cause error when loading." % (f)
+            raise Exception(msg)
+        f.close() 
+        self.Verbose("Loaded and closed json file %s" % (sh_s + self.resultsPath + sh_n), True)
 
         # For-loop: All keys in json file
         self.Verbose("Reading results from %s:" % (sh_h + self.resultsFile + sh_n), True)
@@ -202,7 +226,6 @@ class Output:
                 #    self.Print("AttrName = %s, AttrType = %s" % (sh_h + attrName + sh_n, sh_l + str(attrValue) + sh_n), True)
 
                 setattr(self, "%s" % attrName, attrValue)
-                # key = "%s-%s" % (os.path.basename(self.directory), k) #iro
                 key = k
                 self.resultsX[key] = [d["x"] for d in getattr(self, k)]
                 self.resultsY[key] = [d["y"] for d in getattr(self, k)]
@@ -363,24 +386,35 @@ class Output:
         return
 
     def getLegendLabel(self):
-        label = "%sL (" % (self.layers)
+        
+        # Create the lable variable
+        #label = "%sL (" % (self.layers)
+        label = ""
+        
         # Dirty trick to convert to list the activationFunctions variable (unicode)
         self.activationList = self.activationFunctions.encode('UTF8').replace("[", "").replace("]", "").replace("'", "").split(",")
-        self.neuronsList    = self.neurons.encode('UTF8').replace("[", "").replace("]", "").replace("'", "").replace(" ", "").split(",")
+        self.neuronsList    = self.neurons.encode('UTF8').replace("[", "").replace("]", "").replace("'", "").replace(" ", "").split(",") 
 
         # For-loop: All actication functions
         for i, a in enumerate(self.activationList, 0):
             self.Verbose("%s, type(%s) = %s" % (a, a, type(a)), True)
             label+= " %s%s" % (self.activationList[i].replace("sigmoid", "sig"), self.neuronsList[i])
 
-        label+= ")"
-        label+= " %sb" % (self.batchSize)
-        label+= " %se" % (self.epochs) # this is not very relevant since we have early-stop enabled
-        # self.optimizer
-        # self.hiddenLayers
-        # self.lossFunction
-        # self.model
+        #label+= ")"
+        label+= " %sbs" % (self.batchSize)
+        label+= " %sep" % (self.epochs) # this is not very relevant since we have early-stop enabled
+        if hasattr(self, 'standardisedDatasets'):
+            self.Verbose("dir = %s, st = \"%s\", type(st) = %s" % (self.getDirectoryBase(), self.standardisedDatasets.encode('UTF8'), type(self.standardisedDatasets.encode('UTF8'))), True)
+            if self.standardisedDatasets.encode('UTF8') == "None":
+                pass
+            else:
+                label+= " %s" % (self.standardisedDatasets.encode('UTF8'))
+            if self.decorrelate.encode('UTF8') != "None":
+                label+= " RW"
         return label
+
+    def getResultsFile(self):
+        return self.resultsFile
 
     def _getGraphs(self, keyword=None):
 
@@ -388,9 +422,13 @@ class Output:
         legList   = []
         # For-loop: All x-results (should be same size as y-results)
         for i, k in enumerate(self.resultsX.keys(), 0):
-            #self.Print("Setting graph name to %s" % (sh_a + k + sh_n), i==0)
+            self.Verbose("Setting graph name to %s" % (sh_a + k + sh_n), i==0)
             if keyword!=None:
-                if keyword not in k:
+                #if keyword not in k:
+                if keyword != k:
+                    msg = "Cannot find keyword %s in results file %s" % (sh_h + keyword + sh_e, sh_h + os.path.join(self.getDirectoryBase() , self.getResultsFile()) + sh_e)
+                    self.Verbose(msg, True)
+                    #raise Exception(sh_e + msg + sh_n)
                     continue 
             xArray = array.array("d", self.resultsX[k])
             yArray = array.array("d", self.resultsY[k])
@@ -449,3 +487,6 @@ class Output:
 
     def getDirectory(self):
         return self.directory
+
+    def getDirectoryBase(self):
+        return os.path.basename(self.directory)

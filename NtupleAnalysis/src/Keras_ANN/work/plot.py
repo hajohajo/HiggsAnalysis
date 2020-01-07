@@ -59,11 +59,11 @@ def GetRatioStyle(h_ratio, ytitle, xtitle, ymax=2, ymin=0):
     return h_ratio
 
 def getDirName(dirName, baseDir=None):
-    print "getDirName() => FIXME! Do not assume full save path"
+    #print "getDirName() => FIXME! Do not assume full save path"
     usrName = getpass.getuser() 
     usrInit = usrName[0]
     dirName = dirName.replace(".", "p")
-    dirName = "/afs/cern.ch/user/%s/%s/public/html/%s" % (usrInit, usrName, dirName)
+    #dirName = "/afs/cern.ch/user/%s/%s/public/html/%s" % (usrInit, usrName, dirName)
     return dirName
 
 def CreateDir(saveDir):
