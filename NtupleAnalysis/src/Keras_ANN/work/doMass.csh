@@ -31,12 +31,12 @@ set ROOTFILE1 = /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagge
 #set ROOTFILE1 = /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root
 set ROOTFILE2 = /uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-QCD_7Jets_3BJets.root
 set LOGY      = "--logY"
+#set ENTRIES   = 50000
 set ENTRIES   = 600000
 
 
-#foreach WP (0.0 0.2 0.4 0.6 0.8 0.9)
-#foreach WP (0.0 0.25 0.50 0.75 0.90)
+#foreach WP (0.0 0.1)
 foreach WP (0.0 0.1 0.3 0.5 0.7 0.9)
-    ./plotMass.py -s ${FORMATS} --entries ${ENTRIES} --filename ${ROOTFILE1} --saveDir "${SAVE_DIR}" --dir ${DIR} --wp ${WP} --saveName "TopMass_TT_${WP}" ${VERBOSE} ${LOGY} ${SCALEBACK}
-    ./plotMass.py -s ${FORMATS} --entries ${ENTRIES} --filename ${ROOTFILE2} --saveDir "${SAVE_DIR}" --dir ${DIR} --wp ${WP} --saveName "TopMass_QCD_${WP}" ${VERBOSE} ${LOGY} ${SCALEBACK}
+     ./plotMass.py -s ${FORMATS} --entries ${ENTRIES} --filename ${ROOTFILE1} --saveDir "${SAVE_DIR}" --dir ${DIR} --wp ${WP} --saveName "TopMass_TT_${WP}" ${VERBOSE} ${LOGY} ${SCALEBACK}
+    ./plotMass.py -s ${FORMATS} --entries ${ENTRIES} --filename ${ROOTFILE2} --saveDir "${SAVE_DIR}" --dir ${DIR} --wp ${WP} --saveName "TopMass_QCD_${WP}" ${VERBOSE} ${SCALEBACK}
 end    

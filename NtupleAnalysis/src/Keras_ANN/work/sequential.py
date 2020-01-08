@@ -797,6 +797,7 @@ def main(opts):
         msg  = "Standardising dataset features with the %sScaler%s" % (ls + opts.standardise, ns)
         Print(msg, True)    
         # WARNING! Don't cheat - fit only on training https://scikit-learn.org/stable/modules/neural_networks_supervised.html)
+        # See also: https://sebastianraschka.com/Articles/2014_about_feature_scaling.html#about-min-max-scaling
         scaler_sig, df_sig = func.GetStandardisedDataFrame(df_sig, opts.inputList, scalerType=opts.standardise) # fixme - iro - should fit/transform only the TEST data
         scaler_bkg, df_bkg = func.GetStandardisedDataFrame(df_bkg, opts.inputList, scalerType=opts.standardise)
         scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList, scalerType=opts.standardise)
@@ -814,6 +815,8 @@ def main(opts):
 
     # The best network structure is found through a process of trial and error experimentation. Generally, you need a network large enough to capture the structure of the problem.
     # The Dense function defines each layer - how many neurons and mathematical function to use.
+    # 'Dense' is a standard layer type that works for most cases. In a dense layer, all nodes in the previous layer connect to the nodes in the current layer.
+    # A layer's activation function allows models to take into account nonlinear relationships (i.e. not f(x)=x, but also f(x) = tanh(x) or f(x) = ReLU where x is the layer input)
     for iLayer, n in enumerate(opts.neurons, 0):
         layer = "layer#%d" % (int(iLayer)+1)
         if iLayer == len(opts.neurons)-1:
@@ -882,13 +885,15 @@ def main(opts):
     # Show patience of "50" epochs with a change in the loss function smaller than "min_delta" before stopping procedure
     # https://stackoverflow.com/questions/43906048/keras-early-stopping
     #earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0, patience=10, verbose=1, mode='auto')
-    earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=50)
+    earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=20) #patience=50)
     callbacks = [earlystop]
 
 
     # [Loss function is used to understand how well the network is working (compare predicted label with actual label via some function)]
     # Optimizer function is related to a function used to optimise the weights
     Print("Compiling the model with the loss function %s and optimizer %s " % (ls + opts.lossFunction + ns, ls + opts.optimizer + ns), True)
+    # Before you train, you must compile your model to configure the learning process. This allows you to specify:    # optimizer, loss function, and metrics.
+    # The loss functions: https://keras.io/losses/. The metrics: https://keras.io/metrics/
     myModel.compile(loss=opts.lossFunction, optimizer=opts.optimizer, metrics=['accuracy'])
     
 

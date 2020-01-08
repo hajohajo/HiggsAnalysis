@@ -290,13 +290,16 @@ def main():
         
     # Plot resutls
     if opts.logY:
-        nbins = 450 #1000
         xmin  = 0
         xmax  = 900 #1000    
+        nbins = xmax/5 #1000
     else:
-        nbins = 100
-        xmin  = 100
-        xmax  = 600
+        #nbins = 100
+        #xmin  = 100
+        #xmax  = 600
+        xmin  = 0
+        xmax  = 900 #1000            
+        nbins = xmax/5 #1000
     width = float(xmax)/nbins
     if opts.standardise and not opts.scaleBack:
         nbins = 200
@@ -372,11 +375,14 @@ def main():
 
     # Store ymax for future use
     ymax_ = ymax*ymaxFactor
+    ymin_ = 0.0
     if opts.logY:
+        ymin_ = 1e-4
         ymax_ = 1.05
 
     # For-loop: All drawn Histograms        
     for i,h in enumerate(hList, 1):
+        h.SetMinimum(ymin_)
         h.SetMaximum(ymax_)
 
     # Draw the legend
