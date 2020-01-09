@@ -716,8 +716,8 @@ def GetMetricKwargs(metric, opts):
         kwargs["cutBoxY"] = {"cutValue": opts.cutLineY, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False} 
 
     if "roc" in metric.lower():
-        kwargs["xlabel"] = "#epsilon_{s}"
-        kwargs["ylabel"] = "#epsilon_{b}"
+        kwargs["xlabel"] = "background efficiency" # "#epsilon_{b}"
+        kwargs["ylabel"] = "signal efficiency" # "#epsilon_{s}"
         kwargs["opts"]["ymin"] = 1e-4
         kwargs["opts"]["ymax"] = 5.0
         kwargs["opts"]["xmin"] = 0.0
@@ -730,13 +730,14 @@ def GetMetricKwargs(metric, opts):
         kwargs["ylabel"] = "loss"
         kwargs["opts"]["ymin"] = 0.0
         kwargs["opts"]["ymax"] = 1.0
+        kwargs["moveLegend"] = legNW
 
     if "accuracy" in metric.lower():
         kwargs["xlabel"] = "epoch"
         kwargs["opts"]["ymin"] = 0.0
         kwargs["opts"]["ymax"] = 1.0
         kwargs["ylabel"] = "accuracy"
-        kwargs["moveLegend"] = legSE
+        kwargs["moveLegend"] = legSW
 
     # No need for this since we plot TGraphs
     if opts.xMin == None:
@@ -994,8 +995,13 @@ def GetKwargs(opts):
     if opts.plotType == "significance":
         kwargs["ylabel"] = "Significance"
     if opts.plotType == "roc":
-        kwargs["ylabel"] = "background efficiency"
-        kwargs["xlabel"] = "signal efficiency"
+        kwargs["ylabel"] = "background efficiency" # "#epsilon_{b}"
+        kwargs["xlabel"] = "signal efficiency"     # "#epsilon_{s}"
+        kwargs["opts"]["ymin"] = 1e-4
+        kwargs["opts"]["ymax"] = 5.0
+        kwargs["opts"]["xmin"] = 0.0
+        kwargs["opts"]["ymax"] = 1.0
+
 
     return kwargs
 

@@ -209,7 +209,8 @@ def PrintNetworkSummary(opts):
     for i, n in enumerate(opts.neurons, 0): 
         layerType = "unknown"
         if i == 0:
-            layerType = "input"
+            #layerType = "input" # is this an input layer or hidden?
+            layerType = "hidden"
         elif i+1 == len(opts.neurons):
             layerType = "output"
         else:
@@ -885,7 +886,7 @@ def main(opts):
     # Show patience of "50" epochs with a change in the loss function smaller than "min_delta" before stopping procedure
     # https://stackoverflow.com/questions/43906048/keras-early-stopping
     #earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0, patience=10, verbose=1, mode='auto')
-    earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=20) #patience=50)
+    earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=50)
     callbacks = [earlystop]
 
 
