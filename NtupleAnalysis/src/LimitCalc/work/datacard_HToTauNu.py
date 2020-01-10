@@ -174,6 +174,7 @@ myBtagSystematics       = ["CMS_eff_b"]
 mySystematics = {}
 mySystematics["MC"]     = myLumiSystematics + myPileupSystematics + myTrgEffSystematics + myLeptonVetoSystematics + myJetSystematics + myBtagSystematics
 mySystematics["Signal"] = mySystematics["MC"] #+ ["CMS_Hptn_mu_RF_Hptn","CMS_Hptn_pdf_Hptn"]
+mySystematics["QCD"]    = mySystematics["MC"]
 mySystematics["TT"]     = mySystematics["MC"] + ["QCDscale_ttbar", "pdf_ttbar", "mass_top"] + ["CMS_Hptn_mu_RF_top","CMS_Hptn_pdf_top"]
 mySystematics["ttX"]    = mySystematics["MC"] + ["QCDscale_singleTop", "pdf_singleTop", "mass_top_forSingleTop"] + ["CMS_Hptn_mu_RF_top","CMS_Hptn_pdf_top"]
 mySystematics["EWK"]    = mySystematics["MC"] + ["QCDscale_ewk", "pdf_ewk"] + ["CMS_Hptn_mu_RF_ewk","CMS_Hptn_pdf_ewk"]
@@ -206,6 +207,26 @@ for mass in MassPoints:
     signalDataGroups.append(hx)
 
 # Define all the background datasets
+QCDandFakeTau = DataGroup(label  = labelPrefix + "QCDandFakeTau" + labelPostfix, #
+               landsProcess      = 1,
+               shapeHistoName    = OptionMassShape, 
+               histoPath         = histoPathInclusive,
+               datasetType       = "QCD inverted", 
+               datasetDefinition = "QCDMeasurementMT",
+               validMassPoints   = MassPoints,
+               nuisances         = mySystematics["MC"]
+               )
+
+QCDMC = DataGroup(label            = labelPrefix + "QCD" + labelPostfix, #
+               landsProcess      = 1,
+               shapeHistoName    = OptionMassShape, 
+               histoPath         = histoPathInclusive,
+               datasetType       = "QCDMC",
+               datasetDefinition = "QCD", # You must use the exact name given in plots.py (_datasetMerge dictionary)
+               validMassPoints   = MassPoints,
+               nuisances         = mySystematics["QCD"]
+               )
+
 TT = DataGroup(label             = labelPrefix + "TT" + labelPostfix, #
                landsProcess      = 2,
                shapeHistoName    = OptionMassShape, 
@@ -215,8 +236,9 @@ TT = DataGroup(label             = labelPrefix + "TT" + labelPostfix, #
                validMassPoints   = MassPoints,
                nuisances         = mySystematics["TT"]
                )
+
 WJets = DataGroup(label          = labelPrefix + "WJets" + labelPostfix, #
-               landsProcess      = 2,
+               landsProcess      = 3,
                shapeHistoName    = OptionMassShape,
                histoPath         = histoPathInclusive,
                datasetType       = dsetTypeEWK,
@@ -226,7 +248,7 @@ WJets = DataGroup(label          = labelPrefix + "WJets" + labelPostfix, #
                )
 
 TTX = DataGroup(label             = labelPrefix + "SingleTop" + labelPostfix, # labelPrefix + "ttX" + labelPostfix,
-                landsProcess      = 3,
+                landsProcess      = 4,
                 shapeHistoName    = OptionMassShape,
                 histoPath         = histoPathInclusive,
                 datasetType       = dsetTypeEWK,
@@ -236,7 +258,7 @@ TTX = DataGroup(label             = labelPrefix + "SingleTop" + labelPostfix, # 
                 )
 
 DYJets = DataGroup(label             = labelPrefix + "DYJets" + labelPostfix,
-                   landsProcess      = 4,
+                   landsProcess      = 5,
                    shapeHistoName    = OptionMassShape,
                    histoPath         = histoPathInclusive,
                    datasetType       = dsetTypeEWK,
@@ -246,7 +268,7 @@ DYJets = DataGroup(label             = labelPrefix + "DYJets" + labelPostfix,
                    )
 
 Diboson = DataGroup(label             = labelPrefix + "Diboson" + labelPostfix,
-                    landsProcess      = 5,
+                    landsProcess      = 6,
                     shapeHistoName    = OptionMassShape,
                     histoPath         = histoPathInclusive,
                     datasetType       = dsetTypeEWK,
@@ -259,6 +281,10 @@ Diboson = DataGroup(label             = labelPrefix + "Diboson" + labelPostfix,
 # The list \"DataGroups\" is required by the DataCardGenerator.py module
 DataGroups = []
 DataGroups.extend(signalDataGroups)
+if 0:
+    DataGroups.append(QCDandFakeTau)
+else:
+    DataGroups.append(QCDMC)
 DataGroups.append(TT)
 DataGroups.append(TTX)
 DataGroups.append(WJets)
@@ -612,7 +638,8 @@ hNJets_Std = ControlPlotInput(
                   "divideByBinWidth": False,
                   "unit": "",
                   "log": True,
-                  "opts": {"ymin": 0.9} },
+                  "opts": {"ymin": 0.9, "xmin": 3.0, "xmax": 14.0}
+                  },
     flowPlotCaption  = "^{}#tau_{h}+#geq3j", # Leave blank if you don't want to include the item to the selection flow plot
     )
 
@@ -1137,7 +1164,7 @@ hTransverseMassLogxLog = ControlPlotInput(
 #================================================================================================ 
 # Create the list of control plots (NOTE: Set "OptionDoControlPlots" to True)
 #================================================================================================ 
-if 0 :
+if 0:
     ControlPlots.append(hVertices_Std)
     ControlPlots.append(hTauPt_Std)
     ControlPlots.append(hTauLdgTrkPt_Std)
@@ -1159,7 +1186,7 @@ if 0 :
     ControlPlots.append(hMET)
     ControlPlots.append(hMETPhi)
     ControlPlots.append(hBacktoBackAngularCutsMin)
-if 0:
+if 1:
     ControlPlots.append(hVertices_All)
     ControlPlots.append(hTauPt_All)
     ControlPlots.append(hTauLdgTrkPt_All)
@@ -1181,8 +1208,8 @@ if 0:
     ControlPlots.append(hMET_All)
     ControlPlots.append(hMETPhi_All)
     ControlPlots.append(hDeltaPhiTauMet_All)
-    ControlPlots.append(hBacktoBackAngularCutsMin)
-if 1:
+    ControlPlots.append(hBacktoBackAngularCutsMin_All)
+if 0:
      ControlPlots.append(hNJets_BtagSF)
      ControlPlots.append(JetPt_BtagSF)
      ControlPlots.append(BJetPt_BtagSF)
@@ -1193,7 +1220,11 @@ ControlPlots.append(hTransverseMassLogx)
 ControlPlots.append(hTransverseMassLogxLog)
 
 
-if 0: #OptionTest:
+if OptionTest:
     ControlPlots = []
-    ControlPlots.append(hMET)
+    ControlPlots.append(hNJets_Std) # flow
+    ControlPlots.append(hNBjets)    # flow
+    ControlPlots.append(hMET)       # flow
+    ControlPlots.append(hBacktoBackAngularCutsMin) #flow
+    #ControlPlots.append(hDeltaPhiTauMet_All)
     ControlPlots.append(hTransverseMass)

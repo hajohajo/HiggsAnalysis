@@ -248,7 +248,7 @@ class DatacardColumn():
             dsetType = MulticrabDirectoryDataType.EWKTAUS
         elif datasetType == "EWKfake":
             dsetType = MulticrabDirectoryDataType.EWKFAKETAUS
-        elif datasetType == "QCD MC":
+        elif datasetType == "QCDMC":
             dsetType = MulticrabDirectoryDataType.QCDMC
         elif datasetType == "EWKMC":
             dsetType = MulticrabDirectoryDataType.EWKMC
