@@ -1039,12 +1039,12 @@ class DatacardColumn():
                 minStatUncert = minimumError
             if minStatUncert > 0.5 and not "data" in self.getLabel():
                 minStatUncert = 0.5
-                msg  = "Determined the min. stat. error for column %s to be %f, which is very large. "
+                msg  = "Determined the min. stat. error for column %s to be %f, which is very large. " % (self.getLabel(),minStatUncert)
                 msg += "Setting the uncertainty manually to 0.5. "
-                msg += "THIS IS NOT CORRECT. You need to rebin for more statistics!"  %(self.getLabel(),minStatUncert)
+                msg += "THIS IS NOT CORRECT. You need to rebin for more statistics!" 
                 self.Print(sh_e + msg + sh_n, True)
             else:
-                self.Print("Determined the min. stat. error for column %s to be %f" % (self.getLabel(), minStatUncert), True)
+                self.Verbose("Determined the min. stat. error for column %s to be %f" % (self.getLabel(), minStatUncert), True)
 
         self.Verbose("Setting the minimum stat. uncertainty for histogram %s to be %f" % (myTitle, minStatUncert))
         # For-loop: All histogram bins

@@ -538,7 +538,7 @@ _dataDrivenCtrlPlotBinning = {
 
     #NVertices plots
     "NVertices_AfterStandardSelections": None,
-    "NVertices_AfterAllSelections": None,
+    "NVertices_AfterAllSelections": [i for i in range(0, 40, 5)] + [i for i in range(40, 60, 10)] + [i for i in range(60, 100, 20)] + [i for i in range(100, 200, 50)],
 
     # Jets
     "Njets_AfterStandardSelections": [0,1,2,3,4,5,6,7,8],

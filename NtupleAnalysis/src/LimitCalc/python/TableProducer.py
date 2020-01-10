@@ -257,8 +257,9 @@ class TableProducer:
         self.Verbose("Importing & Calling the control plot maker module", True)
         if self._config.OptionDoControlPlots:
             if opts.analysisType in ["HToTauNu"]:
-                import HiggsAnalysis.LimitCalc.ControlPlotMaker as cp
-            elif opts.analysisType in ["HToHW"]:
+                #import HiggsAnalysis.LimitCalc.ControlPlotMaker as cp # for dcardGenerator_v2.py
+                import HiggsAnalysis.LimitCalc.ControlPlotMakerHToTauNu as cp # for dcardGenerator_v3.py
+            elif opts.analysisType in ["HToHW"]:OA
                 import HiggsAnalysis.LimitCalc.ControlPlotMakerHToHW as cp
             elif opts.analysisType in ["HToTB"]:
                 import HiggsAnalysis.LimitCalc.ControlPlotMakerHToTB as cp
