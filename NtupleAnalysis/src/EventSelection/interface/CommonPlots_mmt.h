@@ -1,10 +1,11 @@
 // -*- c++ -*-
-#ifndef EventSelection_CommonPlots_h
-#define EventSelection_CommonPlots_h
+#ifndef EventSelection_CommonPlots_mmt_h
+#define EventSelection_CommonPlots_mmt_h
 
 #include "EventSelection/interface/EventSelections.h"
 #include "EventSelection/interface/CommonPlotsHelper.h"
 #include "EventSelection/interface/CommonPlotsBase.h"
+#include "EventSelection/interface/CommonPlots.h"
 #include "EventSelection/interface/PUDependencyPlots.h"
 #include "Framework/interface/ParameterSet.h"
 #include "Framework/interface/HistogramSettings.h"
@@ -15,14 +16,13 @@
 
 #include <vector>
 
-class CommonPlots {
+class CommonPlots_mmt : public CommonPlots {
 public:
   enum AnalysisType {
     kSignalAnalysis,
     kHplus2tbAnalysis,
     kHplus2hwAnalysis,
     kHplus2hwAnalysis_mmt,
-    kHplus2hwAnalysis_eet,
     kHplus2hwAnalysisWithTop,
     kHplus2hw_ele_Analysis,
     kBTagEfficiencyAnalysis,
@@ -32,17 +32,19 @@ public:
     kQCDMeasurement,
     kQCDMeasurement_ele,
     kQCDMeasurement_muon,
-    kQCDMeasurement_mmt,
-    kQCDMeasurement_eet,
     kFakeBMeasurement,
     kQCDNormalizationSystematicsSignalRegion, // Needed for obtaining normalization systematics to data-driven control plots
     kQCDNormalizationSystematicsControlRegion // Needed for obtaining normalization systematics to data-driven control plots
   };
 
-  CommonPlots(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper);
-  CommonPlots(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper, bool test);
-//  CommonPlots();
-  ~CommonPlots();
+//  CommonPlots_mmt();
+
+//  CommonPlots_mmt(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper);
+//  CommonPlots_mmt(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper, bool test);
+
+  CommonPlots_mmt(const ParameterSet& config, const CommonPlots_mmt::AnalysisType type, HistoWrapper& histoWrapper);
+  CommonPlots_mmt(const ParameterSet& config, const CommonPlots_mmt::AnalysisType type, HistoWrapper& histoWrapper, bool test);
+  virtual ~CommonPlots_mmt();
 
   //Tau ID syst switches
   bool tauIDup;
@@ -144,7 +146,7 @@ public:
 
 private:
   /// Returns true if anti-isolated taus need to be used (QCD measurement)
-  const bool usesAntiIsolatedTaus() const { return fAnalysisType == kQCDMeasurement || fAnalysisType == kQCDNormalizationSystematicsControlRegion || fAnalysisType == kQCDMeasurement_ele || fAnalysisType == kQCDMeasurement_muon || fAnalysisType == kQCDMeasurement_mmt; }
+  const bool usesAntiIsolatedTaus() const { return fAnalysisType == kQCDMeasurement || fAnalysisType == kQCDNormalizationSystematicsControlRegion || fAnalysisType == kQCDMeasurement_ele || fAnalysisType == kQCDMeasurement_muon; }
   
 private:
   ///===== Config params

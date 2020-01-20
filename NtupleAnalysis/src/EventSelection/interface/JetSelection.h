@@ -14,6 +14,7 @@
 
 class ParameterSet;
 class CommonPlots;
+class CommonPlots_ttm;
 class Event;
 class EventCounter;
 class HistoWrapper;
@@ -123,6 +124,8 @@ public:
   // Main class
   /// Constructor with histogramming
   explicit JetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix = "");
+  explicit JetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix = "");
+  explicit JetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix = "");
   /// Constructor without histogramming
   explicit JetSelection(const ParameterSet& config);
   virtual ~JetSelection();

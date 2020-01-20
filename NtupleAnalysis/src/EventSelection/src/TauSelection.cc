@@ -4,6 +4,7 @@
 #include "Framework/interface/Exception.h"
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/CommonPlots_ttm.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "DataFormat/interface/HLTTau.h"
@@ -40,6 +41,72 @@ const Tau& TauSelection::Data::getAntiIsolatedTau() const {
 }
 
 TauSelection::TauSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  bApplyTriggerMatching(config.getParameter<bool>("applyTriggerMatching")),
+  fTriggerTauMatchingCone(config.getParameter<float>("triggerMatchingCone")),
+  fTauPtCut(config.getParameter<float>("tauPtCut")),
+  fTauEtaCut(config.getParameter<float>("tauEtaCut")),
+  fTauLdgTrkPtCut(config.getParameter<float>("tauLdgTrkPtCut")),
+  fTauNprongs(config.getParameter<int>("prongs")),
+  fTauRtauCut(config.getParameter<float>("rtau")),
+  fTauRtauSmallerThanCut(config.getParameter<float>("rtauSmallerThan",999.0)),
+  fVetoMode(false),
+  // tau identification SF
+  //fTauIDSF(config.getParameter<float>("tauIdentificationSF")), 
+  // tau misidentification SF
+  //fEToTauMisIDSFRegion(assignTauMisIDSFRegion(config, "E")),
+  //fEToTauMisIDSFValue(assignTauMisIDSFValue(config, "E")),
+  //fMuToTauMisIDSFRegion(assignTauMisIDSFRegion(config, "Mu")),
+  //fMuToTauMisIDSFValue(assignTauMisIDSFValue(config, "Mu")),
+  //fJetToTauMisIDSFRegion(assignTauMisIDSFRegion(config, "Jet")),
+  //fJetToTauMisIDSFValue(assignTauMisIDSFValue(config, "Jet")),
+  // tau trigger SF
+  fTauTriggerSFReader(config.getParameterOptional<ParameterSet>("tauTriggerSF")),
+  // Event counter for passing selection
+  cPassedTauSelection(fEventCounter.addCounter("Passed tau selection ("+postfix+")")),
+  cPassedTauSelectionGenuine(fEventCounter.addCounter("Passed tau selection and genuine ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("tau selection ("+postfix+")", "All events")),
+  cSubPassedTriggerMatching(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed trigger matching")),
+  cSubPassedDecayMode(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed decay mode")),
+  cSubPassedGenericDiscriminators(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed generic discriminators")),
+  cSubPassedElectronDiscr(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed e discr")),
+  cSubPassedMuonDiscr(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed mu discr")),
+  cSubPassedPt(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedEta(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedLdgTrk(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed ldg.trk pt cut")),
+  cSubPassedNprongs(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed nprongs")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed isolation")),
+  cSubPassedRtau(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed Rtau")),
+  cSubPassedAntiIsolation(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed anti-isolation")),
+  cSubPassedAntiIsolationRtau(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed anti-isolated Rtau")),
+  cSubPassedTauSelectionGenuine(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed tau selection and genuine")),
+  cSubPassedTauSelectionMultipleTaus(fEventCounter.addSubCounter("tau selection ("+postfix+")", "multiple selected taus")),
+  cSubPassedAntiIsolatedTauSelection(fEventCounter.addSubCounter("tau selection ("+postfix+")", "Passed anti-isolated tau selection")),
+  cSubPassedAntiIsolatedTauSelectionMultipleTaus(fEventCounter.addSubCounter("tau selection ("+postfix+")", "multiple anti-isolated taus"))
+{
+  
+  if(config.exists("tauIdentificationSF")){
+    // tau identification SF
+    fTauIDSF = config.getParameter<float>("tauIdentificationSF");
+    // tau misidentification SF
+    fEToTauMisIDSFRegion = assignTauMisIDSFRegion(config, "E");
+    fEToTauMisIDSFValue  = assignTauMisIDSFValue(config, "E");
+    fMuToTauMisIDSFRegion = assignTauMisIDSFRegion(config, "Mu");
+    fMuToTauMisIDSFValue = assignTauMisIDSFValue(config, "Mu");
+    fJetToTauMisIDSFRegion = assignTauMisIDSFRegion(config, "Jet");
+    fJetToTauMisIDSFValue = assignTauMisIDSFValue(config, "Jet");
+  }
+  
+  if(config.exists("tauTriggerSF")){
+    //  fTauTriggerSFReader = GenericScaleFactor(config.getParameterOptional<ParameterSet>("tauTriggerSF"));
+  }
+  
+  initialize(config, postfix);
+} 
+
+
+TauSelection::TauSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
   bApplyTriggerMatching(config.getParameter<bool>("applyTriggerMatching")),
   fTriggerTauMatchingCone(config.getParameter<float>("triggerMatchingCone")),
@@ -224,20 +291,28 @@ TauSelection::Data TauSelection::silentAnalyze(const Event& event) {
 TauSelection::Data TauSelection::analyze(const Event& event) {
   ensureAnalyzeAllowed(event.eventID());
 
+
   TauSelection::Data data = privateAnalyze(event);
 
   // Send data to CommonPlots
-  if (fCommonPlots != nullptr)
+  if (fCommonPlots != nullptr) {
     fCommonPlots->fillControlPlotsAtTauSelection(event, data);
     fCommonPlots->fillControlPlotsAfterTauSelection(event, data);
+  }
   // Return data
+  if (fCommonPlots_ttm != nullptr) {
+    fCommonPlots_ttm->fillControlPlotsAtTauSelection(event, data);
+    fCommonPlots_ttm->fillControlPlotsAfterTauSelection(event, data);
+  }
+
+
   return data;
 }
 
-TauSelection::Data TauSelection::analyzeTight(const Event& event) {
+TauSelection::Data TauSelection::analyzeLoose(const Event& event) {
   ensureAnalyzeAllowed(event.eventID());
 
-  TauSelection::Data data = privateAnalyzeTight(event);
+  TauSelection::Data data = privateAnalyzeLoose(event);
 
   // Send data to CommonPlots
   if (fCommonPlots != nullptr)
@@ -358,6 +433,7 @@ TauSelection::Data TauSelection::privateAnalyze(const Event& event) {
   hNPassed->Fill(output.fSelectedTaus.size());
   // If there are multiple taus, choose the one with highest pT
 
+
   //comparison for sort defined in Tau.h
   std::sort(output.fSelectedTaus.begin(), output.fSelectedTaus.end());
   std::sort(output.fAntiIsolatedTaus.begin(), output.fAntiIsolatedTaus.end());
@@ -378,6 +454,10 @@ TauSelection::Data TauSelection::privateAnalyze(const Event& event) {
   if (fCommonPlots != nullptr && output.fAntiIsolatedTaus.size()) {
       fCommonPlots->fillControlPlotsAfterAntiIsolatedTauSelection(event, output);
   }
+  if (fCommonPlots_ttm != nullptr && output.fAntiIsolatedTaus.size()) {
+      fCommonPlots_ttm->fillControlPlotsAfterAntiIsolatedTauSelection(event, output);
+  }
+
   // Fill Nprongs matrix plots
   if (event.isMC()) {
     if (output.fSelectedTaus.size()) {
@@ -470,7 +550,7 @@ TauSelection::Data TauSelection::privateAnalyze(const Event& event) {
   return output;
 }
 
-TauSelection::Data TauSelection::privateAnalyzeTight(const Event& event) {
+TauSelection::Data TauSelection::privateAnalyzeLoose(const Event& event) {
   Data output;
  
   cSubAll.increment();
