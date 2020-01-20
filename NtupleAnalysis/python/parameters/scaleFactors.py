@@ -845,6 +845,7 @@ class TriggerMuonSFJsonReader:
         # Calculate SF's
 
         keys = sorted(datadict.keys(), key=lambda x:float(x))
+#        keys = datadict.keys()
 
 #        if len(keys) != len(mcdict.keys()):
 #            raise Exception("Error: different number of bins for data and mc in json '%s'!"%filename)
