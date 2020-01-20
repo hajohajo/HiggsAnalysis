@@ -3,7 +3,8 @@
 #include "Framework/interface/makeTH.h"
 #include "Framework/interface/TreeWriter.h"
 
-#include "EventSelection/interface/CommonPlots.h"
+//#include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/CommonPlots_ttm.h"
 #include "EventSelection/interface/EventSelections.h"
 #include "EventSelection/interface/TransverseMass.h"
 
@@ -26,7 +27,7 @@ private:
   // Input parameters
 
   /// Common plots
-  CommonPlots fCommonPlots;
+  CommonPlots_ttm fCommonPlots;
 
   // Event selection classes and event counters (in same order like they are applied)
   Count cAllEvents;
@@ -85,7 +86,7 @@ REGISTER_SELECTOR(Hplus2hwAnalysis);
 
 Hplus2hwAnalysis::Hplus2hwAnalysis(const ParameterSet& config, const TH1* skimCounters)
 : BaseSelector(config, skimCounters),
-  fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2hwAnalysis, fHistoWrapper),
+  fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots_ttm::kHplus2hwAnalysis, fHistoWrapper),
   cAllEvents(fEventCounter.addCounter("All events")),
   fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -195,7 +196,6 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   if (muData.getSelectedMuons().size() != 1)
     return;
 
-
   ////////////
   // Muon ID and Trigger SF
   ////////////
@@ -207,6 +207,7 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   if (fEvent.isMC()) {
     fEventWeight.multiplyWeight(muData.getMuonTriggerSF());
   }
+
 
   ////////////
   // Dummy Trigger SF for first check
@@ -231,9 +232,12 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
   // Tau
   ////////////
 
+
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
+
   if (!tauData.hasIdentifiedTaus())
     return;
+
 
   if(tauData.getSelectedTaus().size() != 2)
     return;
@@ -257,21 +261,17 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
     return;
   }
 
-/*
-  drTauTau = ROOT::Math::VectorUtil::DeltaR(tauData.getSelectedTaus()[0].p4(),tauData.getSelectedTaus()[1].p4());
-  if(drTauTau < 0.5)
+
+  if(ROOT::Math::VectorUtil::DeltaR(tauData.getSelectedTaus()[0].p4(),tauData.getSelectedTaus()[1].p4()) < 0.5)
     return;
 
-*/
   // make sure that the taus are not too close to muon
-/*  drMuTau1 = ROOT::Math::VectorUtil::DeltaR(muData.getSelectedMuons()[0].p4(),tauData.getSelectedTaus()[0].p4());
-  if(drMuTau1 < 0.5)
+  if(ROOT::Math::VectorUtil::DeltaR(muData.getSelectedMuons()[0].p4(),tauData.getSelectedTaus()[0].p4()) < 0.5)
     return;
 
-  drMuTau2 = ROOT::Math::VectorUtil::DeltaR(muData.getSelectedMuons()[0].p4(),tauData.getSelectedTaus()[1].p4());
-  if(drMuTau2 < 0.5)
+  if(ROOT::Math::VectorUtil::DeltaR(muData.getSelectedMuons()[0].p4(),tauData.getSelectedTaus()[1].p4()) < 0.5)
     return;
-*/
+
 
   ////////////
   // Tau ID SF
@@ -374,6 +374,83 @@ void Hplus2hwAnalysis::process(Long64_t entry) {
 
   double myTransverseMass = TransverseMass::reconstruct(tauData.getSelectedTaus()[0],tauData.getSelectedTaus()[1],muData.getSelectedMuons()[0], METData.getMET());
   hTransverseMass->Fill(myTransverseMass);
+
+
+  // playing around
+
+//  std::vector<genParticle> particles;
+//  std::vector<genParticle> Ws;
+/*
+  // For-loop: All genParticles
+  for (auto& p: fEvent.genparticles().getGenParticles())
+    {
+
+      // std::cout << "p.pdgId() = " << p.pdgId() << std::endl;
+
+      // Find last copy of a given particle
+      // if (isLastCopy) if (!p.isLastCopy()) continue; // crashes
+      if (true)
+        {
+          // fixme
+          if (abs(p.pdgId()) == 5){ if (p.status() != 23) continue;} // Consider only status=23 (outgoing) particles
+          else{ if (p.status() != 1 and p.status() != 2) continue;}
+        }
+
+      // Commonly enables for parton-based jet flavour definition
+      if (false) if (p.daughters().size() > 0) continue;
+
+      // Consider only particles
+      if (std::abs(p.pdgId()) != 13) continue;
+
+      // Apply cuts
+      if ( p.pt() < 27 ) continue;
+      if (std::abs(p.eta()) > 2.4) continue;
+
+      // Save this particle
+      particles.push_back(p);
+    }
+*/
+/*
+  std::cout << "---------------" << "\n";
+
+  for (auto& p: fEvent.genparticles().getGenParticles())
+    {
+
+      // Find last copy of a given particle
+      // if (isLastCopy) if (!p.isLastCopy()) continue; // crashes
+
+      // Consider only particles
+      if (std::abs(p.pdgId()) != 24) continue;
+
+      Ws.push_back(p);
+
+      std::cout << "W decays to: " << p.daughters()[0].pdgId() << " and " << p.daughters()[0].pdgId() << "\n";
+    }
+
+  std::cout << "---------------" << "\n";
+
+  for (auto& p: fEvent.genparticles().getGenParticles())
+    {
+
+    particles.push_back(p);
+
+    }
+
+  for (unsigned int i=0; i < Ws[0].mothers().size(); i++)
+    {
+
+//    std::cout << "W decays to: " <<  particles.at(Ws[0].mothers().at(i)) << "\n";
+//    if (abs(particles(Ws[0].mothers()[i]).pdgId()) == 37) std::cout << "W decays to: " << Ws[0].daughters()[0].pdgId() << " and " << Ws[0].daughters()[1].pdgId() << "\n";
+
+    }
+*/
+//  for (unsigned int i=0; i < Ws[1].mothers().size(); i++)
+//    {
+
+//    if (abs(particles(Ws[1].mothers()[i]).pdgId()) == 37) std::cout << "W decays to: " << Ws[0].daughters()[0].pdgId() << " and " << Ws[1].daughters()[1].pdgId() << "\n";
+
+//    }
+  //
 
 
   cSelected.increment();
