@@ -48,9 +48,27 @@ metFilter = PSet(
 eVeto = PSet(
     applyTriggerMatching = True,
     triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
-    electronPtCut = 27.0,
+    electronPtCut = 28.0,
     electronEtaCut = 2.5,
 #            electronID = "mvaEleID_PHYS14_PU20bx25_nonTrig_V1_wp90", # highest (wp90) for vetoing (2012: wp95)
+    electronID = "cutBasedElectronID_Spring15_25ns_V1_standalone_tight",
+    electronIDType    = "MVA",  # options: "default", "MVA"
+    electronMVA       = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
+    electronMVACut    = "Loose",
+    electronIsolation = "tight", # loosest possible for vetoing ("veto"), "tight" for selecting
+    electronIsolType  = "default", # options: "mini", "default"
+)
+
+##########
+## Loose electron
+##########
+
+looseEVeto = PSet(
+    applyTriggerMatching = True,
+    triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
+    electronPtCut = 28.0,
+    electronEtaCut = 2.5,
+#            electronID = "mvaEleID_PHYS14_PU20bx25_nonTrig_V1_wp90", # highest (wp90) for vetoing ($
     electronID = "cutBasedElectronID_Spring15_25ns_V1_standalone_tight",
     electronIDType    = "MVA",  # options: "default", "MVA"
     electronMVA       = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
@@ -95,7 +113,7 @@ tauSelection = PSet(
    triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
               tauPtCut = 20.0,
              tauEtaCut = 2.3,
-        tauLdgTrkPtCut = 1.0,
+        tauLdgTrkPtCut = 20.0,
                 prongs = -1,    # options: 1, 2, 3, 12, 13, 23, 123 or -1 (all)
                   rtau = 0.0,   # to disable set to 0.0
   againstElectronDiscr = "againstElectronVLooseMVA6",
@@ -113,7 +131,7 @@ looseTauSelection = PSet(
    triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
               tauPtCut = 20.0,
              tauEtaCut = 2.3,
-        tauLdgTrkPtCut = 1.0,
+        tauLdgTrkPtCut = 20.0,
                 prongs = -1,    # options: 1, 2, 3, 12, 13, 23, 123 or -1 (all)
                   rtau = 0.0,   # to disable set to 0.0
   againstElectronDiscr = "againstElectronVLooseMVA6",
@@ -147,13 +165,13 @@ scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau", "nomina
 jetSelection = PSet(
                jetType  = "Jets", # options: Jets (AK4PFCHS), JetsPuppi (AK4Puppi)
               jetPtCuts = [30.0],
-             jetEtaCuts = [2.1], #4.7,
+             jetEtaCuts = [2.4], #4.7,
      tauMatchingDeltaR  = 0.4, #0.4,
   numberOfJetsCutValue  = 2,
   numberOfJetsCutDirection = ">=", # options: ==, !=, <, <=, >, >=
             jetIDDiscr = "IDloose", # options: IDloose, IDtight, IDtightLeptonVeto
           jetPUIDDiscr = "", # does not work at the moment 
-            HTCutValue = 0.0,
+            HTCutValue = 100.0,
     HTCutDirection     = ">=",
             JTCutValue = 0.0,
     JTCutDirection     = ">=",
@@ -169,7 +187,7 @@ bjetSelection = PSet(
     triggerMatchingApply= False,
     triggerMatchingCone = 0.0,  # DeltaR for matching offline bjet with trigger::TriggerBjet 
               jetPtCuts = [30.0],
-             jetEtaCuts = [2.1],
+             jetEtaCuts = [2.4],
              bjetDiscr  = "pfCombinedInclusiveSecondaryVertexV2BJetTags", # default
 #             bjetDiscr  = "pfCombinedMVAV2BJetTags", # use this for MVA b-tagging
  bjetDiscrWorkingPoint  = "Medium", #optimal for CSVv2
@@ -195,7 +213,7 @@ scaleFactors.setupBtagSFInformation(btagPset=bjetSelection,
 ##########
 
 metSelection = PSet(
-           METCutValue = 20.0,
+           METCutValue = 10.0,
        METCutDirection = ">", # options: ==, !=, <, <=, >, >=
   METSignificanceCutValue = -1000.0,
   METSignificanceCutDirection = ">", # options: ==, !=, <, <=, >, >=
@@ -244,6 +262,7 @@ allSelections = PSet(
     Trigger             = trg,
     METFilter 		= metFilter,
     ElectronSelection 	= eVeto,
+    LooseElectronSelection = looseEVeto,
     MuonSelection 	= muonSelection,
     TauSelection	= tauSelection,
     LooseTauSelection   = looseTauSelection,
