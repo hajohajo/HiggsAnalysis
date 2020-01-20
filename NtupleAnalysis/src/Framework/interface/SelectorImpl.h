@@ -3,7 +3,7 @@
 #define Framework_SelectorImpl_h
 
 #include "Framework/interface/Exception.h"
-#include <boost_1_57_0/boost/concept_check.hpp>
+#include <boost_1_70_0/boost/concept_check.hpp>
 
 #include "TSelector.h"
 #include "TStopwatch.h"

@@ -12,9 +12,10 @@ EXAMPLES:
 ./plotTH2.py -m Hplus2tbAnalysis_3bjets40_MVA0p80_MVA0p80_TopMassCutOff600GeV_180112_023556 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeToLumi --logZ 
 ./plotTH2.py -m Hplus2tbAnalysis_NewLeptonVeto_3bjets40_MVA0p85_MVA0p85_TopMassCutOff600GeV_180122_022900 --folder ForDataDrivenCtrlPlots --gridX --gridY --dataset QCD --normalizeToLumi --logZ 
 
+
 LAST USED:
-./plotTH2.py -m Hplus2hwAnalysis_AngularCuts_No2016B_02July2019 --folder AngularCuts_Collinear --gridX --gridY --dataset TT --normalizeToOne --logZ
-./plotTH2.py -m Hplus2hwAnalysis_AngularCuts_No2016B_02July2019 --folder AngularCuts_BackToBack --gridX --gridY --dataset TT --normalizeToOne --logZ
+./plotTH2.py --folder AngularCuts_Collinear --gridX --gridY --dataset TT --normalizeToOne --logZ -s png -m Hplus2hwAnalysisWithTop_LooseTauID_NoBDTGm1p0_19July2019
+./plotTH2.py --folder AngularCuts_BackToBack --gridX --gridY --dataset TT --normalizeToOne --logZ -s png -m Hplus2hwAnalysisWithTop_LooseTauID_NoBDTGm1p0_19July2019
 
 '''
 
@@ -39,6 +40,7 @@ import HiggsAnalysis.NtupleAnalysis.tools.counter as counter
 import HiggsAnalysis.NtupleAnalysis.tools.tdrstyle as tdrstyle
 import HiggsAnalysis.NtupleAnalysis.tools.styles as styles
 import HiggsAnalysis.NtupleAnalysis.tools.plots as plots
+import HiggsAnalysis.NtupleAnalysis.tools.systematics as systematics
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
 import HiggsAnalysis.NtupleAnalysis.tools.crosssection as xsect
 import HiggsAnalysis.NtupleAnalysis.tools.multicrabConsistencyCheck as consistencyCheck
@@ -128,6 +130,12 @@ def main(opts):
     style.setLogZ(opts.logZ)
     style.setWide(True, 0.15)
     # style.setPadRightMargin()#0.13)
+    # style.setPalettePretty()
+    # style.setPaletteMy()
+    #tdrstyle.setDeepSeaPalette()
+    #tdrstyle.setRainBowPalette()
+    #tdrstyle.setDarkBodyRadiatorPalette()
+    #tdrstyle.setTwoColorHuePalette()
 
 
     # For-loop: All opt Mode
@@ -172,6 +180,7 @@ def main(opts):
             Print(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle(), True)
             datasetsMgr.PrintInfo()
             sys.exit()
+
         if nDatasets > 1:
             msg = "Please select only 1 valid dataset. Requested %i datasets for plotting!" % (nDatasets)
             Print(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle(), True)
@@ -192,10 +201,10 @@ def main(opts):
         histoPaths = [os.path.join(folder, h) for h in histoList]
 
         # For-loop: All histograms
-        for h in histoPaths:
+        for i,h in enumerate(histoPaths, 1):
             #if "_Vs_" not in h:
             #    continue
-            Print(h, True)
+            Print(h, i==1)
             Plot2dHistograms(datasetsMgr, h)
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)    
@@ -204,18 +213,19 @@ def main(opts):
 def GetHistoKwargs(h, opts):
 
     # Defaults
-    xMin  =   0
+    xMin  =    0
+    xMax   = 800
+    yMin   =   0
+    yMax   = 800
+    yMaxF  =  10
+    zMin   =   0
+    zMax   = None
+    zLabel = "z-axis"
     if opts.logX:
-        yMin    =  1e0
-    xMax  = 800
-    yMin  =   0
-    yMax  = 800
+        xMin =  1
     if opts.logY:
-        yMin    =  1
-    yMaxF       = 10
-    zMin        =  0
-    zMax        = None
-    zLabel      = "z-axis"
+        yMin =  1
+
     if opts.normalizeToLumi:
         zLabel  = "Events"
         zMin    = 1e0
@@ -224,11 +234,18 @@ def GetHistoKwargs(h, opts):
         #zMin    = 0 #1e-3
     elif opts.normalizeToOne:
         zLabel  = "Arbitrary Units"
+        zMin    = None #5e-4
+        zMax    = None #1e-1
     else:
         zLabel = "Unknown"
     cutBox      = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True} #box = True works
-    cutBoxY     = {"cutValue": 200.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True,
-                   "mainCanvas": True, "ratioCanvas": False} # box = True not working
+    cutBoxY     = {"cutValue": 200.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
+    if "_vs_" not in h.lower():
+        yLabel = zLabel
+    else:
+        yLabel = None
+                   
     kwargs = {
         "stackMCHistograms": False,
         "addMCUncertainty" : False,
@@ -243,62 +260,62 @@ def GetHistoKwargs(h, opts):
         "cutBox"           : cutBox,
         "cutBoxY"          : cutBoxY,
         "moveLegend"       : {"dx": -2.0, "dy": 0.0, "dh": -100.0}, #hack to remove legend (tmp)
-        "zlabel"           : zLabel
+        "ylabel"           : yLabel,
+        "zlabel"           : zLabel,
         }
+
+
+
+    if "transversemass" in h.lower():
+        kwargs["rebinX"]  = 4 #systematics._dataDrivenCtrlPlotBinning["TransverseMass*"] 
+        ROOT.gStyle.SetNdivisions(6, "X")
+        
+    if "AngularCutsDeltaPhi" in h and "_Vs_" in h:
+        kwargs["rebinX"]  = 4
+        kwargs["rebinY"]  = 4
+        kwargs["opts"]    = {"xmax": +180.0, "ymax": +180.0}
+        #ROOT.gStyle.SetNdivisions(8, "X")
+        #ROOT.gStyle.SetNdivisions(8, "Y")
+
 
     if "Collinear" in h:
         units             = "#circ"
-        # kwargs["xlabel"]  = "R_{coll}^{jet} " + units
-        kwargs["ylabel"]  = "#Delta#phi(jet,MET)"
-        #kwargs["cutBox"]  = cutBox
-        #kwargs["cutBoxY"] = cutBoxY
+        #kwargs["xlabel"]  = "R_{coll}^{jet} " + units
+        kwargs["xlabel"]  = "#Delta#phi(#tau,MET) (%s)" % units
+        kwargs["ylabel"]  = "#Delta#phi(jet,MET) (%s)" % units
         kwargs["rebinX"]  = 2
         kwargs["rebinY"]  = 2
-        kwargs["opts"]    = {"xmax": +180.0, "ymax": 180}
+        kwargs["opts"]    = {"xmax": +180.0, "ymax": +180.0}
         #ROOT.gStyle.SetNdivisions(8, "X")
         #ROOT.gStyle.SetNdivisions(8, "Y")
 
     if "BackToBack" in h:
         units             = "#circ"
-        #kwargs["xlabel"]  = "R_{}^{jet} " + units
-        kwargs["ylabel"]  = "#Delta#phi(jet,MET)"
-        #kwargs["cutBox"]  = cutBox
-        #kwargs["cutBoxY"] = cutBoxY
+        kwargs["xlabel"]  = "#Delta#phi(#tau,MET) (%s)" % units
+        kwargs["ylabel"]  = "#Delta#phi(jet,MET) (%s)" % units
         kwargs["rebinX"]  = 2
         kwargs["rebinY"]  = 2
-        kwargs["opts"]    = {"xmax": +180.0, "ymax": 180}
+        kwargs["opts"]    = {"xmax": +180.0, "ymax": +180.0}
         #ROOT.gStyle.SetNdivisions(8, "X")
         #ROOT.gStyle.SetNdivisions(8, "Y")        
 
 
-    if "LdgTrijetPt_Vs_LdgTrijetDijetPt" in h:
+    if "TopPt_Vs_TopDijetPt" in h:
         units             = "(GeV/c)"
-        kwargs["xlabel"]  = "p_{T}^{jjb} " + units
-        kwargs["ylabel"]  = "p_{T}^{jj} " + units
+        #kwargs["xlabel"]  = "p_{T}^{jjb} " + units
+        #kwargs["ylabel"]  = "p_{T}^{jj} " + units
+        kwargs["xlabel"]  = "p_{T}^{top} " + units
+        kwargs["ylabel"]  = "p_{T}^{W} " + units
         kwargs["cutBox"]  = cutBox
         kwargs["cutBoxY"] = cutBoxY
         kwargs["rebinX"]  = 2
         kwargs["rebinY"]  = 2
-        kwargs["opts"]    = {"xmin": 0.0, "xmax": +800.0, "ymin": yMin, "ymax": yMax} #, "ymaxfactor": yMaxF}
+        kwargs["opts"]    = {"xmin": 0.0, "xmax": +600.0, "ymin": 0.0, "ymax": 600.0} #, "ymaxfactor": yMaxF}
         #if  "AfterStandardSelections" in h:
         #if  "AfterAllSelections" in h:
         ROOT.gStyle.SetNdivisions(8, "X")
         ROOT.gStyle.SetNdivisions(8, "Y")
         
-    if "SubldgTrijetPt_Vs_SubldgTrijetDijetPt" in h:
-        units             = "(GeV/c)"
-        kwargs["xlabel"]  = "p_{T}^{jjb} " + units
-        kwargs["ylabel"]  = "p_{T}^{jj} " + units
-        kwargs["cutBox"]  = cutBox
-        kwargs["cutBoxY"] = cutBoxY
-        kwargs["rebinX"]  = 2
-        kwargs["rebinY"]  = 2
-        kwargs["opts"]    = {"xmin": 0.0, "xmax": +800.0, "ymin": yMin, "ymax": yMax} #, "ymaxfactor": yMaxF}
-        # if  "AfterStandardSelections" in h:
-        # if  "AfterAllSelections" in h:
-        ROOT.gStyle.SetNdivisions(8, "X")
-        ROOT.gStyle.SetNdivisions(8, "Y")
-
     return kwargs
     
 
@@ -325,15 +342,14 @@ def Plot2dHistograms(datasetsMgr, histoName):
     # Customise z-axis
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitle(kwargs["zlabel"]))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitleOffset(1.3))
-    if kwargs.get("zmin") != None:
-        zMin = float(kwargs.get("zmin"))
-        p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMinimum(zMin))
-    if kwargs.get("zmax") != None:
-        zMax = float(kwargs.get("zmax"))
-        p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMaximum(zMax))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(1.2))
 
     # Drawing style    
-    p.histoMgr.setHistoDrawStyleAll("COLZ")
+    if 1:
+        p.histoMgr.setHistoDrawStyleAll("COL2Z")
+    else:
+        p.histoMgr.setHistoDrawStyleAll("CONTZ")
+        #p.histoMgr.setHistoDrawStyleAll("CONT4Z")
 
     # Add dataset name on canvas
     p.appendPlotObject(histograms.PlotText(0.18, 0.88, plots._legendLabels[opts.dataset], bold=True, size=22))
@@ -341,30 +357,36 @@ def Plot2dHistograms(datasetsMgr, histoName):
     # Draw the plot
     plots.drawPlot(p, saveName, **kwargs) #the "**" unpacks the kwargs_ dictionary
 
+    # Fix zmin / zmax
+    if kwargs.get("zmin") != None:
+        zMin = float(kwargs.get("zmin"))
+        p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMinimum(zMin))
+        #p.histoMgr.getHistos()[0].getRootHisto().SetMinimum(1e-6) #kwargs["zmin"])
+    if kwargs.get("zmax") != None:
+        zMax = float(kwargs.get("zmax"))
+        p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMaximum(zMax))
+        #p.histoMgr.getHistos()[0].getRootHisto().SetMaximum(1) #kwargs["zmax"])
+
     # Save the plots in custom list of saveFormats
-    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder, opts.dataset), [".png", ".pdf"] )
+    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder, opts.dataset), opts.saveFormats)
     return
 
 
-def SavePlot(plot, plotName, saveDir, saveFormats = [".png", ".pdf"]):
-    Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
-
-    # Check that path exists
+def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
     if not os.path.exists(saveDir):
         os.makedirs(saveDir)
 
     # Create the name under which plot will be saved
-    name = plotName.replace("/", "_").replace(" ", "").replace("(", "").replace(")", "") 
-    saveName = os.path.join(saveDir, name)
+    saveName = os.path.join(saveDir, plotName.replace("/", "_"))
+    saveName = saveName.replace(" ", "_")
+    saveName = saveName.replace(")", "")
+    saveName = saveName.replace("(", "")
 
     # For-loop: All save formats
     for i, ext in enumerate(saveFormats):
         saveNameURL = saveName + ext
         saveNameURL = aux.convertToURL(saveNameURL, opts.url)
-        if opts.url:
-            Verbose(saveNameURL, i==0)
-        else:
-            Verbose(saveName + ext, i==0)
+        Verbose(saveNameURL, i==0)
         plot.saveAs(saveName, formats=saveFormats)
     return
 
@@ -409,6 +431,7 @@ if __name__ == "__main__":
     NORM2ONE     = False
     NORM2XSEC    = False
     NORM2LUMI    = False
+    SAVEFORMATS  = "pdf,png,C"
 
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -455,7 +478,7 @@ if __name__ == "__main__":
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE, 
                       help="Enables verbose mode (for debugging purposes) [default: %s]" % VERBOSE)
 
-    parser.add_option("-i", "--includeOnlyTasks", dest="includeOnlyTasks", action="store", 
+    parser.add_option("-i", "--includeOnlyTaskss", dest="includeOnlyTasks", action="store", 
                       help="List of datasets in mcrab to include")
 
     parser.add_option("-e", "--excludeTasks", dest="excludeTasks", action="store", 
@@ -478,6 +501,10 @@ if __name__ == "__main__":
 
     parser.add_option("--normalizeToLumi", dest="normalizeToLumi", action="store_true", default=NORM2LUMI,
                       help="Normalise plot to luminosity [default: %s]" % NORM2LUMI)
+
+    parser.add_option("-s", "--saveFormats", dest="saveFormats", default = SAVEFORMATS,
+                      help="Save formats for all plots [default: %s]" % SAVEFORMATS)
+
 
     (opts, parseArgs) = parser.parse_args()
 
@@ -512,6 +539,13 @@ if __name__ == "__main__":
         for m in allowedFolders:
             Print(m, False)
         sys.exit()
+
+    # Create save formats
+    if "," in opts.saveFormats:
+        opts.saveFormats = opts.saveFormats.split(",")
+    else:
+        opts.saveFormats = [opts.saveFormats]
+    opts.saveFormats = ["." + s for s in opts.saveFormats]          
 
     # Call the main function
     main(opts)

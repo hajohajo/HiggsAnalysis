@@ -11,8 +11,6 @@ Classes for producing output
 #================================================================================================ 
 from HiggsAnalysis.LimitCalc.Extractor import ExtractorBase
 from HiggsAnalysis.LimitCalc.DatacardColumn import DatacardColumn
-from HiggsAnalysis.LimitCalc.ControlPlotMaker import ControlPlotMaker
-from HiggsAnalysis.LimitCalc.ControlPlotMakerHToTB import ControlPlotMakerHToTB
 from HiggsAnalysis.NtupleAnalysis.tools.systematics import ScalarUncertaintyItem
 import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
@@ -23,6 +21,18 @@ import os
 import sys
 import time
 import ROOT
+
+#================================================================================================ 
+# Shell Types
+#================================================================================================ 
+sh_e = ShellStyles.ErrorStyle()
+sh_s = ShellStyles.SuccessStyle()
+sh_h = ShellStyles.HighlightStyle()
+sh_a = ShellStyles.HighlightAltStyle()
+sh_l = ShellStyles.AltStyle()
+sh_t = ShellStyles.NoteStyle()
+sh_n = ShellStyles.NormalStyle()
+sh_w = ShellStyles.WarningStyle()
 
 #================================================================================================ 
 # Function definition
@@ -209,11 +219,12 @@ def getTableOutput(widths,table,latexMode=False):
 # Class definition
 #================================================================================================ 
 class TableProducer:
-    def __init__(self, opts, config, outputPrefix, luminosity, observation, datasetGroups, extractors, mcrabInfoOutput, h2tb, verbose=False):
+    def __init__(self, opts, config, outputPrefix, luminosity, observation, datasetGroups, extractors, mcrabInfoOutput):
         '''
         Constructor
         '''
         self._opts = opts
+        self._verbose = opts.verbose
         self._config = config
         self._binByBinLabel = ""
         if hasattr(self._config, 'OptionBinByBinLabel'):
@@ -224,7 +235,7 @@ class TableProducer:
         self._datasetGroups = datasetGroups
         self._purgeColumnsWithSmallRateDoneStatus = False
         self._extractors = extractors[:]
-        self._h2tb = h2tb
+        self._analysisType = opts.analysisType
         self._timestamp = time.strftime("%y%m%d_%H%M%S", time.gmtime(time.time()))
         self._outputFileStem = "combine_datacard_hplushadronic_m"
         self._outputRootFileStem = "combine_histograms_hplushadronic_m"
@@ -232,19 +243,30 @@ class TableProducer:
             self._Paper = self._config.OptionPaper
         else:
             self._Paper = False
-        if self._h2tb:
+        if self._analysisType in ["HToTB"]:
             self.channelLabel = "tbhadr"
-        else:
+        elif self._analysisType in ["HToTauNu"]:
             self.channelLabel = "taunuhadr"
-        self._verbose = verbose
+        elif self._analysisType in ["HToHW"]:
+            self.channelLabel = "tautauhadr"
+        else:
+            self.channelLabel = "unknown"
         self.makeDirectory()
             
         # Make control plots
+        self.Verbose("Importing & Calling the control plot maker module", True)
         if self._config.OptionDoControlPlots:
-            if hasattr(self._config, 'OptionGenuineTauBackgroundSource'):
-                ControlPlotMaker(self._opts, self._config, self._ctrlPlotDirname, self._luminosity, self._observation, self._datasetGroups)
-            if hasattr(self._config, 'OptionFakeBMeasurementSource'):
-                ControlPlotMakerHToTB(self._opts, self._config, self._ctrlPlotDirname, self._luminosity, self._observation, self._datasetGroups)
+            if opts.analysisType in ["HToTauNu"]:
+                import HiggsAnalysis.LimitCalc.ControlPlotMaker as cp
+            elif opts.analysisType in ["HToHW"]:
+                import HiggsAnalysis.LimitCalc.ControlPlotMakerHToHW as cp
+            elif opts.analysisType in ["HToTB"]:
+                import HiggsAnalysis.LimitCalc.ControlPlotMakerHToTB as cp
+            else:
+                raise Exception(sh_e + msg + sh_n)
+            self.Verbose("Control plots will be created using the %s module" % (sh_h + os.path.basename(cp.__file__) + sh_n), True)
+            # Assumption is that the constructors of all 3 classes take the exact same arguments (currently holds)
+            cp.ControlPlotMaker(self._opts, self._config, self._ctrlPlotDirname, self._luminosity, self._observation, self._datasetGroups)
         else:
             msg = "Skipped making of data-driven control plots. To enable, set OptionDoControlPlots = True in the input datacard."
             if self._opts.verbose:
@@ -252,7 +274,7 @@ class TableProducer:
 
         # Make other reports
         if self._opts.verbose:
-            Print(ShellStyles.HighlightStyle() + "Generating reports" + ShellStyles.NormalStyle())
+            Print(ShellStyles.HighlightStyle() + "Generating reports" + sh_n)
 
         # Create table of shape variation for shapeQ nuisances
         self.makeShapeVariationTable()
@@ -299,7 +321,7 @@ class TableProducer:
             f.close()
             # Inform user of code status txt files
             msg = "Created file " 
-            Verbose(msg + ShellStyles.SuccessStyle() + theFile + ShellStyles.NormalStyle(), index==1)
+            Verbose(msg + sh_s + theFile + sh_n, index==1)
 
         self._extractors = extractors[:]
         
@@ -407,8 +429,8 @@ class TableProducer:
         for index, m in enumerate(self._config.MassPoints, 1):
             
             # Print progress 
-            msg = "Datacard %s/%s (mH=%s)" % (index, len(self._config.MassPoints), str(m)) 
-            PrintFlushed(ShellStyles.HighlightStyle() + msg + ShellStyles.NormalStyle(), index==1)
+            msg = "Datacard %s/%s: mH=%s GeV" % (index, len(self._config.MassPoints), str(m)) 
+            PrintFlushed(sh_l + msg + sh_n, index==1)
             if index == len(self._config.MassPoints):
                 print 
 
@@ -419,7 +441,7 @@ class TableProducer:
 
             if myRootFile == None:
                 msg = " Cannot open file %s for output!" % (myRootFilename)
-                Print(ShellStyles.ErrorLabel() + msg + ShellStyles.NormalStyle())
+                Print(ShellStyles.ErrorLabel() + msg + sh_n)
                 sys.exit()
 
             # Invoke extractors
@@ -469,7 +491,7 @@ class TableProducer:
             # Print datacard to screen if requested
             if self._opts.showDatacard:
                 if self._config.BlindAnalysis:
-                    print ShellStyles.WarningStyle()+"You are BLINDED: Refused cowardly to print datacard on screen (you're not supposed to look at it)!"+ShellStyles.NormalStyle()
+                    print ShellStyles.WarningStyle()+"You are BLINDED: Refused cowardly to print datacard on screen (you're not supposed to look at it)!"+sh_n
                 else:
                     print myCard
 
@@ -477,13 +499,13 @@ class TableProducer:
             myFile = open(myFilename, "w")
             myFile.write(myCard)
             myFile.close()
-            Verbose("Written datacard to %s" % (ShellStyles.SuccessStyle() + myFilename + ShellStyles.NormalStyle() ))
+            Verbose("Written datacard to %s" % (sh_s + myFilename + sh_n ))
 
             # Save & close histograms to root file and create bin-by-bin stat. uncertainties
             self._saveHistograms(myRootFile,m,binByBinLabel=self._binByBinLabel),
             myRootFile.Write()
             myRootFile.Close()
-            Verbose("Written shape ROOT file to %s" % (ShellStyles.SuccessStyle() + myRootFilename + ShellStyles.NormalStyle() ))
+            Verbose("Written shape ROOT file to %s" % (sh_s + myRootFilename + sh_n ))
         return
 
     def _purgeColumnsWithSmallRate(self):
@@ -921,7 +943,7 @@ class TableProducer:
 
         # Inform the user
         msg = "Shape variation tables written to "
-        Verbose(msg + ShellStyles.SuccessStyle() + myFilename + ShellStyles.NormalStyle() ) #ShellStyles.HighlightAltStyle()
+        Verbose(msg + sh_s + myFilename + sh_n ) #ShellStyles.HighlightAltStyle()
         return
 
     def getFormattedUnc(self, formatStr,myPrecision,uncUp,uncDown):
@@ -972,7 +994,7 @@ class TableProducer:
         self.formatStr = "%6."
         self.myPrecision = None
         if self._config.OptionNumberOfDecimalsInSummaries == None:
-            print ShellStyles.WarningLabel()+"Using default value for number of decimals in summaries. To change, set OptionNumberOfDecimalsInSummaries in your config."+ShellStyles.NormalStyle()
+            print ShellStyles.WarningLabel()+"Using default value for number of decimals in summaries. To change, set OptionNumberOfDecimalsInSummaries in your config."+sh_n
             self.formatStr += "1"
             self.myPrecision = 1
         else:
@@ -1018,12 +1040,12 @@ class TableProducer:
                                 QCD = c.getCachedShapeRootHistogramWithUncertainties().Clone()
                             except AttributeError:
                                 msg = "Did you create the pseudo-Multicrab containing the correctly normalized QCD background? Step 3) in the QCD background measurement instructions."
-                                raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle())
+                                raise Exception(sh_e + msg + sh_n)
                         else:
                             QCD.Add(c.getCachedShapeRootHistogramWithUncertainties())
 ##
                     elif c.typeIsEWK() or (c.typeIsEWKfake() and self._config.OptionGenuineTauBackgroundSource == "MC_FakeAndGenuineTauNotSeparated") or c.typeIsEWKMC() or c.typeIsGenuineB():
-                        # fixme: what a mess! c.typeIsEWKMC() and c.typeIsGenuineB() ORs added for h2tb. must make a proper code!
+                        # fixme: what a mess! c.typeIsEWKMC() and c.typeIsGenuineB() ORs added for HToTB. must make a proper code!
                         if Embedding == None:
                             Embedding = c.getCachedShapeRootHistogramWithUncertainties().Clone()
                         else:
@@ -1035,8 +1057,8 @@ class TableProducer:
                             EWKFakes.Add(c.getCachedShapeRootHistogramWithUncertainties())
                     #else:
 		    #	print "yllatys"
-                    #    msg = "Unknown dataset type for dataset %s!%s" % (c.getLabel(), ShellStyles.NormalStyle())
-                    #    raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle())
+                    #    msg = "Unknown dataset type for dataset %s!%s" % (c.getLabel(), sh_n)
+                    #    raise Exception(sh_e + msg + sh_n)
                     
 
             # Calculate signal yield
@@ -1044,7 +1066,7 @@ class TableProducer:
             myBr = self._config.OptionBr
             if not (self._config.OptionLimitOnSigmaBr or m > 161 or HW==None):
                 if self._config.OptionBr == None:
-                    print ShellStyles.WarningLabel()+"Br(t->bH+) has not been specified in config file, using default 0.01! To specify, add OptionBr=0.05 to the config file."+ShellStyles.NormalStyle()
+                    print ShellStyles.WarningLabel()+"Br(t->bH+) has not been specified in config file, using default 0.01! To specify, add OptionBr=0.05 to the config file."+sh_n
                     myBr = 0.01
                 HW.Scale(2.0 * myBr * (1.0 - myBr))
             if HH != None:
@@ -1082,7 +1104,7 @@ class TableProducer:
             if not (self._config.OptionLimitOnSigmaBr or m > 179):
                 myOutput += "Signal, mH+=%3d GeV, Br(t->bH+)=%.2f: %s"%(m,myBr,self.getResultString(HW, self.formatStr, self.myPrecision))
             else:
-                myOutput += "Signal, mH+=%3d GeV, sigma x Br=1 fb: %s"%(m,self.getResultString(HW, self.formatStr, self.myPrecision))
+                myOutput += "Signal, mH+=%3d GeV, sigma x Br=1 pb: %s"%(m,self.getResultString(HW, self.formatStr, self.myPrecision))
             myOutput += "Backgrounds:\n"
             if containsQCDdataset:
                 myOutput += "                           Multijets: %s"%self.getResultString(QCD, self.formatStr, self.myPrecision)
@@ -1095,16 +1117,12 @@ class TableProducer:
                     if EWKFakes != None:
                         myOutput += "               EWK+tt with fake taus: %s"%self.getResultString(EWKFakes, self.formatStr, self.myPrecision)
                 myOutput += "                      Total expected: %s"%self.getResultString(TotalExpected, self.formatStr, self.myPrecision)
-            # FIXME: Add support for config.OptionFakeBMeasurementSource?
-
-            #if self._config.BlindAnalysis:
-            #    myOutput += "                            Observed: BLINDED\n\n"
-            #else:
 	    myOutput += "                            Observed: %5d\n\n"%self._observation.getCachedShapeRootHistogramWithUncertainties().getRate()
 
             # Print to screen
             if self._config.OptionDisplayEventYieldSummary:
-               Print(myOutput)
+                print
+                Print(myOutput, True)
 
             # Save output to file & infor user
             myFilename = self._infoDirname + "/EventYieldSummary_m%d.txt" % m
@@ -1112,7 +1130,7 @@ class TableProducer:
             myFile.write(myOutput)
             myFile.close()
             msg = "Event yield summary written to "
-            self.Verbose(msg + ShellStyles.SuccessStyle() + msg + myFilename + ShellStyles.NormalStyle(), True) #HighlightAltStyle
+            self.Verbose(msg + sh_s + msg + myFilename + sh_n, True) #HighlightAltStyle
 
             # Save the event yield to a file (LaTeX table)
             self.saveEventYieldsToFile(m, QCD, Embedding, TotalExpected)
@@ -1122,7 +1140,7 @@ class TableProducer:
         # First construct the file name
         baseName = "EventYieldSummary_m%d_" % (m)
         fileName  = os.path.join(self._infoDirname, baseName)
-        if self._h2tb:
+        if self._analysisType in ["HToTB"]:
             fileName += self._outputPrefix + "_" + self._config.DataCardName.replace(" ","_")
         else:
             fileName += self._timestamp + "_" + self._outputPrefix + "_" + self._config.DataCardName.replace(" ","_")
@@ -1136,12 +1154,12 @@ class TableProducer:
         myFile.close()
 
         # Inform user before returning
-        msg = "Event yield summary (LaTeX) written to %s" % (ShellStyles.SuccessStyle() + os.path.basename(fileName) + ShellStyles.NormalStyle())
+        msg = "Event yield summary (LaTeX) written to %s" % (sh_s + os.path.basename(fileName) + sh_n)
         self.Verbose(msg, True)
         return
     
     def getEventYieldTable(self, mass, QCD, Embedding, TotalExpected):
-        if self._h2tb:
+        if self._analysisType in ["HToTB"]:
             return self.getEventYieldTableHToTB(mass, QCD, Embedding, TotalExpected)
         else:
             return self.getEventYieldTableHToTauNu(mass, QCD, Embedding, TotalExpected)
@@ -1201,7 +1219,8 @@ class TableProducer:
             
 
         if hasattr(self._config, 'OptionGenuineTauBackgroundSource'):
-            if self._config.OptionGenuineTauBackgroundSource == "MC_FakeAndGenuineTauNotSeparated":
+            #if self._config.OptionGenuineTauBackgroundSource == "MC_FakeAndGenuineTauNotSeparated":
+            if self._config.OptionGenuineTauBackgroundSource != "DataDriven":
                 myOutputLatex += "  MC EWK+\\ttbar                           & %s \\\\ \n" % self.getLatexResultString(Embedding, self.formatStr, self.myPrecision)
             else:
                 myOutputLatex += "  EWK+\\ttbar with $\\tau$ (data-driven)    & %s \\\\ \n" % self.getLatexResultString(Embedding, self.formatStr, self.myPrecision)
@@ -1235,7 +1254,7 @@ class TableProducer:
         '''
         Prints systematics summary table
         '''
-        if self._h2tb and light==True:
+        if self._analysisType in ["HToTB"] and light==True:
             return
         signalColumn="CMS_Hptntj_Hp"
         if light:
@@ -1248,8 +1267,11 @@ class TableProducer:
                          "CMS_Hptntj_DY", 
                          "CMS_Hptntj_VV"]
 
+        if self._analysisType in ["HToHW"]:
+            myColumnOrder = ["Hp",  "QCDandFakeTau", "TT", "ttX", "Diboson"]
 
-        if self._h2tb:
+
+        if self._analysisType in ["HToTB"]:
             myColumnOrder = ["Hp",  "FakeB", "TT_GenuineB", "SingleTop_GenuineB"]
             if self._Paper:
                 myColumnOrder = ["Hp",  "FakeB", "TT_GenuineB", "ttX_GenuineB", "EWK_GenuineB"]
@@ -1354,7 +1376,41 @@ class TableProducer:
                                ["CMS_Hptntj_QCDbkg_templateFit","Fake tau template fit"],
                                ["CMS_Hptntj_QCDkbg_metshape","Fake tau MET shape"]
                                ]
-            
+
+        if self._analysisType in ["HToHW"]:
+	    myNuisanceOrder = [["CMS_eff_t","tau ID"], # first ID, then the text that goes to the table
+                               ["CMS_eff_t_highpt","high-$p_{T}$ tau ID"],        
+			       ["CMS_eff_m","muon ID"],
+                               ["CMS_eff_trg_MC","muon trigger efficiency"],
+                               ["CMS_eff_e_veto","electron veto eff."],
+#                               ["CMS_eff_m_veto","muon veto eff."],
+                               ["CMS_eff_b","b-tagging eff."],
+#                               ["CMS_fake_b","b-mistagging eff."],
+                               ["CMS_scale_t","tau energy scale"],
+                               ["CMS_scale_j","jet energy scale"],
+                               ["CMS_scale_met","MET unclustered energy scale"],
+                               ["CMS_res_j","jet energy resolution"],
+                               ["CMS_pileup","pileup reweighting"],
+                               ["CMS_HPTB_mu_PDF_HPTB", "pdf acceptance (signal)"],
+                               ["CMS_HPTB_mu_PDF_top", "pdf acceptance (top BG)"],
+                               ["CMS_HPTB_mu_PDF_ewk", "pdf acceptance (EWK BG)"],
+                               ["CMS_HPTB_mu_RF_HPTB", "RF scale acceptance (signal)"],
+                               ["CMS_HPTB_mu_RF_top", "RF scale acceptance (top BG)"],
+                               ["CMS_HPTB_mu_RF_ewk", "RF scale acceptance (EWK BG)"],
+                               ["QCDscale_ttbar", "ttbar scale"],
+                               ["pdf_ttbar", "ttbar pdf"],
+                               ["mass_top", "top mass"],
+			       ["mass_top_forSingleTop","top mass"],
+                               ["QCDscale_singleTop", "ttX scale"],
+                               ["pdf_singleTop", "ttX pdf"],
+#                               ["TTJets_scale", "TT scale"],
+#                               ["pdf_TT", "TT pdf"],
+                               ["CMS_scale_VV", "diboson scale"],
+                               ["CMS_pdf_VV", "diboson pdf"],
+                               ["lumi_13TeV","luminosity (13 TeV)"],
+                               ["CMS_FakeRate","Fake Rate measurement"]
+                               ]
+
         # Make table - The horror!
         myTable = []
         for n in myNuisanceOrder: # for each nuisance
@@ -1375,7 +1431,9 @@ class TableProducer:
 
                     # if column name matches to dataset group label
                     foundMatch = columnName in c.getLabel()
-                    if self._h2tb and not "Hp" in c.getLabel():
+                    if self._analysisType in ["HToTB"] and not "Hp" in c.getLabel(): #fixme - dirty!
+                        foundMatch = (columnName == c.getLabel())
+		    if self._analysisType in ["HToHW"] and not "Hp" in c.getLabel(): #fixme - dirty!
                         foundMatch = (columnName == c.getLabel())
                     if foundMatch: 
                         # if this column+nuisance combination matches to a list, loop over the list
@@ -1475,12 +1533,12 @@ class TableProducer:
         myFile   = open(fileName, "w")
         myFile.write(myOutput)
         myFile.close()
-        msg = "Created systematics LaTeX table %s" % (ShellStyles.SuccessStyle() + fileName + ShellStyles.NormalStyle())
+        msg = "Created systematics LaTeX table %s" % (sh_s + fileName + sh_n)
         self.Verbose(msg, True)
         return
 
     def getSystematicsTable(self, myTable):
-        if self._h2tb:
+        if self._analysisType in ["HToTB"]:
             return self.getSystematicsTableHToTB(myTable)
         myOutput = "% table auto generated by datacard generator on "+self._timestamp+" for "+self._config.DataCardName+" / "+self._outputPrefix+"\n\n"
         myOutput += "\\documentclass{article}\n"
@@ -1496,7 +1554,10 @@ class TableProducer:
         myOutput += "\\hline\n"
         myOutput += "& Signal & Jet \to \taujet & \multicolumn{5}{c}{EWK+t\={t} genuine tau and e/\mu \to \taujet}"
         myOutput += "\n \\\\"
+
         myCaptionLine = [["","","","t\={t}","W+jets","single top","DY","Diboson"]] 
+	if self._analysisType in ["HToHW"]:
+            myCaptionLine = [["","","","t\={t}","ttX","Diboson"]]
         # Calculate dimensions of tables
         myWidths = []
         myWidths = calculateCellWidths(myWidths, myTable)
@@ -1557,7 +1618,7 @@ class TableProducer:
         postFix = "_heavy.tex"
         if light:
             postFix = "_light.tex"
-        if self._h2tb:
+        if self._analysisType in ["HToTB"]:
             postFix = ".tex"
 
         filePath = os.path.join(self._infoDirname, "SystematicsSummary")

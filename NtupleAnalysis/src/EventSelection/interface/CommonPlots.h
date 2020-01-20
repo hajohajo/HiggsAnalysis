@@ -21,6 +21,9 @@ public:
     kSignalAnalysis,
     kHplus2tbAnalysis,
     kHplus2hwAnalysis,
+    kHplus2hwAnalysis_mmt,
+    kHplus2hwAnalysis_eet,
+    kHplus2hwAnalysisWithTop,
     kHplus2hw_ele_Analysis,
     kBTagEfficiencyAnalysis,
     kTauAnalysis,
@@ -29,6 +32,8 @@ public:
     kQCDMeasurement,
     kQCDMeasurement_ele,
     kQCDMeasurement_muon,
+    kQCDMeasurement_mmt,
+    kQCDMeasurement_eet,
     kFakeBMeasurement,
     kQCDNormalizationSystematicsSignalRegion, // Needed for obtaining normalization systematics to data-driven control plots
     kQCDNormalizationSystematicsControlRegion // Needed for obtaining normalization systematics to data-driven control plots
@@ -36,6 +41,7 @@ public:
 
   CommonPlots(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper);
   CommonPlots(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper, bool test);
+//  CommonPlots();
   ~CommonPlots();
 
   //Tau ID syst switches
@@ -90,7 +96,6 @@ public:
    * (it is usually set through TauSelection via CommonPlots::fillControlPlotsAfterTauSelection)
    */
   void setGenuineTauStatus(const bool isGenuineTau) { bIsGenuineTau = isGenuineTau; };
-  void setGenuineBStatus(const bool isGenuineB) { bIsGenuineB = isGenuineB; };
   
   //===== unique filling methods (to be called inside the event selection routine only, i.e. (before a passing decision is done))
   void fillControlPlotsAtVertexSelection(const Event& event);
@@ -120,11 +125,9 @@ public:
 					       const JetSelection::Data& jetData, 
 					       const BJetSelection::Data& bjetData, 
 					       const METSelection::Data& METData, 
-					       const QuarkGluonLikelihoodRatio::Data& qglrData,
-					       const TopSelectionBDT::Data& topData,
-					       bool bIsGenuineB); //HToTB-specific
+					       const TopSelectionBDT::Data& topData);
   void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
-  void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false);
+  void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false, int i=0, int j=1);
   void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineB);  //HToTB-specific
   void fillControlPlotsAfterAllSelectionsWithProbabilisticBtag(const Event& event, const METSelection::Data& metData, double btagWeight);
   //void fillControlPlotsAfterAllSelectionsWithFullMass(const Event& event, FullHiggsMassCalculator::Data& data);
@@ -141,8 +144,7 @@ public:
 
 private:
   /// Returns true if anti-isolated taus need to be used (QCD measurement)
-  const bool usesAntiIsolatedTaus() const { return fAnalysisType == kQCDMeasurement ||
-      fAnalysisType == kQCDNormalizationSystematicsControlRegion || fAnalysisType == kQCDMeasurement_ele || fAnalysisType == kQCDMeasurement_muon; }
+  const bool usesAntiIsolatedTaus() const { return fAnalysisType == kQCDMeasurement || fAnalysisType == kQCDNormalizationSystematicsControlRegion || fAnalysisType == kQCDMeasurement_ele || fAnalysisType == kQCDMeasurement_muon || fAnalysisType == kQCDMeasurement_mmt; }
   
 private:
   ///===== Config params
@@ -182,20 +184,6 @@ private:
   // NOTE: the histograms with the prefix hShape are used as shape histograms
   // NOTE: histogram triplets contain the inclusive and events with fake tau histograms
   
-  // vertex
-
-  // tau selection
-
-  // tau trigger SF
-
-  // veto tau selection
-  
-  // electron veto
-  
-  // muon veto
-
-  // tau veto
- 
   // jet selection
   HistoSplitter::SplittedTripletTH1s hCtrlNjets;
   
@@ -208,6 +196,20 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlCollinearAngularCutsJet2;
   HistoSplitter::SplittedTripletTH1s hCtrlCollinearAngularCutsJet3;
   HistoSplitter::SplittedTripletTH1s hCtrlCollinearAngularCutsJet4;
+  // Collinear or B2B? Decide later
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiTaus;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiTauMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiLdgTauMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiSubldgTauMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiLdgJetMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiSubldgJetMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiMuonMET;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiLdgTauMuon;
+  HistoSplitter::SplittedTripletTH1s hCtrlAngularCutsDeltaPhiSubldgTauMuon;
+  HistoSplitter::SplittedTripletTH2s hCtrlAngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiSubldgTauMET;
+  HistoSplitter::SplittedTripletTH2s hCtrlAngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiMuonMET;
+  HistoSplitter::SplittedTripletTH2s hCtrlAngularCutsDeltaPhiLdgTauMET_Vs_DeltaPhiLdgBJetMET;
+  HistoSplitter::SplittedTripletTH2s hCtrlAngularCutsDeltaPhiLdgTauMuon_Vs_DeltaPhiSubldgTauMuon;
   
   // this is the point of "standard selections"
   HistoSplitter::SplittedTripletTH1s hCtrlNVerticesAfterStdSelections;  
@@ -220,6 +222,13 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauNProngsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauRtauAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauSourceAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauPtAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauEtaAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauPhiAfterStdSelections;
+  HistoSplitter::SplittedTripletTH2s hCtrlSubldgTauEtaPhiAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauLdgTrkPtAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauDecayModeAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauNProngsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPtAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonEtaAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPhiAfterStdSelections;
@@ -235,12 +244,12 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlMETAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlMETPhiAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiTauMetAfterStdSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuMetAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlHTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlMHTAfterStdSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlNAllCleanedTopsAfterStdSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlNSelectedCleanedTopsAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetMassAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopMassAfterStdSelections;
@@ -287,6 +296,14 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauRtauAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauSourceAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTauIPxyAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauPtAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauEtaAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauPhiAfterAllSelections;
+  HistoSplitter::SplittedTripletTH2s hCtrlSubldgTauEtaPhiAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauLdgTrkPtAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauDecayModeAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauNProngsAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlSubldgTauIPxyAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPtAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonEtaAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedMuonPhiAfterAllSelections;
@@ -334,9 +351,10 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlBDiscriminatorAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlBackToBackAngularCutsMinimumAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiTauMetAfterAllSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlNAllCleanedTopsAfterAllSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlNSelectedCleanedTopsAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetMassAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopMassAfterAllSelections;
@@ -364,7 +382,6 @@ private:
   TauSelection::Data fTauData;
   //FakeTauIdentifier::Data fFakeTauData;
   bool bIsGenuineTau;
-  bool bIsGenuineB;
   ElectronSelection::Data fElectronData;
   MuonSelection::Data fMuonData;
   JetSelection::Data fJetData;

@@ -43,7 +43,7 @@ public:
 
 private:
   // Input parameters
-  const DirectionalCut<double> cfg_PrelimTopMVACut;
+  const DirectionalCut<double> cfg_PrelimTopBDTGCut;
   //const std::string cfg_LdgTopDefinition;
   const DirectionalCut<double> cfg_MiniIsoCut;
   const DirectionalCut<double> cfg_MiniIsoInvCut;
@@ -338,7 +338,7 @@ REGISTER_SELECTOR(SystTopBDT);
 
 SystTopBDT::SystTopBDT(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    cfg_PrelimTopMVACut(config, "SystTopBDTSelection.MVACut"),
+    cfg_PrelimTopBDTGCut(config, "SystTopBDTSelection.BDTGCut"),
     //cfg_LdgTopDefinition(config.getParameter<std::string>("FakeBTopSelectionBDT.LdgTopDefinition")),
     cfg_MiniIsoCut(config, "SystTopBDTSelection.MiniIsoCut"),
     cfg_MiniIsoInvCut(config, "SystTopBDTSelection.MiniIsoInvCut"),
@@ -724,9 +724,9 @@ void SystTopBDT::setupBranches(BranchManager& branchManager) {
 void SystTopBDT::process(Long64_t entry) {
 
   // Sanity check
-  //if (cfg_LdgTopDefinition != "MVA" &&  cfg_LdgTopDefinition != "Pt")
+  //if (cfg_LdgTopDefinition != "BDTG" &&  cfg_LdgTopDefinition != "Pt")
   //  {
-  //    throw hplus::Exception("config") << "Unsupported method of defining the leading top (=" << cfg_LdgTopDefinition << "). Please select from \"MVA\" and \"Pt\".";
+  //    throw hplus::Exception("config") << "Unsupported method of defining the leading top (=" << cfg_LdgTopDefinition << "). Please select from \"BDTG\" and \"Pt\".";
   //  }
 
   int Debug = 0;
@@ -824,12 +824,12 @@ void SystTopBDT::process(Long64_t entry) {
   if (0) std::cout << "=== Top (BDT) selection" << std::endl;
   const TopSelectionBDT::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
   
-  bool passPrelimMVACut = false;  
-  if (topData.getSelectedTopsBJet().size() > 0) passPrelimMVACut = true;
+  bool passPrelimBDTGCut = false;  
+  if (topData.getSelectedTopsBJet().size() > 0) passPrelimBDTGCut = true;
   
   hCEvts_TopPassBDT_SR -> Fill("All Events", 1);
   hCEvts_PassSelections_SR -> Fill("All Events", 1);
-  if (passPrelimMVACut){
+  if (passPrelimBDTGCut){
     hCEvts_TopPassBDT_SR -> Fill("Pass BDT", 1);
     hCEvts_PassSelections_SR -> Fill("Selected Tops", 1);
   }
@@ -961,7 +961,7 @@ void SystTopBDT::DoBaselineAnalysis(const JetSelection::Data& jetData, const BJe
   Jet  ldgTop_Jet1 =  topData.getAllTopsJet1().at(ldgTopIndex);
   Jet  ldgTop_Jet2 =  topData.getAllTopsJet2().at(ldgTopIndex);
   Jet  ldgTop_BJet =  topData.getAllTopsBJet().at(ldgTopIndex);
-  float ldgTop_MVA =  topData.getAllTopsMVA().at(ldgTopIndex);
+  float ldgTop_BDTG =  topData.getAllTopsBDTG().at(ldgTopIndex);
 
   // Get 4-momentum of top (trijet)
   math::XYZTLorentzVector LdgTop_p4;
@@ -980,7 +980,7 @@ void SystTopBDT::DoBaselineAnalysis(const JetSelection::Data& jetData, const BJe
   if (Debug)
     {
       std::cout<<"leading top index = "<<ldgTopIndex<<std::endl;
-      std::cout<<"leading top BDT = "  <<topData.getAllTopsMVA().at(ldgTopIndex)<<std::endl;
+      std::cout<<"leading top BDT = "  <<topData.getAllTopsBDTG().at(ldgTopIndex)<<std::endl;
     }
   
   bool MuPass_Iso       = cfg_MiniIsoCut.passedCut(mu.effAreaMiniIso());
@@ -1181,7 +1181,7 @@ void SystTopBDT::DoBaselineAnalysis(const JetSelection::Data& jetData, const BJe
     h_AfterStandardSelections_Muon_Eta_SR    -> Fill(isGenuineTop_StandardSelections, mu.eta());
     h_AfterStandardSelections_Muon_Phi_SR    -> Fill(isGenuineTop_StandardSelections, mu.phi());
     h_AfterStandardSelections_WMass_SR      -> Fill(isGenuineTop_StandardSelections, MT);
-    h_AfterStandardSelections_LeadingTrijet_BDT_SR -> Fill(isGenuineTop_StandardSelections, ldgTop_MVA);
+    h_AfterStandardSelections_LeadingTrijet_BDT_SR -> Fill(isGenuineTop_StandardSelections, ldgTop_BDTG);
     h_AfterStandardSelections_DeltaPhi_MuMET_SR    -> Fill(isGenuineTop_StandardSelections, deltaPhi_mu_met);
     //h_AfterStandardSelections_Muon_BJetMinDR         -> Fill(isGenuineTop_StandardSelections, dRmin_mu_bjet);
     h_AfterStandardSelections_Muon_LeadingTrijetDR_SR   -> Fill(isGenuineTop_StandardSelections, DR_mu_LdgTrijet);
@@ -1283,10 +1283,10 @@ void SystTopBDT::DoBaselineAnalysis(const JetSelection::Data& jetData, const BJe
     //h_AfterAllSelections_Muon_BJetMinDR -> Fill(isGenuineTop_AllSelections, dRmin_mu_bjet);
     h_AfterAllSelections_WMass_SR       -> Fill(isGenuineTop_AllSelections, MT);
     
-    h_AfterAllSelections_LeadingTrijet_BDT_SR -> Fill(isGenuineTop_AllSelections, ldgTop_MVA);
+    h_AfterAllSelections_LeadingTrijet_BDT_SR -> Fill(isGenuineTop_AllSelections, ldgTop_BDTG);
     h_AfterAllSelections_DeltaPhi_MuMET_SR    -> Fill(isGenuineTop_AllSelections, deltaPhi_mu_met);
     
-    if (cfg_PrelimTopMVACut.passedCut(ldgTop_MVA)){
+    if (cfg_PrelimTopBDTGCut.passedCut(ldgTop_BDTG)){
       h_AfterAllSelections_Muon_LeadingTrijetDR_SR   -> Fill(isGenuineTop_AllSelections, DR_mu_LdgTrijet);
       h_AfterAllSelections_LeadingTrijet_Pt_SR       -> Fill(isGenuineTop_AllSelections, LdgTrijet_MaxPt);
       h_AfterAllSelections_LeadingTrijet_Eta_SR      -> Fill(isGenuineTop_AllSelections, LdgTrijet_Eta);
@@ -1335,7 +1335,7 @@ void SystTopBDT::DoBaselineAnalysis(const JetSelection::Data& jetData, const BJe
     h_AfterStandardSelections_Muon_Eta_VR    -> Fill(isGenuineTop_StandardSelections, mu.eta());
     h_AfterStandardSelections_Muon_Phi_VR    -> Fill(isGenuineTop_StandardSelections, mu.phi());
     h_AfterStandardSelections_WMass_VR      -> Fill(isGenuineTop_StandardSelections, MT);
-    h_AfterStandardSelections_LeadingTrijet_BDT_VR      -> Fill(isGenuineTop_StandardSelections, ldgTop_MVA);
+    h_AfterStandardSelections_LeadingTrijet_BDT_VR      -> Fill(isGenuineTop_StandardSelections, ldgTop_BDTG);
     h_AfterStandardSelections_DeltaPhi_MuMET_VR         -> Fill(isGenuineTop_StandardSelections, deltaPhi_mu_met);
     //h_AfterStandardSelections_Muon_BJetMinDR          -> Fill(isGenuineTop_StandardSelections, dRmin_mu_bjet);
     h_AfterStandardSelections_Muon_LeadingTrijetDR_VR   -> Fill(isGenuineTop_StandardSelections, DR_mu_LdgTrijet);
@@ -1432,10 +1432,10 @@ void SystTopBDT::DoBaselineAnalysis(const JetSelection::Data& jetData, const BJe
     //h_AfterAllSelections_Muon_BJetMinDR -> Fill(isGenuineTop_AllSelections, dRmin_mu_bjet);
     h_AfterAllSelections_WMass_VR       -> Fill(isGenuineTop_AllSelections, MT);
 
-    h_AfterAllSelections_LeadingTrijet_BDT_VR -> Fill(isGenuineTop_AllSelections, ldgTop_MVA);
+    h_AfterAllSelections_LeadingTrijet_BDT_VR -> Fill(isGenuineTop_AllSelections, ldgTop_BDTG);
     h_AfterAllSelections_DeltaPhi_MuMET_VR    -> Fill(isGenuineTop_AllSelections, deltaPhi_mu_met);
     
-    if (cfg_PrelimTopMVACut.passedCut(ldgTop_MVA)){
+    if (cfg_PrelimTopBDTGCut.passedCut(ldgTop_BDTG)){
       h_AfterAllSelections_Muon_LeadingTrijetDR_VR   -> Fill(isGenuineTop_AllSelections, DR_mu_LdgTrijet);
       h_AfterAllSelections_LeadingTrijet_Pt_VR       -> Fill(isGenuineTop_AllSelections, LdgTrijet_MaxPt);
       h_AfterAllSelections_LeadingTrijet_Eta_VR      -> Fill(isGenuineTop_AllSelections, LdgTrijet_Eta);
@@ -1457,7 +1457,7 @@ void SystTopBDT::DoInvertedAnalysis(const JetSelection::Data& jetData, const BJe
   double met    = METData.getMET().R();
   //double dRmin_mu_bjet = 999.999;
   // double dRmin_mu_top  = 999.999;
-  // size_t nTops = topData.getAllTopsMVA().size();
+  // size_t nTops = topData.getAllTopsBDTG().size();
   
   // Calculate transverse W mass
   double deltaPhi_mu_met = std::abs(ROOT::Math::VectorUtil::DeltaPhi(mu.p4(), METData.getMET()));
@@ -1478,7 +1478,7 @@ void SystTopBDT::DoInvertedAnalysis(const JetSelection::Data& jetData, const BJe
   Jet  ldgTop_Jet1 =  topData.getAllTopsJet1().at(ldgTopIndex);
   Jet  ldgTop_Jet2 =  topData.getAllTopsJet2().at(ldgTopIndex);
   Jet  ldgTop_BJet =  topData.getAllTopsBJet().at(ldgTopIndex);
-  float ldgTop_MVA =  topData.getAllTopsMVA().at(ldgTopIndex);
+  float ldgTop_BDTG =  topData.getAllTopsBDTG().at(ldgTopIndex);
 
   // Get 4-momentum of top (trijet)
   math::XYZTLorentzVector LdgTop_p4;
@@ -1497,7 +1497,7 @@ void SystTopBDT::DoInvertedAnalysis(const JetSelection::Data& jetData, const BJe
   if (Debug)
     {
       std::cout<<"leading top index = "<<ldgTopIndex<<std::endl;
-      std::cout<<"leading top BDT = "  <<topData.getAllTopsMVA().at(ldgTopIndex)<<std::endl;
+      std::cout<<"leading top BDT = "  <<topData.getAllTopsBDTG().at(ldgTopIndex)<<std::endl;
     }
 
   bool MuPass_Iso       = cfg_MiniIsoCut.passedCut(mu.effAreaMiniIso());
@@ -1666,7 +1666,7 @@ void SystTopBDT::DoInvertedAnalysis(const JetSelection::Data& jetData, const BJe
   //Inclusive low pt region
   //=======================================================================
   h_AfterStandardSelections_LeadingTrijet_Pt_lowMET  -> Fill(isGenuineTop_StandardSelections, LdgTrijet_MaxPt);
-  if (cfg_PrelimTopMVACut.passedCut(ldgTop_MVA)) h_AfterAllSelections_LeadingTrijet_Pt_lowMET  -> Fill(isGenuineTop_StandardSelections, LdgTrijet_MaxPt);
+  if (cfg_PrelimTopBDTGCut.passedCut(ldgTop_BDTG)) h_AfterAllSelections_LeadingTrijet_Pt_lowMET  -> Fill(isGenuineTop_StandardSelections, LdgTrijet_MaxPt);
 
   if (MuPass_Iso){
     
@@ -1706,7 +1706,7 @@ void SystTopBDT::DoInvertedAnalysis(const JetSelection::Data& jetData, const BJe
     h_AfterStandardSelections_Muon_Eta_CR1    -> Fill(isGenuineTop_StandardSelections, mu.eta());
     h_AfterStandardSelections_Muon_Phi_CR1    -> Fill(isGenuineTop_StandardSelections, mu.phi());
     h_AfterStandardSelections_WMass_CR1      -> Fill(isGenuineTop_StandardSelections, MT);
-    h_AfterStandardSelections_LeadingTrijet_BDT_CR1      -> Fill(isGenuineTop_StandardSelections, ldgTop_MVA);
+    h_AfterStandardSelections_LeadingTrijet_BDT_CR1      -> Fill(isGenuineTop_StandardSelections, ldgTop_BDTG);
     h_AfterStandardSelections_DeltaPhi_MuMET_CR1         -> Fill(isGenuineTop_StandardSelections, deltaPhi_mu_met);
     //h_AfterStandardSelections_Muon_BJetMinDR         -> Fill(isGenuineTop_StandardSelections, dRmin_mu_bjet);
     h_AfterStandardSelections_Muon_LeadingTrijetDR_CR1   -> Fill(isGenuineTop_StandardSelections, DR_mu_LdgTrijet);
@@ -1802,10 +1802,10 @@ void SystTopBDT::DoInvertedAnalysis(const JetSelection::Data& jetData, const BJe
     //h_AfterAllSelections_Muon_BJetMinDR -> Fill(isGenuineTop_AllSelections, dRmin_mu_bjet);
     h_AfterAllSelections_WMass_CR1       -> Fill(isGenuineTop_AllSelections, MT);
     
-    h_AfterAllSelections_LeadingTrijet_BDT_CR1 -> Fill(isGenuineTop_AllSelections, ldgTop_MVA);
+    h_AfterAllSelections_LeadingTrijet_BDT_CR1 -> Fill(isGenuineTop_AllSelections, ldgTop_BDTG);
     h_AfterAllSelections_DeltaPhi_MuMET_CR1    -> Fill(isGenuineTop_AllSelections, deltaPhi_mu_met);
     
-    if (cfg_PrelimTopMVACut.passedCut(ldgTop_MVA)){
+    if (cfg_PrelimTopBDTGCut.passedCut(ldgTop_BDTG)){
       h_AfterAllSelections_Muon_LeadingTrijetDR_CR1   -> Fill(isGenuineTop_AllSelections, DR_mu_LdgTrijet);
       h_AfterAllSelections_LeadingTrijet_Pt_CR1       -> Fill(isGenuineTop_AllSelections, LdgTrijet_MaxPt);
       h_AfterAllSelections_LeadingTrijet_Eta_CR1      -> Fill(isGenuineTop_AllSelections, LdgTrijet_Eta);
@@ -1854,7 +1854,7 @@ void SystTopBDT::DoInvertedAnalysis(const JetSelection::Data& jetData, const BJe
     h_AfterStandardSelections_Muon_Eta_CR2    -> Fill(isGenuineTop_StandardSelections, mu.eta());
     h_AfterStandardSelections_Muon_Phi_CR2    -> Fill(isGenuineTop_StandardSelections, mu.phi());
     h_AfterStandardSelections_WMass_CR2      -> Fill(isGenuineTop_StandardSelections, MT);
-    h_AfterStandardSelections_LeadingTrijet_BDT_CR2      -> Fill(isGenuineTop_StandardSelections, ldgTop_MVA);
+    h_AfterStandardSelections_LeadingTrijet_BDT_CR2      -> Fill(isGenuineTop_StandardSelections, ldgTop_BDTG);
     h_AfterStandardSelections_DeltaPhi_MuMET_CR2         -> Fill(isGenuineTop_StandardSelections, deltaPhi_mu_met);
     //h_AfterStandardSelections_Muon_BJetMinDR         -> Fill(isGenuineTop_StandardSelections, dRmin_mu_bjet);
     h_AfterStandardSelections_Muon_LeadingTrijetDR_CR2   -> Fill(isGenuineTop_StandardSelections, DR_mu_LdgTrijet);
@@ -1951,10 +1951,10 @@ void SystTopBDT::DoInvertedAnalysis(const JetSelection::Data& jetData, const BJe
     //h_AfterAllSelections_Muon_BJetMinDR -> Fill(isGenuineTop_AllSelections, dRmin_mu_bjet);
     h_AfterAllSelections_WMass_CR2       -> Fill(isGenuineTop_AllSelections, MT);
     
-    h_AfterAllSelections_LeadingTrijet_BDT_CR2 -> Fill(isGenuineTop_AllSelections, ldgTop_MVA);
+    h_AfterAllSelections_LeadingTrijet_BDT_CR2 -> Fill(isGenuineTop_AllSelections, ldgTop_BDTG);
     h_AfterAllSelections_DeltaPhi_MuMET_CR2    -> Fill(isGenuineTop_AllSelections, deltaPhi_mu_met);
     
-    if (cfg_PrelimTopMVACut.passedCut(ldgTop_MVA)){
+    if (cfg_PrelimTopBDTGCut.passedCut(ldgTop_BDTG)){
       h_AfterAllSelections_Muon_LeadingTrijetDR_CR2   -> Fill(isGenuineTop_AllSelections, DR_mu_LdgTrijet);
       h_AfterAllSelections_LeadingTrijet_Pt_CR2       -> Fill(isGenuineTop_AllSelections, LdgTrijet_MaxPt);
       h_AfterAllSelections_LeadingTrijet_Eta_CR2      -> Fill(isGenuineTop_AllSelections, LdgTrijet_Eta);
@@ -1975,8 +1975,8 @@ int SystTopBDT::getLeadingTopIndex(const TopSelectionBDT::Data& topData, string 
   int LdgTrijet_Index = -1;
   size_t nTops = 0;
 
-  if (topType == "all") nTops = topData.getAllTopsMVA().size();
-  else if (topType == "selected") nTops = topData.getSelectedTopsMVA().size();
+  if (topType == "all") nTops = topData.getAllTopsBDTG().size();
+  else if (topType == "selected") nTops = topData.getSelectedTopsBDTG().size();
   else return -1;
   
   for (size_t i=0; i < nTops; i++)
@@ -2028,8 +2028,8 @@ bool SystTopBDT::IsGenuineTop(const TopSelectionBDT::Data& topData, string topTy
   size_t nTops = 0;
   
   if (min(MCtrue_Bjet.size(), min(MCtrue_LdgJet.size(), MCtrue_SubldgJet.size())) == 0) return false;
-  if (topType == "all") nTops = topData.getAllTopsMVA().size();
-  else if (topType == "selected") nTops = topData.getSelectedTopsMVA().size();
+  if (topType == "all") nTops = topData.getAllTopsBDTG().size();
+  else if (topType == "selected") nTops = topData.getSelectedTopsBDTG().size();
   else return false;
   
   for (size_t i=0; i < nTops; i++)
@@ -2147,8 +2147,8 @@ vector <int> SystTopBDT::GetTopsIndex( const TopSelectionBDT::Data& topData, str
 
   size_t nTops = -1;
   vector <int> vTops;
-  if (topType == "all") nTops = topData.getAllTopsMVA().size();
-  else if (topType == "selected") nTops = topData.getSelectedTopsMVA().size();
+  if (topType == "all") nTops = topData.getAllTopsBDTG().size();
+  else if (topType == "selected") nTops = topData.getSelectedTopsBDTG().size();
   else return vTops;
   if (nTops < 1 ) return vTops;
   for (size_t i=0; i < nTops; i++)

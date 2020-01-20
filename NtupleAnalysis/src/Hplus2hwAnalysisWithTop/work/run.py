@@ -124,30 +124,63 @@ def main():
         Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=opts.excludeTasks)
     else:
-        myBlackList = ["QCD_b"
-                       "ChargedHiggs_HplusTB_HplusToTB_M_180_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_200_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_220_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_250_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_300_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_350_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_400_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_500_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_800_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_1000_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_1500_ext1",
-                       "ChargedHiggs_HplusTB_HplusToTB_M_2000_ext1",
-                       "ChargedHiggs_HplusTB_HplusToTB_M_2500_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_3000_ext1", 
-                       "ChargedHiggs_HplusTB_HplusToTB_M_1000",
-                       "ChargedHiggs_HplusTB_HplusToTB_M_1500",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_2000",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_2500",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_3000",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_5000",   # Speeed things up
-                       "ChargedHiggs_HplusTB_HplusToTB_M_7000",   # Speeed things up  
-                       "ChargedHiggs_HplusTB_HplusToTB_M_10000",  # Speeed things up
+        myBlackList = ["DYJetsToLL_M_50_ext1",
+                       "DYJetsToLL_M_50_ext2",
+                       #"WJetsToLNu",
+                       "WJetsToLNu_ext2",
+                       "QCD_Pt_15to30",
+                       "QCD_Pt_30to50",
+                       "QCD_Pt_50to80",
+                       "QCD_Pt_80to120",
+                       "QCD_Pt_80to120_ext2",
+                       "QCD_Pt_120to170",
+                       "QCD_Pt_120to170_ext1",
+                       "QCD_Pt_170to300",
+                       "QCD_Pt_170to300_ext1",
+                       "QCD_Pt_300to470",
+                       "QCD_Pt_300to470_ext1",
+                       "QCD_Pt_470to600",
+                       "QCD_Pt_600to800",
+                       "QCD_Pt_600to800_ext1",
+                       "QCD_Pt_800to1000",
+                       "QCD_Pt_800to1000_ext1",
+                       "QCD_Pt_1000to1400_ext1",
+                       "QCD_Pt_1400to1800",
+                       "QCD_Pt_1400to1800_ext1",
+                       "QCD_Pt_1800to2400",
+                       "QCD_Pt_1800to2400_ext1",
+                       "QCD_Pt_2400to3200",
+                       "QCD_Pt_2400to3200_ext1",
+                       # "QCD_Pt_15to20_MuEnrichedPt5",
+                       # "QCD_Pt_20to30_MuEnrichedPt5",
+                       # "QCD_Pt_30to50_MuEnrichedPt5",
+                       # "QCD_Pt_50to80_MuEnrichedPt5",
+                       # "QCD_Pt_80to120_MuEnrichedPt5",
+                       # "QCD_Pt_80to120_MuEnrichedPt5_ext1",
+                       # "QCD_Pt_120to170_MuEnrichedPt5",
+                       # "QCD_Pt_170to300_MuEnrichedPt5",
+                       # "QCD_Pt_170to300_MuEnrichedPt5_ext1",
+                       # "QCD_Pt_300to470_MuEnrichedPt5",
+                       # "QCD_Pt_300to470_MuEnrichedPt5_ext1",
+                       # "QCD_Pt_300to470_MuEnrichedPt5_ext2",
+                       # "QCD_Pt_470to600_MuEnrichedPt5",
+                       # "QCD_Pt_470to600_MuEnrichedPt5_ext1",
+                       # "QCD_Pt_470to600_MuEnrichedPt5_ext2",
+                       # "QCD_Pt_600to800_MuEnrichedPt5",
+                       # "QCD_Pt_600to800_MuEnrichedPt5_ext1",
+                       # "QCD_Pt_800to1000_MuEnrichedPt5",
+                       # "QCD_Pt_800to1000_MuEnrichedPt5_ext1",
+                       # "QCD_Pt_800to1000_MuEnrichedPt5_ext2",
+                       # "QCD_Pt_1000toInf_MuEnrichedPt5",
+                       # "QCD_bEnriched_HT200to300",
+                       # "QCD_bEnriched_HT300to500",
+                       # "QCD_bEnriched_HT500to700",
+                       # "QCD_bEnriched_HT700to1000",
+                       # "QCD_bEnriched_HT1000to1500",
+                       # "QCD_bEnriched_HT1500to2000",
+                       # "QCD_bEnriched_HT2000toInf",
                        ]
+
         #if opts.doSystematics:
         #    myBlackList.append("QCD")
 
@@ -201,9 +234,11 @@ def main():
                               usePUreweighting       = opts.usePUreweighting,
                               useTopPtReweighting    = opts.useTopPtReweighting,
                               doSystematicVariations = opts.doSystematics,
+                              # analysisType="HToHW_withTop",#iro
                               analysisType="HToTB",
                               verbose=opts.verbose)
 
+    print "=== run.py: TESTing!"
     # Add variations (e.g. for optimisation)
     # builder.addVariation("METSelection.METCutValue", [100,120,140])
     # builder.addVariation("AngularCutsBackToBack.workingPoint", ["Loose","Medium","Tight"])

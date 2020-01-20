@@ -58,9 +58,6 @@ private:
   void doBaselineAnalysis(const Event& event, const TauSelection::Data& tauData, const int nVertices);
   void doSignalAnalysis(const Event& event, const TauSelection::Data& tauData, const int nVertices);
 
-//  double drMuTau1;
-//  double drMuTau2;
-
   // Non-common histograms
   HistoSplitter::SplittedTripletTH1s hMtInvertedTauAfterStdSelections;
 
@@ -161,7 +158,7 @@ void Hplus2hwAnalysis_background_ele::book(TDirectory *dir) {
 
 void Hplus2hwAnalysis_background_ele::setupBranches(BranchManager& branchManager) {
   fEvent.setupBranches(branchManager);
-//  return;
+  return;
 }
 
 void Hplus2hwAnalysis_background_ele::process(Long64_t entry) {
@@ -173,7 +170,6 @@ void Hplus2hwAnalysis_background_ele::process(Long64_t entry) {
   fCommonPlots.initialize();
 //  fNormalizationSystematicsSignalRegion.initialize();
 
-//  fCommonPlots.setFactorisationBinForEvent(std::vector<float> {});
   cAllEvents.increment();
 
 
@@ -377,7 +373,9 @@ void Hplus2hwAnalysis_background_ele::process(Long64_t entry) {
   // Jet selection
   ////////////
 
-  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, looseTauData.getSelectedTau());
+  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, looseTauData.getSelectedTaus()[0],looseTauData.getSelectedTaus()[1]);
+
+//  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, looseTauData.getSelectedTau());
   if (!jetData.passedSelection())
     return;
 

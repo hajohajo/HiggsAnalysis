@@ -43,7 +43,7 @@ struct TrijetSelection{
   std::vector<Jet> Jet1;
   std::vector<Jet> Jet2;
   std::vector<Jet> BJet;
-  std::vector<double> MVA;
+  std::vector<double> BDTG;
   std::vector<math::XYZTLorentzVector> TrijetP4;
   std::vector<math::XYZTLorentzVector> DijetP4; 
   std::vector<bool> isGenuine;
@@ -54,7 +54,7 @@ struct SelectedTrijets{
   Jet Jet1;
   Jet Jet2;
   Jet BJet;
-  double MVA;
+  double BDTG;
   math::XYZTLorentzVector TrijetP4;
   math::XYZTLorentzVector DijetP4;
   bool isGenuine;
@@ -73,10 +73,13 @@ public:
     ~Data();
 
     // Status of passing event selection
-    bool passedSelection() const { return bPassedSelection; }    
+    bool passedMVACut() const { return bPassedBDTGCut; } // for historic reasons (+ backgwards compatibility)
+    bool passedBDTGCut() const { return bPassedBDTGCut; }
+    bool passedNTopsCut() const { return bPassedNTopsCut; }
+    bool passedSelection() const { return bPassedSelection; }
 
     // Trijet
-    const float getTopMVA() const { return fTopMVA; }
+    const float getTopBDTG() const { return fTopBDTG; }
     const Jet getTopJet1() const { return fTopJet1; } 
     const Jet getTopJet2() const { return fTopJet2; } 
     const Jet getTopBJet() const { return fTopBJet; } 
@@ -87,32 +90,32 @@ public:
     const std::vector<Jet>& getSelectedTopsJet1() const { return fSelectedTopsJet1; }
     const std::vector<Jet>& getSelectedTopsJet2() const { return fSelectedTopsJet2; }
     const std::vector<Jet>& getSelectedTopsBJet() const { return fSelectedTopsBJet; }
-    const std::vector<float>& getSelectedTopsMVA() const { return fSelectedTopsMVA; }
-    const size_t getSelectedTopsSize() const { return fSelectedTopsMVA.size(); }
+    const std::vector<float>& getSelectedTopsBDTG() const { return fSelectedTopsBDTG; }
+    const size_t getSelectedTopsSize() const { return fSelectedTopsBDTG.size(); }
 
     const std::vector<Jet>& getNotSelectedTopsJet1() const { return fNotSelectedTopsJet1; }
     const std::vector<Jet>& getNotSelectedTopsJet2() const { return fNotSelectedTopsJet2; }
     const std::vector<Jet>& getNotSelectedTopsBJet() const { return fNotSelectedTopsBJet; }
-    const std::vector<float>& getNotSelectedTopsMVA() const { return fNotSelectedTopsMVA; }
-    const size_t getNotSelectedTopsSize() const { return fNotSelectedTopsMVA.size(); }
+    const std::vector<float>& getNotSelectedTopsBDTG() const { return fNotSelectedTopsBDTG; }
+    const size_t getNotSelectedTopsSize() const { return fNotSelectedTopsBDTG.size(); }
 
     const std::vector<Jet>& getAllTopsJet1() const { return fAllTopsJet1; }
     const std::vector<Jet>& getAllTopsJet2() const { return fAllTopsJet2; }
     const std::vector<Jet>& getAllTopsBJet() const { return fAllTopsBJet; }
-    const std::vector<float>& getAllTopsMVA() const { return fAllTopsMVA; }
-    const size_t getAllTopsSize() const { return fAllTopsMVA.size(); }
+    const std::vector<float>& getAllTopsBDTG() const { return fAllTopsBDTG; }
+    const size_t getAllTopsSize() const { return fAllTopsBDTG.size(); }
 
     const std::vector<Jet>& getSelectedCleanedTopsJet1() const { return fSelectedCleanedTopsJet1; }
     const std::vector<Jet>& getSelectedCleanedTopsJet2() const { return fSelectedCleanedTopsJet2; }
     const std::vector<Jet>& getSelectedCleanedTopsBJet() const { return fSelectedCleanedTopsBJet; }
-    const std::vector<float>& getSelectedCleanedTopsMVA() const { return fSelectedCleanedTopsMVA; }
-    const size_t getSelectedCleanedTopsSize() const { return fSelectedCleanedTopsMVA.size(); }
+    const std::vector<float>& getSelectedCleanedTopsBDTG() const { return fSelectedCleanedTopsBDTG; }
+    const size_t getSelectedCleanedTopsSize() const { return fSelectedCleanedTopsBDTG.size(); }
 
     const std::vector<Jet>& getAllCleanedTopsJet1() const { return fAllCleanedTopsJet1; }
     const std::vector<Jet>& getAllCleanedTopsJet2() const { return fAllCleanedTopsJet2; }
     const std::vector<Jet>& getAllCleanedTopsBJet() const { return fAllCleanedTopsBJet; }
-    const std::vector<float>& getAllCleanedTopsMVA() const { return fAllCleanedTopsMVA; }
-    const size_t getAllCleanedTopsSize() const { return fAllCleanedTopsMVA.size(); }
+    const std::vector<float>& getAllCleanedTopsBDTG() const { return fAllCleanedTopsBDTG; }
+    const size_t getAllCleanedTopsSize() const { return fAllCleanedTopsBDTG.size(); }
     
     const double getTopMassWMassRatio() const
     { 
@@ -128,11 +131,14 @@ public:
 
   private:
     /// Boolean for passing selection
+    bool bPassedBDTGCut;
+    bool bPassedNTopsCut;
     bool bPassedSelection;
+
     std::vector<Jet> fJetsUsedAsBJets;
     std::vector<Jet> fFailedBJetsUsedAsBJets;
     /// Trijet-1
-    float fTopMVA;
+    float fTopBDTG;
     Jet fTopJet1;
     Jet fTopJet2;
     Jet fTopBJet;
@@ -142,27 +148,27 @@ public:
     std::vector<Jet> fSelectedTopsJet1;
     std::vector<Jet> fSelectedTopsJet2;
     std::vector<Jet> fSelectedTopsBJet;
-    std::vector<float> fSelectedTopsMVA;
+    std::vector<float> fSelectedTopsBDTG;
 
     std::vector<Jet> fNotSelectedTopsJet1;
     std::vector<Jet> fNotSelectedTopsJet2;
     std::vector<Jet> fNotSelectedTopsBJet;
-    std::vector<float> fNotSelectedTopsMVA;
+    std::vector<float> fNotSelectedTopsBDTG;
 
     std::vector<Jet> fAllTopsJet1;
     std::vector<Jet> fAllTopsJet2;
     std::vector<Jet> fAllTopsBJet;
-    std::vector<float> fAllTopsMVA;
+    std::vector<float> fAllTopsBDTG;
 
     std::vector<Jet> fSelectedCleanedTopsJet1;
     std::vector<Jet> fSelectedCleanedTopsJet2;
     std::vector<Jet> fSelectedCleanedTopsBJet;
-    std::vector<float> fSelectedCleanedTopsMVA;
+    std::vector<float> fSelectedCleanedTopsBDTG;
 
     std::vector<Jet> fAllCleanedTopsJet1;
     std::vector<Jet> fAllCleanedTopsJet2;
     std::vector<Jet> fAllCleanedTopsBJet;
-    std::vector<float> fAllCleanedTopsMVA;
+    std::vector<float> fAllCleanedTopsBDTG;
 
     // top-tagging scale factor event weight
     double fTopTaggingScaleFactorEventWeight;
@@ -220,9 +226,9 @@ private:
   bool _getIsMatchedTop(bool isMC, Jet bjet, Jet jet1, Jet jet2, TrijetSelection mcTrueTrijets);
   Jet getLeadingSubleadingJet(const Jet& jet0, const Jet& jet1, string selectedJet);
   bool isMatchedJet(const Jet& jet, const TrijetSelection& myTops, const unsigned int index);
-  TrijetSelection SortInMVAvalue(TrijetSelection TopCand);
+  TrijetSelection SortInBDTGvalue(TrijetSelection TopCand);
   SelectedTrijets GetSelectedTopCandidate(TrijetSelection TopCand, int index);
-  bool TopIsCrossCleaned(int Index, TrijetSelection TopCand, const std::vector<Jet>& bjets);
+  bool TopIsCrossCleaned(int Index, TrijetSelection TopCand);
   vector<genParticle> GetGenParticles(const vector<genParticle> genParticles, const int pdgId);
   const genParticle GetLastCopy(const vector<genParticle> genParticles, const genParticle &p);
   genParticle getLeadingSubleadingParton(const genParticle& quark0, const genParticle& quark1, string selectedParton);
@@ -233,7 +239,7 @@ private:
  
   // Input parameters
   const DirectionalCut<int> cfg_NumberOfTopsCut;
-  const DirectionalCut<double> cfg_TopMVACut;
+  const DirectionalCut<double> cfg_TopBDTGCut;
   const DirectionalCut<double> cfg_TopMassLowCut;
   const DirectionalCut<double> cfg_TopMassUppCut;
   const DirectionalCut<double> cfg_CSV_bDiscCut;
@@ -243,8 +249,9 @@ private:
 
   // Sub counters
   Count cSubAll;
+  Count cSubPassedJetsCut;
   Count cSubPassedBjetsCut;
-  Count cSubPassedMVACut;
+  // Count cSubPassedBDTGCut;
   Count cSubPassedNTopsCut;
   //
   Count cTopsAll;

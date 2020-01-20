@@ -193,7 +193,7 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "FakeBMeasurement"
+    ANALYSISNAME = "Hplus2hwAnalysisWithTop"
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
     OPTMODE      = ""
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     SAVEDIR      = None
     VERBOSE      = False
     DOQCD        = False
-    FOLDER       = "ForFakeBMeasurement"
+    FOLDER       = "ForDataDrivenCtrlPlots"
 
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")

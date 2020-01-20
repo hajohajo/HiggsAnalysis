@@ -4,6 +4,7 @@
 #include "Framework/interface/HistoWrapper.h"
 #include "Framework/interface/EventCounter.h"
 #include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/CommonPlots_ttm.h"
 #include "Framework/interface/type.h"
 #include "Framework/interface/Exception.h"
 #include "Framework/interface/EventWeight.h"
@@ -16,6 +17,35 @@ BaseSelection::BaseSelection(EventCounter& eventCounter, HistoWrapper& histoWrap
   fEventCounter(eventCounter),
   fHistoWrapper(histoWrapper),
   fCommonPlots(commonPlots),
+  fCommonPlots_ttm(nullptr),
+  sPostfix(postfix),
+  fEventNumber(0),
+  fLumiNumber(0),
+  fRunNumber(0)
+{}
+
+BaseSelection::BaseSelection(EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
+: fLocalDummyEventWeight(nullptr),
+  fLocalDummyEventCounter(nullptr),
+  fLocalDummyHistoWrapper(nullptr),
+  fEventCounter(eventCounter),
+  fHistoWrapper(histoWrapper),
+  fCommonPlots(nullptr),
+  fCommonPlots_ttm(commonPlots),
+  sPostfix(postfix),
+  fEventNumber(0),
+  fLumiNumber(0),
+  fRunNumber(0)
+{}
+
+BaseSelection::BaseSelection(EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix)
+: fLocalDummyEventWeight(nullptr),
+  fLocalDummyEventCounter(nullptr),
+  fLocalDummyHistoWrapper(nullptr),
+  fEventCounter(eventCounter),
+  fHistoWrapper(histoWrapper),
+  fCommonPlots(nullptr),
+  fCommonPlots_ttm(nullptr),
   sPostfix(postfix),
   fEventNumber(0),
   fLumiNumber(0),
@@ -29,11 +59,13 @@ BaseSelection::BaseSelection()
   fEventCounter(*fLocalDummyEventCounter), // Dummy EventCounter with dummy event weight
   fHistoWrapper(*fLocalDummyHistoWrapper), // Dummy HistoWrapper with dummy event weight
   fCommonPlots(nullptr),
+  fCommonPlots_ttm(nullptr),
   sPostfix(""),
   fEventNumber(0),
   fLumiNumber(0),
   fRunNumber(0)
 {}
+
 
 BaseSelection::~BaseSelection() {
   if (fLocalDummyHistoWrapper != nullptr)

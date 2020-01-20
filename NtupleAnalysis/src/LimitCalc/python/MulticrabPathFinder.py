@@ -6,9 +6,9 @@ It Identifies separately the signal, ewk QCDfact and QCDinv dirs. If multiple
 directories are found, the most recent one is taken!
 '''
 
-#================================================================================================    
+#================================================================================================
 # Import modules
-#================================================================================================    
+#================================================================================================
 import sys
 import os
 import re
@@ -16,9 +16,21 @@ import re
 from HiggsAnalysis.NtupleAnalysis.tools.aux import execute
 import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 
-#================================================================================================    
+
+#================================================================================================
+# Shell Types
+#================================================================================================
+sh_e = ShellStyles.ErrorStyle()
+sh_s = ShellStyles.SuccessStyle()
+sh_h = ShellStyles.HighlightStyle()
+sh_a = ShellStyles.HighlightAltStyle()
+sh_t = ShellStyles.NoteStyle()
+sh_n = ShellStyles.NormalStyle()
+sh_w = ShellStyles.WarningStyle()
+
+#================================================================================================
 # Class Definition
-#================================================================================================    
+#================================================================================================
 class MulticrabDirectoryDataType:
     UNKNOWN      = 0
     OBSERVATION  = 1
@@ -34,16 +46,38 @@ class MulticrabDirectoryDataType:
     GENUINEB     = 11
 
 class MulticrabPathFinder:
-    def __init__(self, path, h2tb=False, verbose=False):
+    def __init__(self, path, analysisType="HToTauNu", verbose=False):
         self._verbose        = verbose
-        self._h2tb           = h2tb
+        self._analysisType   = analysisType
+        self._signal_path  = None
+        self._ewk_path     = None
+        self._fakeB_path   = None
+        self._qcdfact_path = None
+        self._qcdinv_path  = None
+        self._SanityChecks()
         self._multicrabpaths = self.scan(path)
-        self._signal_path    = self.signalfind(self._multicrabpaths)
-        self._ewk_path       = self.ewkfind(self._multicrabpaths)
-        self._qcdfact_path   = self.qcdfactfind(self._multicrabpaths)
-        self._qcdinv_path    = self.qcdinvfind(self._multicrabpaths)
-        self._fakeB_path     = self.fakeBfind(self._multicrabpaths)
+        self._GetPaths()  
         return
+
+    def _SanityChecks(self):
+        myAnalyses = ["HToTauNu", "HToTB", "HToHW"]
+        if self._analysisType not in myAnalyses:
+            msg = "Invalid analysis type \"%s\". Please selected one of the following: \"%s" % (self._analysisType, "\", \"".join(myAnalyses) + "\"")
+            raise Exception(sh_e + msg + sh_n)
+        else:
+            return
+
+    def _GetPaths(self):
+        
+        self._signal_path    = self.signalfind(self._multicrabpaths)
+        if self._analysisType in ["HToTB", "HToTauNu","HToHW"]:
+            self._ewk_path       = self.ewkfind(self._multicrabpaths)
+            self._qcdfact_path   = self.qcdfactfind(self._multicrabpaths)
+            self._qcdinv_path    = self.qcdinvfind(self._multicrabpaths)
+        if self._analysisType == "HToTB":            
+            self._fakeB_path  = self.fakeBfind(self._multicrabpaths)
+        return
+
 
     def Verbose(self, msg, printHeader=True):
         '''
@@ -73,19 +107,25 @@ class MulticrabPathFinder:
         table.append(hLine)
         table.append(title)
         table.append(hLine)
-        table.append( align.format("Verbose"        , "", self._verbose) )
-        table.append( align.format("h2tb"           , "", self._h2tb) )
+        table.append( align.format("Verbose"        , "", self._verbose) ) 
+        table.append( align.format("Analysis Type"  , "", self._analysisType) )
         table.append( align.format("#Multicrab Dirs", "", len(self._multicrabpaths)) )
         table.append( align.format("Signal Path"    , "", self._signal_path ) )
-        if self._h2tb:
+        if self._analysisType == "HToTB":
             table.append( align.format("Fake-b"         , "", self.getFakeBPath()) )
             table.append( align.format("Genuine-b"      , "", self.getGenuineBPath()) )
             table.append( align.format("QCD MC"         , "", self.getQCDMCPath()) )
             table.append( align.format("EWK MC"         , "", self.getEWKMCPath()) )
-        else:
+        elif self._analysisType == "HToTauNu":
             table.append( align.format("EWK Path"       , "", self._ewk_path) )
             table.append( align.format("QCD Factorised" , "", self._qcdfact_path) )
             table.append( align.format("QCD Inverted"   , "", self._qcdinv_path ) )
+        elif (self._analysisType == "HToHW"):
+            table.append( align.format("EWK Path"       , "", self._ewk_path) )
+            table.append( align.format("QCD Factorised" , "", self._qcdfact_path) )
+            table.append( align.format("QCD Inverted"   , "", self._qcdinv_path ) )
+        else:
+            pass
         table.append(hLine)
         table.append("")
 
@@ -180,8 +220,11 @@ class MulticrabPathFinder:
         return multicrabdirs
 
     def ewkfind(self,dirs):
-        if self._h2tb:
+        if (self._analysisType == "HToTB"):
             myWord = "Hplus2tbAnalysis"
+            myFile = "multicrab.cfg"
+        elif (self._analysisType == "HToHW"):
+            myWord = "Hplus2hwAnalysis"
             myFile = "multicrab.cfg"
         else:
             myWord = "mbedded"
@@ -189,8 +232,14 @@ class MulticrabPathFinder:
         return self.selectLatest( self.grep(dirs, myWord, myFile) )
 
     def signalfind(self,dirs):
-        if self._h2tb:
+        if (self._analysisType == "HToTB"):
             myWord = "Hplus2tbAnalysis"
+            myFile = "multicrab.cfg"
+        elif (self._analysisType == "HToTauNu"):
+            myWord = "SignalAnalysis"
+            myFile = "multicrab.cfg"
+        elif (self._analysisType == "HToHW"):
+            myWord = "Hplus2hwAnalysis"
             myFile = "multicrab.cfg"
         else:
             myWord = "SignalAnalysis"
@@ -214,7 +263,7 @@ class MulticrabPathFinder:
         return self.selectLatest(myList)
 
     def fakeBfind(self,dirs):
-        if not self._h2tb:
+        if not (self._analysisType == "HToTB"):
             return None
         myList   = []
         keyword  = "FakeBMeasurement"
@@ -264,7 +313,8 @@ class MulticrabPathFinder:
         if len(dirs) == 0:
             return ""
         if len(dirs) > 1:
-            self.Print("More than 1 path found! Will take the most recent one:")
+            msg = "More than 1 path found! Will take the most recent one:"
+            self.Print(sh_a + msg + sh_n, True)
             latest = dirs[0]
             for dir in dirs:
                 if os.path.getmtime(dir) > os.path.getmtime(latest):
@@ -273,11 +323,13 @@ class MulticrabPathFinder:
             # Print all paths found and highlight the latest one
             for d in dirs:
                 if d == latest:
-                    #self.Print(ShellStyles.NoteStyle() + latest + ShellStyles.NormalStyle(), False)
-                    self.Print(ShellStyles.SuccessStyle() + latest + ShellStyles.NormalStyle(), False)
+                    self.Print(sh_s + latest + sh_n, False)
                 else:
                     self.Print(d, False)            
+            msg = "=== %s\n\t%s" % (__file__.split("/")[-1],  sh_w + "Press any key to continue..." + sh_n)
+            raw_input(msg)
             return latest
         else:
-            self.Verbose(ShellStyles.SuccessStyle() + "Selecting dir %s" % (dirs[0]) + ShellStyles.NormalStyle(), False)
+            msg = "Will search for signal and backgound datasets under directory %s" % (sh_h + dirs[0] + sh_n)
+            self.Verbose(msg, True)
             return dirs[0]

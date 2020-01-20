@@ -1659,15 +1659,7 @@ hadd higgsCombineinj_m{MASS}.Asymptotic.mH{MASS}.root higgsCombineinj_m{MASS}.As
             Print(ShellStyles.WarningLabel() + "Skipping limit for mass point %s" % mass, True)
 
 
-
-        # xenios-1: What do we do here?
-
         self._runMLFit(mass)
-
-
-
-        # xenios-2: What do we do here?
-
         self._runSignificance(mass)
 
         return result

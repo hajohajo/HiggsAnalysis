@@ -1,8 +1,13 @@
+'''
 ## \package histograms
 # Histogram utilities and classes
 #
 # The package contains classes and utilities for histogram management.
+'''
 
+#================================================================================================   
+# Import modules
+#================================================================================================   
 import os, sys
 import glob
 import array
@@ -17,8 +22,13 @@ import ROOT
 import dataset
 import aux
 
-## Enumeration class for CMS text mode
+#================================================================================================   
+# Class definition
+#================================================================================================   
 class CMSMode:
+    '''
+    Enumeration class for CMS text mode
+    '''
     class NONE: pass
     class PRELIMINARY: pass
     class PAPER: pass
@@ -30,10 +40,11 @@ class CMSMode:
 
 ## Global variable to hold CMS text mode
 cmsTextMode = CMSMode.PRELIMINARY
+
 ## Global dictionary to hold the CMS text labels
 cmsText = {
     CMSMode.NONE: None,
-    CMSMode.PRELIMINARY: "Very preliminary",
+    CMSMode.PRELIMINARY: "Preliminary",
     CMSMode.PAPER: "",
     CMSMode.UNPUBLISHED: "Preliminary",
     CMSMode.SIMULATION : "Simulation",
@@ -41,11 +52,16 @@ cmsText = {
     CMSMode.SIMULATION_UNPUBLISHED: "Simulation unpublished",
     }
 
-## Global uncertainty mode
-#
-# Python treats classes as singletons, slitghly more safe than
-# hand-made enumeration
+#================================================================================================   
+# Class definition
+#================================================================================================   
 class Uncertainty:
+    '''
+    Global uncertainty mode
+    
+     Python treats classes as singletons, slitghly more safe than
+      hand-made enumeration
+    '''
     ## Statistical uncertainties only
     class StatOnly:
         pass
@@ -85,28 +101,35 @@ uncertaintyMode = Uncertainty()
 ## Default energy text
 energyText = "13 TeV"
 
-## Class to provide default positions of the various texts.
-#
-# The attributes which can be set are the x and y coordinates and the
-# text size.
-#
-# \todo Set the text fonts to non-bold
+
+#================================================================================================   
+# Class definition
+#================================================================================================   
 class TextDefaults:
+    '''
+    Class to provide default positions of the various texts.
+    
+     The attributes which can be set are the x and y coordinates and the
+     text size.
+    '''
     def __init__(self):
         self._setDefaults("cmsPreliminary", x=0.62, y=0.96)
         self._setDefaults("energy", x=0.19, y=0.96)
         self._setDefaults("lumi", x=0.43, y=0.96)
+        return
 
-    ## Modify the default values
-    # 
-    # \param name   Name of the property ('cmsPreliminary', 'energy', 'lumi')
-    # \param kwargs Keyword arguments
-    #
-    # <b>Keyword arguments</b>
-    # \li \a x     X coordinate
-    # \li \a y     Y coordinate
-    # \li \a size  Font size
     def _setDefaults(self, name, **kwargs):
+        '''
+        Modify the default values
+        
+         \param name   Name of the property ('cmsPreliminary', 'energy', 'lumi')
+         \param kwargs Keyword arguments
+         
+         <b>Keyword arguments</b>
+         \li \a x     X coordinate
+         \li \a y     Y coordinate
+         \li \a size  Font size
+        '''
         for x, value in kwargs.iteritems():
             setattr(self, name+"_"+x, value)
             
@@ -159,38 +182,47 @@ class TextDefaults:
 # histograms.addEnergyText(), histograms.addLuminosityText().
 textDefaults = TextDefaults()
 
-## Draw text to current TCanvas/TPad with TLaTeX
-#
-# \param x       X coordinate of the text (in NDC)
-# \param y       Y coordinate of the text (in NDC)
-# \param text    String to draw
-# \param args    Other positional arguments (forwarded to histograms.PlotText.__init__())
-# \param kwargs  Other keyword arguments (forwarded to histograms.PlotText.__init__())
 def addText(x, y, text, *args, **kwargs):
+    '''
+    Draw text to current TCanvas/TPad with TLaTeX
+    
+    \param x       X coordinate of the text (in NDC)
+    \param y       Y coordinate of the text (in NDC)
+    \param text    String to draw
+    \param args    Other positional arguments (forwarded to histograms.PlotText.__init__())
+    \param kwargs  Other keyword arguments (forwarded to histograms.PlotText.__init__())    
+    '''
     t = PlotText(x, y, text, *args, **kwargs)
     t.Draw()
+    return
 
 
-## Class for drawing text to current TPad with TLaTeX
-#
-# Text can be added to plots in object-oriented way. Mainly intended
-# to be used with plots.PlotBase.appendPlotObject etc.
+#================================================================================================   
+# Class definition
+#=====================1===========================================================================   
 class PlotText:
-    ## Constructor
-    #
-    # \param x       X coordinate of the text (in NDC)
-    # \param y       Y coordinate of the text (in NDC)
-    # \param text    String to draw
-    # \param size    Size of text (None for the default value, taken from gStyle)
-    # \param bold    Should the text be bold?
-    # \param align   Alignment of text (left, center, right)
-    # \param color   Color of the text
-    # \param font    Specify font explicitly
-    def __init__(self, x, y, text, size=None, bold=True, align="left", color=ROOT.kBlack, font=None):
+    '''
+    Class for drawing text to current TPad with TLaTeX
+    
+    Text can be added to plots in object-oriented way. Mainly intended
+    to be used with plots.PlotBase.appendPlotObject etc.
+    '''
+    def __init__(self, x, y, text, size=None, bold=False, align="left", color=ROOT.kBlack, font=None):
+        '''
+        Constructor
+        
+        \param x       X coordinate of the text (in NDC)
+        \param y       Y coordinate of the text (in NDC)
+        \param text    String to draw
+        \param size    Size of text (None for the default value, taken from gStyle)
+        \param bold    Should the text be bold?
+        \param align   Alignment of text (left, center, right)
+        \param color   Color of the text
+        \param font    Specify font explicitly        
+        '''
         self.x = x
         self.y = y
         self.text = text
-
         self.l = ROOT.TLatex()
         self.l.SetNDC()
         if not bold:
@@ -211,29 +243,37 @@ class PlotText:
         else:
             self.l.SetTextAlign(align)
         self.l.SetTextColor(color)
+        return
 
-    ## Draw the text to the current TPad
-    #
-    # \param options   For interface compatibility, ignored
-    #
-    # Provides interface compatible with ROOT's drawable objects.
     def Draw(self, options=None):
+        '''
+        Draw the text to the current TPad
+        
+        \param options   For interface compatibility, ignored
+        
+        Provides interface compatible with ROOT's drawable objects.
+        '''
         self.l.DrawLatex(self.x, self.y, self.text)        
+        return
 
-
-## Class for drawing text and a background box
 class PlotTextBox:
-    ## Constructor
-    #
-    # \param xmin       X min coordinate of the box (NDC)
-    # \param ymin       Y min coordinate of the box (NDC) (if None, deduced automatically)
-    # \param xmax       X max coordinate of the box (NDC)
-    # \param ymax       Y max coordinate of the box (NDC)
-    # \param lineheight Line height
-    # \param fillColor  Fill color of the box
-    # \param transparent  Should the box be transparent? (in practive the TPave is not created)
-    # \param kwargs       Forwarded to histograms.PlotText.__init__()
+    '''
+    Class for drawing text and a background box
+    '''
     def __init__(self, xmin, ymin, xmax, ymax, lineheight=0.04, fillColor=ROOT.kWhite, transparent=True, **kwargs):
+        '''
+        Constructor
+        
+        \param xmin       X min coordinate of the box (NDC)
+        \param ymin       Y min coordinate of the box (NDC) (if None, deduced automatically)
+        \param xmax       X max coordinate of the box (NDC)
+        \param ymax       Y max coordinate of the box (NDC)
+        \param lineheight Line height
+        \param fillColor  Fill color of the box
+        \param transparent  Should the box be transparent? (in practive the TPave is not created)
+        \param kwargs       Forwarded to histograms.PlotText.__init__()
+        '''
+
         # ROOT.TPave Set/GetX1NDC() etc don't seem to work as expected.
         self.xmin = xmin
         self.xmax = xmax
@@ -247,26 +287,35 @@ class PlotTextBox:
         self.textArgs.update(kwargs)
 
         self.currenty = ymax
+        return
 
-    ## Add text to current position
     def addText(self, text):
+        '''
+        Add text to current position
+        '''
         self.currenty -= self.lineheight
         self.addPlotObject(PlotText(self.xmin+0.01, self.currenty, text, **self.textArgs))
+        return
 
-    ## Add PlotText object
     def addPlotObject(self, obj):
+        '''
+        Add PlotText object
+        '''
         self.texts.append(obj)
+        return
 
-    ## Move the box and the contained text objects
-    #
-    # \param dx  Movement in x (positive is to right)
-    # \param dy  Movement in y (positive is to up)
-    # \param dw  Increment of width (negative to decrease width)
-    # \param dh  Increment of height (negative to decrease height)
-    #
-    # \a dx and \a dy affect to both box and text objects, \a dw and
-    # \dh affect the box only.
     def move(self, dx=0, dy=0, dw=0, dh=0):
+        '''
+        Move the box and the contained text objects
+        
+        \param dx  Movement in x (positive is to right)
+        \param dy  Movement in y (positive is to up)
+        \param dw  Increment of width (negative to decrease width)
+        \param dh  Increment of height (negative to decrease height)
+        
+        \a dx and \a dy affect to both box and text objects, \a dw and
+        \dh affect the box only.
+        '''
         self.xmin += dx
         self.xmax += dx
         if self.ymin is not None:
@@ -280,11 +329,14 @@ class PlotTextBox:
         for t in self.texts:
             t.x += dx
             t.y += dy
+        return
 
-    ## Draw the box and the text to the current TPad
-    #
-    # \param options  Forwarded to ROOT.TPave.Draw(), and the Draw() of the contained objects
     def Draw(self, options=""):
+        '''
+        Draw the box and the text to the current TPad
+        
+        \param options  Forwarded to ROOT.TPave.Draw(), and the Draw() of the contained objects
+        '''
         if not self.transparent:
             ymin = self.ymin
             if ymin is None:
@@ -294,6 +346,7 @@ class PlotTextBox:
             self.pave.Draw(options)
         for t in self.texts:
             t.Draw(options)
+        return
 
 def _printTextDeprecationWarning(oldFunctionName, newFunctionName="histograms.addStandardTexts()"):
     import traceback
@@ -304,12 +357,15 @@ def _printTextDeprecationWarning(oldFunctionName, newFunctionName="histograms.ad
     stack = traceback.extract_stack()[:-2] # take out calls to this and the caller
     print "".join(traceback.format_list(stack))
     print "#################################################"
+    return
 
-## Draw the "CMS Preliminary" text to the current TPad
-#
-# \param x   X coordinate of the text (None for default value)
-# \param y   Y coordinate of the text (None for default value)
 def addCmsPreliminaryText(x=None, y=None, text=None):
+    '''
+    Draw the "CMS Preliminary" text to the current TPad
+    
+    \param x   X coordinate of the text (None for default value)
+    \param y   Y coordinate of the text (None for default value)    
+    '''
     _printTextDeprecationWarning("histograms.addCmsPreliminaryText()")
     (x, y) = textDefaults.getValues("cmsPreliminary", x, y)
     if text == None:
@@ -318,23 +374,28 @@ def addCmsPreliminaryText(x=None, y=None, text=None):
         txt = text
     addText(x, y, txt, textDefaults.getSize("cmsPreliminary"), bold=False)
 
-## Draw the center-of-mass energy text to the current TPad
-#
-# \param x   X coordinate of the text (None for default value)
-# \param y   Y coordinate of the text (None for default value)
-# \param s   Center-of-mass energy text with the unit (None for the default value, dataset.energyText
 def addEnergyText(x=None, y=None, s=None):
+    '''
+    Draw the center-of-mass energy text to the current TPad
+    
+    \param x   X coordinate of the text (None for default value)
+    \param y   Y coordinate of the text (None for default value)
+    \param s   Center-of-mass energy text with the unit (None for the default value, dataset.energyText
+    '''
     _printTextDeprecationWarning("histograms.addEnergyText()")
     (x, y) = textDefaults.getValues("energy", x, y)
     text = energyText
     if s != None:
         text = s
     addText(x, y, "#sqrt{s} = "+text, textDefaults.getSize("energy"), bold=False)
+    return
 
-## Format luminosity number to fb
-#
-# \param lumi  Luminosity in pb^-1
 def formatLuminosityInFb(lumi):
+    '''
+    Format luminosity number to fb
+    
+    \param lumi  Luminosity in pb^-1
+    '''
     lumiInFb = lumi/1000.
     log = 0
     ndigis = 0
@@ -352,13 +413,15 @@ def formatLuminosityInFb(lumi):
         format = "%"+format
     return format % lumiInFb
 
-## Draw the integrated luminosity text to the current TPad
-#
-# \param x     X coordinate of the text (None for default value)
-# \param y     Y coordinate of the text (None for default value)
-# \param lumi  Value of the integrated luminosity in pb^-1
-# \param unit  Unit of the integrated luminosity value (should be fb^-1)
 def addLuminosityText(x, y, lumi, unit="fb^{-1}"):
+    '''
+    Draw the integrated luminosity text to the current TPad
+    
+    \param x     X coordinate of the text (None for default value)
+    \param y     Y coordinate of the text (None for default value)
+    \param lumi  Value of the integrated luminosity in pb^-1
+    \param unit  Unit of the integrated luminosity value (should be fb^-1)
+    '''
     _printTextDeprecationWarning("histograms.addLuminosityText()")
     (x, y) = textDefaults.getValues("lumi", x, y)
     lumiStr = "L="
@@ -370,30 +433,28 @@ def addLuminosityText(x, y, lumi, unit="fb^{-1}"):
     lumiStr += " "+unit
 
     addText(x, y, lumiStr, textDefaults.getSize("lumi"), bold=False)
-#    l.DrawLatex(x, y, "#intL=%.0f %s" % (lumi, unit))
-#    l.DrawLatex(x, y, "L=%.0f %s" % (lumi, unit))
+    return
 
-## Draw the CMS standard texts
-#
-# Updated version of addCmsPreliminaryText(), addEnergyText() and
-# addLuminosityText() following the new guidelines at
-# https://ghm.web.cern.ch/ghm/plots/
-#
-# \param lumi        Luminosity as float in pb^-1 (or as string in fb^1), None to ignore completely
-# \param sqrts       Centre-of-mass energy text with the unit
-# \param addCmsText  If True, add the CMS text
-# \param cmsTextPosition Position of CMS text ("left", "right", "outframe", pair of (x, y) in NDC
-# \param cmsExtraTextPosition Position of CMS extra text (None for default, pair of (x, y) for explicit)
-# \param cmsText         If not None, override the "CMS" text
-# \param cmsExtraText    If not None, override the CMS extra text (e.g. "Preliminary")
 def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=None, cmsExtraTextPosition=None, cmsText=None, cmsExtraText=None):
-#    if cmsTextPosition is None:
-#        cmsTextPosition = "left"
-    cmsTextPosition = "outframe"
-
-    lumiTextSize = 40*0.6
-    cmsTextFrac = 0.75
-    cmsTextSize = 40*cmsTextFrac
+    '''
+    ## Draw the CMS standard texts
+    #
+    # Updated version of addCmsPreliminaryText(), addEnergyText() and
+    # addLuminosityText() following the new guidelines at
+    # https://ghm.web.cern.ch/ghm/plots/
+    #
+    # \param lumi        Luminosity as float in pb^-1 (or as string in fb^1), None to ignore completely
+    # \param sqrts       Centre-of-mass energy text with the unit
+    # \param addCmsText  If True, add the CMS text
+    # \param cmsTextPosition Position of CMS text ("left", "right", "outframe", pair of (x, y) in NDC
+    # \param cmsExtraTextPosition Position of CMS extra text (None for default, pair of (x, y) for explicit)
+    # \param cmsText         If not None, override the "CMS" text
+    # \param cmsExtraText    If not None, override the CMS extra text (e.g. "Preliminary")
+    '''
+    cmsTextPosition  = "outframe"
+    lumiTextSize     = 40*0.6
+    cmsTextFrac      = 0.75
+    cmsTextSize      = 40*cmsTextFrac
     cmsExtraTextSize = cmsTextSize * 0.76
 
     # Lumi + energy text
@@ -474,18 +535,24 @@ def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=Non
             posXe = cmsExtraTextPosition[0]
             posYe = cmsExtraTextPosition[1]
         addText(posXe, posYe, extraText, size=cmsExtraTextSize, font=53, align=align)
+    return
 
-## Class to create signal information box on plots
+
 class SignalTextCreator:
-    ## Constructor
-    #
-    # \param xmin       xmin coordinate of the box (NDC)
-    # \param ymax       ymax coordinate of the box (NDC)
-    # \param size       Text size
-    # \param lineheight Height of one line
-    # \param width      Width of the box
-    # \param kwargs     Keyword arguments, forwarded to histograms.PlotTextBox.__init__()
+    '''
+    Class to create signal information box on plots
+    '''
     def __init__(self, xmin=0.6, ymax=0.9, size=20, lineheight=0.04, width=0.3, **kwargs):
+        '''
+        Constructor
+        
+        \param xmin       xmin coordinate of the box (NDC)
+        \param ymax       ymax coordinate of the box (NDC)
+        \param size       Text size
+        \param lineheight Height of one line
+        \param width      Width of the box
+        \param kwargs     Keyword arguments, forwarded to histograms.PlotTextBox.__init__()
+        '''
         self.settings = dataset.Settings(xmin=xmin, ymax=ymax, size=size, lineheight=lineheight, width=width,
                                  mass=None, tanbeta=None, mu=None,
                                  br_tH=None,
@@ -2417,33 +2484,34 @@ class HistoManager:
             if h.getDataset().isMC():
                 h.normalizeToLuminosity(lumi)
         self.luminosity = lumi
-
-#    def scale(self, value):
-#        """Scale the histograms with a value."""
-#        if self.impl != None:
-#            raise Exception("Can't scale after the histograms have been created!")
-#        for h in self.datasetRootHistos:
-#            h.scale(value)
+        return
 
     def hasLuminosity(self):
         return self.luminosity is not None
 
-    ## Get the integrated luminosity to which the MC datasets have been normalized to.
     def getLuminosity(self):
+        '''
+        Get the integrated luminosity to which the MC datasets have been normalized to.
+        '''
         if self.luminosity == None:
             raise Exception("No normalization by or to luminosity!")
         return self.luminosity
 
-    ## Draw the text for the integrated luminosity.
-    #
-    # \param x   X coordinate of the text (\a None for default)
-    # \param y   Y coordinate of the text (\a None for default)
     def addLuminosityText(self, x=None, y=None):
+        '''
+        Draw the text for the integrated luminosity.
+        
+        \param x   X coordinate of the text (\a None for default)
+        \param y   Y coordinate of the text (\a None for default)
+        '''
         _printTextDeprecationWarning("histograms.HistoManager.addLuminosityText()", "histograms.addStandardTexts() with histograms.HistoManager.getLuminosity()")
         addLuminosityText(x, y, self.getLuminosity())
+        return
 
-    ## Create the HistoManagerImpl object.
     def _createImplementation(self):
+        '''
+        Create the HistoManagerImpl object.
+        '''
         self.impl = HistoManagerImpl([HistoWithDataset(datasetRootHisto=drh) for drh in self.datasetRootHistos])
 
     ## Stack all MC histograms to one named <i>StackedMC</i>.

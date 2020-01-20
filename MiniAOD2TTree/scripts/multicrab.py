@@ -102,11 +102,12 @@ from CRABClient.UserUtilities import getConsoleLogLevel
 gitFound = False
 try: #sami please fix me-28Nov2017 (alex)
     import HiggsAnalysis.MiniAOD2TTree.tools.git as git
-    from HiggsAnalysis.MiniAOD2TTree.tools.datasets import *
+    #from HiggsAnalysis.MiniAOD2TTree.tools.datasets import *
+    from HiggsAnalysis.MiniAOD2TTree.tools.datasets import DatasetGroup
     gitfound = True
 except: #sami please fix me-28Nov2017 (alex)
-#    from datasets import *
     pass
+#from HiggsAnalysis.MiniAOD2TTree.tools.datasets import DatasetGroup
 
 #================================================================================================ 
 # Global Definitions

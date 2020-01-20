@@ -120,7 +120,7 @@ class CrossSectionList:
 # [19] https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopSigma
 # [20] https://github.com/UHH2/UHH2/wiki/Ntuple-Production-(Run-II,-2nd-round,-50ns)
 # [21] CMS AN2018_042_v4, Table 3
-
+# [22] https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#HTT
 
 backgroundCrossSections = CrossSectionList(
     CrossSection("QCD_Pt_15to30", {
@@ -695,6 +695,21 @@ backgroundCrossSections = CrossSectionList(
             }),
     CrossSection("TTZToQQ", {
             "13": 5.297e-01, #5.297e-01 +- 7.941e-04 pb [16] (inputFiles="204FB864-5D1A-E611-9BA7-001E67A3F49D.root")
+            }),
+    CrossSection("TTZToLLNuNu_M_10", {
+            "13": 0.2529, # [22]
+            }),
+    CrossSection("ttHJetTobb_M125", {
+            "13": 0.2934, # [22] (NNLO)
+            }),
+    CrossSection("ttHJetToNonbb_M125", {
+            "13": 0.2151, # [22] (NNLO QCD and NLO EW)
+            }),
+    CrossSection("ttHJetToTT_M125", {
+            "13": 0.0321, # [22]
+            }),
+    CrossSection("ttHJetToGG_M125", {
+            "13": 0.0012, # [22]
             }),
     CrossSection("WJetsToQQ_HT_600ToInf", {
             "13": 9.936e+01, #9.936e+01 +- 4.407e-01 pb [16] (inputFiles="0EA1D6CA-931A-E611-BFCD-BCEE7B2FE01D.root")

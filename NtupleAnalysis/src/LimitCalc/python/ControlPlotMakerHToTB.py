@@ -63,7 +63,8 @@ drawPlot2D = plots.PlotDrawer(opts2={"ymin": 0.5, "ymax": 1.5},
 #================================================================================================ 
 # Definitions
 #================================================================================================ 
-class ControlPlotMakerHToTB:
+#class ControlPlotMakerHToTB:
+class ControlPlotMaker:
     def __init__(self, opts, config, dirname, luminosity, observation, datasetGroups, verbose=False):
         self._validateDatacard(config)
         self._config  = config

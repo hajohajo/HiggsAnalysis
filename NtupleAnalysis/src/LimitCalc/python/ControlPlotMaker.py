@@ -18,10 +18,6 @@ import sys
 import ROOT
 
 
-print "-----"
-print "nyt tehdaan controlliplotteja jee!"
-print "-----"
-
 _legendLabelQCD = "QCD" 
 _legendLabelQCDdata = "Mis-ID. #tau_{h} (data)"
 _legendLabelEmbedding = "EWK+t#bar{t} with #tau_{h} (data)"
@@ -43,8 +39,7 @@ drawPlot2D = plots.PlotDrawer(opts2={"ymin": 0.5, "ymax": 1.5},
                             cmsTextPosition="outframe")
 ##
 class ControlPlotMaker:
-    ## Constructor
-    def __init__(self, opts, config, dirname, luminosity, observation, datasetGroups):
+    def __init__(self, opts, config, dirname, luminosity, observation, datasetGroups, verbose=False):
         plots._legendLabels["MCStatError"] = "Bkg. stat."
         plots._legendLabels["MCStatSystError"] = "Bkg. stat.#oplussyst."
         plots._legendLabels["BackgroundStatError"] = "Bkg. stat. unc"

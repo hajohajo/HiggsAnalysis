@@ -41,22 +41,24 @@ metFilter = PSet(
 # Electron veto
 #================================================================================================
 eVeto = PSet(
-    electronPtCut     = 10.0,    # [default: 10.0]
-    electronEtaCut    = 2.4,     # [default: 2.4]
-    electronIDType    = "MVA",   # [default: "MVA] ("default", "MVA")
-    electronID        = "cutBasedElectronID_Spring15_25ns_V1_standalone_veto",
-    electronMVA       = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
-    electronMVACut    = "Loose", # [default: "Loose"]
-    electronIsolation = "veto",  # [default: "veto"] ("veto", "tight")
-    electronIsolType  = "mini",  # [default: "mini"] ("mini", "default")
+    applyTriggerMatching = False,
+    triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
+    electronPtCut        = 10.0,    # [default: 10.0]
+    electronEtaCut       = 2.4,     # [default: 2.4]
+    electronIDType       = "MVA",   # [default: "MVA] ("default", "MVA")
+    electronID           = "cutBasedElectronID_Spring15_25ns_V1_standalone_veto",
+    electronMVA          = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
+    electronMVACut       = "Loose", # [default: "Loose"]
+    electronIsolation    = "veto",  # [default: "veto"] ("veto", "tight")
+    electronIsolType     = "mini",  # [default: "mini"] ("mini", "default")
     )
 
 #================================================================================================
-# Muon veto
+# Muon Selection
 #================================================================================================
 muonSelection = PSet(
-    applyTriggerMatching = True,
-    triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
+    applyTriggerMatching = False ,      # HLTMuon_Pt Missing from tree!
+    triggerMatchingCone  = 0.1,         # DeltaR for matching offline tau with trigger tau
     muonPtCut            = 26.0,        # [default: 10.0]
     muonEtaCut           = 2.4,         # [default: 2.4]
     muonID               = "muIDTight", # [default: "muIDTight"] ("muIDLoose", "muIDMedium", "muIDTight")
@@ -72,15 +74,15 @@ tauSelection = PSet(
     triggerMatchingCone  =   0.1, # [default: False]
     tauPtCut             =  20.0, # [default: 20.0]
     tauEtaCut            =   2.3, # [default: 2.3]
-    tauLdgTrkPtCut       =   1.0, # [default: 0.0]
+    tauLdgTrkPtCut       =  20.0, # [default: 0.0]
     prongs               =  -1,   # [default: -1] (1, 2, 3, 12, 13, 23, 123 or -1 (all))
     rtau                 =   0.0, # [default: 0.0] (to disable set to 0.0)
     againstElectronDiscr = "againstElectronTightMVA6",
     againstMuonDiscr     = "againstMuonLoose3",
-    isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
-    # isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
-    # isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Default
-    # isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
+    #isolationDiscr       = "byLooseIsolationMVArun2v1DBoldDMwLT",
+    isolationDiscr       = "byMediumIsolationMVArun2v1DBoldDMwLT", # Default
+    #isolationDiscr       = "byTightIsolationMVArun2v1DBoldDMwLT",
     # isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits",
     # isolationDiscr       = "byMediumCombinedIsolationDeltaBetaCorr3Hits",
     )
@@ -173,7 +175,7 @@ enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
 bjetSelection = PSet(
     triggerMatchingApply      = False,    # [default: False]
     triggerMatchingCone       = 0.1,      # [default: 0.1 ]
-    jetPtCuts                 = [20.0],   # [default: [20.]]
+    jetPtCuts                 = [30.0],   # [default: [20.]]
     jetEtaCuts                = [2.4],    # [default: [2.4]]
     bjetDiscr                 = "pfCombinedInclusiveSecondaryVertexV2BJetTags", # default
     bjetDiscrWorkingPoint     = "Medium", # [default: "Medium"] ("Medium", "Tight")
@@ -212,19 +214,19 @@ metSelection = PSet(
 # Top selection BDT                                               
 #================================================================================================        
 topSelectionBDT = PSet(
-    NumberOfTopsCutValue     = 1,     # [default: 3]
-    NumberOfTopsCutDirection = "==",  # [default: "=="] (==, !=, <, <=, >, >=)
-    AnyTopMVACutValue      = -1.0,   # [default: -1.0]
-    AnyTopMVACutDirection  =  ">",    # [default: ">"]
-    TopMVACutValue         = -0.00,   # [default: 0.40] NOTE: Only use numbers with 2 decimals
-    TopMVACutDirection     =  ">=",   # [default: ">="]
-    TopMassLowCutValue     =   0.0,   # [default: 0.0]
-    TopMassLowCutDirection =  ">=",   # [default: ">="]
-    TopMassUppCutValue     = 1000.0,  # [default: 400.0]
-    TopMassUppCutDirection =  "<=",   # [default: "<"]
-    CSV_bDiscCutValue      = 0.8484,  # [default: 0.8484]
-    CSV_bDiscCutDirection  = ">=",    # [default: ">="]
-    WeightFile             = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 
+    NumberOfTopsCutDirection = "==",       # [default: "="] (==, !=, <, <=, >, >=)
+    NumberOfTopsCutValue     =    1,       # [default: 0]
+    AnyTopBDTGCutDirection   =  ">",       # [default: ">"]
+    AnyTopBDTGCutValue       =   -1.00,    # [default: -1.00]
+    TopBDTGCutDirection      = ">=",       # [default: ">="]
+    TopBDTGCutValue          =   0.40,     # [default: 0.40] NOTE: Only use numbers with 2 decimals
+    TopMassLowCutDirection   = ">=",       # [default: ">="]
+    TopMassLowCutValue       =    0.00,    # [default: 0.00]
+    TopMassUppCutDirection   = "<=",       # [default: "<"]
+    TopMassUppCutValue       = 2000.00,    # [default: 2000.0]
+    CSV_bDiscCutDirection    = ">=",       # [default: ">="]
+    CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
+    WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml", 
 )
 
 
@@ -253,9 +255,9 @@ fakeBMeasurement = PSet(
     baselineBJetsDiscr             = bjetSelection.bjetDiscr,
     baselineBJetsDiscrWP           = bjetSelection.bjetDiscrWorkingPoint,
     # Tops
-    LdgTopMVACutValue              = topSelectionBDT.TopMVACutValue,
-    LdgTopMVACutDirection          = topSelectionBDT.TopMVACutDirection, 
-    SubldgTopMVACutValue           = topSelectionBDT.TopMVACutValue,
+    LdgTopMVACutValue              = topSelectionBDT.TopBDTGCutValue,
+    LdgTopMVACutDirection          = topSelectionBDT.TopBDTGCutDirection, 
+    SubldgTopMVACutValue           = topSelectionBDT.TopBDTGCutValue,
     SubldgTopMVACutDirection       = "<", # [default: "<"]
     )
 
@@ -277,7 +279,7 @@ else:
     raise Exception("This should never be reached!")
 
 # top-tagging (json files available for: defaut, fatJet, ldgJet)
-MVAstring = "%.2f" % topSelectionBDT.TopMVACutValue
+MVAstring = "%.2f" % topSelectionBDT.TopBDTGCutValue
 # Determine which top JSON files to use depending on the BDT trainigh weightfile used
 if "noDeltaRqq_noTopPtRew" in topSelectionBDT.WeightFile:
     # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)    
@@ -314,12 +316,13 @@ commonPlotsOptions = PSet(
     enableGenuineBHistograms   = False,
     enablePUDependencyPlots    = True,  # Enable/Disable some debug-level plots
     # Bin settings (final bin setting done in datacardGenerator, there also variable bin width is supported)
-    nVerticesBins     = PSet(nBins = 100, axisMin =  0.0, axisMax =  100.0),
+    nVerticesBins     = PSet(nBins = 100, axisMin =  0.0, axisMax =  200.0),
     ptBins            = PSet(nBins =  50, axisMin =  0.0, axisMax =  500.0),
     etaBins           = PSet(nBins =  50, axisMin = -5.0, axisMax =    5.0),
     phiBins           = PSet(nBins =  64, axisMin = -3.2, axisMax =    3.2),
     deltaEtaBins      = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
-    deltaPhiBins      = PSet(nBins =  32, axisMin =  0.0, axisMax =    3.2),
+    #deltaPhiBins      = PSet(nBins =  32, axisMin =  0.0, axisMax =    3.2),
+    deltaPhiBins      = PSet(nBins =  36, axisMin =  0.0, axisMax =  180.0), # 5 degress
     deltaRBins        = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
     rtauBins          = PSet(nBins =  55, axisMin =  0.0, axisMax =    1.1), # HToTauNu
     njetsBins         = PSet(nBins =  18, axisMin =  0.0, axisMax =   18.0),

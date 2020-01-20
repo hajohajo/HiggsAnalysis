@@ -12,6 +12,7 @@
 
 class ParameterSet;
 class CommonPlots;
+class CommonPlots_ttm;
 class Event;
 class EventCounter;
 class HistoWrapper;
@@ -37,10 +38,18 @@ public:
     const std::vector<Electron>& getSelectedElectrons() const { return fSelectedElectrons; }
     const float getHighestSelectedElectronPt() const { return fHighestSelectedElectronPt; }
     const float getHighestSelectedElectronEta() const { return fHighestSelectedElectronEta; }
+    const float getElectronTriggerSF() const { return fElectronTriggerSF; }
+    const float getElectronIDSF() const { return fElectronIDSF; }
+    const int getHLTElectronCharge() const { return fHLTElectronCharge; }
     // FIXME: Add MC information if deemed necessary
     // const bool eventContainsElectronFromCJet() const { return fHasElectronFromCjetStatus; }
     // const bool eventContainsElectronFromBJet() const { return fHasElectronFromBjetStatus; }
     // const bool eventContainsElectronFromCorBJet() const { return eventContainsElectronFromCJet() || eventContainsElectronFromBJet(); }
+
+    // Getters for anti-isolated electrons (i.e. passed other cuts but not isolation)
+    const bool isAntiIsolated() const { return !hasIdentifiedElectrons(); }
+    const bool hasAntiIsolatedElectrons() const { return (fAntiIsolatedElectrons.size() > 0); }
+    const std::vector<Electron>& getAntiIsolatedElectrons() const { return fAntiIsolatedElectrons; }
 
     friend class ElectronSelection;
 
@@ -48,16 +57,24 @@ public:
     /// pt and eta of highest pt electron passing the selection
     float fHighestSelectedElectronPt;
     float fHighestSelectedElectronEta;
+    /// Cache electron identification scale factor
+    float fElectronIDSF;
+    /// Cache for electron trigger SF
+    float fElectronTriggerSF;
+    int fHLTElectronCharge;
     /// MC info about non-isolated electrons
     //bool fHasElectronFromCjetStatus;
     //bool fHasElectronFromBjetStatus;
     /// Electron collection after all selections
     std::vector<Electron> fSelectedElectrons;
+    std::vector<Electron> fAntiIsolatedElectrons;
   };
   
   // Main class
   /// Constructor with histogramming
   explicit ElectronSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix);
+  explicit ElectronSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix);
+  explicit ElectronSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix);
   /// Constructor without histogramming
   explicit ElectronSelection(const ParameterSet& config, const std::string& postfix);
   virtual ~ElectronSelection();
@@ -68,38 +85,48 @@ public:
   Data silentAnalyze(const Event& event);
   /// analyze does fill histograms and incrementes counters
   Data analyze(const Event& event);
+  Data analyzeLoose(const Event& event);
 
 private:
   /// Initialisation called from constructor
   void initialize(const ParameterSet& config, const std::string& postfix);
   /// The actual selection
   Data privateAnalyze(const Event& iEvent);
+  Data privateAnalyzeLoose(const Event& iEvent);
 
   bool passTrgMatching(const Electron& electron, std::vector<math::LorentzVectorT<double>>& trgElectrons) const;
   /// Return MVA decision based on MVA Cut
   bool getMVADecision(const Electron& ele, const std::string mvaCut);
   
   // Input parameters
-  const bool bApplyTriggerMatching;
-  const float fTriggerElectronMatchingCone;
-  const double fElectronPtCut;
-  const double fElectronEtaCut;
+  bool  cfg_ApplyTriggerMatching;
+  float cfg_TriggerMatchingCone;
+  const double cfg_ElectronPtCut;
+  const double cfg_ElectronEtaCut;
+  const std::string cfg_ElectronMVACut;
   float fRelIsoCut;
   float fMiniIsoCut;
   bool fVetoMode;
   bool fMiniIsol;
   bool fElectronMVA;
-  const std::string fElectronMVACut;
   
+  // electron identification SF
+  GenericScaleFactor fElectronIDSFReader;
+  // electron trigger SF
+  GenericScaleFactor fElectronTriggerSFReader;
+
   // Event counter for passing selection
   Count cPassedElectronSelection;
   // Sub counters
   Count cSubAll;
+  Count cSubPassedIsPresent;
   Count cSubPassedTriggerMatching;
   Count cSubPassedPt;
   Count cSubPassedEta;
   Count cSubPassedID;
   Count cSubPassedIsolation;
+  Count cSubPassedSelection;
+  Count cSubPassedVeto;
   
   // Histograms
   WrappedTH1 *hTriggerMatchDeltaR;

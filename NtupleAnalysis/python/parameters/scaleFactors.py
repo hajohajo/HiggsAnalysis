@@ -123,6 +123,70 @@ def assignMisIDSF(pset, direction, jsonfile, variationType="MC"):
         raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
     return
 
+def assignMuonIdentificationSF(muonSelectionPset, direction, variationType="Data"):
+    '''
+    Muon ID SF (SF as function of pT)
+    \param muonSelectionPset  the muon config PSet
+    \param direction         "nominal, "up", "down"
+    '''
+    # FIXME: there is no mechanic right now to choose correct era / run range
+    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
+
+    muonIDJson = "muonPAGID.json"
+
+    print "Taking muon ID SF from", muonIDJson
+
+    reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", muonIDJson, "Tight")
+    result = reader.getResult()
+
+
+    print result["binEdges"]
+
+    print "-------"
+
+    print result["SF"]
+
+    if variationType == "MC":
+        _assignTrgSF("muonIDSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], muonSelectionPset, direction)
+    elif variationType == "Data":
+        _assignTrgSF("muonIDSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], muonSelectionPset, direction)
+    else:
+        raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
+
+    return
+
+def assignElectronIdentificationSF(electronSelectionPset, direction, variationType="Data"):
+    '''
+    Muon ID SF (SF as function of pT)
+    \param muonSelectionPset  the muon config PSet
+    \param direction         "nominal, "up", "down"
+    '''
+    # FIXME: there is no mechanic right now to choose correct era / run range
+    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
+
+    electronIDJson = "ElePOGID.json"
+
+    print "Taking electron ID SF from", electronIDJson
+
+    reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", electronIDJson, "Tight")
+    result = reader.getResult()
+
+
+    print result["binEdges"]
+
+    print "-------"
+
+    print result["SF"]
+
+    if variationType == "MC":
+        _assignTrgSF("electronIDSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], electronSelectionPset, direction)
+    elif variationType == "Data":
+        _assignTrgSF("electronIDSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], electronSelectionPset, direction)
+    else:
+        raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
+
+    return
+
 def assignTauTriggerSF(tauSelectionPset, direction, tauTrgJson, variationType="MC"):
     '''
     tau trigger SF (SF as function of pT)
@@ -186,13 +250,50 @@ def assignMuonTriggerSF(muonSelectionPset, direction, muonTrgJson, variationType
     # FIXME: there is no mechanic right now to choose correct era / run range
     # FIXME: this approach works as long as there is just one efficiency for the simulated samples
 
-    Print("Taking muon trigger eff/sf from" % (muonTrgJson), True)
-    reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", muonTrgJson)
+    print "Taking muon trigger eff/sf from",  muonTrgJson
+
+    #Print("Taking muon trigger eff/sf from" % (muonTrgJson), True)
+    reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", muonTrgJson,"IsoMu24_OR_IsoTkMu24_PtBins")
     result = reader.getResult()
+
+    print result["binEdges"]
+
+    print "-------"
+    print result["SF"]
+
     if variationType == "MC":
         _assignTrgSF("muonTriggerSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], muonSelectionPset, direction)
     elif variationType == "Data":
         _assignTrgSF("muonTriggerSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], muonSelectionPset, direction)
+    else:
+        raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
+    return
+
+def assignElectronTriggerSF(electronSelectionPset, direction, electronTrgJson, variationType="Data"):
+    '''
+    Muon trigger SF (SF as function of pT)
+    \param muonSelectionPset  the muon config PSet
+    \param direction         "nominal, "up", "down"
+    \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
+    '''
+    # FIXME: there is no mechanic right now to choose correct era / run range
+    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
+
+    print "Taking electron trigger eff/sf from",  electronTrgJson
+
+    #Print("Taking muon trigger eff/sf from" % (muonTrgJson), True)
+    reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", electronTrgJson,"Ele25_eta2p1_WPTight_Gsf")
+    result = reader.getResult()
+
+    print result["binEdges"]
+
+    print "-------"
+    print result["SF"]
+
+    if variationType == "MC":
+        _assignTrgSF("electronTriggerSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], electronSelectionPset, direction)
+    elif variationType == "Data":
+        _assignTrgSF("electronTriggerSF", result["binEdges"], result["SF"], result["SFdataUp"], result["SFdataDown"], electronSelectionPset, direction)
     else:
         raise Exception("Error: Unsupported variation type '%s'! Valid options are: 'MC', 'data'"%variationType)
     return
@@ -715,7 +816,7 @@ class TriggerMuonSFJsonReader:
     '''
     Reader for trigger SF json files
     '''
-    def __init__(self, era, runrange, jsonname):
+    def __init__(self, era, runrange, jsonname, myParameter):
         # Read json
         _jsonpath = os.path.join(os.getenv("HIGGSANALYSIS_BASE"), "NtupleAnalysis", "data", "TriggerEfficiency")
         filename = os.path.join(_jsonpath, jsonname)
@@ -724,14 +825,16 @@ class TriggerMuonSFJsonReader:
         f = open(filename)
         contents = json.load(f)
         f.close()
+
         # Obtain SFs
-        param = "IsoMu24_OR_IsoTkMu24_PtBins"
+        param = myParameter #"IsoMu24_OR_IsoTkMu24_PtBins"
         if not param in contents.keys():
             raise Exception("Error: missing key '%s' in json '%s'! Options: %s"%(param,filename,", ".join(map(str,contents.keys()))))
         if not "pt_ratio" in contents[param].keys():
-            print "pt_ratio missing in trg json"
+            print "pt_ratio missing in json"
             raise Exception("Error: missing run range '%s' for data in json '%s'! Options: %s"(runrange,filename,", ".join(map(str,contents[param].keys()))))
         datadict = self._muonReadValues(contents[param]["pt_ratio"], "data")
+
         # Obtain MC efficiencies
 #        param = "mcParameters"
 #        if not param in contents.keys():
@@ -740,10 +843,14 @@ class TriggerMuonSFJsonReader:
 #            raise Exception("Error: missing era '%s' for mc in json '%s'! Options: %s"(runrange,filename,", ".join(map(str,contents[param].keys()))))
 #        mcdict = self._readValues(contents[param][era], "mc")
         # Calculate SF's
-        keys = datadict.keys()
+
+        keys = sorted(datadict.keys(), key=lambda x:float(x))
+#        keys = datadict.keys()
+
 #        if len(keys) != len(mcdict.keys()):
 #            raise Exception("Error: different number of bins for data and mc in json '%s'!"%filename)
-        keys.sort()
+#        keys.sort()
+
         self.result = {}
         self.result["binEdges"] = []
         self.result["SF"] = []
@@ -756,9 +863,16 @@ class TriggerMuonSFJsonReader:
             if i > 0:
                 self.result["binEdges"].append(key)
             i += 1
+
+#	    print key
+#	    print datadict[key]["dataSF"]
+#	    print datadict[key]["dataSFup"]
+#	    print datadict[key]["dataSFdown"]
+
             self.result["SF"].append(datadict[key]["dataSF"])
             self.result["SFdataUp"].append(datadict[key]["dataSFup"])
             self.result["SFdataDown"].append(datadict[key]["dataSFdown"])
+
 #            self.result["SFmcUp"].append(datadict[key]["dataeff"] / mcdict[key]["mceffup"])
 #            if abs(mcdict[key]["mceffdown"]) < 0.000001:
 #                raise Exception("Down variation in bin '%s' is zero in json '%s'"%(key, filename))
@@ -766,6 +880,7 @@ class TriggerMuonSFJsonReader:
             # Sanity check
 #            if self.result["SF"][len(self.result["SF"])-1] < 0.000001:
 #                raise Exception("Error: In file '%s' bin %s the SF is zero! Please fix!"%(filename, key))
+
     def getResult(self):
         return self.result
 
@@ -774,6 +889,9 @@ class TriggerMuonSFJsonReader:
         for item in inputdict:
             bindict = {}
             bindict[label+"SF"] = inputdict[item]["value"]
+
+#	    print inputdict[item]["value"]
+#	    print inputdict[item]["error"]
 
             bindict[label+"SFup"] = inputdict[item]["value"]+inputdict[item]["error"]
             bindict[label+"SFdown"] = inputdict[item]["value"]-inputdict[item]["error"]
