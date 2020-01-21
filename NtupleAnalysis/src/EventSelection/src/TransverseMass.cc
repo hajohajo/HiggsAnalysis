@@ -102,3 +102,22 @@ double TransverseMass::reconstruct(const math::XYVector muonptvec_1, const math:
     myHWTransverseMass = std::sqrt(myHWTransverseMassSquared);
   return myHWTransverseMass;
 }
+
+double TransverseMass::reconstruct(const math::XYVector tau, const math::XYVector lepton, const math::XYVector jet1, const math::XYVector jet2, const math::XYVectorD& met) {
+  //we use scalar sums to get the transverse mass
+  double metEt    = met.R();
+  double tauEt    = tau.r();
+  double leptonEt = lepton.r();
+  double jet1Et   = jet1.r();
+  double jet2Et   = jet2.r();
+  double myHWTransverseMass=-999;
+  double myHWTransverseMassSquared = 0;
+  double Esum = metEt + tauEt + leptonEt + jet1Et + jet2Et;
+  double xsum = tau.x() + lepton.x() + jet1.x() + jet2.x() + met.x();
+  double ysum = tau.y() + lepton.y() + jet1.y() + jet2.y() + met.y();
+
+  myHWTransverseMassSquared = (Esum*Esum)-(xsum*xsum)-(ysum*ysum);
+  if (myHWTransverseMassSquared >= 0)
+    myHWTransverseMass = std::sqrt(myHWTransverseMassSquared);
+  return myHWTransverseMass;
+}

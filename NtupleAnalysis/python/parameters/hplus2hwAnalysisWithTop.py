@@ -74,7 +74,7 @@ tauSelection = PSet(
     triggerMatchingCone  =   0.1, # [default: False]
     tauPtCut             =  20.0, # [default: 20.0]
     tauEtaCut            =   2.3, # [default: 2.3]
-    tauLdgTrkPtCut       =  20.0, # [default: 0.0]
+    tauLdgTrkPtCut       =   0.0, # [default: 0.0]
     prongs               =  -1,   # [default: -1] (1, 2, 3, 12, 13, 23, 123 or -1 (all))
     rtau                 =   0.0, # [default: 0.0] (to disable set to 0.0)
     againstElectronDiscr = "againstElectronTightMVA6",
@@ -132,7 +132,7 @@ jetSelection = PSet(
     jetType                  = "Jets",    # [default: "jets"] ("Jets", "JetsPuppi")
     jetPtCuts                = [30.0],    # [default: [30.0]]
     jetEtaCuts               = [4.7],     # [default: [4.7]]
-    numberOfJetsCutValue     = 3,         # [default: 3]
+    numberOfJetsCutValue     = 0,         # [default: 3]
     numberOfJetsCutDirection = ">=",      # [default: ">="] (==, !=, <, <=, >, >=)
     jetIDDiscr               = "IDloose", # [default: "IDloose"] ("IDloose", "IDtight", "IDtightLeptonVeto")
     jetPUIDDiscr             = "",        # [default: ""]
