@@ -302,22 +302,23 @@ bool TriggerDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
           //std::cout << "Trigger Muon " << patTriggerObject.p4().Pt() << std::endl;
         }//triggerMuon
 
-	////////
-
-        if (patTriggerObject.hasPathName( "HLT_Ele27_eta2p1_WPTight_Gsf_v8", true, true )) {
-	  std::cout << "FIRED " << patTriggerObject.hasPathName( "HLT_Ele27_eta2p1_WPTight_Gsf_v8", true, true ) << std::endl;
-	  std::cout << "Trigger id: " << std::endl;
-	  std::cout << "Mu " << patTriggerObject.id(trigger::TriggerMuon) << std::endl;
-          std::cout << "Ele " << patTriggerObject.id(trigger::TriggerElectron) << std::endl;
-	  std::cout << "Tau " << patTriggerObject.id(trigger::TriggerTau) << std::endl;
-	  std::cout << "Photon " << patTriggerObject.id(trigger::TriggerPhoton) << std::endl;
-	  std::cout << "Cluster " << patTriggerObject.id(trigger::TriggerCluster) << std::endl;
-
-	  std::cout << "Trigger paths: " << std::endl;
-          for(size_t i = 0; i < patTriggerObject.pathNames().size(); ++i){
-            std::cout << patTriggerObject.pathNames()[i] << std::endl;
-          }
-        }
+	// Printouts disabled
+        if (0*patTriggerObject.hasPathName( "HLT_Ele27_eta2p1_WPTight_Gsf_v8", true, true )) 
+	  {
+	    std::cout << "FIRED " << patTriggerObject.hasPathName( "HLT_Ele27_eta2p1_WPTight_Gsf_v8", true, true ) << std::endl;
+	    std::cout << "Trigger id: " << std::endl;
+	    std::cout << "Mu " << patTriggerObject.id(trigger::TriggerMuon) << std::endl;
+	    std::cout << "Ele " << patTriggerObject.id(trigger::TriggerElectron) << std::endl;
+	    std::cout << "Tau " << patTriggerObject.id(trigger::TriggerTau) << std::endl;
+	    std::cout << "Photon " << patTriggerObject.id(trigger::TriggerPhoton) << std::endl;
+	    std::cout << "Cluster " << patTriggerObject.id(trigger::TriggerCluster) << std::endl;
+	    
+	    std::cout << "Trigger paths: " << std::endl;
+	    for(size_t i = 0; i < patTriggerObject.pathNames().size(); ++i)
+	      {
+		std::cout << patTriggerObject.pathNames()[i] << std::endl;
+	      }
+	  }
 
         ////////
         // Trigger object is of type Electron
