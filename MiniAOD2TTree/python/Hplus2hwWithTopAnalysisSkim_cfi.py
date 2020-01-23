@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 skim = cms.EDFilter("Hplus2hwWithTopAnalysisSkim",
-                    Verbose        = cms.bool(True),
+                    Verbose        = cms.bool(False),
                     TriggerResults = cms.InputTag("TriggerResults::HLT"),
                     HLTPaths       = cms.vstring(# SingleMuon Primary Dataset (PD)
                                                  "HLT_IsoMu24_v", 
@@ -47,7 +47,7 @@ skim = cms.EDFilter("Hplus2hwWithTopAnalysisSkim",
                     MuonEtaCut           = cms.double(3.0),
                     MuonNCut             = cms.int32(0),        # This is checked ONLY if the "LeptonNCut" is satisfied
                     ### Leptons (Electrons or Muons)
-                    LeptonNCut           = cms.int32(1),        # Concerns the above-defined electrons and muon selections
+                    LeptonNCut           = cms.int32(0),        # Concerns the above-defined electrons and muon selections
                     ### Taus
                     TauCollection        = cms.InputTag("slimmedTaus"),
                     TauDiscriminators    = cms.vstring("decayModeFinding",

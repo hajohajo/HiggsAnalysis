@@ -954,14 +954,17 @@ class DatasetGroup:
         Create dataset grouping in a dictionary for easy access.
         '''
 
+        # analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "JetTriggers", "TauLeg", "METLeg", "L1Study", "All"]
         analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "JetTriggers", "TopSystBDT", "TauLeg", "METLeg", "L1Study", "All"]
-        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis" , "JetTriggers", "TauLeg", "METLeg", "L1Study", "All"]
+        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "Hplus2hwWithTopAnalysis", "JetTriggers", "TopSystBDT", "TauLeg", "METLeg", "L1Study", "All"]
+ 
         if self.analysis not in analyses:
             raise Exception("Unknown analysis \"%s\". Please select one of the following: \"%s" % (self.analysis, "\", \"".join(analyses) + "\".") )
 
         self.GroupDict["SignalAnalysis"]   = signalAnalysisDatasets
         self.GroupDict["Hplus2tbAnalysis"] = hplus2tbAnalysisDatasets
         self.GroupDict["Hplus2hwAnalysis"] = hplus2hwAnalysisDatasets
+        self.GroupDict["Hplus2hwWithTopAnalysis"] = hplus2hwAnalysisDatasets
         self.GroupDict["TauLeg"]           = tauLegDatasets
         self.GroupDict["METLeg"]           = metLegDatasets
         self.GroupDict["L1Study"]          = l1Datasets

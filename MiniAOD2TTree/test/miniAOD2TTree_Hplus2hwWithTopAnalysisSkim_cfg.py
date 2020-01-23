@@ -12,10 +12,10 @@ from HiggsAnalysis.MiniAOD2TTree.tools.HChOptions import getOptionsDataVersion
 #================================================================================================  
 # Options
 #================================================================================================  
-maxEvents    = 500
+maxEvents    = 1000
 maxWarnings  = 100
 reportEvery  = 10
-testWithData = False
+testWithData = True
 
 # Define ROOT files for local testing
 testData = {}
