@@ -313,7 +313,7 @@ def PrintProgressBar(taskName, iteration, total, suffix=""):
 def ClearProgressBar():
     Verbose("ClearProgressBar()")
     # The \r is the carriage return. (Option: You need the comma at the end of the print statement to avoid automatic newline)
-    print '\r%s' % (" "*180)
+    print '\r%s' % (" "*185)
     return
 
 
@@ -368,12 +368,13 @@ def GetTaskDashboardURL(datasetPath):
     Verbose("GetTaskDashboardURL()")
     
     # Variable Declaration
-    crabLog      = os.path.join(datasetPath, "crab.log")
-    grepFile     = os.path.join(datasetPath, "grep.tmp")
+    crabLog      = os.path.join(opts.dirName, datasetPath, "crab.log")
+    grepFile     = os.path.join(opts.dirName, datasetPath, "grep.tmp")
     stringToGrep = "Dashboard monitoring URL"
     cmd          = "grep '%s' %s > %s" % (stringToGrep, crabLog, grepFile )
     dashboardURL = "UNKNOWN"
 
+    Verbose(cmd, True)
     # Execute the command
     if os.system(cmd) == 0:
         
@@ -394,21 +395,20 @@ def GetTaskStatus(datasetPath):
     Call the "grep" command to look for the "Task status" from the crab.log file 
     of a given dataset. It uses as input parameter the absolute path of the task dir (datasetPath)
     '''
-    Verbose("GetTaskStatus()", True)
+    Verbose("GetTaskStatus(%s)" % (datasetPath) , True)
     
-    # Variable Declaration
+    # Variable Declaratio`4
+    if opts.dirName not in datasetPath:
+        datasetPath = os.path.join(opts.dirName, datasetPath)
     crabLog      = os.path.join(datasetPath, "crab.log")
     grepFile     = os.path.join(datasetPath, "grep.tmp")
-    #stringToGrep = "Task status:"
-    #stringToGrep = "Status on the CRAB server:"
-    #stringToGrep = "Jobs status:"
-    stringToGrep  = "Status on the scheduler:"
+    stringToGrep = "Status on the scheduler:"
     cmd          = "grep '%s' %s > %s" % (stringToGrep, crabLog, grepFile )
-    status       = "UNKNOWN"
-    
+    status       = "UNKN`OWN"
     if not os.path.exists( crabLog ):
         raise Exception("File %s not found!" % (crabLog) )
 
+    Verbose(cmd, True)
     # Execute the command
     if os.system(cmd) == 0:
 
@@ -487,6 +487,7 @@ def GetTaskReports(datasetPath, opts):
     # Catch exceptions (Errors detected during execution which may not be "fatal")
     except:
         msg = sys.exc_info()[1]
+        Print(msg, True)
         report = Report(datasetPath, "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?") 
         Print("crab status failed with message %s. Skipping ..." % ( msg ), True)
     return report
@@ -862,7 +863,7 @@ def CheckJob(opts, args):
     # Get the paths for the datasets (absolute paths)
     datasets = GetDatasetsPaths(opts)
     if len(datasets) < 1:
-        Print("Found %s CRAB tasks under %s! Exit .." % (opts.dirName) )
+        Print("Found %s CRAB tasks under %s! Exit .." % (len(datasets), opts.dirName) )
         return
     else:
         Verbose("Working with %s CRAB task directories:\n\t%s" % ( len(datasets), "\n\t".join( GetDatasetBasenames(datasets) ) ), True)
@@ -923,7 +924,7 @@ def PrintTaskSummary(reportDict):
                                "%s%s" % (colors.CYAN  , "Out"     ),
                                "%s%s" % (colors.WHITE , "Status"  ),
                                )
-    hLine = colors.WHITE + "="*180
+    hLine = colors.WHITE + "="*185
     reports.append(hLine)
     reports.append(header)
     reports.append(hLine)
@@ -1910,7 +1911,8 @@ def CreateJob(opts, args):
     opts.dirName = taskDirName
 
     # Give user last chance to abort
-    AskToContinue(taskDirName, analysis, opts)
+    if opts.ask:
+        AskToContinue(taskDirName, analysis, opts)
     
     # Create CRAB task diractory
     CreateTaskDir(taskDirName)
@@ -1957,6 +1959,7 @@ if __name__ == "__main__":
     PSET    = "miniAOD2TTree_SignalAnalysisSkim_cfg.py"
     SITE    = "T2_FI_HIP"
     DIRNAME = ""
+    ASK     = False
 
     parser = OptionParser(usage="Usage: %prog [options]")
     parser.add_option("--create", dest="create", default=False, action="store_true", 
@@ -1983,8 +1986,8 @@ if __name__ == "__main__":
     parser.add_option("-v", "--verbose", dest="verbose", default=VERBOSE, action="store_true",
                       help="Verbose mode for debugging purposes [default: %s]" % (VERBOSE))
 
-    parser.add_option("-a", "--ask", dest="ask", default=False, action="store_true",
-                      help="Prompt user before executing CRAB commands [defaut: False]")
+    parser.add_option("-a", "--ask", dest="ask", default=ASK, action="store_true",
+                      help="Prompt user before executing CRAB commands [defaut: %s]" % (ASK))
 
     parser.add_option("-p", "--pset", dest="pset", default=PSET, type="string",
                       help="The python cfg file to be used by cmsRun [default: %s]" % (PSET))
