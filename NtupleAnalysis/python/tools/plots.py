@@ -50,6 +50,7 @@ import histograms
 import styles
 import aux
 import HiggsAnalysis.NtupleAnalysis.tools.crosssection as xsect
+import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
 
 #================================================================================================
 # Global Definitions
@@ -583,72 +584,73 @@ for mass in _intermediateHplusMasses:
 #================================================================================================
 # Dataset ordering (default)
 #================================================================================================
-'''
-This defines the order in which the dataets will appear in the plots.
-The datasets high up in the _datasetOrder list will be plotted last in the MC stack.
-'''
-_datasetOrder = ["Data"]
-for process in ["TTToHplusBWB_M%d", "TTToHplusBHminusB_M%d", "TTToHplus_M%d", "Hplus_taunu_t-channel_M%d", "Hplus_taunu_tW-channel_M%d", "Hplus_taunu_s-channel_M%d", "Hplus_taunu_M%d", "TTOrTToHplus_M%d"]:
-    for mass in _lightHplusMasses:
-        _datasetOrder.append(process%mass)
-for mass in _intermediateHplusMasses:
-    _datasetOrder.append("HplusTBintermediate_M%d"%mass)
-for mass in _heavyHplusMasses:
-    _datasetOrder.append("HplusTB_M%d"%mass)
-for mass in _heavyHplusToTBbarMasses:
-    _datasetOrder.append("ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass)
+def getAnalysisOrder(analysisType="HToTauNu"):
+    '''
+    This defines the order in which the dataets will appear in the plots.
+    The datasets high up in the _datasetOrder list will be plotted last in the MC stack.
+    '''
+    
+    analysis = aux.getAnalysisType(analysisType)
+    
+    # Data always goes first. 
+    _datasetOrder = ["Data"]
 
-_datasetOrder.extend([
-    "FakeB",
-    "QCD",
-    "QCDdata",
-    "QCD-b",
-    "QCD_Pt20_MuEnriched",
-    "EWK",
-    "WJets",
-    "W1Jets",
-    "W2Jets",
-    "W3Jets",
-    "W4Jets",
-    "WJets_0bquark",
-    "WJets_1bquark",
-    "WJets_2bquark",
-    "WJets_3bquark",
-    "WToTauNu",
-    "WJetsHT",
-    "WJets",
-    "TTJets",
-    "TT",
-    "TT_Mtt",
-    "SingleTop",
-    "ttX",
-    "TTandSingleTop",
-    "DYJetsToLL",
-    "DYJetsToLLHT",
-    "DYJetsToQQHT",
-    "noTop",
-    "WJetsToQQ_HT_600ToInf",
-    "ttH"
-    "ttHJetToTT",
-    "ttHJetToGG",
-    "ttHJetTobb", 
-    "ttHJetToNonbb",
-    "TTZ",
-    "TTZToQQ",
-    "TTZToLL",
-    "TTWJets",
-    "TTWJetsToQQ",
-    "TTWJetsToLNu",
-    "Diboson",
-    "WW",
-    "WZ",
-    "ZZ"
-    "WWTo4Q",
-    "TTBB",
-    "TTTT",
-    "ZJetsToQQ_HT600toInf",
-    ]) 
+    # Signal samples
+    dsets_signal = {}
+    dsets_signal["HToTauNu"]      = []
+    dsets_signal["HToTB"]         = []
+    dsets_signal["HToHW"]         = []
+    dsets_signal["HToHW_withTop"] = []
 
+    for process in ["TTToHplusBWB_M%d", "TTToHplusBHminusB_M%d", "TTToHplus_M%d", "Hplus_taunu_t-channel_M%d", "Hplus_taunu_tW-channel_M%d", "Hplus_taunu_s-channel_M%d", "Hplus_taunu_M%d", "TTOrTToHplus_M%d"]:
+        for mass in _lightHplusMasses:
+            dsets_signal["HToTauNu"].append(process % mass)
+    for mass in _intermediateHplusMasses:
+        dsets_signal["HToTauNu"].append("HplusTBintermediate_M%d" % mass)
+    for mass in _heavyHplusMasses:
+        dsets_signal["HToTauNu"].append("HplusTB_M%d" % mass)
+    for mass in _heavyHplusToTBbarMasses:
+        dsets_signal["HToTB"].append("ChargedHiggs_HplusTB_HplusToTB_M_%d" % mass)
+    for mass in [300, 700]:
+        dsets_signal["HToHW"].append("ChargedHiggs_HplusTB_HplusToHW_M%d_mH200_2ta_NLO" % mass)
+        dsets_signal["HToHW_withTop"].append("ChargedHiggs_HplusTB_HplusToHW_M%d_mH200_2ta_NLO" % mass)
+
+    
+    # Extend list wih signal samples
+    _datasetOrder.extend(dsets_signal[analysisType])
+
+    # Analysis-specific 
+    dsets_HToTauNu = ["FakeB", "QCD","QCDdata","QCD-b", "QCD_Pt20_MuEnriched", "EWK", "WJets", "W1Jets", "W2Jets", "W3Jets", 
+                      "W4Jets", "WJets_0bquark", "WJets_1bquark", "WJets_2bquark", "WJets_3bquark", "WToTauNu", "WJetsHT", "WJets", 
+                      "TTJets", "TT", "TT_Mtt", "SingleTop", "ttX","TTandSingleTop", "DYJetsToLL", "DYJetsToLLHT", "DYJetsToQQHT", "noTop",
+                      "WJetsToQQ_HT_600ToInf", "ttH", "ttHJetToTT", "ttHJetToGG","ttHJetTobb", "ttHJetToNonbb", "TTZ", "TTZToQQ", 
+                      "TTZToLL","TTWJets","TTWJetsToQQ","TTWJetsToLNu","Diboson", "WW","WZ","ZZ""WWTo4Q","TTBB","TTTT","ZJetsToQQ_HT600toInf"]
+
+    dsets_HToTB = ["FakeB", "QCD","QCDdata","QCD-b", "QCD_Pt20_MuEnriched", "EWK", "WJets", "W1Jets", "W2Jets", "W3Jets", 
+                   "W4Jets", "WJets_0bquark", "WJets_1bquark", "WJets_2bquark", "WJets_3bquark", "WToTauNu", "WJetsHT", "WJets", 
+                   "TTJets", "TT", "TT_Mtt", "SingleTop", "ttX","TTandSingleTop", "DYJetsToLL", "DYJetsToLLHT", "DYJetsToQQHT", "noTop",
+                   "WJetsToQQ_HT_600ToInf", "ttH", "ttHJetToTT", "ttHJetToGG","ttHJetTobb", "ttHJetToNonbb", "TTZ", "TTZToQQ", 
+                   "TTZToLL","TTWJets","TTWJetsToQQ","TTWJetsToLNu","Diboson", "WW","WZ","ZZ""WWTo4Q","TTBB","TTTT","ZJetsToQQ_HT600toInf"]
+
+    dsets_HToHW = ["FakeB", "QCD","QCDdata","QCD-b", "QCD_Pt20_MuEnriched", "EWK", "WJets", "W1Jets", "W2Jets", "W3Jets", 
+                   "W4Jets", "WJets_0bquark", "WJets_1bquark", "WJets_2bquark", "WJets_3bquark", "WToTauNu", "WJetsHT", "WJets", 
+                   "TTJets", "TT", "TT_Mtt", "SingleTop", "ttX","TTandSingleTop", "DYJetsToLL", "DYJetsToLLHT", "DYJetsToQQHT", "noTop",
+                   "WJetsToQQ_HT_600ToInf", "ttH", "ttHJetToTT", "ttHJetToGG","ttHJetTobb", "ttHJetToNonbb", "TTZ", "TTZToQQ", 
+                   "TTZToLL","TTWJets","TTWJetsToQQ","TTWJetsToLNu","Diboson", "WW","WZ","ZZ""WWTo4Q","TTBB","TTTT","ZJetsToQQ_HT600toInf"]
+    
+    #dsets_HToHW_withTop = ["GenuineTau", "FakeTau", "WJetsHT", "TT", "SingleTop", "DYJetsToLLHT", "Diboson", "ttX"]
+    dsets_HToHW_withTop = ["GenuineTau", "FakeTau", "TT", "WJetsHT", "DYJetsToLLHT", "SingleTop", "Diboson", "ttX"]
+
+    myOrder = {}
+    myOrder["HToTauNu"]      = dsets_HToTauNu
+    myOrder["HToTB"]         = dsets_HToTB
+    myOrder["HToHW"]         = dsets_HToHW
+    myOrder["HToHW_withTop"] = dsets_HToHW_withTop
+    _datasetOrder.extend(myOrder[analysisType])
+
+    print "_datasetOrder = ", _datasetOrder
+    return _datasetOrder
+    
 #================================================================================================
 # Mapping of logical dataset names  to legend labels (dataset->label)
 #================================================================================================
@@ -1044,7 +1046,7 @@ def UpdatePlotStyleFill(styleMap, namesToFilled):
 
     return SetProperty(styleMap, update)
 
-def mergeRenameReorderForDataMC(datasetMgr, keepSourcesMC=False):
+def mergeRenameReorderForDataMC(datasetMgr, keepSourcesMC=False, analysisType="HToTauNu"):
     '''
     Default dataset merging, naming and reordering for data/MC comparison
     
@@ -1099,7 +1101,8 @@ normalization of background! \033[00m"""%datasetName
 
     mcNames = datasetMgr.getAllDatasetNames()
     newOrder = []
-    for name in _datasetOrder:
+    datasetOrder = getAnalysisOrder(analysisType)
+    for name in datasetOrder:
         try:
             i = mcNames.index(name)
             newOrder.append(name)
