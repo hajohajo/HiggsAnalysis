@@ -948,7 +948,9 @@ def PrintTaskSummary(reportDict):
         rOutput    = '{0: >3}'.format(report.retrievedOut)
         rLogsEOS   = '{0: >3}'.format(report.eosLog)
         rOutputEOS = '{0: >3}'.format(report.eosOut)
-        line = msgAlign.format(index, task,
+        line = msgAlign.format(index, 
+                               #task,
+                               (task[:58] + '..') if len(task) > 58 else task, # 
                                "%s%s/%s" % (colors.GRAY  , idle      , allJobs),
                                "%s%s/%s" % (colors.RED   , failed    , allJobs),
                                "%s%s/%s" % (colors.ORANGE, running   , allJobs),

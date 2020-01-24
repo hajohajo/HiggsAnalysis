@@ -145,7 +145,8 @@ def main(opts):
 
 
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
-        plots.mergeRenameReorderForDataMC(datasetsMgr) 
+        plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
+        #datasetsMgr.PrintInfo()
 
         # Set signal cross-section
         newOrder = datasetsMgr.getAllDatasetNames()
@@ -219,7 +220,7 @@ def main(opts):
 
             Verbose(h, i==1)
             PlotDataMCHistograms(datasetsMgr, h)
-        
+
     Print("All plots saved under directory %s" % (ts + aux.convertToURL(opts.saveDir, opts.url) + ns), True)    
     return
 
@@ -660,7 +661,8 @@ def GetHistoKwargs(h, opts):
 
     if "Njets" in h:
         kwargs["xlabel"] = "jet multiplicity"
-        kwargs["opts"]   = {"xmin": 3.0, "xmax": 12.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        #kwargs["opts"]   = {"xmin": 3.0, "xmax": 12.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": 12.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 3.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "muonN" in h:
