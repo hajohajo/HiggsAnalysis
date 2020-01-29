@@ -143,10 +143,8 @@ def main(opts):
         datasetsMgr.updateNAllEventsToPUWeighted()
         datasetsMgr.loadLuminosities() # from lumi.json
 
-
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
         plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
-        #datasetsMgr.PrintInfo()
 
         # Set signal cross-section
         newOrder = datasetsMgr.getAllDatasetNames()
@@ -931,14 +929,14 @@ def replaceBinLabels(p, kwargs, histoName):
     myBinDict["passed PV"]                           = "PV"
     myBinDict["passed e selection (Veto)"]           = "e veto"
     myBinDict["passed mu selection ()"]              = "1 #mu"
-    myBinDict["Passed tau selection ()"]             = "#geq 1 #tau jets"
+    myBinDict["Passed tau selection ()"]             = "1 #tau jet"
     myBinDict["Passed tau selection and genuine ()"] = "genuine #tau"
-    myBinDict["#tau N"]                              = "2 #tau jets"
+    myBinDict["#tau N"]                              = "1 #tau jet(s)"
     myBinDict["#tau OS"]                             = "#taus OS"
     myBinDict["#tau SF"]                             = "#tau SF"
     myBinDict["Fake #tau SF"]                        = "fake #tau SF"
     myBinDict["#tau DM"]                             = "DM"
-    myBinDict["passed jet selection ()"]             = "#geq 3 jets"
+    myBinDict["passed jet selection ()"]             = "#geq 0 jets"
     myBinDict["passed angular cuts Collinear ()"]    = "R_{coll}"
     myBinDict["passed b-jet selection ()"]           = "#geq 1 b jets"
     myBinDict["b-tag SF"]                            = "b jets SF"

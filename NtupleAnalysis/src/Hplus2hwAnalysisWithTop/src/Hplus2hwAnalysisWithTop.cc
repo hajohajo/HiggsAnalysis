@@ -253,8 +253,8 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   if (!tauData.hasIdentifiedTaus() ) return;
   if (0) std::cout << "=== Tau Selection: Has Identified taus" << std::endl;
     
-  // -> Require 2 taus
-  if(tauData.getSelectedTaus().size() != 1) return;
+  // -> Require # of taus
+  if(tauData.getSelectedTaus().size() != 1) return; // fixme. needed? check signal analysis
   cTauNCounter.increment(); 
   if (0) std::cout << "=== Tau Selection: 1 selected taus" << std::endl;
 
