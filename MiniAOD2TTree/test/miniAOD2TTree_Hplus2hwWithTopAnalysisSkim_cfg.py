@@ -14,15 +14,18 @@ from HiggsAnalysis.MiniAOD2TTree.tools.HChOptions import getOptionsDataVersion
 #================================================================================================  
 maxEvents    = 1000
 maxWarnings  = 100
-reportEvery  = 10
+reportEvery  = 1
 testWithData = True
 
 # Define ROOT files for local testing
 testData = {}
 testData["SingleElectron"] = [
-    '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FEB9169C-39EB-E611-9E94-0CC47AD99116.root',
-    '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FE9CA978-3CEB-E611-8617-90B11C27E14D.root',
-    '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FCB0EDF4-28EB-E611-ABAF-A0000420FE80.root',
+    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver2-v2/110001/FE93EA39-A2EB-E611-A1E5-0CC47AD99176.root',                                                                                   
+    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver2-v2/110001/FE23EF13-84EB-E611-B99A-0025905A6070.root',                                                                                   
+    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver2-v2/110001/FAEF3272-79EB-E611-84C3-0CC47AACFCDE.root',   
+    # '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FEB9169C-39EB-E611-9E94-0CC47AD99116.root',
+    # '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FE9CA978-3CEB-E611-8617-90B11C27E14D.root',
+    # '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FCB0EDF4-28EB-E611-ABAF-A0000420FE80.root',
     # '/store/data/Run2016H/SingleElectron/MINIAOD/PromptReco-v2/000/284/035/00000/F063D9E7-449F-E611-9C38-02163E014291.root',
     # '/store/data/Run2016H/SingleElectron/MINIAOD/PromptReco-v2/000/284/035/00000/EA3918D4-449F-E611-8B15-FA163E8769C6.root',
     # '/store/data/Run2016H/SingleElectron/MINIAOD/PromptReco-v2/000/284/035/00000/DEBB0DF5-449F-E611-909F-02163E01425C.root',
@@ -252,27 +255,6 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
         TriggerPrescales = cms.untracked.PSet(
             src   = cms.InputTag("patTrigger",""),
             paths = cms.vstring(
-                # SingleMuon Primary Dataset (PD)
-                "HLT_IsoMu24_v", 
-                "HLT_IsoTkMu24_v",
-                # SingleElectron Primary Dataset (PD)
-                "HLT_Ele27_WPTight_Gsf_v",
-                # DoubleMuon Primary Dataset (PD)
-                "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v",
-                "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v",
-                "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
-                "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
-                # DoubleEG Primary Dataset (PD)
-                "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-                "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-                "HLT_DoubleEle33_CaloIdL_v",
-                # MuonEG Primary Dataset (PD)
-                "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",
-                "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
-                "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
-                "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-                "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",
-                "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
                 )
             ),
 	filter = cms.untracked.bool(False)

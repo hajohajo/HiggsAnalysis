@@ -214,7 +214,7 @@ bool Hplus2hwWithTopAnalysisSkim::filter(edm::Event& iEvent, const edm::EventSet
 		  if (std::regex_search(*j, hlt_re)) 
 		    {
 		      
-		      if (cfg_verbose*1) std::cout << "\t" << *j << " = " << trghandle->accept(n) << std::endl;
+		      if (cfg_verbose) std::cout << "\t" << *j << " = " << trghandle->accept(n) << std::endl;
 		      trgBitFound = true;
 
 		      if ( trghandle->accept(n) ) firedTriggers.push_back(*j);
@@ -417,14 +417,14 @@ bool Hplus2hwWithTopAnalysisSkim::filter(edm::Event& iEvent, const edm::EventSet
       {
 	// Apply electron multiplicity selection
 	if (nElectrons < cfg_electronNCut) return false;
-	if (cfg_verbose*1) std::cout << "=== nElectrons:\n\tSelected = " << nElectrons << ", Requested = " << cfg_electronNCut << std::endl;
+	if (cfg_verbose) std::cout << "=== nElectrons:\n\tSelected = " << nElectrons << ", Requested = " << cfg_electronNCut << std::endl;
 	
 	// Apply muon multiplicity selection
 	if (nMuons < cfg_muonNCut) return false; //fixme
-	if (cfg_verbose*1) std::cout << "=== Passed Muons:\n\tSelected = " << nMuons << ", Requested =  " << cfg_muonNCut << std::endl;
+	if (cfg_verbose) std::cout << "=== Passed Muons:\n\tSelected = " << nMuons << ", Requested =  " << cfg_muonNCut << std::endl;
 
       }
-    if (cfg_verbose*1) std::cout << "=== Passed Leptons:\n\tSelected = " << nLeptons << ", Requested = " << cfg_leptonNCut << std::endl;
+    if (cfg_verbose) std::cout << "=== Passed Leptons:\n\tSelected = " << nLeptons << ", Requested = " << cfg_leptonNCut << std::endl;
     
 
     // Taus
@@ -460,7 +460,7 @@ bool Hplus2hwWithTopAnalysisSkim::filter(edm::Event& iEvent, const edm::EventSet
       }
     // Apply tau multiplicity selection
     if (nTaus < cfg_tauNCut) return false;
-    if (cfg_verbose*1) std::cout << "=== Passed Taus:\n\tSelected = " << nTaus << ", Requested = " << cfg_tauNCut << std::endl;
+    if (cfg_verbose) std::cout << "=== Passed Taus:\n\tSelected = " << nTaus << ", Requested = " << cfg_tauNCut << std::endl;
     
 
     // Jets
@@ -502,7 +502,7 @@ bool Hplus2hwWithTopAnalysisSkim::filter(edm::Event& iEvent, const edm::EventSet
       }
     // Apply jet multiplicity selection
     if(nJets < cfg_jetsNCut) return false;
-    if (cfg_verbose*1) std::cout << "=== Passed Jets:\n\tSelected = " << nJets << ", Requested = " << cfg_jetsNCut << std::endl;
+    if (cfg_verbose) std::cout << "=== Passed Jets:\n\tSelected = " << nJets << ", Requested = " << cfg_jetsNCut << std::endl;
     
 
     // All selections passed
