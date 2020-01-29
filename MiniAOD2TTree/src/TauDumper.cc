@@ -134,10 +134,12 @@ pat::Tau TauDumper::TEScorrection(const pat::Tau& tau){
 bool TauDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
   if (!booked) return true;
   
+  if (0) std::cout << "=== TauDumper::fill() GenParticlesHandle" << std::endl;
   edm::Handle <reco::GenParticleCollection> genParticlesHandle;
   if (!iEvent.isRealData())
     iEvent.getByToken(genParticleToken, genParticlesHandle);
 
+  if (0) std::cout << "=== TauDumper::fill() inputCollections loop" << std::endl;
   for(size_t ic = 0; ic < inputCollections.size(); ++ic){
     edm::Handle<edm::View<pat::Tau>> tauHandle;
     iEvent.getByToken(tauToken[ic], tauHandle);
@@ -147,10 +149,12 @@ bool TauDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
       std::vector<std::string> discriminatorNames = inputCollections[ic].getParameter<std::vector<std::string> >("discriminators");
       double TESvariation = inputCollections[ic].getUntrackedParameter<double>("TESvariation");
       double TESvariationExtreme = inputCollections[ic].getUntrackedParameter<double>("TESvariationExtreme");
-      
+
+      if (0) std::cout << "=== TauDumper::fill() tauHandle" << std::endl;
       for(size_t i=0; i<tauHandle->size(); ++i) {
         const pat::Tau& rawtau = tauHandle->at(i);
 
+	if (0) std::cout << "=== TauDumper::fill() TEScorrection" << std::endl;
 	pat::Tau tau = TEScorrection(rawtau);
 
         pt[ic].push_back(tau.p4().pt());
@@ -187,27 +191,29 @@ bool TauDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
           discriminators[inputCollections.size()*iDiscr+ic].push_back(tau.tauID(discriminatorNames[iDiscr]));
         }
         // Systematics variations
-        if (systVariations && !iEvent.isRealData()) {
-	  double variation = TESvariation;
-          if(tau.p4().pt() > 400) variation = TESvariationExtreme;
-
-          systTESup[ic].add(tau.p4().pt()*(1.0+variation),
-                            tau.p4().eta(),
-                            tau.p4().phi(),
-                            tau.p4().energy()*(1.0+variation));
-          systTESdown[ic].add(tau.p4().pt()*(1.0-variation),
-                            tau.p4().eta(),
-                            tau.p4().phi(),
-                            tau.p4().energy()*(1.0-variation));
-          systExtremeTESup[ic].add(tau.p4().pt()*(1.0+TESvariationExtreme),
-                                    tau.p4().eta(),
-                                    tau.p4().phi(),
-                                    tau.p4().energy()*(1.0+TESvariationExtreme));
-          systExtremeTESdown[ic].add(tau.p4().pt()*(1.0-TESvariationExtreme),
-                                    tau.p4().eta(),
-                                    tau.p4().phi(),
-                                    tau.p4().energy()*(1.0-TESvariationExtreme));
-        }
+        if (systVariations && !iEvent.isRealData()) 
+	  {
+	    if (0) std::cout << "=== TauDumper::fill() systVariations" << std::endl;
+	    double variation = TESvariation;
+	    if(tau.p4().pt() > 400) variation = TESvariationExtreme;
+	    
+	    systTESup[ic].add(tau.p4().pt()*(1.0+variation),
+			      tau.p4().eta(),
+			      tau.p4().phi(),
+			      tau.p4().energy()*(1.0+variation));
+	    systTESdown[ic].add(tau.p4().pt()*(1.0-variation),
+				tau.p4().eta(),
+				tau.p4().phi(),
+				tau.p4().energy()*(1.0-variation));
+	    systExtremeTESup[ic].add(tau.p4().pt()*(1.0+TESvariationExtreme),
+				     tau.p4().eta(),
+				     tau.p4().phi(),
+				     tau.p4().energy()*(1.0+TESvariationExtreme));
+	    systExtremeTESdown[ic].add(tau.p4().pt()*(1.0-TESvariationExtreme),
+				       tau.p4().eta(),
+				       tau.p4().phi(),
+				       tau.p4().energy()*(1.0-TESvariationExtreme));
+	  }
         
         // Find MC particle matching to the tau. Logic is done in the following order:
         // - e is true if DeltaR(reco_tau, MC_e) < 0.1
@@ -223,9 +229,12 @@ bool TauDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
         // - else                           -> pdgId = 0
 
         // MC match info
+	if (0) std::cout << "=== TauDumper::fill() fillMCMatchInfo" << std::endl;
         if (!iEvent.isRealData())
           fillMCMatchInfo(ic, genParticlesHandle, tau);
+
         // Find matching jet
+	if (0) std::cout << "=== TauDumper::fill() Find matching jet" << std::endl;
         reco::Candidate::LorentzVector p4BestJet(0,0,0,0);
         double myMinDeltaR = 999.0;
         int jetPdgId = 0;
@@ -248,6 +257,7 @@ bool TauDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
       } // tau loop
     } 
   } // input collections
+	if (0) std::cout << "=== TauDumper::fill() Before calling filter()" << std::endl;
   return filter();
 }
 
