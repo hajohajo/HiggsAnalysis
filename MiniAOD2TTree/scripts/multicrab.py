@@ -662,7 +662,12 @@ def ResubmitTask(taskPath, failed):
         return
 
     joblist = JobList(failed)
-    
+    nFailed = 0
+    if isinstance(joblist, list):
+        nFailed = len(joblist)
+    else:
+        nFailed = len([joblist])
+
     # Sanity check
     if len(joblist) < 1:
         return
@@ -674,10 +679,10 @@ def ResubmitTask(taskPath, failed):
             return
     else:
         taskName = os.path.basename(taskPath)
-        Print("Found %s failed jobs! Resubmitting ..." % (len(joblist) ) )
+        Print("Found %d failed jobs! Resubmitting ..." % (nFailed) )
         Print("crab resubmit %s --jobids %s" % (taskName, joblist) )
         result = crabCommand('resubmit', jobids=joblist, dir=taskPath)
-        Verbose("Calling crab resubmit %s --jobids %s returned" % (taskName, joblist, result ) )
+        Verbose("Calling crab \"resubmit %s --jobids %s\" returned %s" % (taskName, joblist, result ) )
 
     return
 
