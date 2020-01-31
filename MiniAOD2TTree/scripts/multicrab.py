@@ -663,10 +663,10 @@ def ResubmitTask(taskPath, failed):
 
     joblist = JobList(failed)
     nFailed = 0
-    if isinstance(joblist, list):
-        nFailed = len(joblist)
+    if "," in joblist:
+        nFailed = len(joblist.split(","))
     else:
-        nFailed = len([joblist])
+        nFailed = 1
 
     # Sanity check
     if len(joblist) < 1:
