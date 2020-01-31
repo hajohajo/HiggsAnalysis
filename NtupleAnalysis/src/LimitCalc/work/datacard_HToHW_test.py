@@ -91,7 +91,7 @@ def PrintNuisancesTable(Nuisances, DataGroups):
 #================================================================================================  
 # Options
 #================================================================================================  
-OptionTest                             = True  # [default: False]
+OptionTest                             = False  # [default: False]
 OptionPaper                            = True  # [default: True]   (Changes figure style to paper style)
 OptionIncludeSystematics               = True  # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
 OptionShapeSystematics                 = False # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
@@ -116,7 +116,7 @@ OptionPlotNamePrefix                   = None  #"Results" #[default: None] (Pref
 #================================================================================================  
 OptionPrintNuisances                   = False            # [default: True]
 MassPoints                             = [300, 700]       # [default: [300, 700]] (Mass points to be considered)
-PlotLegendHeader                       = "H^{#pm}#rightarrowW^{#pm}H^{0}, H^{0}#rightarrow #tau^{+}_{h} #tau^{-}_{h}"
+PlotLegendHeader                       = "H^{#pm}#rightarrowW^{#pm}H^{0}, H^{0}#rightarrow #tau^{+} #tau^{-}"  #tau^{+}_{h} #tau^{-}_{h}"
 SignalName                             = "ChargedHiggs_HplusTB_HplusToHW_M%s_mH200_2ta_NLO"
 DataCardName                           = "HToHW"          # [default: Hplus2hw_13TeV]  (Used by TableProducer.py)
 BlindAnalysis                          = False             # [default: True]   (Change only if "green light" for unblinding)
@@ -531,6 +531,7 @@ if (nSysShapeComponents>0):
 uPt     = "GeV/c"
 uMass   = "GeV/c^{2}"
 uEnergy = "GeV"
+yMin    = 0.5e-1 #0.5e-2
 if OptionPaper:
     uPt   = "GeV"
     uMass = "GeV"
@@ -548,7 +549,7 @@ hMET = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmax": 300.0}
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}#, "xmax": 300.0}
                   },
     blindedRange=[100.0, 1000.0], # specify range min,max if blinding applies to this control plot      
     )
@@ -563,7 +564,7 @@ hHT = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 3000.0} },
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}#, "xmax": 3000.0} },
                   },
     blindedRange=[200.0, 1500.0], # specify range min,max if blinding applies to this control plot      
     )
@@ -578,7 +579,7 @@ hMHT = ControlPlotInput(
                    "log"                : True,
                    "legendPosition"     : "NE",
                    "ratioLegendPosition": "right",
-                   "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 400.0} }
+                   "opts"               : {"ymin": yMin, "ymaxfactor": 10}#, "xmax": 400.0} }
                    },
     )
 
@@ -592,7 +593,7 @@ hTopPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "SE", #"right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmax": 800.0}
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10, "xmax": 800.0}
                          },
     )
 
@@ -606,7 +607,7 @@ hTopMass = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 350.0} 
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}#, "xmax": 350.0} 
                   },
     )
 
@@ -620,7 +621,7 @@ hTopBjetPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 700.0} }
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}#, "xmax": 700.0} }
                   },
     )
 
@@ -634,7 +635,7 @@ hTopBjetEta = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "RM",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmin": -2.5, "xmax": 2.5} 
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10, "xmin": -2.5, "xmax": 2.5} 
                   },
     )
 
@@ -648,7 +649,7 @@ hTopBjetBdisc = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NW",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmin": 0.7}
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10, "xmin": 0.7}
                   },
     )
 
@@ -663,7 +664,7 @@ hTopDijetPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}#, "xmax": 700.0} 
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}#, "xmax": 700.0} 
                   },
     )
 
@@ -677,7 +678,7 @@ hTopDijetMass = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2}
+                  "opts"               : {"ymin": yMin}
                          },
     )
 
@@ -691,7 +692,7 @@ hTransverseMass = ControlPlotInput(
                     "log"                : True,
                     "legendPosition"     : "NE",
                     "ratioLegendPosition": "right",
-                    "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
+                    "opts"               : {"ymin": yMin, "ymaxfactor": 10}
                     },
     blindedRange=[0.0, 2500.0], # specify range min,max if blinding applies to this control plot
     flowPlotCaption  = "", # Leave blank if you don't want to include the item to the selection flow plot    
@@ -708,7 +709,7 @@ hVertices = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10, "xmax": 80.0} 
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10, "xmax": 105.0} 
                   },
     flowPlotCaption  = "", # Leave blank if you don't want to include the item to the selection flow plot    
     )
@@ -723,7 +724,7 @@ hNjets = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}
                   },
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
@@ -738,7 +739,7 @@ hNBjets = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}
                   },
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
@@ -753,7 +754,7 @@ hJetPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}
                   },
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot
     )
@@ -768,7 +769,7 @@ hJetEta = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "RM",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}}#,
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}}#,
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
 
@@ -783,7 +784,7 @@ hBJetPt = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NE",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}}#,
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}}#,
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
 
@@ -797,7 +798,7 @@ hBJetEta = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "RM",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10}}#,
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10}}#,
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
 
@@ -811,7 +812,7 @@ hBtagDiscriminator = ControlPlotInput(
                   "log"                : True,
                   "legendPosition"     : "NW",
                   "ratioLegendPosition": "right",
-                  "opts"               : {"ymin": 0.5e-2, "ymaxfactor": 10,  "xmin": 0.7}}
+                  "opts"               : {"ymin": yMin, "ymaxfactor": 10,  "xmin": 0.5}}
     #blindedRange=[100.0, 400.0], # specify range min,max if blinding applies to this control plot      
     )
 
@@ -821,13 +822,13 @@ hBtagDiscriminator = ControlPlotInput(
 ControlPlots.append(hMET)
 ControlPlots.append(hHT)
 ControlPlots.append(hMHT)
-ControlPlots.append(hTopPt)
-ControlPlots.append(hTopMass)
-ControlPlots.append(hTopBjetPt)
-ControlPlots.append(hTopBjetEta)
-ControlPlots.append(hTopBjetBdisc)
-ControlPlots.append(hTopDijetPt)
-ControlPlots.append(hTopDijetMass)
+#ControlPlots.append(hTopPt)
+#ControlPlots.append(hTopMass)
+#ControlPlots.append(hTopBjetPt)
+#ControlPlots.append(hTopBjetEta)
+#ControlPlots.append(hTopBjetBdisc)
+#ControlPlots.append(hTopDijetPt)
+#ControlPlots.append(hTopDijetMass)
 ControlPlots.append(hVertices)
 ControlPlots.append(hNjets)
 ControlPlots.append(hJetPt)

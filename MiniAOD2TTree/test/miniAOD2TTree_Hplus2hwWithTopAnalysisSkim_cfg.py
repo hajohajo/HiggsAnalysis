@@ -12,10 +12,10 @@ from HiggsAnalysis.MiniAOD2TTree.tools.HChOptions import getOptionsDataVersion
 #================================================================================================  
 # Options
 #================================================================================================  
-maxEvents    = 1000
+maxEvents    = 100
 maxWarnings  = 100
 reportEvery  = 1
-testWithData = True
+testWithData = False
 
 # Define ROOT files for local testing
 testData = {}
@@ -180,6 +180,14 @@ process.load("HiggsAnalysis/MiniAOD2TTree/Top_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/MET_cfi")
 process.load("HiggsAnalysis/MiniAOD2TTree/METNoiseFilter_cfi")
 
+#================================================================================================ 
+# Setup skim counters
+#================================================================================================ 
+process.load("HiggsAnalysis.MiniAOD2TTree.Hplus2hwWithTopAnalysisSkim_cfi")
+process.skimCounterAll        = cms.EDProducer("HplusEventCountProducer")
+process.skimCounterPassed     = cms.EDProducer("HplusEventCountProducer")
+process.skim.TriggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getTriggerProcess()))
+
 process.METNoiseFilter.triggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getMETFilteringProcess())) 
 
 process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
@@ -203,59 +211,36 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
     ),
     Trigger = cms.PSet(
 	TriggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getTriggerProcess())),
-	TriggerBits    = cms.vstring(
-            # SingleMuon Primary Dataset (PD)
-            "HLT_IsoMu24_v", 
-            "HLT_IsoTkMu24_v",
-            # SingleElectron Primary Dataset (PD)
-            "HLT_Ele27_WPTight_Gsf_v",
-            # DoubleMuon Primary Dataset (PD)
-            "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v",
-            "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v",
-            "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
-            "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
-            # DoubleEG Primary Dataset (PD)
-            "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            "HLT_DoubleEle33_CaloIdL_v",
-            # MuonEG Primary Dataset (PD)
-            "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            ),
+	TriggerBits    = process.skim.HLTPaths,
 	L1Extra        = cms.InputTag("l1extraParticles:MET"),
         L1EtSumObjects = cms.InputTag("caloStage2Digis:EtSum"),
 	TriggerObjects = cms.InputTag("selectedPatTrigger"),
-        TriggerMatch   = cms.untracked.vstring(
-            # SingleMuon Primary Dataset (PD)
-            "HLT_IsoMu24_v", 
-            "HLT_IsoTkMu24_v",
-            # SingleElectron Primary Dataset (PD)
-            "HLT_Ele27_WPTight_Gsf_v",
-            # DoubleMuon Primary Dataset (PD)
-            "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v",
-            "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v",
-            "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
-            "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
-            # DoubleEG Primary Dataset (PD)
-            "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            "HLT_DoubleEle33_CaloIdL_v",
-            # MuonEG Primary Dataset (PD)
-            "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
-        ),
+        TriggerMatch   = cms.untracked.vstring(# SingleMuon Primary Dataset (PD)
+                                                 "HLT_IsoMu24_v", 
+                                                 "HLT_IsoTkMu24_v",
+                                                 # SingleElectron Primary Dataset (PD)
+                                                 "HLT_Ele27_WPTight_Gsf_v",
+                                                 # DoubleMuon Primary Dataset (PD)
+                                                 "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v",
+                                                 "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v",
+                                                 "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
+                                                 "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
+                                                 # DoubleEG Primary Dataset (PD)
+                                                 "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
+                                                 "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
+                                                 "HLT_DoubleEle33_CaloIdL_v",
+                                                 # MuonEG Primary Dataset (PD)
+                                                 "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",
+                                                 "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
+                                                 "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
+                                                 "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
+                                                 "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",
+                                                 "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
+                                                 ),
         TriggerPrescales = cms.untracked.PSet(
             src   = cms.InputTag("patTrigger",""),
             paths = cms.vstring(
-                )
+                ) # don't include unnecessary triggers (causes crash in some cases)
             ),
 	filter = cms.untracked.bool(False)
     ),
@@ -307,13 +292,6 @@ process.dump = cms.EDFilter('MiniAOD2TTreeFilter',
 
 )
 
-#================================================================================================ 
-# Setup skim counters
-#================================================================================================ 
-process.load("HiggsAnalysis.MiniAOD2TTree.Hplus2hwWithTopAnalysisSkim_cfi")
-process.skimCounterAll        = cms.EDProducer("HplusEventCountProducer")
-process.skimCounterPassed     = cms.EDProducer("HplusEventCountProducer")
-process.skim.TriggerResults = cms.InputTag("TriggerResults::"+str(dataVersion.getTriggerProcess()))
 
 #================================================================================================ 
 # Setup customizations

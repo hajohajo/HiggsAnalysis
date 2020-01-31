@@ -141,16 +141,16 @@ void TriggerDumper::book(const edm::Run& iRun, HLTConfigProvider hltConfig){
 
   // Trigger matching
   std::regex obj_re("((Tau)|(Mu)|(Ele))");
-//  std::regex obj_re("((Tau)|(Egamma))");
+  //  std::regex obj_re("((Tau)|(Egamma))");
   for(size_t imatch = 0; imatch < trgMatchStr.size(); ++imatch){
     std::string name = "";
     std::smatch match;
     if (std::regex_search(trgMatchStr[imatch], match, obj_re) && match.size() > 0) name = match.str(0); 
-    if(name=="Tau") name = "Taus"; // FIXME, these should come from the config
-    if(name=="Mu") name = "Muons"; // FIXME, these should come from the config
-    if(name=="Ele") name = "Electrons"; // FIXME, these should come from the config
+    if (name=="Tau") name = "Taus";      // FIXME, these should come from the config
+    if (name=="Mu")  name = "Muons";     // FIXME, these should come from the config
+    if (name=="Ele") name = "Electrons"; // FIXME, these should come from the config
     name+= "_TrgMatch_";
-
+    
     std::regex match_re(trgMatchStr[imatch]);
     for(size_t i = 0; i < selectedTriggers.size(); ++i){		
       if (std::regex_search(selectedTriggers[i], match_re)) {
@@ -316,11 +316,11 @@ bool TriggerDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
       
 	// Trigger object is of type Muon
+	// https://github.com/cms-sw/cmssw/blob/master/DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h
         if(patTriggerObject.id(trigger::TriggerMuon))
 	  {
 	    if (0) std::cout << "TriggerDumper::fill() TriggerMuon" << std::endl;
 	    bool fired = false;
-	    
 	    for(size_t i = 0; i < trgMatchPaths.size(); ++i)
 	      {
 		if(patTriggerObject.hasPathName( trgMatchPaths[i], true, true )) fired = true;
@@ -332,7 +332,7 @@ bool TriggerDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
 		HLTMuon_phi.push_back(patTriggerObject.p4().Phi());
 		HLTMuon_e.push_back(patTriggerObject.p4().E());
 	      }
-	    // std::cout << "Trigger Muon " << patTriggerObject.p4().Pt() << std::endl;
+	    if (0) std::cout << "Trigger Muon " << patTriggerObject.p4().Pt() << std::endl;
 	  }//triggerMuon
       
 	// Printouts disabled
