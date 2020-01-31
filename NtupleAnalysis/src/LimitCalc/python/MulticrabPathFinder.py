@@ -44,6 +44,8 @@ class MulticrabDirectoryDataType:
     EWKMC        = 9
     FAKEB        = 10
     GENUINEB     = 11
+    FAKETAU      = 12
+    GENUINETAU   = 13
 
 class MulticrabPathFinder:
     def __init__(self, path, analysisType="HToTauNu", verbose=False):
