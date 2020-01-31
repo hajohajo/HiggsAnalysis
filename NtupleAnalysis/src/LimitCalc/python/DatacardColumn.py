@@ -244,6 +244,10 @@ class DatacardColumn():
             dsetType = MulticrabDirectoryDataType.FAKEB
         elif datasetType == "GenuineB":
             dsetType = MulticrabDirectoryDataType.GENUINEB
+        elif datasetType == "FakeTau":
+            dsetType = MulticrabDirectoryDataType.FAKETAU
+        elif datasetType == "GenuineTau":
+            dsetType = MulticrabDirectoryDataType.GENUINETAU
         elif datasetType == "Embedding":
             dsetType = MulticrabDirectoryDataType.EWKTAUS
         elif datasetType == "EWKfake":
@@ -332,6 +336,18 @@ class DatacardColumn():
         '''
         return self._datasetType == MulticrabDirectoryDataType.GENUINEB
 
+    def typeIsGenuineTau(self):
+        '''
+        Returns true if the column is using the Genuine-tau (EWK MC) samples 
+        '''
+        return self._datasetType == MulticrabDirectoryDataType.GENUINETAU
+
+    def typeIsFakeTau(self):
+        '''
+        Returns true if the column is using the Fake-tau (EWK MC) samples
+        '''
+        return self._datasetType == MulticrabDirectoryDataType.FAKETAU
+
     def typeIsQCD(self):
         '''
         Returns true if the column is QCD
@@ -370,6 +386,8 @@ class DatacardColumn():
         typeDict["EWKfake"]     = self.typeIsEWKfake()
         typeDict["FakeB"]       = self.typeIsFakeB()
         typeDict["GenuineB"]    = self.typeIsGenuineB()
+        typeDict["FakeTau"]     = self.typeIsFakeTau()
+        typeDict["GenuineTau"]  = self.typeIsGenuineTau()
         typeDict["QCD"]         = self.typeIsQCD()
         typeDict["QCDMC"]       = self.typeIsQCDMC()
         typeDict["EWKMC"]       = self.typeIsEWKMC()
