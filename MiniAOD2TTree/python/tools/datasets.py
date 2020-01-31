@@ -825,7 +825,7 @@ hplus2hwAnalysisDatasets.extend(datasetsWJetsHT)
 hplus2hwAnalysisDatasets.extend(datasetsDiboson)
 ### hplus2hwAnalysisDatasets.extend(datasetsQCD)
 hplus2hwAnalysisDatasets.extend(datasetsQCDMuEnriched)
-hplus2hwAnalysisDatasets.extend(datasetsQCDbEnriched)
+### hplus2hwAnalysisDatasets.extend(datasetsQCDbEnriched) #don't think we need this
 hplus2hwAnalysisDatasets.extend(datasetsTTWJetsToLNu)
 hplus2hwAnalysisDatasets.extend(datasetsTTTT)
 hplus2hwAnalysisDatasets.extend(datasetsTTZToLLNuNu)
