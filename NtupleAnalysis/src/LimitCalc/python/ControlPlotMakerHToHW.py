@@ -38,9 +38,11 @@ sh_w = ShellStyles.WarningStyle()
 #================================================================================================ 
 # Definitions
 #================================================================================================ 
-_legendLabelQCDMC = "QCD (MC)" 
-_legendLabelEWKMC = "EWK (MC)" 
-_legendLabelFakeB = "Jets misid. as #tau_{h}"
+_legendLabelQCDMC      = "QCD (MC)" 
+_legendLabelEWKMC      = "EWK (MC)" 
+_legendLabelFakeB      = "Jets misid. as b jets"
+_legendLabelFakeTau    = "Jets misid. as #tau_{h}"
+_legendLabelGenuineTau = "Genuine  #tau_{h}"
 
 drawPlot = plots.PlotDrawer(ratio             = True, 
                             ratioYlabel       = "Data / Bkg  ",
@@ -133,18 +135,19 @@ class ControlPlotMaker:
 
                 # The case m < 0 is for plotting hitograms without any signal
                 if m > 0:
-                    saveName = "%s/%s_M%d_%s" % (self._dirname, self._config.OptionPlotNamePrefix, m, myCtrlPlot.title) #xenios - iro
+                    saveName = "%s/%s_M%d_%s" % (self._dirname, self._config.OptionPlotNamePrefix, m, myCtrlPlot.title)
                     msg      = "Control Plot %d/%d: mH=%s GeV"  % (counter, nMasses*nPlots, str(m))
                 else:
                     saveName = "%s/%s_%s" % (self._dirname, self._config.OptionPlotNamePrefix, myCtrlPlot.title)
                     msg      = "Control Plot %d/%d: no signal"  % (counter, nMasses*nPlots)
 
                 # Initialize histograms
-                hData     = None
-                hSignal   = None
-                hFakeB    = None
-                hQCDMC    = None
-                stackList = []
+                hData       = None
+                hSignal     = None
+                hFakeTau    = None
+                hGenuineTau = None
+                hQCDMC      = None
+                stackList   = []
 
                 # Inform user of progress
                 self.PrintFlushed(sh_l + msg + sh_n, counter==1)
@@ -198,13 +201,20 @@ class ControlPlotMaker:
                             hSignal = h.Clone()
                         else:
                             hSignal.Add(h)
-                    elif c.typeIsFakeB():
-                        msg += ". FakeB"
+                    elif c.typeIsFakeTau():
+                        msg += ". FakeTau"
                         self.Verbose(msg, True)
-                        if hFakeB == None:
-                            hFakeB = h.Clone()
+                        if hFakeTau == None:
+                            hFakeTau = h.Clone()
                         else:
-                            hFakeB.Add(h)
+                            hFakeTau.Add(h)
+                    elif c.typeIsGenuineTau():
+                        msg += ". GenuineTau"
+                        self.Verbose(msg, True)
+                        if hGenuineTau == None:
+                            hGenuineTau = h.Clone()
+                        else:
+                            hGenuineTau.Add(h)
                     elif c.typeIsQCDMC():
                         msg += ". QCDMC"
                         self.Verbose(msg, True)
@@ -224,12 +234,20 @@ class ControlPlotMaker:
                     
                 # If stackList is empty skip the next steps
                 if len(stackList) < 1:
-                    continue
+                    #continue
+                    msg = "The stackList is empty!"
+                    self.Print(sh_e + msg + sh_n, True)
 
                 # Stack all the histograms
-                if hFakeB != None:
-                    self.Verbose("Stacking FakeB", True)
-                    myHisto = histograms.Histo(hFakeB, "FakeB", legendLabel=_legendLabelFakeB)
+                if hGenuineTau != None:
+                    self.Verbose("Stacking GenuineTau", True)
+                    myHisto = histograms.Histo(hGenuineTau, "GenuineTau", legendLabel=_legendLabelGenuineTau)
+                    myHisto.setIsDataMC(isData=False, isMC=True)
+                    stackList.insert(0, myHisto)
+
+                if hFakeTau != None:
+                    self.Verbose("Stacking FakeTau", True)
+                    myHisto = histograms.Histo(hFakeTau, "FakeTau", legendLabel=_legendLabelFakeTau)
                     myHisto.setIsDataMC(isData=False, isMC=True)
                     stackList.insert(0, myHisto)
                 elif hQCDMC != None:
@@ -724,8 +742,10 @@ class SelectionFlowPlotMaker:
             myRHWU.makeFlowBinsVisible()
             if self._expectedLabelList[i] == "QCD":
                 myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelQCD)
-            elif self._expectedLabelList[i] == "FakeB":
-                myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelFakeB)
+            elif self._expectedLabelList[i] == "FakeTau":
+                myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelFakeTau)
+            elif self._expectedLabelList[i] == "GenuineTau":
+                myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelGenuineTau)
             elif self._expectedLabelList[i] == "EWKfakes":
                 myHisto = histograms.Histo(myRHWU, self._expectedLabelList[i], legendLabel=_legendLabelEWKFakes)
             else:
