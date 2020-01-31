@@ -632,7 +632,7 @@ def getAnalysisOrder(analysisType="HToTauNu"):
                    "WJetsToQQ_HT_600ToInf", "ttH", "ttHJetToTT", "ttHJetToGG","ttHJetTobb", "ttHJetToNonbb", "TTZ", "TTZToQQ", 
                    "TTZToLL","TTWJets","TTWJetsToQQ","TTWJetsToLNu","Diboson", "WW","WZ","ZZ""WWTo4Q","TTBB","TTTT","ZJetsToQQ_HT600toInf"]
 
-    dsets_HToHW = ["FakeB", "QCD","QCDdata","QCD-b", "QCD_Pt20_MuEnriched", "EWK", "WJets", "W1Jets", "W2Jets", "W3Jets", 
+    dsets_HToHW = ["FakeB", "FakeTau", "GenuineTau", "QCD","QCDdata","QCD-b", "QCD_Pt20_MuEnriched", "EWK", "WJets", "W1Jets", "W2Jets", "W3Jets", 
                    "W4Jets", "WJets_0bquark", "WJets_1bquark", "WJets_2bquark", "WJets_3bquark", "WToTauNu", "WJetsHT", "WJets", 
                    "TTJets", "TT", "TT_Mtt", "SingleTop", "ttX","TTandSingleTop", "DYJetsToLL", "DYJetsToLLHT", "DYJetsToQQHT", "noTop",
                    "WJetsToQQ_HT_600ToInf", "ttH", "ttHJetToTT", "ttHJetToGG","ttHJetTobb", "ttHJetToNonbb", "TTZ", "TTZToQQ", 
@@ -648,7 +648,6 @@ def getAnalysisOrder(analysisType="HToTauNu"):
     myOrder["HToHW_withTop"] = dsets_HToHW_withTop
     _datasetOrder.extend(myOrder[analysisType])
 
-    print "_datasetOrder = ", _datasetOrder
     return _datasetOrder
     
 #================================================================================================
@@ -664,6 +663,8 @@ _legendLabels = {
     "QCD"                  : "QCD multijet", #Mis-ID. #tau_{h} (data)",
     "FakeB"                : "Fake b (data)",
     "GenuineB"             : "Genuine b (MC)",
+    "FakeTau"              : "jet #rightarrow #tau_{h} (MC)",
+    "GenuineTau"           : "Genuine #tau_{h} (MC)",
     "QCD-b"                : "QCD (b enr.)",
     "QCDdata"              : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
     "TTJets"               : "t#bar{t}+jets",
@@ -862,6 +863,8 @@ _plotStyles = {
     "EWK"           : styles.wStyle,
     "QCD"           : styles.qcdStyle,
     "FakeB"         : styles.fakeBStyle,
+    "FakeTau"       : styles.fakeTauStyle,
+    "GenuineTau"    : styles.genuineTauStyle,
     "QCD-b"         : styles.qcdBEnrichedStyle,
     "ttX"           : styles.ttXStyle,
     "noTop"         : styles.noTopStyle,
