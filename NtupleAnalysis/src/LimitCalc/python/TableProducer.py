@@ -1051,6 +1051,11 @@ class TableProducer:
                             Embedding = c.getCachedShapeRootHistogramWithUncertainties().Clone()
                         else:
                             Embedding.Add(c.getCachedShapeRootHistogramWithUncertainties())
+                    elif c.typeIsGenuineTau():
+                        if Embedding == None:
+                            Embedding = c.getCachedShapeRootHistogramWithUncertainties().Clone()
+                        else:
+                            Embedding.Add(c.getCachedShapeRootHistogramWithUncertainties())
                     elif c.typeIsEWKfake():
                         if EWKFakes == None:
                             EWKFakes = c.getCachedShapeRootHistogramWithUncertainties().Clone()
