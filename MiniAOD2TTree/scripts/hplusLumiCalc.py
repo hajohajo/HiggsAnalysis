@@ -657,8 +657,8 @@ def PrintSummary(data, lumiUnit):
     Verbose("PrintSummary()", True)
     table   = []
     table.append("")
-    align   = "{:<3} {:<50} {:>20} {:<7}"
-    hLine   = "="*80
+    align   = "{:<3} {:<70} {:>20} {:<7}"
+    hLine   = "="*100
     header  = align.format("#", "Task", "Luminosity", "")
     data    = OrderedDict(sorted(data.items(), key=lambda t: t[0]))
     table.append(hLine)
