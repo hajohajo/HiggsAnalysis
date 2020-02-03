@@ -1133,7 +1133,7 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
     ClearProgressBar()
 
     # Count merged files (local)
-    retrievedOutMerged = [f for f in os.listdir(os.path.join(taskDir, "results"))] # iro
+    retrievedOutMerged = [f for f in os.listdir(os.path.join(taskDir, "results"))]
     # Count merged files (EOS)
     if opts.filesInEOS:
         cmd = ConvertCommandToEOS("ls", opts) + " " + taskDirEOS + " | grep histograms- | wc -l"
@@ -1141,7 +1141,7 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
         eosOutMerged = Execute(cmd)[0] # just a number
 
     # Print results in a nice table
-    reportTable = GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, failed, idle, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged) #iro
+    reportTable = GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, failed, idle, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged)
     if printTable:
         for r in reportTable:
             Print(r, False)
@@ -1199,10 +1199,10 @@ def GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, fai
     table.append( txtAlign.format("%sDone"                  % (colors.WHITE ), nFinish  , "/", nTotal ) )
     table.append( txtAlign.format("%sRetrieved Logs"        % (colors.PURPLE), nLogs    , "/", nTotal ) )
     table.append( txtAlign.format("%sRetrieved Outputs"     % (colors.PURPLE), nOut     , "/", nTotal ) ) 
-    table.append( txtAlign.format("%sRetrieved Outputs (M)" % (colors.PURPLE), ""       , "" , nOutM ) ) #iro
+    table.append( txtAlign.format("%sRetrieved Outputs (M)" % (colors.PURPLE), ""       , "" , nOutM ) )
     table.append( txtAlign.format("%sEOS Logs"              % (colors.CYAN  ), nLogsEOS , "/", nTotal ) )
     table.append( txtAlign.format("%sEOS Outputs"           % (colors.CYAN  ), nOutEOS  , "/", nTotal ) ) 
-    table.append( txtAlign.format("%sEOS Outputs (M)"       % (colors.CYAN  ), ""       , "" , nOutEOSM ) ) #iro
+    table.append( txtAlign.format("%sEOS Outputs (M)"       % (colors.CYAN  ), ""       , "" , nOutEOSM ) )
     table.append( "{:<100}".format("%s%s"                   % (colors.WHITE, hLine) ) )
     return table
 
