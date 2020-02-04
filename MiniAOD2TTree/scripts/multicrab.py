@@ -991,7 +991,7 @@ def PrintTaskSummary(reportDict):
                                "%s%s"    % (colors.PURPLE, rOutputMerged),
                                "%s%s/%s" % (colors.CYAN  , rLogsEOS     , allJobs), 
                                "%s%s/%s" % (colors.CYAN  , rOutputEOS   , allJobs),
-                               "%s%s"    % (colors.CYAN  , rOutputEOSm), # iro
+                               "%s%s"    % (colors.CYAN  , rOutputEOSm),
                                "%s"      % (status), #already with colour
                                )
 
@@ -1136,9 +1136,14 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
     retrievedOutMerged = [f for f in os.listdir(os.path.join(taskDir, "results"))]
     # Count merged files (EOS)
     if opts.filesInEOS:
+        taskDirEOS = GetEOSDir(taskDir, opts)
         cmd = ConvertCommandToEOS("ls", opts) + " " + taskDirEOS + " | grep histograms- | wc -l"
         Verbose(cmd, True)
-        eosOutMerged = Execute(cmd)[0] # just a number
+        # Check if directory does not exist!
+        if "Unable to stat" in cmd:
+            eosOutMerged = 0
+        else:
+            eosOutMerged = Execute(cmd)[0] # just a number
 
     # Print results in a nice table
     reportTable = GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, failed, idle, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged)
