@@ -267,8 +267,8 @@ def main():
     nInputs = len(inputList)
     
     #Get signal and background dataframes and assign signal/background flag
-    df_signal     = signal.pandas.df(inputList)
-    df_background = background.pandas.df(inputList)
+    df_signal     = signal.pandas.df(inputList, entrystop=500000)
+    df_background = background.pandas.df(inputList, entrystop=500000)
     #
     df_signal = df_signal.assign(signal=1)
     df_background = df_background.assign(signal=0)
@@ -311,19 +311,6 @@ def main():
     # Get training and test samples
     X_train, X_test, Y_train, Y_test, target_train, target_test = train_test_split(
         X, Y, target, test_size=0.5, random_state=seed, shuffle=True)
-
-    ###################################################
-    # Define classifier
-    ###################################################
-    
-    model_clf = Sequential()
-    model_clf = getClassifier(model_clf, nInputs)
-
-    # Compile classifier (loss function: binary crossentropy, optimizer: adam)
-    model_clf.compile(loss="binary_crossentropy", optimizer="adam")
-
-    print "=== Classifier: Fit"
-    model_clf.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=10, verbose=opt.debug)
 
     ###################################################
     # Define Models
@@ -634,5 +621,3 @@ if __name__ == "__main__":
 
     main()                                  
                                     
-    # Problems:
-    # 1. Check why we need the classifier's PRE pre-training
