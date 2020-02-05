@@ -66,6 +66,7 @@ EXAMPLES:
 LAST USED:
 ./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 5 --batchSize 20000 -s pdf --entrystop 20000 --standardise Robust
 
+./sequential.py --activation relu,relu,relu,sigmoid --neurons 32,32,32,1 --epochs 500 --batchSize 32 -s pdf,png --url --rootFileName histograms-TT_19var_6Jets_2BJets_14Nov2019.root --entrystop 500000 --standardise Robust --scaleBack
 
 GITHUB:
 https://github.com/skonstantinou/Keras_ANN/
@@ -794,6 +795,7 @@ def main(opts):
     # Create a DataFrame list
     df_all  = pandas.concat( [df_sig, df_bkg] )
     Verbose("Printing the combined tabular data (signal first, background appended after signal):\n%s%s%s" % (ts, df_all, ns), True)
+    
     if opts.standardise:
         msg  = "Standardising dataset features with the %sScaler%s" % (ls + opts.standardise, ns)
         Print(msg, True)    
@@ -802,6 +804,12 @@ def main(opts):
         scaler_sig, df_sig = func.GetStandardisedDataFrame(df_sig, opts.inputList, scalerType=opts.standardise) # fixme - iro - should fit/transform only the TEST data
         scaler_bkg, df_bkg = func.GetStandardisedDataFrame(df_bkg, opts.inputList, scalerType=opts.standardise)
         scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList, scalerType=opts.standardise)
+        
+    # Store scaler attributes    
+    scaler_attributes = "scalerType %s \n" % opts.standardise
+    if opts.standardise:
+        scaler_attributes += func.GetScalerAttributes(df_all, scaler_all, opts.standardise)
+        Verbose("Scaler Attributes\n%s\n" % scaler_attributes, True)
 
     # Get a Numpy representation of the DataFrames for signal and background datasets (again, and AFTER assigning signal and background)
     Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
@@ -975,7 +983,7 @@ def main(opts):
     # Write weights and architecture in txt file
     modelFilename = os.path.join(opts.saveDir, "model.txt")
     Print("Writing the model (weights and architecture) in the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
-    func.WriteModel(myModel, model_json, opts.inputList, modelFilename, verbose=False)
+    func.WriteModel(myModel, model_json, opts.inputList, scaler_attributes, modelFilename, verbose=False)
 
     #https://keras.io/visualization/
     #https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
