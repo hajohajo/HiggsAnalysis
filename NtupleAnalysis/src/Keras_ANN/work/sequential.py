@@ -806,9 +806,9 @@ def main(opts):
         scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList, scalerType=opts.standardise)
         
     # Store scaler attributes    
-    scaler_attributes = "scalerType %s \n" % opts.standardise
+    scaler_attributes = "scalerType %s\n" % opts.standardise
     if opts.standardise:
-        scaler_attributes += func.GetScalerAttributes(df_all, scaler_all, opts.standardise)
+        scaler_attributes += func.GetScalerAttributes(df_all, nInputs, scaler_all, opts.standardise)
         Verbose("Scaler Attributes\n%s\n" % scaler_attributes, True)
 
     # Get a Numpy representation of the DataFrames for signal and background datasets (again, and AFTER assigning signal and background)

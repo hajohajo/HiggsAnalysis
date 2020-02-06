@@ -8,6 +8,7 @@ import array
 import json
 import pandas
 import numpy 
+import contextlib
 
 from sklearn.utils.class_weight import compute_sample_weight
 from sklearn.preprocessing import StandardScaler
@@ -143,7 +144,31 @@ def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
 
     return weights
 
-def GetScalerAttributes(df, scaler, scalerType):    
+
+def PrintArray(array):
+    '''
+    Fixes missing leading whitespace (fixme!)
+    '''
+    @contextlib.contextmanager
+    def printoptions(*args, **kwargs):
+        '''
+        https://stackoverflow.com/questions/2891790/how-to-pretty-print-a-numpy-array-without-scientific-notation-and-with-given-pre/2891805
+        '''
+        original = numpy.get_printoptions()
+        numpy.set_printoptions(*args, **kwargs)
+        try:
+            yield
+        finally: 
+            numpy.set_printoptions(**original)        
+        return    
+    
+    with printoptions(suppress=True):
+        _str = str(array)
+    _str = _str.replace("[","[ ")
+    _str = _str.replace("]"," ]")
+    return _str
+
+def GetScalerAttributes(df, nInputs, scaler, scalerType):    
     '''
     Get scaler attributes (only the ones that are needed for the features transformation!)
     Standard Scaler: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
@@ -151,41 +176,42 @@ def GetScalerAttributes(df, scaler, scalerType):
     Robust Scaler: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html
     Preprocessing: https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/preprocessing/_data.py
     '''
-    atr = ""
+    attr = ""
 
     # is sparse?
     isSparse = sparse.issparse(df.values)
 
     if scalerType.lower() == "standard":
         # X' = (X - mean_)/scale_
-        mean = 0
-        std_dev = 1
+        mean = numpy.zeros(nInputs)
+        scale = numpy.ones(nInputs)
         if scaler.with_mean:
             mean = scaler.mean_
         if scaler.with_std:
-            std_dev = scaler.scale_
-        atr += "mean\n%s\n" % mean
-        atr += "std_dev\n%s\n" % std_dev
-        atr += "isSparse %s \n" % isSparse # this should return false!
+            scale = scaler.scale_
+        attr += "mean\n%s\n" % PrintArray(mean)
+        attr += "scale\n%s\n" % PrintArray(scale)
+        attr += "isSparse %.0f\n" % isSparse # this should return false!
 
     elif scalerType.lower() == "minmax":
         # X' = X*scale_ + min_
-        atr += "scale\n%s\n" % scaler.scale_
-        atr += "min \n%s\n" % scaler.min_
+        attr += "min\n%s\n" % PrintArray(scaler.min_)
+        attr += "scale\n%s\n" % PrintArray(scaler.scale_)
+        attr += "isSparse %.0f\n" % isSparse # not used
 
     elif scalerType.lower() == "robust":
         # X' = (X-center_)/scale_
-        center = 0
-        scale = 1
+        center = numpy.zeros(nInputs)
+        scale = numpy.ones(nInputs)
         if scaler.with_centering:
             center = scaler.center_
         if scaler.with_scaling:
             scale = scaler.scale_
-        atr += "center \n%s\n" % center
-        atr += "scale \n%s\n" % scale
-        atr += "isSparse %s \n" % isSparse # this should return false!
-
-    return atr
+        attr += "center\n%s\n" % PrintArray(center)
+        attr += "scale\n%s\n" % PrintArray(scale)
+        attr += "isSparse %.0f\n" % isSparse # this should return false!
+        
+    return attr
 
 def GetOriginalDataFrame(scaler, df, inputList):
     '''
