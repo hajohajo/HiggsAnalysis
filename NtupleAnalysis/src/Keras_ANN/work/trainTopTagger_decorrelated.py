@@ -504,8 +504,10 @@ def main():
     with open("%s/modelANN_architecture_lam%s.json" % (saveModelDir, opt.lam), "w") as json_file:
         json_file.write(model_json)
 
+    # Store scaler attributes
+        scaler_attributes = "scalerType None\n" #fixme! trainTopTagger_decorrelated.py does not support standardization
     # write weights and architecture in txt file
-    func.WriteModel(model_clf, model_json, inputList, "%s/modelANN_lam%s.txt" % (saveModelDir, opt.lam))
+    func.WriteModel(model_clf, model_json, inputList,  scaler_attributes, "%s/modelANN_lam%s.txt" % (saveModelDir, opt.lam))
 
 
 #================================================================================================ 

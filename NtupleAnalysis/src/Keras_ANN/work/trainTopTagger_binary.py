@@ -199,8 +199,10 @@ if not debug:
     model.save_weights('model_weights.h5', overwrite=True)
     model.save(modelName)
     
+    # Store scaler attribute
+    scaler_attributes = "scalerType None\n" #fixme! trainTopTagger_binary.py does not support standardization
     # write weights and architecture in txt file
-    func.WriteModel(model, model_json, inputList, "model_test.txt")
+    func.WriteModel(model, model_json, inputList, scaler_attributes, "model_test.txt")
 
 pred_train = model.predict(X_train)
 pred_test = model.predict(X_test)

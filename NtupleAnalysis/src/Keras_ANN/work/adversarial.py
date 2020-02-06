@@ -582,7 +582,11 @@ def SaveTheModel(model_clf, last_epoch):
         
     # Write weights and architecture in txt file
     modelFilename = os.path.join(opts.saveDir, "model_%sEpochs.txt" % (last_epoch))
-    func.WriteModel(model_clf, model_json, opts.inputList, modelFilename, verbose=False)
+    
+    # Store scaler attributes
+    scaler_attributes = "scalerType None\n" #fixme! adversarial.py does not support standardization
+    # write weights and architecture in txt file
+    func.WriteModel(model_clf, model_json, opts.inputList, scaler_attributes, modelFilename, verbose=False)
 
 def main(opts): 
 
