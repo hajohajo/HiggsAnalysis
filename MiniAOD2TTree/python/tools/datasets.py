@@ -288,36 +288,6 @@ datasetsSignalTB_ext1.append(Dataset('/ChargedHiggs_HplusTB_HplusToTB_M-2000_13T
 datasetsSignalTB_ext1.append(Dataset('/ChargedHiggs_HplusTB_HplusToTB_M-2500_13TeV_amcatnlo_pythia8/'  + campaign + '_ext1-v1/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
 datasetsSignalTB_ext1.append(Dataset('/ChargedHiggs_HplusTB_HplusToTB_M-3000_13TeV_amcatnlo_pythia8/'  + campaign + '_ext1-v1/MINIAODSIM', dataVersion="80Xmc", dasQuery=das))
 
-datasetsSignalHW_Pythia8LO = []
-das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FChargedHiggs_TTToHplusBWB_HplusToTauNu_M-*%2FRunII*16MiniAODv2-*%2FMINIAODSIM"
-datasetsSignalHW_Pythia8LO.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das)) # m = 350
-
-datasetsSignalHW_MG_LO = []
-#https://cmsweb.cern.ch/das/request?input=%2FCRAB_PrivateMC%2Fmlotti-Hplus2hw_2ta_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f%2FUSER&instance=prod%2Fphys03
-#datasetsSignalHW_MG_LO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-datasetsSignalHW_MG_LO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp350_mh150-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-
-datasetsSignalHW_MG_NLO = []
-datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp700_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp300_mh200_noMatch_2-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m1500_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_2-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_3-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_4-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_5-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_6-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_7-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_8-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_9-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_10-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_11-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-
-datasetsSignalHW = []
-#datasetsSignalHW.extend(datasetsSignalHW_Pythia8LO)
-#datasetsSignalHW.extend(datasetsSignalHW_MG_LO)
-datasetsSignalHW.extend(datasetsSignalHW_MG_NLO)
-
 
 datasetsSignalTauNu = []
 das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FChargedHiggs_TTToHplusBWB_HplusToTauNu_M-*%2FRunII*16MiniAODv2-*%2FMINIAODSIM"
@@ -377,48 +347,6 @@ datasetsSignalTauNu.append(Dataset('/ChargedHToTauNu_lowmass_M140_13TeV_pythia8/
 datasetsSignalTauNu.append(Dataset('/ChargedHToTauNu_lowmass_M150_13TeV_pythia8/amarini-PUMoriond17-MINIAODSIM-v1-28028af67189b3de7224b79195bd0e1d/USER', dbs="phys03",dataVersion="80Xmc", dasQuery=das, name="ChargedHiggs_TTToHplusBWB_HplusToTauNu_M_150_Pythia8"))
 datasetsSignalTauNu.append(Dataset('/ChargedHToTauNu_lowmass_M155_13TeV_pythia8/amarini-PUMoriond17-MINIAODSIM-v1-28028af67189b3de7224b79195bd0e1d/USER', dbs="phys03",dataVersion="80Xmc", dasQuery=das, name="ChargedHiggs_TTToHplusBWB_HplusToTauNu_M_155_Pythia8"))
 datasetsSignalTauNu.append(Dataset('/ChargedHToTauNu_lowmass_M160_13TeV_pythia8/amarini-PUMoriond17-MINIAODSIM-v1-28028af67189b3de7224b79195bd0e1d/USER', dbs="phys03",dataVersion="80Xmc", dasQuery=das, name="ChargedHiggs_TTToHplusBWB_HplusToTauNu_M_160_Pythia8"))
-
-#================================================================================================ 
-# Private Productions
-#================================================================================================ 
-das = "https://cmsweb.cern.ch/das/request?input=dataset%3D%2FCRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO%2Fmlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT-b023a05347da3c2a313d219710ff54e9%2FUSER&instance=prod/phys03"
-
-# cHiggs 2 HW
-datasetsSignalHW = []
-
-#pythia8 LO
-#das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FChargedHiggs_TTToHplusBWB_HplusToTauNu_M-*%2FRunII*16MiniAODv2-*%2FMINIAODSIM"
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das)) # m = 350
-
-#MG_LO samples
-#mh 350
-#https://cmsweb.cern.ch/das/request?input=%2FCRAB_PrivateMC%2Fmlotti-Hplus2hw_2ta_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f%2FUSER&instance=prod%2Fphys03
-#older datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp350_mh150-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-
-#NLO
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp300_mh200_noMatch_2-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-datasetsSignalHW.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp700_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-
-#mh 1500
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m1500_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_2-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_3-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_4-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_5-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_6-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_7-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_8-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_9-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_10-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_11-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-
-#4l mh 350 
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_4l_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
-
-# 4l mh 1500
-#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_4l_PAT_m1500_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
 
 
 datasetsSingleTop = []
@@ -743,6 +671,49 @@ das = "https://cmsweb.cern.ch/das/request?view=list&limit=150&instance=prod%2Fgl
 # datasets_ttHJetSyst.append(Dataset('/ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM', dasQuery=das)) 
 
 
+#================================================================================================ 
+# Private Productions
+#================================================================================================ 
+das = "https://cmsweb.cern.ch/das/request?input=dataset%3D%2FCRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO%2Fmlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT-b023a05347da3c2a313d219710ff54e9%2FUSER&instance=prod/phys03"
+
+datasetsSignalHW_MG_LO = []
+#https://cmsweb.cern.ch/das/request?input=%2FCRAB_PrivateMC%2Fmlotti-Hplus2hw_2ta_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f%2FUSER&instance=prod%2Fphys03
+#datasetsSignalHW_MG_LO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+datasetsSignalHW_MG_LO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp350_mh150-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+
+
+datasetsSignalHW_Pythia8LO = []
+das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FChargedHiggs_TTToHplusBWB_HplusToTauNu_M-*%2FRunII*16MiniAODv2-*%2FMINIAODSIM"
+datasetsSignalHW_Pythia8LO.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das)) # m = 350
+
+
+datasetsSignalHW_4l = []
+datasetsSignalHW_4l.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_4l_PAT_m350_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+datasetsSignalHW_4l.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_4l_PAT_m1500_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+
+
+datasetsSignalHW_MG_NLO = []
+datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp700_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp300_mh200_noMatch_2-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_m1500_f-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_2-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_3-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_4-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_5-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_6-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_7-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_8-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_9-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_10-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+#datasetsSignalHW.append(Dataset('/CRAB_PrivateMC/mlotti-CRAB3_Hplus_PAT_11-71a58a62b6d71fe0f402eda209b9b80f/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+
+datasetsSignalHW = []
+#datasetsSignalHW.extend(datasetsSignalHW_Pythia8LO)
+#datasetsSignalHW.extend(datasetsSignalHW_MG_LO)
+datasetsSignalHW.extend(datasetsSignalHW_MG_NLO)
+#datasetsSignalHW.extend(datasetsSignalHW_4l)
+
 
 #================================================================================================ 
 # MC, Trigger Development
@@ -854,12 +825,34 @@ hplus2hwAnalysisDatasets.extend(datasetsWJetsHT)
 hplus2hwAnalysisDatasets.extend(datasetsDiboson)
 ### hplus2hwAnalysisDatasets.extend(datasetsQCD)
 hplus2hwAnalysisDatasets.extend(datasetsQCDMuEnriched)
-hplus2hwAnalysisDatasets.extend(datasetsQCDbEnriched)
+### hplus2hwAnalysisDatasets.extend(datasetsQCDbEnriched) #don't think we need this
 hplus2hwAnalysisDatasets.extend(datasetsTTWJetsToLNu)
 hplus2hwAnalysisDatasets.extend(datasetsTTTT)
 hplus2hwAnalysisDatasets.extend(datasetsTTZToLLNuNu)
 hplus2hwAnalysisDatasets.extend(datasetsTTZToQQ)
 hplus2hwAnalysisDatasets.extend(datasets_ttHJet)
+
+
+hplus2hwWithTopAnalysisDatasets = [] 
+hplus2hwWithTopAnalysisDatasets.extend(datasetsSignalHW)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsMuonData03Feb)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsElectronData03Feb)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsTop)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsSingleTop)
+### hplus2hwWithTopAnalysisDatasets.extend(datasetsDY)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsDY_HT)
+### hplus2hwWithTopAnalysisDatasets.extend(datasetsWJets) #for doing the HT binned 0To70
+hplus2hwWithTopAnalysisDatasets.extend(datasetsWJetsHT)
+### hplus2hwWithTopAnalysisDatasets.extend(datasetsZJetsToQQ)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsDiboson)
+### hplus2hwWithTopAnalysisDatasets.extend(datasetsQCD)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsQCDMuEnriched)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsQCDbEnriched)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsTTWJetsToLNu)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsTTTT)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsTTZToLLNuNu)
+hplus2hwWithTopAnalysisDatasets.extend(datasetsTTZToQQ)
+hplus2hwWithTopAnalysisDatasets.extend(datasets_ttHJet)
 
 
 # Trigger Efficiency (h2hw)
@@ -954,14 +947,17 @@ class DatasetGroup:
         Create dataset grouping in a dictionary for easy access.
         '''
 
+        # analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "JetTriggers", "TauLeg", "METLeg", "L1Study", "All"]
         analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "JetTriggers", "TopSystBDT", "TauLeg", "METLeg", "L1Study", "All"]
-        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis" , "JetTriggers", "TauLeg", "METLeg", "L1Study", "All"]
+        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "Hplus2hwWithTopAnalysis", "JetTriggers", "TopSystBDT", "TauLeg", "METLeg", "L1Study", "All"]
+ 
         if self.analysis not in analyses:
             raise Exception("Unknown analysis \"%s\". Please select one of the following: \"%s" % (self.analysis, "\", \"".join(analyses) + "\".") )
 
         self.GroupDict["SignalAnalysis"]   = signalAnalysisDatasets
         self.GroupDict["Hplus2tbAnalysis"] = hplus2tbAnalysisDatasets
         self.GroupDict["Hplus2hwAnalysis"] = hplus2hwAnalysisDatasets
+        self.GroupDict["Hplus2hwWithTopAnalysis"] = hplus2hwWithTopAnalysisDatasets
         self.GroupDict["TauLeg"]           = tauLegDatasets
         self.GroupDict["METLeg"]           = metLegDatasets
         self.GroupDict["L1Study"]          = l1Datasets

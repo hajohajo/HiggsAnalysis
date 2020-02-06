@@ -17,7 +17,7 @@ set INITIAL = `echo $USER | cut -c1-1`
 set PSEUDO_MCRAB_DIR = ${1}
 #set FORMATS = "png,pdf,C"
 set FORMATS = "png,pdf"
-set DSETS = " QCD_bEnriched|ttHJetToGG|ttHJetToTT"
+set DSETS = " "# QCD_bEnriched|ttHJetToGG|ttHJetToTT"
 #set DSETS = " QCD_bEnriched|ttHJetToGG_M125|ttHJetToNonbb_M125|ttHJetToTT_M125"
 #set DSETS = " QCD_bEnriched|ttHJetToGG_M125|ttHJetToNonbb_M125|ttHJetToTT_M125|ttHJetTobb_M125"
 

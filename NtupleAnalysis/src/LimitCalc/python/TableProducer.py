@@ -257,7 +257,8 @@ class TableProducer:
         self.Verbose("Importing & Calling the control plot maker module", True)
         if self._config.OptionDoControlPlots:
             if opts.analysisType in ["HToTauNu"]:
-                import HiggsAnalysis.LimitCalc.ControlPlotMaker as cp
+                #import HiggsAnalysis.LimitCalc.ControlPlotMaker as cp # for dcardGenerator_v2.py
+                import HiggsAnalysis.LimitCalc.ControlPlotMakerHToTauNu as cp # for dcardGenerator_v3.py
             elif opts.analysisType in ["HToHW"]:
                 import HiggsAnalysis.LimitCalc.ControlPlotMakerHToHW as cp
             elif opts.analysisType in ["HToTB"]:
@@ -1046,6 +1047,11 @@ class TableProducer:
 ##
                     elif c.typeIsEWK() or (c.typeIsEWKfake() and self._config.OptionGenuineTauBackgroundSource == "MC_FakeAndGenuineTauNotSeparated") or c.typeIsEWKMC() or c.typeIsGenuineB():
                         # fixme: what a mess! c.typeIsEWKMC() and c.typeIsGenuineB() ORs added for HToTB. must make a proper code!
+                        if Embedding == None:
+                            Embedding = c.getCachedShapeRootHistogramWithUncertainties().Clone()
+                        else:
+                            Embedding.Add(c.getCachedShapeRootHistogramWithUncertainties())
+                    elif c.typeIsGenuineTau():
                         if Embedding == None:
                             Embedding = c.getCachedShapeRootHistogramWithUncertainties().Clone()
                         else:

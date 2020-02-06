@@ -147,18 +147,22 @@ class colors:
     http://stackoverflow.com/questions/15580303/python-output-complex-line-with-floats-colored-by-value
     ''' 
     colordict = {
-                'RED'     :'\033[91m',
-                'GREEN'   :'\033[92m',
-                'BLUE'    :'\033[34m',
-                'GRAY'    :'\033[90m',
-                'WHITE'   :'\033[00m',
-                'ORANGE'  :'\033[33m',
-                'CYAN'    :'\033[36m',
-                'PURPLE'  :'\033[35m',
-                'LIGHTRED':'\033[91m',
-                'PINK'    :'\033[95m',
-                'YELLOW'  :'\033[93m',
+                'RED'        : '\033[91m',
+                'GREEN'      : '\033[92m',
+                'BLUE'       : '\033[34m',
+                'GRAY'       : '\033[90m',
+                'WHITE'      : '\033[00m',
+                'ORANGE'     : '\033[33m',
+                'CYAN'       : '\033[36m',
+                'PURPLE'     : '\033[35m',
+                'LIGHTRED'   : '\033[91m',
+                'PINK'       : '\033[95m',
+                'YELLOW'     : '\033[93m',
+                'BLINK'      : '\033[5m' ,
+                'NORMAL'     : '\033[28m' ,
+                "WARNING"    : '\033[1;31m',
                 }
+
     if sys.stdout.isatty():
         RED      = colordict['RED']
         GREEN    = colordict['GREEN']
@@ -171,34 +175,39 @@ class colors:
         LIGHTRED = colordict['LIGHTRED']
         PINK     = colordict['PINK']
         YELLOW   = colordict['YELLOW']
+        BLINK    = colordict['BLINK']
+        NORMAL   = colordict['NORMAL']
+        WARNING  = colordict['WARNING']
     else:
-        RED, GREEN, BLUE, GRAY, WHITE, ORANGE, CYAN, PURPLE, LIGHTRED, PINK, YELLOW = '', '', '', '', '', '', '', '', '', '', ''
+        RED, GREEN, BLUE, GRAY, WHITE, ORANGE, CYAN, PURPLE, LIGHTRED, PINK, YELLOW, BLINK, NORMAL, WARNING = '', '', '', '', '', '', '', '', '', '', '', '', '', ''
 
 
 #================================================================================================ 
 # Class Definition
 #================================================================================================ 
 class Report:
-    def __init__(self, name, allJobs, idle, retrieved, running, finished, failed, transferring, retrievedLog, retrievedOut, eosLog, eosOut, status, dashboardURL):
+    def __init__(self, name, allJobs, idle, retrieved, running, finished, failed, transferring, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged, status, dashboardURL):
         '''
         Constructor 
         '''
         Verbose("class Report:__init__()", True)
-        self.name            = name
-        self.allJobs         = str(allJobs)
-        self.retrieved       = str(retrieved)
-        self.running         = str(running)
-        self.dataset         = self.name.split("/")[-1]
-        self.dashboardURL    = dashboardURL
-        self.status          = self.GetTaskStatusStyle(status)
-        self.finished        = str(len(finished))
-        self.failed          = failed
-        self.idle            = idle
-        self.transferring    = transferring
-        self.retrievedLog    = str(len(retrievedLog))
-        self.retrievedOut    = str(len(retrievedOut))
-        self.eosLog          = eosLog
-        self.eosOut          = eosOut
+        self.name               = name
+        self.allJobs            = str(allJobs)
+        self.retrieved          = str(retrieved)
+        self.running            = str(running)
+        self.dataset            = self.name.split("/")[-1]
+        self.dashboardURL       = dashboardURL
+        self.status             = self.GetTaskStatusStyle(status)
+        self.finished           = str(len(finished))
+        self.failed             = failed
+        self.idle               = idle
+        self.transferring       = transferring
+        self.retrievedLog       = len(retrievedLog) #str(len(retrievedLog))
+        self.retrievedOut       = len(retrievedOut) #str(len(retrievedOut))
+        self.retrievedOutMerged = len(retrievedOutMerged) #str(len(retrievedOut))
+        self.eosLog             = eosLog
+        self.eosOut             = eosOut
+        self.eosOutMerged       = eosOutMerged
         return
 
 
@@ -313,7 +322,7 @@ def PrintProgressBar(taskName, iteration, total, suffix=""):
 def ClearProgressBar():
     Verbose("ClearProgressBar()")
     # The \r is the carriage return. (Option: You need the comma at the end of the print statement to avoid automatic newline)
-    print '\r%s' % (" "*180)
+    print '\r%s' % (" "*185)
     return
 
 
@@ -368,12 +377,13 @@ def GetTaskDashboardURL(datasetPath):
     Verbose("GetTaskDashboardURL()")
     
     # Variable Declaration
-    crabLog      = os.path.join(datasetPath, "crab.log")
-    grepFile     = os.path.join(datasetPath, "grep.tmp")
+    crabLog      = os.path.join(opts.dirName, datasetPath, "crab.log")
+    grepFile     = os.path.join(opts.dirName, datasetPath, "grep.tmp")
     stringToGrep = "Dashboard monitoring URL"
     cmd          = "grep '%s' %s > %s" % (stringToGrep, crabLog, grepFile )
     dashboardURL = "UNKNOWN"
 
+    Verbose(cmd, True)
     # Execute the command
     if os.system(cmd) == 0:
         
@@ -394,21 +404,20 @@ def GetTaskStatus(datasetPath):
     Call the "grep" command to look for the "Task status" from the crab.log file 
     of a given dataset. It uses as input parameter the absolute path of the task dir (datasetPath)
     '''
-    Verbose("GetTaskStatus()", True)
+    Verbose("GetTaskStatus(%s)" % (datasetPath) , True)
     
-    # Variable Declaration
+    # Variable Declaratio`4
+    if opts.dirName not in datasetPath:
+        datasetPath = os.path.join(opts.dirName, datasetPath)
     crabLog      = os.path.join(datasetPath, "crab.log")
     grepFile     = os.path.join(datasetPath, "grep.tmp")
-    #stringToGrep = "Task status:"
-    #stringToGrep = "Status on the CRAB server:"
-    #stringToGrep = "Jobs status:"
-    stringToGrep  = "Status on the scheduler:"
+    stringToGrep = "Status on the scheduler:"
     cmd          = "grep '%s' %s > %s" % (stringToGrep, crabLog, grepFile )
-    status       = "UNKNOWN"
-    
+    status       = "UNKN`OWN"
     if not os.path.exists( crabLog ):
         raise Exception("File %s not found!" % (crabLog) )
 
+    Verbose(cmd, True)
     # Execute the command
     if os.system(cmd) == 0:
 
@@ -453,7 +462,7 @@ def GetTaskReports(datasetPath, opts):
 
         # Assess JOB success/failure for task
         Verbose("Retrieving files", True)
-        idle, running, finished, transferring, failed, retrievedLog, retrievedOut, eosLog, eosOut = RetrievedFiles(datasetPath, result, dashboardURL, True, opts)
+        idle, running, finished, transferring, failed, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged = RetrievedFiles(datasetPath, result, dashboardURL, True, opts)
 
         # Get the task logs & output ?        
         Verbose("Getting task logs", True)
@@ -476,7 +485,7 @@ def GetTaskReports(datasetPath, opts):
 
         # Append the report
         Verbose("Appending Report")
-        report = Report(datasetPath, alljobs, idle, retrieved, running, finished, failed, transferring, retrievedLog, retrievedOut, eosLog, eosOut, status, dashboardURL)
+        report = Report(datasetPath, alljobs, idle, retrieved, running, finished, failed, transferring, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged, status, dashboardURL)
 
         # Determine if task is DONE or not
         Verbose("Determining if Task is DONE")
@@ -487,7 +496,8 @@ def GetTaskReports(datasetPath, opts):
     # Catch exceptions (Errors detected during execution which may not be "fatal")
     except:
         msg = sys.exc_info()[1]
-        report = Report(datasetPath, "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?") 
+        Print(msg, True)
+        report = Report(datasetPath, "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?") 
         Print("crab status failed with message %s. Skipping ..." % ( msg ), True)
     return report
 
@@ -661,7 +671,12 @@ def ResubmitTask(taskPath, failed):
         return
 
     joblist = JobList(failed)
-    
+    nFailed = 0
+    if "," in joblist:
+        nFailed = len(joblist.split(","))
+    else:
+        nFailed = 1
+
     # Sanity check
     if len(joblist) < 1:
         return
@@ -673,10 +688,10 @@ def ResubmitTask(taskPath, failed):
             return
     else:
         taskName = os.path.basename(taskPath)
-        Print("Found %s failed jobs! Resubmitting ..." % (len(joblist) ) )
+        Print("Found %d failed jobs! Resubmitting ..." % (nFailed) )
         Print("crab resubmit %s --jobids %s" % (taskName, joblist) )
         result = crabCommand('resubmit', jobids=joblist, dir=taskPath)
-        Verbose("Calling crab resubmit %s --jobids %s returned" % (taskName, joblist, result ) )
+        Verbose("Calling crab \"resubmit %s --jobids %s\" returned %s" % (taskName, joblist, result ) )
 
     return
 
@@ -862,7 +877,7 @@ def CheckJob(opts, args):
     # Get the paths for the datasets (absolute paths)
     datasets = GetDatasetsPaths(opts)
     if len(datasets) < 1:
-        Print("Found %s CRAB tasks under %s! Exit .." % (opts.dirName) )
+        Print("Found %s CRAB tasks under %s! Exit .." % (len(datasets), opts.dirName) )
         return
     else:
         Verbose("Working with %s CRAB task directories:\n\t%s" % ( len(datasets), "\n\t".join( GetDatasetBasenames(datasets) ) ), True)
@@ -910,20 +925,22 @@ def PrintTaskSummary(reportDict):
     Verbose("PrintTaskSummary()")
     
     reports  = []    
-    msgAlign = "{:<3} {:<60} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16} {:^16}"
+    msgAlign = "{:<3} {:<50} {:^15} {:^15} {:^15} {:^15} {:^15} {:^15} {:^15} {:^15} {:^15} {:^15} {:^15} {:^15}"
     header   = msgAlign.format("#", "Task",
                                "%s%s" % (colors.GRAY  , "Idle"    ),
                                "%s%s" % (colors.RED   , "Failed"  ),
                                "%s%s" % (colors.ORANGE, "Running" ),
-                               "%s%s" % (colors.ORANGE, "Transfer"),
+                               "%s%s" % (colors.BLUE  , "Transfer"),
                                "%s%s" % (colors.WHITE , "Done"    ),
                                "%s%s" % (colors.PURPLE, "Logs"    ),
-                               "%s%s" % (colors.BLUE  , "Out"     ),
+                               "%s%s" % (colors.PURPLE, "Output"  ),
+                               "%s%s" % (colors.PURPLE, "Merged"  ),
                                "%s%s" % (colors.CYAN  , "Logs"    ),
-                               "%s%s" % (colors.CYAN  , "Out"     ),
+                               "%s%s" % (colors.CYAN  , "Output"  ),
+                               "%s%s" % (colors.CYAN  , "Merged"  ),
                                "%s%s" % (colors.WHITE , "Status"  ),
                                )
-    hLine = colors.WHITE + "="*180
+    hLine = colors.WHITE + "="*185
     reports.append(hLine)
     reports.append(header)
     reports.append(hLine)
@@ -931,34 +948,53 @@ def PrintTaskSummary(reportDict):
     # Alphabetical sorting of tasks
     ReportDict = OrderedDict(sorted(reportDict.items(), key=lambda t: t[0]))
 
+    # Some Definitions
+    logOK    = False
+    outOK    = False
+
     # For-loop: All datasets (key) and corresponding status (value)
     for i, dataset in enumerate(ReportDict):
         report     = reportDict[dataset]
         index      = i+1
         task       = dataset
         status     = report.status
-        idle       = '{0: >3}'.format(report.idle)
-        allJobs    = '{0: <3}'.format(report.allJobs)
-        running    = '{0: >3}'.format(report.running)
-        finished   = '{0: >3}'.format(report.finished)
-        transfer   = '{0: >3}'.format(report.transferring)
-        failed     = '{0: >3}'.format(len(report.failed))
-        rLogs      = '{0: >3}'.format(report.retrievedLog)
-        rOutput    = '{0: >3}'.format(report.retrievedOut)
-        rLogsEOS   = '{0: >3}'.format(report.eosLog)
-        rOutputEOS = '{0: >3}'.format(report.eosOut)
-        line = msgAlign.format(index, task,
-                               "%s%s/%s" % (colors.GRAY  , idle      , allJobs),
-                               "%s%s/%s" % (colors.RED   , failed    , allJobs),
-                               "%s%s/%s" % (colors.ORANGE, running   , allJobs),
-                               "%s%s/%s" % (colors.ORANGE, transfer  , allJobs),
-                               "%s%s/%s" % (colors.WHITE , finished  , allJobs), 
-                               "%s%s/%s" % (colors.PURPLE, rLogs     , allJobs), 
-                               "%s%s/%s" % (colors.BLUE  , rOutput   , allJobs), 
-                               "%s%s/%s" % (colors.CYAN  , rLogsEOS  , allJobs), 
-                               "%s%s/%s" % (colors.CYAN  , rOutputEOS, allJobs),
-                               "%s"   % (status), #already with colour
+
+        if (report.allJobs == report.eosLog):
+            logOK = True
+        if (report.allJobs == report.eosOut):
+            outOK = True
+
+        if (not logOK or not outOK):
+            status = "%s%s" % (colors.BLINK, status)
+
+        idle          = '{0: >3}'.format(report.idle)
+        allJobs       = '{0: <3}'.format(report.allJobs)
+        running       = '{0: >3}'.format(report.running)
+        finished      = '{0: >3}'.format(report.finished)
+        transfer      = '{0: >3}'.format(report.transferring)
+        failed        = '{0: >3}'.format(len(report.failed))
+        rLogs         = '{0: >3}'.format( str(report.retrievedLog) ) 
+        rOutput       = '{0: >3}'.format( str(report.retrievedOut) )
+        rOutputMerged = '{0: >3}'.format( str(report.retrievedOutMerged) )
+        rLogsEOS      = '{0: >3}'.format(report.eosLog)
+        rOutputEOS    = '{0: >3}'.format(report.eosOut)
+        rOutputEOSm   = '{0: >3}'.format(report.eosOutMerged)
+        line = msgAlign.format(index, 
+                               (task[:48] + '..') if len(task) > 58 else task, # 
+                               "%s%s/%s" % (colors.GRAY  , idle         , allJobs),
+                               "%s%s/%s" % (colors.RED   , failed       , allJobs),
+                               "%s%s/%s" % (colors.ORANGE, running      , allJobs),
+                               "%s%s/%s" % (colors.BLUE  , transfer     , allJobs),
+                               "%s%s/%s" % (colors.WHITE , finished     , allJobs), 
+                               "%s%s/%s" % (colors.PURPLE, rLogs        , allJobs), 
+                               "%s%s/%s" % (colors.PURPLE, rOutput      , allJobs), 
+                               "%s%s"    % (colors.PURPLE, rOutputMerged),
+                               "%s%s/%s" % (colors.CYAN  , rLogsEOS     , allJobs), 
+                               "%s%s/%s" % (colors.CYAN  , rOutputEOS   , allJobs),
+                               "%s%s"    % (colors.CYAN  , rOutputEOSm),
+                               "%s"      % (status), #already with colour
                                )
+
         reports.append(line)
     reports.append(hLine)
     
@@ -1019,20 +1055,22 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
     Verbose("RetrievedFiles()", True)
     
     # Initialise variables
-    retrievedLog = []
-    retrievedOut = []
-    eosLog       = 0
-    eosOut       = 0
-    finished     = []
-    failed       = []
-    transferring = 0
-    running      = 0
-    idle         = 0
-    unknown      = 0
-    dataset      = taskDir.split("/")[-1]
-    nJobs        = GetTotalJobsFromStatus(crabResults)
-    missingOuts  = []
-    missingLogs  = []
+    retrievedLog       = []
+    retrievedOut       = []
+    retrievedOutMerged = []
+    eosLog             = 0
+    eosOut             = 0
+    eosOutMerged       = 0
+    finished           = []
+    failed             = []
+    transferring       = 0
+    running            = 0
+    idle               = 0
+    unknown            = 0
+    dataset            = taskDir.split("/")[-1]
+    nJobs              = GetTotalJobsFromStatus(crabResults)
+    missingOuts        = []
+    missingLogs        = []
 
     # For-loop:All CRAB results
     for index, jobId in enumerate(crabResults['jobs']):
@@ -1094,8 +1132,21 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
     # Remove the progress bar once finished
     ClearProgressBar()
 
+    # Count merged files (local)
+    retrievedOutMerged = [f for f in os.listdir(os.path.join(taskDir, "results"))]
+    # Count merged files (EOS)
+    if opts.filesInEOS:
+        taskDirEOS = GetEOSDir(taskDir, opts)
+        cmd = ConvertCommandToEOS("ls", opts) + " " + taskDirEOS + " | grep histograms- | wc -l"
+        Verbose(cmd, True)
+        # Check if directory does not exist!
+        if "Unable to stat" in cmd:
+            eosOutMerged = 0
+        else:
+            eosOutMerged = Execute(cmd)[0] # just a number
+
     # Print results in a nice table
-    reportTable = GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, failed, idle, retrievedLog, retrievedOut, eosLog, eosOut)
+    reportTable = GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, failed, idle, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged)
     if printTable:
         for r in reportTable:
             Print(r, False)
@@ -1111,10 +1162,10 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
     # Print the dashboard url 
     if opts.url:
         Print(dashboardURL, False)
-    return idle, running, finished, transferring, failed, retrievedLog, retrievedOut, eosLog, eosOut
+    return idle, running, finished, transferring, failed, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged
 
 
-def GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, failed, idle, retrievedLog, retrievedOut, eosLog, eosOut):
+def GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, failed, idle, retrievedLog, retrievedOut, retrievedOutMerged, eosLog, eosOut, eosOutMerged):
     '''
     Takes various info on the status of a CRAB job and return a neat table.
     '''
@@ -1129,10 +1180,11 @@ def GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, fai
     nIdle     = str(idle)
     nLogs     = str(len(retrievedLog))#''.join( str(retrievedLog).split() ) 
     nOut      = str(len(retrievedOut))#''.join( str(retrievedOut).split() )
+    nOutM     = str(len(retrievedOutMerged))
     nLogsEOS  = ''.join( str(eosLog).split() ) 
     nOutEOS   = ''.join( str(eosOut).split() )
+    nOutEOSM  = eosOutMerged 
     txtAlign  = "{:<25} {:>4} {:<1} {:<4}"
-
     dataset   = taskDir.split("/")[-1]
     length    = 45 #len(dataset)
     hLine     = "="*length
@@ -1144,17 +1196,19 @@ def GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, fai
     table.append(hLine)
     table.append(header)
     table.append(hLine)
-    table.append( txtAlign.format("%sIdle"             % (colors.GRAY  ), nIdle    , "/", nTotal ) )
-    table.append( txtAlign.format("%sUnknown"          % (colors.GRAY  ), nUnknown , "/", nTotal ) )
-    table.append( txtAlign.format("%sFailed"           % (colors.RED   ), nFail    , "/", nTotal ) )
-    table.append( txtAlign.format("%sRunning"          % (colors.ORANGE), nRun     , "/", nTotal ) )
-    table.append( txtAlign.format("%sTransferring"     % (colors.ORANGE), nTransfer, "/", nTotal ) )
-    table.append( txtAlign.format("%sDone"             % (colors.WHITE ), nFinish  , "/", nTotal ) )
-    table.append( txtAlign.format("%sRetrieved Logs"   % (colors.PURPLE), nLogs    , "/", nTotal ) )
-    table.append( txtAlign.format("%sRetrieved Outputs"% (colors.BLUE  ), nOut     , "/", nTotal ) ) 
-    table.append( txtAlign.format("%sEOS Logs"         % (colors.CYAN  ), nLogsEOS , "/", nTotal ) )
-    table.append( txtAlign.format("%sEOS Outputs"      % (colors.CYAN  ), nOutEOS  , "/", nTotal ) ) 
-    table.append( "{:<100}".format("%s%s"              % (colors.WHITE, hLine) ) )
+    table.append( txtAlign.format("%sIdle"                  % (colors.GRAY  ), nIdle    , "/", nTotal ) )
+    table.append( txtAlign.format("%sUnknown"               % (colors.GRAY  ), nUnknown , "/", nTotal ) )
+    table.append( txtAlign.format("%sFailed"                % (colors.RED   ), nFail    , "/", nTotal ) )
+    table.append( txtAlign.format("%sRunning"               % (colors.ORANGE), nRun     , "/", nTotal ) )
+    table.append( txtAlign.format("%sTransferring"          % (colors.BLUE  ), nTransfer, "/", nTotal ) )
+    table.append( txtAlign.format("%sDone"                  % (colors.WHITE ), nFinish  , "/", nTotal ) )
+    table.append( txtAlign.format("%sRetrieved Logs"        % (colors.PURPLE), nLogs    , "/", nTotal ) )
+    table.append( txtAlign.format("%sRetrieved Outputs"     % (colors.PURPLE), nOut     , "/", nTotal ) ) 
+    table.append( txtAlign.format("%sRetrieved Outputs (M)" % (colors.PURPLE), ""       , "" , nOutM ) )
+    table.append( txtAlign.format("%sEOS Logs"              % (colors.CYAN  ), nLogsEOS , "/", nTotal ) )
+    table.append( txtAlign.format("%sEOS Outputs"           % (colors.CYAN  ), nOutEOS  , "/", nTotal ) ) 
+    table.append( txtAlign.format("%sEOS Outputs (M)"       % (colors.CYAN  ), ""       , "" , nOutEOSM ) )
+    table.append( "{:<100}".format("%s%s"                   % (colors.WHITE, hLine) ) )
     return table
 
 
@@ -1910,7 +1964,8 @@ def CreateJob(opts, args):
     opts.dirName = taskDirName
 
     # Give user last chance to abort
-    AskToContinue(taskDirName, analysis, opts)
+    if opts.ask:
+        AskToContinue(taskDirName, analysis, opts)
     
     # Create CRAB task diractory
     CreateTaskDir(taskDirName)
@@ -1957,6 +2012,7 @@ if __name__ == "__main__":
     PSET    = "miniAOD2TTree_SignalAnalysisSkim_cfg.py"
     SITE    = "T2_FI_HIP"
     DIRNAME = ""
+    ASK     = False
 
     parser = OptionParser(usage="Usage: %prog [options]")
     parser.add_option("--create", dest="create", default=False, action="store_true", 
@@ -1983,8 +2039,8 @@ if __name__ == "__main__":
     parser.add_option("-v", "--verbose", dest="verbose", default=VERBOSE, action="store_true",
                       help="Verbose mode for debugging purposes [default: %s]" % (VERBOSE))
 
-    parser.add_option("-a", "--ask", dest="ask", default=False, action="store_true",
-                      help="Prompt user before executing CRAB commands [defaut: False]")
+    parser.add_option("-a", "--ask", dest="ask", default=ASK, action="store_true",
+                      help="Prompt user before executing CRAB commands [defaut: %s]" % (ASK))
 
     parser.add_option("-p", "--pset", dest="pset", default=PSET, type="string",
                       help="The python cfg file to be used by cmsRun [default: %s]" % (PSET))

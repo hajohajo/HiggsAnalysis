@@ -291,6 +291,7 @@ JetSelection::Data JetSelection::privateAnalyze(const Event& event, const math::
   // Sort jets by pT (descending order)
   std::sort(output.fSelectedJets.begin(), output.fSelectedJets.end());
 
+
   // Calculate HT
   output.fHT = 0.0;
   for(Jet jet: output.getSelectedJets()) 
@@ -301,12 +302,17 @@ JetSelection::Data JetSelection::privateAnalyze(const Event& event, const math::
   if (tauPt > 0.0) output.fHT += tauPt;
   hHTAll->Fill(output.fHT);
   // Calculate JT
-  output.fJT = output.fHT - output.fSelectedJets.at(0).pt();
+  if (output.fSelectedJets.size() > 0) 
+    {
+      output.fJT = output.fHT - output.fSelectedJets.at(0).pt();
+    }
+
   hJTAll->Fill(output.fJT);
   //=== Apply cut on HT
   if (!fHTCut.passedCut(output.fHT)) return output;
   cSubPassedHT.increment();
   hHTPassed->Fill(output.fHT);
+
   //=== Apply cut on JT
   if (!fJTCut.passedCut(output.fJT)) return output;
   cSubPassedJT.increment();
@@ -315,15 +321,15 @@ JetSelection::Data JetSelection::privateAnalyze(const Event& event, const math::
   // Calculate MHT
   calculateMHTInformation(output, tauP, tauPt);
   hMHTAll->Fill(output.fMHTvalue);
+
   //=== Apply cut on MHT
   if (!fMHTCut.passedCut(output.fMHTvalue)) return output;
   cSubPassedMHT.increment();
   hMHTPassed->Fill(output.fMHTvalue);
-  
+
   //=== Passed all jet selections
   output.bPassedSelection = true;
   cPassedJetSelection.increment();
-
 
   // Find jet matched to tau
   if (tauPt > 0.0) {

@@ -244,11 +244,15 @@ class DatacardColumn():
             dsetType = MulticrabDirectoryDataType.FAKEB
         elif datasetType == "GenuineB":
             dsetType = MulticrabDirectoryDataType.GENUINEB
+        elif datasetType == "FakeTau":
+            dsetType = MulticrabDirectoryDataType.FAKETAU
+        elif datasetType == "GenuineTau":
+            dsetType = MulticrabDirectoryDataType.GENUINETAU
         elif datasetType == "Embedding":
             dsetType = MulticrabDirectoryDataType.EWKTAUS
         elif datasetType == "EWKfake":
             dsetType = MulticrabDirectoryDataType.EWKFAKETAUS
-        elif datasetType == "QCD MC":
+        elif datasetType == "QCDMC":
             dsetType = MulticrabDirectoryDataType.QCDMC
         elif datasetType == "EWKMC":
             dsetType = MulticrabDirectoryDataType.EWKMC
@@ -332,6 +336,18 @@ class DatacardColumn():
         '''
         return self._datasetType == MulticrabDirectoryDataType.GENUINEB
 
+    def typeIsGenuineTau(self):
+        '''
+        Returns true if the column is using the Genuine-tau (EWK MC) samples 
+        '''
+        return self._datasetType == MulticrabDirectoryDataType.GENUINETAU
+
+    def typeIsFakeTau(self):
+        '''
+        Returns true if the column is using the Fake-tau (EWK MC) samples
+        '''
+        return self._datasetType == MulticrabDirectoryDataType.FAKETAU
+
     def typeIsQCD(self):
         '''
         Returns true if the column is QCD
@@ -370,6 +386,8 @@ class DatacardColumn():
         typeDict["EWKfake"]     = self.typeIsEWKfake()
         typeDict["FakeB"]       = self.typeIsFakeB()
         typeDict["GenuineB"]    = self.typeIsGenuineB()
+        typeDict["FakeTau"]     = self.typeIsFakeTau()
+        typeDict["GenuineTau"]  = self.typeIsGenuineTau()
         typeDict["QCD"]         = self.typeIsQCD()
         typeDict["QCDMC"]       = self.typeIsQCDMC()
         typeDict["EWKMC"]       = self.typeIsEWKMC()
@@ -689,7 +707,7 @@ class DatacardColumn():
                     dset += "_ext1"
                     if not dsetMgr.hasDataset(dset):
                         msg  = "Cannot find merged dataset by key '%s' or '%s' in multicrab dir! " % (oldKey,dset)
-                        msg += "Did you forget to merge the root files with hplusMergeHistograms.py ?"
+                        msg += "Did you forget to merge the root files with hplusMergeHistograms.py? "
                         msg += "Did you misspell the dataset name? You must use the exact name given in \"_datasetMerge\" dictionary defined in \"plots.py\""
                         dsetMgr.PrintInfo()
                         raise Exception(sh_e + msg + sh_n)
@@ -1039,12 +1057,12 @@ class DatacardColumn():
                 minStatUncert = minimumError
             if minStatUncert > 0.5 and not "data" in self.getLabel():
                 minStatUncert = 0.5
-                msg  = "Determined the min. stat. error for column %s to be %f, which is very large. "
+                msg  = "Determined the min. stat. error for column %s to be %f, which is very large. " % (self.getLabel(),minStatUncert)
                 msg += "Setting the uncertainty manually to 0.5. "
-                msg += "THIS IS NOT CORRECT. You need to rebin for more statistics!"  %(self.getLabel(),minStatUncert)
+                msg += "THIS IS NOT CORRECT. You need to rebin for more statistics!" 
                 self.Print(sh_e + msg + sh_n, True)
             else:
-                self.Print("Determined the min. stat. error for column %s to be %f" % (self.getLabel(), minStatUncert), True)
+                self.Verbose("Determined the min. stat. error for column %s to be %f" % (self.getLabel(), minStatUncert), True)
 
         self.Verbose("Setting the minimum stat. uncertainty for histogram %s to be %f" % (myTitle, minStatUncert))
         # For-loop: All histogram bins

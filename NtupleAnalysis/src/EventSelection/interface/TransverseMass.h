@@ -27,6 +27,7 @@ public:
 
   static double reconstruct(const Muon& muon_1,const Muon& muon_2,const Muon& muon_3,const Muon& muon_4,const Muon& muon_5, const math::XYVectorD& met);
   static double reconstruct(const math::XYVector muonptvec_1, const math::XYVector muonptvec_2, const math::XYVector muonptvec_3, const math::XYVector muonptvec_4, const math::XYVector muonptvec_5, const math::XYVectorD& met);
+  static double reconstruct(const math::XYVector tau, const math::XYVector lepton, const math::XYVector jet1, const math::XYVector jet2, const math::XYVectorD& met);
 
 //  static double reconstruct(const genParticle& gamma_1,const genParticle& gamma_2,const Muon& muon, const math::XYVectorD& met);
 

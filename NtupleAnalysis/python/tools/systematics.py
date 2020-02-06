@@ -523,8 +523,8 @@ DataMCBinningHToHW = {
     "TopMass"     : [60] + [i for i in range(80, 100, 20)] + [i for i in range(100, 250, 25)] + [i for i in range(250, 400, 50)] + [500],
     "DijetPt"     : [30,50,70,90,110,130,150,200,250,300,400,600],
     "DijetMass"   : [0, 50, 75, 100, 125, 150, 200, 300, 500, 600],
-    "NJets"       : [i for i in range(3, 15, 1)],
-    "NBjets"      : [i for i in range(1, 8, 1)],
+    "NJets"       : [i for i in range(0, 15, 1)],
+    "NBjets"      : [i for i in range(0, 8+1, 1)],
     "Mt"          : [0,100,200,300,400,500,600,700,800,1000],
     #"Mt"          : [0,100,200,300,400,500,600,700,800,900,1600],
     }
@@ -538,7 +538,7 @@ _dataDrivenCtrlPlotBinning = {
 
     #NVertices plots
     "NVertices_AfterStandardSelections": None,
-    "NVertices_AfterAllSelections": None,
+    "NVertices_AfterAllSelections": [i for i in range(0, 40, 5)] + [i for i in range(40, 60, 10)] + [i for i in range(60, 100, 20)] + [i for i in range(100, 200, 50)],
 
     # Jets
     "Njets_AfterStandardSelections": [0,1,2,3,4,5,6,7,8],

@@ -1802,7 +1802,8 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
        if ((fAnalysisType == kSignalAnalysis) || fAnalysisType == kQCDNormalizationSystematicsSignalRegion) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTau(), fMETData.getMET());
        if ( (fAnalysisType == kHplus2hwAnalysis) || (fAnalysisType == kHplus2hwAnalysisWithTop) )
 	 {
-	   myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getSelectedTaus()[1],fMuonData.getSelectedMuons()[0], fMETData.getMET());
+	   if (fTauData.getSelectedTaus().size() > 1) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getSelectedTaus()[1],fMuonData.getSelectedMuons()[0], fMETData.getMET());
+	   else myTransverseMass = -1.0;
 	 }
        if (fAnalysisType == kHplus2hw_ele_Analysis) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getSelectedTaus()[1],fElectronData.getSelectedElectrons()[0], fMETData.getMET());
       }

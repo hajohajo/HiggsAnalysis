@@ -15,8 +15,27 @@ histogramAmbientLevel = "Debug"  # ("Systematics", "Vital", "Informative", "Debu
 #================================================================================================
 trigger = PSet(
     triggerOR = [
+        # SingleMuon Primary Dataset (PD)
         "HLT_IsoMu24",
         "HLT_IsoTkMu24",
+        # # SingleElectron Primary Dataset (PD)
+        # "HLT_Ele27_WPTight_Gsf",
+        # # DoubleMuon Primary Dataset (PD)
+        # "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL",
+        # "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL",
+        # "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ",
+        # "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",
+        # # DoubleEG Primary Dataset (PD)
+        # "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+        # "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+        # "HLT_DoubleEle33_CaloIdL",
+        # # MuonEG Primary Dataset (PD)
+        # "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL",
+        # "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ",
+        # "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",
+        # "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+        # "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL",
+        # "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ",
         ],
     triggerOR2 = [],
     )
@@ -38,9 +57,9 @@ metFilter = PSet(
     )
 
 #================================================================================================
-# Electron veto
+# Electron Selection
 #================================================================================================
-eVeto = PSet(
+electronSelection = PSet(
     applyTriggerMatching = False,
     triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
     electronPtCut        = 10.0,    # [default: 10.0]
@@ -57,7 +76,7 @@ eVeto = PSet(
 # Muon Selection
 #================================================================================================
 muonSelection = PSet(
-    applyTriggerMatching = False ,      # HLTMuon_Pt Missing from tree!
+    applyTriggerMatching = False ,       # HLTMuon_Pt Missing from tree!
     triggerMatchingCone  = 0.1,         # DeltaR for matching offline tau with trigger tau
     muonPtCut            = 26.0,        # [default: 10.0]
     muonEtaCut           = 2.4,         # [default: 2.4]
@@ -74,7 +93,7 @@ tauSelection = PSet(
     triggerMatchingCone  =   0.1, # [default: False]
     tauPtCut             =  20.0, # [default: 20.0]
     tauEtaCut            =   2.3, # [default: 2.3]
-    tauLdgTrkPtCut       =  20.0, # [default: 0.0]
+    tauLdgTrkPtCut       =   0.0, # [default: 0.0]
     prongs               =  -1,   # [default: -1] (1, 2, 3, 12, 13, 23, 123 or -1 (all))
     rtau                 =   0.0, # [default: 0.0] (to disable set to 0.0)
     againstElectronDiscr = "againstElectronTightMVA6",
@@ -132,7 +151,7 @@ jetSelection = PSet(
     jetType                  = "Jets",    # [default: "jets"] ("Jets", "JetsPuppi")
     jetPtCuts                = [30.0],    # [default: [30.0]]
     jetEtaCuts               = [4.7],     # [default: [4.7]]
-    numberOfJetsCutValue     = 3,         # [default: 3]
+    numberOfJetsCutValue     = 0,         # [default: 3]
     numberOfJetsCutDirection = ">=",      # [default: ">="] (==, !=, <, <=, >, >=)
     jetIDDiscr               = "IDloose", # [default: "IDloose"] ("IDloose", "IDtight", "IDtightLeptonVeto")
     jetPUIDDiscr             = "",        # [default: ""]
@@ -179,7 +198,7 @@ bjetSelection = PSet(
     jetEtaCuts                = [2.4],    # [default: [2.4]]
     bjetDiscr                 = "pfCombinedInclusiveSecondaryVertexV2BJetTags", # default
     bjetDiscrWorkingPoint     = "Medium", # [default: "Medium"] ("Medium", "Tight")
-    numberOfBJetsCutValue     = 1,        # [default: 1]
+    numberOfBJetsCutValue     = 0,        # [default: 1]
     numberOfBJetsCutDirection = ">=",     # [default: ">="] (==, !=, <, <=, >, >=)
 )
 
@@ -327,8 +346,8 @@ commonPlotsOptions = PSet(
     deltaRBins        = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
     rtauBins          = PSet(nBins =  55, axisMin =  0.0, axisMax =    1.1), # HToTauNu
     njetsBins         = PSet(nBins =  18, axisMin =  0.0, axisMax =   18.0),
-    metBins           = PSet(nBins =  80, axisMin =  0.0, axisMax =  400.0), #  5 GeV bin width
-    htBins            = PSet(nBins = 500, axisMin =  0.0, axisMax = 5000.0), # 10 GeV bin width 
+    metBins           = PSet(nBins = 160, axisMin =  0.0, axisMax =  800.0), # 5 GeV bin width
+    htBins            = PSet(nBins = 400, axisMin =  0.0, axisMax = 2000.0), # 5 GeV bin width 
     bjetDiscrBins     = PSet(nBins = 120, axisMin =  0.0, axisMax =    1.2),
     angularCuts1DBins = PSet(nBins =  52, axisMin =  0.0, axisMax =  260.0), 
     topMassBins       = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width 
@@ -344,7 +363,7 @@ allSelections = PSet(
     Verbose               = verbose,
     Trigger               = trigger,
     METFilter             = metFilter,
-    ElectronSelection     = eVeto,
+    ElectronSelection     = electronSelection,
     MuonSelection         = muonSelection,
     TauSelection          = tauSelection,
     JetSelection          = jetSelection,

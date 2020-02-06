@@ -36,7 +36,7 @@ sh_t = ShellStyles.NoteStyle()
 sh_n = ShellStyles.NormalStyle()
 sh_w = ShellStyles.WarningStyle()
 
-                                                                                                                                                                                                                 
+
 #================================================================================================
 # Class definition
 #================================================================================================
@@ -69,7 +69,8 @@ class DatasetMgrCreatorManager:
             raise Exception(ShellStyles.ErrorLabel() + msg + sh_n)
         self._toleranceForLuminosityDifference = config.ToleranceForLuminosityDifference
         self._optionDebugConfig = opts.debugConfig
-        self._config = config
+        self._config = config        
+        self._analysisType = opts.analysisType
         return
 
     def Verbose(self, msg, printHeader=True):
@@ -91,6 +92,9 @@ class DatasetMgrCreatorManager:
             print "=== ", fName
         print "\t", msg
         return
+
+    def GetAnalysisType(self):
+        return self._analysisType
 
     def __del__(self):
         self.closeManagers()
@@ -138,7 +142,7 @@ class DatasetMgrCreatorManager:
             self._luminosities.append( self._getIntLumi(i, myDsetMgr) )
 
             # Merge divided datasets
-            plots.mergeRenameReorderForDataMC(myDsetMgr)
+            plots.mergeRenameReorderForDataMC(myDsetMgr, keepSourcesMC=False, analysisType=self._analysisType)
 
             # Show info of available datasets
             if verbose:
@@ -547,7 +551,7 @@ class DataCardGenerator:
         extractors      = self._extractors
         mcrabInfoOutput = mcrabInfoOutput
 
-        self.Verbose("Calling the TableProducer constructor", True)#iro
+        self.Verbose("Calling the TableProducer constructor", True)
         myProducer = TableProducer.TableProducer(opts, config, outputPrefix, luminosity, observation, datasetGroups, extractors, mcrabInfoOutput)
 
         # Close files
@@ -727,18 +731,20 @@ class DataCardGenerator:
         table.append(hLine)
         table.append(align.format("Column Type", "True/False"))
         table.append(hLine)
-        table.append(align.format("Is Observation", c.typeIsObservation()) )
-        table.append(align.format("Is Signal"     , c.typeIsSignal() ) )
-        table.append(align.format("Is EWK Fake"   , c.typeIsEWKfake() ) )
-        table.append(align.format("Is QCD"        , c.typeIsQCD() ) )
-        table.append(align.format("Is QCD MC"     , c.typeIsQCDMC() ) )
-        table.append(align.format("IS EWK MC"     , c.typeIsEWKMC() ) )
-        table.append(align.format("IS EWK"        , c.typeIsEWK() ) )
-        table.append(align.format("IS QCD Inverted",c.typeIsQCDinverted() ) )
-        table.append(align.format("Is Fake-b"     , c.typeIsFakeB() ) )
-        table.append(align.format("Is Genuine-b"  , c.typeIsGenuineB() ) )
-        table.append(align.format("Is empty column",c.typeIsEmptyColumn() ) )
-        table.append(align.format("Dset Mgr Index", dsetMgrIndex ) )
+        table.append(align.format("Is Observation" , c.typeIsObservation()) )
+        table.append(align.format("Is Signal"      , c.typeIsSignal() ) )
+        table.append(align.format("Is EWK Fake"    , c.typeIsEWKfake() ) )
+        table.append(align.format("Is QCD"         , c.typeIsQCD() ) )
+        table.append(align.format("Is QCD MC"      , c.typeIsQCDMC() ) )
+        table.append(align.format("IS EWK MC"      , c.typeIsEWKMC() ) )
+        table.append(align.format("IS EWK"         , c.typeIsEWK() ) )
+        table.append(align.format("IS QCD Inverted", c.typeIsQCDinverted() ) )
+        table.append(align.format("Is Fake-b"      , c.typeIsFakeB() ) )
+        table.append(align.format("Is Genuine-b"   , c.typeIsGenuineB() ) )
+        table.append(align.format("Is GenuineTau"  , c.typeIsGenuineTau() ) )
+        table.append(align.format("Is FakeTau"     , c.typeIsFakeTau() ) )
+        table.append(align.format("Is empty column", c.typeIsEmptyColumn() ) )
+        table.append(align.format("Dset Mgr Index" , dsetMgrIndex ) )
         table.append(hLine)
         table.append("")
 

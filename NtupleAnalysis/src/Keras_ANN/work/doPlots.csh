@@ -38,7 +38,8 @@ echo "\n=== Output"
 ./plotResults.py -s ${FORMATS} --plotType output --logY --saveDir ${SAVE_DIR} --dirs ${DIRS} --cutLineX 0.4 --xMin 0.0 --xMax 1.0 --yMin 0.5e3 ${VERBOSE}
 
 echo "\n=== ROC" 
-./plotResults.py -s ${FORMATS} --plotType roc --logY --saveDir ${SAVE_DIR} --dirs ${DIRS},Keras_BDTG2018_Aug2018  --cutLineX 0.65 --xMin 0.0 --refName BDTG ${VERBOSE}
+./plotResults.py -s ${FORMATS} --plotType roc --logY --saveDir ${SAVE_DIR} --dirs ${DIRS},Keras_BDTG2018_Aug2018 --xMin 0.0 --refName BDTG ${VERBOSE}
+#./plotResults.py -s ${FORMATS} --plotType roc --logY --saveDir ${SAVE_DIR} --dirs ${DIRS},Keras_BDTG2018_Aug2018  --cutLineX 0.65 --xMin 0.0 --refName BDTG ${VERBOSE}
 
 echo "\n=== Metrics (Loss Vs Epoch, Accuracy Vs Epoch, etc..)"
 ./plotResults.py -s ${FORMATS} --plotType metric --saveDir ${SAVE_DIR} --xMin 0.0 --dirs ${DIRS} --yMax 1.0 ${VERBOSE}

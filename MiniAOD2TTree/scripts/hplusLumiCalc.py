@@ -37,8 +37,10 @@ open two terminals
 for both terminals, ssh to the same machine (e.g. ssh -YK aattikis@cmslpc37.fnal.gov)
 setup CMSSW and CRAB environments
 terminal 1: (ssh tunneling session)
-ssh -N -L 10121:itrac5212-v.cern.ch:10121 <username>@lxplus.cern.ch
+ssh -N -L 10121:itrac5117-v.cern.ch:10121 <cernusername>@lxplus.cern.ch # latest
+ssh -N -L 10121:itrac5212-v.cern.ch:10121 <username>@lxplus.cern.ch  #invalid after recent cern oracle server migration 
 ssh -N -L 10121:itrac50012-v.cern.ch:10121 <username>@lxplus.cern.ch #invalid after recent cern oracle server migration
+
 
 terminal 2 (while terminal 1 is open):
 cd multicrab_AnalysisType_vXYZ_TimeStamp
@@ -655,8 +657,8 @@ def PrintSummary(data, lumiUnit):
     Verbose("PrintSummary()", True)
     table   = []
     table.append("")
-    align   = "{:<3} {:<50} {:>20} {:<7}"
-    hLine   = "="*80
+    align   = "{:<3} {:<70} {:>20} {:<7}"
+    hLine   = "="*100
     header  = align.format("#", "Task", "Luminosity", "")
     data    = OrderedDict(sorted(data.items(), key=lambda t: t[0]))
     table.append(hLine)
@@ -686,8 +688,11 @@ def IsSSHReady(opts):
 
     if not opts.offsite:
         return
-    #cmd_ssh   = "ssh -N -L 10121:itrac50012-v.cern.ch:10121 <username>@lxplus.cern.ch\n\tPress "
-    cmd_ssh   = "ssh -N -L 10121:itrac5212-v.cern.ch:10121 <username>@lxplus.cern.ch\n\tPress "
+
+    Print("https://cms-service-lumi.web.cern.ch/cms-service-lumi/brilwsdoc.html", True)
+    #cmd_ssh   = "ssh -N -L 10121:itrac50012-v.cern.ch:10121 <username>@lxplus.cern.ch\n\tPress " #obsolete
+    #cmd_ssh   = "ssh -N -L 10121:itrac5212-v.cern.ch:10121 <username>@lxplus.cern.ch\n\tPress " #obsolete
+    cmd_ssh   = "ssh -N -L 10121:itrac5117-v.cern.ch:10121 <username>@lxplus.cern.ch\n\tPress "
     ssh_ready = AskUser("Script executed outside LXPLUS (--offsite enabled). Is the ssh tunneling session ready?\n\t%s" % (cmd_ssh), True)
     if not ssh_ready:
         sys.exit()

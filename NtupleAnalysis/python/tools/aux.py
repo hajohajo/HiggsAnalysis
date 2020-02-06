@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+#================================================================================================ 
+# Imports
+#================================================================================================ 
 import sys
 import os
 import hashlib
@@ -9,6 +12,7 @@ import stat
 import ROOT
 import OrderedDict
 import HiggsAnalysis.NtupleAnalysis.tools.git as git
+import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 import getpass
 import socket
 
@@ -20,7 +24,6 @@ def Verbose(msg, printHeader=True, verbose=False):
         return
     Print(msg, printHeader)
     return
-
 
 def Print(msg, printHeader=True):
     '''
@@ -216,6 +219,15 @@ def higgsAnalysisPath():
         return os.path.join(os.environ["CMSSW_BASE"], "src", "HiggsAnalysis")
     else:
         raise Exception("No $HIGGSANALYSIS_BASE nor $CMSSW_BASE environment variable. For standalone environment use setupStandalone.(c)sh, for CMSSW environment use cmsenv")
+    
+def getAnalysisType(analysis):
+    myAnalyses = ["HToTauNu", "HToTB", "HToHW", "HToHW_background", "HToHW_withTop"] # as defined in AnalysisBuilder.py
+    if analysis not in myAnalyses:
+        msg = "Unsupported analysis \"%s\". Please select one of the following: %s" % (analysis, ", ".join(myAnalyses))
+        raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle() )
+    else:
+        Print("Analysis type set to %s" % (ShellStyles.NoteStyle() + analysis + ShellStyles.NormalStyle()), True)
+        return analysis
 
 def execute(cmd):
     f = os.popen(cmd)
