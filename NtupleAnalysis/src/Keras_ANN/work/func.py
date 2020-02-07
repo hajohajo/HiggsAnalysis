@@ -148,24 +148,14 @@ def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
 def PrintArray(array):
     '''
     Fixes missing leading whitespace (fixme!)
+    https://stackoverflow.com/questions/23870301/extra-spaces-in-the-representation-of-numpy-arrays-of-floats
     '''
-    @contextlib.contextmanager
-    def printoptions(*args, **kwargs):
-        '''
-        https://stackoverflow.com/questions/2891790/how-to-pretty-print-a-numpy-array-without-scientific-notation-and-with-given-pre/2891805
-        '''
-        original = numpy.get_printoptions()
-        numpy.set_printoptions(*args, **kwargs)
-        try:
-            yield
-        finally: 
-            numpy.set_printoptions(**original)        
-        return    
+    _str = str(array)
     
-    with printoptions(suppress=True):
-        _str = str(array)
-    _str = _str.replace("[","[ ")
-    _str = _str.replace("]"," ]")
+    if ("[ " not in _str):
+        _str = _str.replace("[","[ ")
+    if (" ]" not in _str):
+        _str = _str.replace("]"," ]")
     return _str
 
 def GetScalerAttributes(df, nInputs, scaler, scalerType):    
@@ -1187,10 +1177,10 @@ def WriteModel(model, model_json, inputList, scaler_attributes, output, verbose=
                 
                 for w in W:
                     # Store weights
-                    fout.write(str(w) + '\n')
+                    fout.write(PrintArray(w) + '\n')
                 # Store bias values (shifts the activation function : output[i] = (Sum(weights[i,j]*inputs[j]) + bias[i]))
                 biases = model.layers[index].get_weights()[1]
-                fout.write(str(biases) + '\n')
+                fout.write(PrintArray(biases) + '\n')
 
         if verbose:
             Print('Writing model in file %s' % (output), True)
