@@ -60,22 +60,5 @@ void test_main(std::string model, TString fileName) {
     vector<float> inputs = GetListOfInputs(kerasModel.GetInputNames());
     float MVAoutput = kerasModel.predict(inputs).at(0);
     std::cout<<"    ["<<MVAoutput<<"]"<<std::endl;
-  }
-  
-  /*
-  // declare keras model object
-  KerasModel kerasModel(dumped_nn);
-  vector<float> result = kerasModel.compute_output(input_data);
-
-  cout << "Predicted Class: ";
-  if(result[0] > 0.5) {
-    cout << 1 << endl;
-  }
-  else {
-    cout << 0 << endl;
-  }
-  cout << "Actual Class: " << response_class << endl;
-  cout << "Predicted value: " << result[0] << endl;
-  */
-  //return 0;
+  }  
 }
