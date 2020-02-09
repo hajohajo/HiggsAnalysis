@@ -985,6 +985,13 @@ def main(opts):
     Print("Writing the model (weights and architecture) in the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
     func.WriteModel(myModel, model_json, opts.inputList, scaler_attributes, modelFilename, verbose=False)
 
+    # Write scaler
+    if (opts.standardise):
+        scalerFilename = os.path.join(opts.saveDir, "scaler.save")
+        joblib.dump(scaler_all, scalerFilename)
+        joblib.dump(scaler_sig, scalerFilename.replace("scaler","scaler_sig"))
+        joblib.dump(scaler_bkg, scalerFilename.replace("scaler","scaler_bkg"))
+
     #https://keras.io/visualization/
     #https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
     molelFilename = modelFilename.replace(".txt", ".png")
