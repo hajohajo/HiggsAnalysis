@@ -4,6 +4,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <cmath>
 
 class KerasModel;
 class Layer;
