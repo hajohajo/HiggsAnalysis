@@ -1,7 +1,7 @@
 #include "KerasModel.h"
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 #include "TFile.h"
 #include "TTree.h"
@@ -13,11 +13,15 @@
 #include "TTreeReaderValue.h"
 
 #include "test_main.h"
-//LAST USE:
-// root -l -b
-// .x test_main.cc("../Keras_4Layers_32relu_32relu_32relu_1sigmoid_500Epochs_32BatchSize_500000Entrystop_19Inputs_07Feb2020_11h29m27s/model.txt", "../histograms-TT_19var.root")
 
-void test_main(std::string model, TString fileName) {
+// EXAMPLE:
+// root -l -b -q test_main.cc\(\"../Keras_4Layers_32relu_32relu_32relu_1sigmoid_500Epochs_32BatchSize_500000Entrystop_19Inputs_07Feb2020_11h29m27s\",\"../histograms-TT_19var.root\"\)
+
+// LAST USE:
+// root -l -b -q test_main.cc\(\"../Keras_4Layers_32relu_32relu_32relu_1sigmoid_500Epochs_32BatchSize_500000Entrystop_19Inputs_07Feb2020_11h29m27s\",\"../histograms-TT_19var.root\"\)
+
+void test_main(std::string folder, TString fileName) {
+  std::string model = folder+"/model.txt";
   std::cout<<"===  test_main.cc"<<std::endl;
   std::cout<<"    Opening ROOT file "<<fileName<<std::endl;  
   TFile *file = TFile::Open(fileName, "R");
