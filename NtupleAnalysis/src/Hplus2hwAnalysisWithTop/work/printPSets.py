@@ -143,11 +143,11 @@ def main(opts):
             datasetsMgr.printSelections()
         
         # Print PSets used for FakeBMeasurement
-        if 0:
+        if 1:
             datasetsMgr.printSelections()
             PrintPSet("BJetSelection", datasetsMgr)
-            PrintPSet("TopSelectionBDT", datasetsMgr)
-            PrintPSet("FakeBMeasurement", datasetsMgr)
+            #PrintPSet("TopSelectionBDT", datasetsMgr)
+            #PrintPSet("FakeBMeasurement", datasetsMgr)
             sys.exit()
 
         sys.exit()
