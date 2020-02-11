@@ -639,7 +639,7 @@ def getAnalysisOrder(analysisType="HToTauNu"):
                    "TTZToLL","TTWJets","TTWJetsToQQ","TTWJetsToLNu","Diboson", "WW","WZ","ZZ""WWTo4Q","TTBB","TTTT","ZJetsToQQ_HT600toInf"]
     
     #dsets_HToHW_withTop = ["GenuineTau", "FakeTau", "WJetsHT", "TT", "SingleTop", "DYJetsToLLHT", "Diboson", "ttX"]
-    dsets_HToHW_withTop = ["GenuineTau", "FakeTau", "TT", "WJetsHT", "DYJetsToLLHT", "SingleTop", "Diboson", "ttX"]
+    dsets_HToHW_withTop = ["GenuineTau", "FakeTau", "QCD", "QCD-b", "WJetsHT", "TT", "DYJetsToLLHT", "SingleTop", "Diboson", "ttX"]
 
     myOrder = {}
     myOrder["HToTauNu"]      = dsets_HToTauNu
@@ -655,6 +655,7 @@ def getAnalysisOrder(analysisType="HToTauNu"):
 #================================================================================================
 _legendLabels = {
     "Data"                 : "Data",
+    "Simulation"           : "Simulation",
     "EWK"                  : "Electroweak",
     "Diboson"              : "Diboson",
     "ttX"                  : "t, tW, t#bar{t} + X",
@@ -859,6 +860,7 @@ _plotStyles = {
     "DYJetsToLLHT"  : styles.dyStyle,
     "DYJetsToQQHT"  : styles.dyStyle,
     "Data"          : styles.dataStyle,
+    "Simulation"    : styles.simStyle,
     "Diboson"       : styles.dibStyle,
     "EWK"           : styles.wStyle,
     "QCD"           : styles.qcdStyle,
