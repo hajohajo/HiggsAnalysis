@@ -125,7 +125,7 @@ public:
 					       const JetSelection::Data& jetData, 
 					       const BJetSelection::Data& bjetData, 
 					       const METSelection::Data& METData, 
-					       const TopSelectionBDT::Data& topData);
+					       const TopSelectionMVA::Data& topData);
   void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
   void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false, int i=0, int j=1);
   void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineB);  //HToTB-specific
@@ -390,7 +390,7 @@ private:
   METSelection::Data fMETData;
   TopologySelection::Data fTopologyData;
   // QuarkGluonLikelihoodRatio::Data fQGLRData;
-  TopSelectionBDT::Data fTopData;
+  TopSelectionMVA::Data fTopData;
   AngularCutsCollinear::Data fBackToBackAngularCutsData;
   // FatJetSelection::Data fFatJetData;
   // FatJetSoftDropSelection::Data fFatJetSoftDropData;

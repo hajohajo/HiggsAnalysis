@@ -304,7 +304,7 @@ void Hplus2hwAnalysis_fake::process(Long64_t entry) {
   // 6) Tau
   ////////////
 
-  const TauSelection::Data looseTauData = fLooseTauSelection.analyzeTight(fEvent);
+  const TauSelection::Data looseTauData = fLooseTauSelection.analyzeLoose(fEvent);
 
 //  const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
 

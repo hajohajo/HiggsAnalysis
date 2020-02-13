@@ -225,7 +225,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   // Tau
   ////////////
 
-  const TauSelection::Data looseTauData = fLooseTauSelection.analyzeTight(fEvent);
+  const TauSelection::Data looseTauData = fLooseTauSelection.analyzeLoose(fEvent);
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
 
   std::vector<float> myFactorisationInfo;

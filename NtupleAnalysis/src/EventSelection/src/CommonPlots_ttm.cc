@@ -1102,7 +1102,7 @@ void CommonPlots_ttm::initialize() {
   fBJetData = BJetSelection::Data();
   fMETData  = METSelection::Data();
   // fQGLRData = QuarkGluonLikelihoodRatio::Data();
-  fTopData  = TopSelectionBDT::Data();
+  fTopData  = TopSelectionMVA::Data();
   fBackToBackAngularCutsData = AngularCutsCollinear::Data();
   // fFatJetData = FatJetSelection::Data();
   // fFatJetSoftDropData = FatJetSoftDropSelection::Data();
@@ -1345,7 +1345,7 @@ void CommonPlots_ttm::fillControlPlotsAfterStandardSelections(const Event& event
 							  const JetSelection::Data& jetData,
 							  const BJetSelection::Data& bjetData,
 							  const METSelection::Data& METData,
-							  const TopSelectionBDT::Data& topData){
+							  const TopSelectionMVA::Data& topData){
   fJetData      = jetData;
   fBJetData     = bjetData;
   fTopData      = topData;
@@ -1433,12 +1433,12 @@ void CommonPlots_ttm::fillControlPlotsAfterStandardSelections(const Event& event
   // TopSelection histograms
   if (fAnalysisType == kHplus2hwAnalysisWithTop)
     {
-      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNTopsAfterStdSelections, bIsGenuineTau, fTopData.getSelectedCleanedTopsBDTG().size() );
+      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNTopsAfterStdSelections, bIsGenuineTau, fTopData.getSelectedCleanedTopsMVA().size() );
       
       if (fTopData.getAllCleanedTopsSize() > 0)
 	{
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopPtAfterStdSelections        , bIsGenuineTau, fTopData.getTop().pt() );
-	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterStdSelections       , bIsGenuineTau, fTopData.getTopBDTG() );
+	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterStdSelections       , bIsGenuineTau, fTopData.getTopMVA() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetPtAfterStdSelections   , bIsGenuineTau, fTopData.getTopDijet().pt() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetMassAfterStdSelections , bIsGenuineTau, fTopData.getTopDijet().mass() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopMassAfterStdSelections      , bIsGenuineTau, fTopData.getTop().mass() );
@@ -1574,12 +1574,12 @@ void CommonPlots_ttm::fillControlPlotsAfterAllSelections(const Event& event, int
   // fHistoSplitter.fillShapeHistogramTriplet(hCtrlQGLRNGluonJetsAfterAllSelections,isGenuineB, fQGLRData.getNumberOfGluonJets());
 
   // TopSelection histograms
-  fHistoSplitter.fillShapeHistogramTriplet(hCtrlNTopsAfterAllSelections, isGenuineB, fTopData.getSelectedCleanedTopsBDTG().size() );
+  fHistoSplitter.fillShapeHistogramTriplet(hCtrlNTopsAfterAllSelections, isGenuineB, fTopData.getSelectedCleanedTopsMVA().size() );
 
   if (fTopData.getAllCleanedTopsSize() > 0)
     {
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopPtAfterAllSelections        , isGenuineB, fTopData.getTop().pt() );
-      fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterAllSelections       , isGenuineB, fTopData.getTopBDTG() );
+      fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterAllSelections       , isGenuineB, fTopData.getTopMVA() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetPtAfterAllSelections   , isGenuineB, fTopData.getTopDijet().pt() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetMassAfterAllSelections , isGenuineB, fTopData.getTopDijet().mass() );
       fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopMassAfterAllSelections      , isGenuineB, fTopData.getTop().mass() );
@@ -1854,12 +1854,12 @@ void CommonPlots_ttm::fillControlPlotsAfterAllSelections(const Event& event, boo
   if (fAnalysisType == kHplus2hwAnalysisWithTop)
     {
 
-      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNTopsAfterAllSelections, bIsGenuineTau, fTopData.getSelectedCleanedTopsBDTG().size() );
+      fHistoSplitter.fillShapeHistogramTriplet(hCtrlNTopsAfterAllSelections, bIsGenuineTau, fTopData.getSelectedCleanedTopsMVA().size() );
       
       if (fTopData.getAllCleanedTopsSize() > 0)
 	{
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopPtAfterAllSelections        , bIsGenuineTau, fTopData.getTop().pt() );
-	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterAllSelections       , bIsGenuineTau, fTopData.getTopBDTG() );
+	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopBDTAfterAllSelections       , bIsGenuineTau, fTopData.getTopMVA() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetPtAfterAllSelections   , bIsGenuineTau, fTopData.getTopDijet().pt() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopDijetMassAfterAllSelections , bIsGenuineTau, fTopData.getTopDijet().mass() );
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlTopMassAfterAllSelections      , bIsGenuineTau, fTopData.getTop().mass() );
