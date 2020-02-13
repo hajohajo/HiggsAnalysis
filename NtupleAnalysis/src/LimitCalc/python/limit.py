@@ -108,7 +108,7 @@ def useParentheses():
     global BRlimit, sigmaBRlimit
     
     BRlimit      = "%s(t#rightarrowH^{+}b)#times%s(%s)" % (BR, BR, hplusDecayMode)
-    sigmaBRlimit = "#sigma(H^{+})#times%s(%s) (fb)" % (BR, hplusDecayMode)
+    sigmaBRlimit = "#sigma(H^{+})#times%s(%s) (pb)" % (BR, hplusDecayMode)
     return
 
     
@@ -122,7 +122,7 @@ def useSubscript(HToTB=False):
         sigmaBRlimit = "#sigma H^{#pm} %s (pb)" % (hplusDecayModeHtb)
     else:
         BRlimit      = "%s_{t#rightarrowH^{+}b}#times%s_{%s}" % (BR, BR, hplusDecayMode)
-        sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (fb)" % (BR, hplusDecayMode)
+        sigmaBRlimit = "#sigma_{H^{+}}#times%s_{%s} (pb)" % (BR, hplusDecayMode)
     return
 
 def mHplus():
@@ -337,7 +337,7 @@ class BRLimits:
 
         br = "#sigma_{H^{#pm}} #bf{#it{#Beta}} (%s) (pb)"
         sigmaBRlimits["HToTauNu"] = br % ( "H^{#pm} #rightarrow #tau^{#pm} #nu_{#tau}")
-        sigmaBRlimits["HToHW"]    = br % ( "H^{#pm} #rightarrow H^{0}_{SM} W^{#pm}")
+        sigmaBRlimits["HToHW"]    = br % ( "H^{#pm} #rightarrow H W^{#pm}, H#rightarrow #tau^{+}#tau^{-}")
         sigmaBRlimits["HToTB"]    = br % ( "H^{#pm} #rightarrow tb" )
         return sigmaBRlimits[self.analysisType]
 
@@ -345,7 +345,7 @@ class BRLimits:
         
         finalStates = {}
         finalStates["HToTauNu"] = "#tau_{h}+jets final state"
-        finalStates["HToHW"]    = "#mu#tau_{h} and e#tau_{h} final states"
+        finalStates["HToHW"]    = "#mu#tau_{h}#tau_{h} and e#tau_{h}#tau_{h} final states"
         finalStates["HToTB"]    = "fully hadronic final state"
         return finalStates[self.analysisType]
 
@@ -353,7 +353,7 @@ class BRLimits:
         
         processes = {}
         processes["HToTauNu"] = "pp #rightarrow t(b)H^{#pm} #rightarrow #tau^{#pm}#nu_{#tau}"
-        processes["HToHW"]    = "pp #rightarrow t(b)H^{#pm} #rightarrow t(b)"
+        processes["HToHW"]    = "pp #rightarrow t(b)H^{#pm}, H^{#pm} #rightarrow H W^{#pm}"
         processes["HToTB"]    = "pp #rightarrow t(b)H^{#pm} #rightarrow t(b)"
         return processes[self.analysisType]
 

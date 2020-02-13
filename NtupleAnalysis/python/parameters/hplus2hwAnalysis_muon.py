@@ -67,13 +67,38 @@ muonSelection = PSet(
   applyTriggerMatching = True,
    triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
              muonPtCut = 26.0,
-            muonEtaCut = 2.1, #2.4,
+            muonEtaCut = 2.4, #2.4,
                 muonID = "muIDTight", #"muIDMedium", #"muIDTight", # options: muIDLoose, muIDMedium, muIDTight
          muonIsolation = "tight", #"tight", # for selecting, not vetoing
 	muonIsolType   = "default",      # options: "mini", "default" 
 )
 
+##########
+## Muon identification scale factors
+##########
 
+scaleFactors.assignMuonIdentificationSF(muonSelection, "nominal", "Data")
+
+##########
+## Muon trigger scale factors
+##########
+
+scaleFactors.assignMuonTriggerSF(muonSelection, "nominal", trg.MuontriggerEfficiencyJsonName, "Data")
+
+##########
+## Loose Muon without Iso
+##########
+
+looseMuonSelection = PSet(
+  applyTriggerMatching = True,
+   triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
+             muonPtCut = 26.0,
+            muonEtaCut = 2.4, #2.4,
+                muonID = "muIDTight", #"muIDMedium", #"muIDTight", # options: muIDLoose, muIDMedium, muIDTight
+         muonIsolation = "veto", # no effect #"tight", # for selecting, not vetoing
+        muonIsolType   = "default", # no effect      # options: "mini", "default" 
+
+)
 ##########
 ## Tau
 ##########
@@ -83,12 +108,12 @@ tauSelection = PSet(
    triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
               tauPtCut = 20.0,
              tauEtaCut = 2.3,
-        tauLdgTrkPtCut = 1.0,
+        tauLdgTrkPtCut = 5.0,
                 prongs = -1,    # options: 1, 2, 3, 12, 13, 23, 123 or -1 (all)
                   rtau = 0.0,   # to disable set to 0.0
   againstElectronDiscr = "againstElectronVLooseMVA6",
       againstMuonDiscr = "againstMuonLoose3",
-        isolationDiscr = "byMediumIsolationMVArun2v1DBoldDMwLT", #"byVLooseIsolationMVArun2v1DBoldDMwLT", #byTightIsolationMVArun2v1DBoldDMwLT", #"byLooseIsolationMVArun2v1DBoldDMwLT", #"byLooseIsolationMVArun2v1DBoldDMwLT", #"byMediumIsolationMVArun2v1DBnewDMwLT",
+        isolationDiscr = "byTightIsolationMVArun2v1DBoldDMwLT", #"byMediumIsolationMVArun2v1DBoldDMwLT", #"byVLooseIsolationMVArun2v1DBoldDMwLT", #byTightIsolationMVArun2v1DBoldDMwLT", #"byLooseIsolationMVArun2v1DBoldDMwLT", #"byLooseIsolationMVArun2v1DBoldDMwLT", #"byMediumIsolationMVArun2v1DBnewDMwLT",
 )
 
 ##########
@@ -101,7 +126,7 @@ looseTauSelection = PSet(
    triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
               tauPtCut = 20.0,
              tauEtaCut = 2.3,
-        tauLdgTrkPtCut = 1.0,
+        tauLdgTrkPtCut = 5.0,
                 prongs = -1,    # options: 1, 2, 3, 12, 13, 23, 123 or -1 (all)
                   rtau = 0.0,   # to disable set to 0.0
   againstElectronDiscr = "againstElectronVLooseMVA6",
@@ -135,9 +160,9 @@ scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau", "nomina
 jetSelection = PSet(
                jetType  = "Jets", # options: Jets (AK4PFCHS), JetsPuppi (AK4Puppi)
               jetPtCuts = [30.0],
-             jetEtaCuts = [2.1], #4.7,
+             jetEtaCuts = [2.4], #4.7,
      tauMatchingDeltaR  = 0.4, #0.4,
-  numberOfJetsCutValue  = 3,
+  numberOfJetsCutValue  = 2,
   numberOfJetsCutDirection = ">=", # options: ==, !=, <, <=, >, >=
             jetIDDiscr = "IDloose", # options: IDloose, IDtight, IDtightLeptonVeto
           jetPUIDDiscr = "", # does not work at the moment 
@@ -157,7 +182,7 @@ bjetSelection = PSet(
     triggerMatchingApply= False,
     triggerMatchingCone = 0.0,  # DeltaR for matching offline bjet with trigger::TriggerBjet 
               jetPtCuts = [30.0],
-             jetEtaCuts = [2.1],
+             jetEtaCuts = [2.4],
              bjetDiscr  = "pfCombinedInclusiveSecondaryVertexV2BJetTags", # default
 #             bjetDiscr  = "pfCombinedMVAV2BJetTags", # use this for MVA b-tagging
  bjetDiscrWorkingPoint  = "Medium", #optimal for CSVv2
@@ -233,6 +258,7 @@ allSelections = PSet(
     METFilter 		= metFilter,
     ElectronSelection 	= eVeto,
     MuonSelection 	= muonSelection,
+    LooseMuonSelection  = looseMuonSelection,
     TauSelection	= tauSelection,
     LooseTauSelection   = looseTauSelection,
     JetSelection	= jetSelection,

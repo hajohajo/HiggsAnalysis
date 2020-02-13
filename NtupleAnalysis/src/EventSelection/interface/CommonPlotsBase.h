@@ -6,16 +6,18 @@
 #include "Framework/interface/HistoWrapper.h"
 #include "Framework/interface/HistoSplitter.h"
 #include "Framework/interface/HistogramSettings.h"
-
+#include "Framework/interface/ParameterSet.h"
 #include "TDirectory.h"
 
 /// Base class for plotting routines needed at specific steps of the analysis
 class CommonPlotsBase {
 public:
+//  CommonPlotsBase();
   CommonPlotsBase(HistoWrapper& histoWrapper, bool isEnabled);
   virtual ~CommonPlotsBase();
   
   bool isEnabled() const { return bIsEnabled; }
+
 
   virtual void book(TDirectory* dir, bool isData);
   virtual void reset();
@@ -49,17 +51,40 @@ public:
 						       const TopSelection::Data& topData,
 						       bool bIsInverted);
   virtual void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false);
-  virtual void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false);
+  virtual void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false,int i=0,int j=1);
   virtual void fillControlPlotsAfterAllSelections(const Event& event, int isInverted);
   virtual void fillControlPlotsAfterAllSelectionsWithProbabilisticBtag(const Event& event, const METSelection::Data& metData, double btagWeight);
   //virtual void fillControlPlotsAfterAllSelectionsWithFullMass(const Event& event, FullHiggsMassCalculator::Data& data);
 
+  virtual int nVertices();
+  
+  int iVertices;
 protected:
   HistoWrapper fHistoWrapper;
   
 private:
   bool bIsEnabled;
+/*  const HistogramSettings fNVerticesBinSettings;
+  const HistogramSettings fPtBinSettings;
+  const HistogramSettings fEtaBinSettings;
+  const HistogramSettings fPhiBinSettings;
+  const HistogramSettings fDeltaEtaBinSettings;
+  const HistogramSettings fDeltaPhiBinSettings;
+  const HistogramSettings fDeltaRBinSettings;
+  const HistogramSettings fRtauBinSettings;
+  const HistogramSettings fNjetsBinSettings;
+  const HistogramSettings fMetBinSettings;
+  const HistogramSettings fHtBinSettings;
+  const HistogramSettings fBJetDiscriminatorBinSettings;
+  const HistogramSettings fAngularCuts1DSettings;
+  const HistogramSettings fWMassBinSettings;
+  const HistogramSettings fTopMassBinSettings;
+  const HistogramSettings fInvmassBinSettings;
+  const HistogramSettings fMtBinSettings;
   
+  int iVertices;
+
+*/
 };
 
 #endif

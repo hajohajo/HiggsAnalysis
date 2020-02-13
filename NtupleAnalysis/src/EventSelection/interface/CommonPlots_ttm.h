@@ -1,6 +1,6 @@
 // -*- c++ -*-
-#ifndef EventSelection_CommonPlots_h
-#define EventSelection_CommonPlots_h
+#ifndef EventSelection_CommonPlots_ttm_h
+#define EventSelection_CommonPlots_ttm_h
 
 #include "EventSelection/interface/EventSelections.h"
 #include "EventSelection/interface/CommonPlotsHelper.h"
@@ -15,7 +15,7 @@
 
 #include <vector>
 
-class CommonPlots {
+class CommonPlots_ttm {
 public:
   enum AnalysisType {
     kSignalAnalysis,
@@ -39,10 +39,10 @@ public:
     kQCDNormalizationSystematicsControlRegion // Needed for obtaining normalization systematics to data-driven control plots
   };
 
-  CommonPlots(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper);
-  CommonPlots(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper, bool test);
+  CommonPlots_ttm(const ParameterSet& config, const CommonPlots_ttm::AnalysisType type, HistoWrapper& histoWrapper);
+  CommonPlots_ttm(const ParameterSet& config, const CommonPlots_ttm::AnalysisType type, HistoWrapper& histoWrapper, bool test);
 //  CommonPlots();
-  ~CommonPlots();
+  ~CommonPlots_ttm();
 
   //Tau ID syst switches
   bool tauIDup;
@@ -125,7 +125,7 @@ public:
 					       const JetSelection::Data& jetData, 
 					       const BJetSelection::Data& bjetData, 
 					       const METSelection::Data& METData, 
-					       const TopSelectionMVA::Data& topData);
+					       const TopSelectionBDT::Data& topData);
   void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
   void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false, int i=0, int j=1);
   void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineB);  //HToTB-specific
@@ -249,7 +249,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlMHTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterStdSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlTopMVAAfterStdSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetMassAfterStdSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopMassAfterStdSelections;
@@ -354,7 +354,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopPtAfterAllSelections;
-  HistoSplitter::SplittedTripletTH1s hCtrlTopMVAAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlTopBDTAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetPtAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopDijetMassAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlTopMassAfterAllSelections;
@@ -390,7 +390,7 @@ private:
   METSelection::Data fMETData;
   TopologySelection::Data fTopologyData;
   // QuarkGluonLikelihoodRatio::Data fQGLRData;
-  TopSelectionMVA::Data fTopData;
+  TopSelectionBDT::Data fTopData;
   AngularCutsCollinear::Data fBackToBackAngularCutsData;
   // FatJetSelection::Data fFatJetData;
   // FatJetSoftDropSelection::Data fFatJetSoftDropData;

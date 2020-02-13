@@ -19,7 +19,7 @@ for x in sys.argv:
   print x
 
 
-pr = "1pr"
+pr = "2pr"
 
 hist_num_g_WZ = f.Get('Hplus2hwAnalysis_fake_350to3000_Run2016/tauPt_num_g_'+pr)
 hist_den_g_WZ = f.Get('Hplus2hwAnalysis_fake_350to3000_Run2016/tauPt_den_g_'+pr)
@@ -207,6 +207,7 @@ hist_dummy_den_1pr.Add(hist_den_g_ZZ,-1)
 
 
 # what about DY
+
 hist_dummy_num_1pr.Add(hist_num_g_DY,-1)
 
 hist_dummy_den_1pr.Add(hist_den_g_DY,-1)
@@ -239,7 +240,7 @@ hist_num_DY.Draw("")
 hist_dummy_num_1pr.Draw("Same")
 hist_dummy_num_1pr.SetMarkerStyle(20)
 
-canvas_3.Print('FR/Numerator_DY_data'+pr+'.png')
+canvas_3.Print('Numerator_DY_data'+pr+'.png')
 
 
 #plot ratio
@@ -269,7 +270,7 @@ canvas = ROOT.TCanvas('canvas', '', 500,500)
 n_data.Draw()
 n_data.SetMarkerStyle(20)
 n_data.GetXaxis().SetRangeUser(20,120)
-n_data.GetYaxis().SetRangeUser(0,0.5)
+n_data.GetYaxis().SetRangeUser(0,1)
 
 #hist_num_DY.Divide(hist_den_DY)
 
@@ -281,12 +282,18 @@ n_data.GetYaxis().SetRangeUser(0,0.5)
 #hist_num_DY.Draw("Same")
 #hist_num_DY.SetMarkerStyle(20)
 n.Draw("SAME")
-n.GetXaxis().SetRangeUser(20,120)
+#n.GetXaxis().SetRangeUser(20,120)
+n.GetYaxis().SetRangeUser(0,1)
 n.SetMarkerStyle(1)
 #hist_num_DY.GetXaxis().SetRangeUser(20,140)
-#hist_num_DY.GetYaxis().SetRangeUser(0,0.5)
 
-canvas.Print('FR/FR_'+pr+'.png')
+canvas.Print('FR_'+pr+'.png')
+
+
+print "FR and up and down"
+print "[ ", n_data.GetBinContent(1), "," ,n_data.GetBinContent(2), ",", n_data.GetBinContent(3) , " ]"
+print "[ ", n_data.GetBinContent(1)+n_data.GetBinErrorUp(1), "," ,n_data.GetBinContent(2)+n_data.GetBinErrorUp(2), ",", n_data.GetBinContent(3)+n_data.GetBinErrorUp(3) , " ]"
+print "[ ", n_data.GetBinContent(1)-n_data.GetBinErrorLow(2), "," ,n_data.GetBinContent(2)-n_data.GetBinErrorLow(2), ",", n_data.GetBinContent(3)-n_data.GetBinErrorLow(3) , " ]"
 
 
 #plot denominator
@@ -300,7 +307,7 @@ hist_den_DY.GetYaxis().SetRangeUser(0,26000)
 hist_dummy_den_1pr.Draw("Same")
 hist_dummy_den_1pr.SetMarkerStyle(20)
 
-canvas_2.Print('FR/Denominator_DY_data'+pr+'.png')
+canvas_2.Print('Denominator_DY_data'+pr+'.png')
 
 #plot mu Pt
 
@@ -315,7 +322,7 @@ hist_mu_DY.GetYaxis().SetRangeUser(0,80000)
 hist_dummy_mu.Draw("Same")
 hist_dummy_mu.SetMarkerStyle(20)
 
-canvas_4.Print('FR/mu_Pt_DY_data'+pr+'.png')
+canvas_4.Print('mu_Pt_DY_data'+pr+'.png')
 
 #plot n jets
 
@@ -330,7 +337,7 @@ hist_jet_DY.GetYaxis().SetRangeUser(0,80000)
 hist_dummy_jet.Draw("Same")
 hist_dummy_jet.SetMarkerStyle(20)
 
-canvas_6.Print('FR/Njet_DY_data'+pr+'.png')
+canvas_6.Print('Njet_DY_data'+pr+'.png')
 
 
 f.Close()
