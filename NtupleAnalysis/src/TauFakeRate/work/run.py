@@ -212,11 +212,10 @@ def main():
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
     allSelections.MuonSelection.applyTriggerMatching = False # cannot use it for 2 muons and single-muon trigger
-    allSelections.MuonSelection.muonPCut = 40.0 # cannot use it for 2 muons and single-muon trigger
+    #allSelections.MuonSelection.muonPtCut = 40.0 # cannot use it for 2 muons and single-muon trigger
     allSelections.JetSelection.numberOfJetsCutValue = 1 # [default; 0]
 
     # allSelections.BjetSelection.triggerMatchingApply = True
-    # allSelections.TopSelection.ChiSqrCutValue = 100.0
     # allSelections.BJetSelection.numberOfBJetsCutValue = 0
     # allSelections.BJetSelection.numberOfBJetsCutDirection = "=="
     
