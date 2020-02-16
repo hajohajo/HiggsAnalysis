@@ -20,10 +20,7 @@ public:
   virtual void process(Long64_t entry) override;
 
 private:
-  // Input parameters
-  // const DirectionalCut<float> cfg_PrelimTopFitChiSqr;
-  //const DirectionalCut<double> cfg_PrelimTopMVACut;
-
+  
   // Common plots
   CommonPlots fCommonPlots;
   // Event selection classes and event counters (in same order like they are applied)
@@ -38,127 +35,124 @@ private:
   BJetSelection fBJetSelection;
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
-  // TopologySelection fTopologySelection;
   TopSelectionMVA fTopSelection;
   Count cSelected;
-    
+  
   // Non-common histograms
-  WrappedTH1 *hJetsQGL;
-  WrappedTH1 *hGluonJetsQGL;
-  WrappedTH1 *hLightJetsQGL;
-
-  // pT in the range [30,40)
-  WrappedTH1 *hGluonJetsQGL_30pt40;
-  WrappedTH1 *hGluonJetsN_30pt40;  
-  WrappedTH1 *hGluonJetsPt_30pt40; 
+  WrappedTH1 *hCtrlMETAfterJetSelection;
+  WrappedTH1 *hCtrlNVerticesAfterJetSelection;
+  WrappedTH1 *hCtrlNJetsAfterJetSelection;
+  WrappedTH1 *hCtrlJetsPtAfterJetSelection;
+  WrappedTH1 *hCtrlJetsEtaAfterJetSelection;
+  WrappedTH1 *hCtrlJetsPhiAfterJetSelection;
+  WrappedTH1 *hCtrlJetsQGLAfterJetSelection;
+  WrappedTH1 *hCtrlJetsBDiscAfterJetSelection;
+  WrappedTH1 *hCtrlJetsHadronFlavourAfterJetSelection;
+  WrappedTH1 *hCtrlJetsPartonFlavourAfterJetSelection;
+  WrappedTH1 *hCtrlHTAfterJetSelection;
   
-  WrappedTH1 *hLightJetsQGL_30pt40;
-  WrappedTH1 *hLightJetsN_30pt40;  
-  WrappedTH1 *hLightJetsPt_30pt40;
-  // pT in the range [40,50)
-  WrappedTH1 *hGluonJetsQGL_40pt50;
-  WrappedTH1 *hGluonJetsN_40pt50;  
-  WrappedTH1 *hGluonJetsPt_40pt50; 
+  WrappedTH1 *hCtrlNBJets;
+  WrappedTH1 *hCtrlBJetsPt;
+  WrappedTH1 *hCtrlBJetsEta;
+  WrappedTH1 *hCtrlBJetsPhi;
+  WrappedTH1 *hCtrlBJetsBDisc;
+  WrappedTH1 *hCtrlBJetsQGL;
   
-  WrappedTH1 *hLightJetsQGL_40pt50;
-  WrappedTH1 *hLightJetsN_40pt50;  
-  WrappedTH1 *hLightJetsPt_40pt50; 
-  // pT in the range [50,65)
-  WrappedTH1 *hGluonJetsQGL_50pt65;
-  WrappedTH1 *hGluonJetsN_50pt65;  
-  WrappedTH1 *hGluonJetsPt_50pt65; 
+  WrappedTH1 *hCtrlNCJets;
+  WrappedTH1 *hCtrlCJetsPt;
+  WrappedTH1 *hCtrlCJetsEta;
+  WrappedTH1 *hCtrlCJetsPhi;
+  WrappedTH1 *hCtrlCJetsBDisc;
+  WrappedTH1 *hCtrlCJetsQGL;
   
-  WrappedTH1 *hLightJetsQGL_50pt65;
-  WrappedTH1 *hLightJetsN_50pt65;  
-  WrappedTH1 *hLightJetsPt_50pt65; 
-  // pT in the range [65,80)
-  WrappedTH1 *hGluonJetsQGL_65pt80;
-  WrappedTH1 *hGluonJetsN_65pt80;  
-  WrappedTH1 *hGluonJetsPt_65pt80; 
+  WrappedTH1 *hCtrlNUDSGJets;
+  WrappedTH1 *hCtrlUDSGJetsPt;
+  WrappedTH1 *hCtrlUDSGJetsEta;
+  WrappedTH1 *hCtrlUDSGJetsPhi;
+  WrappedTH1 *hCtrlUDSGJetsBDisc;
+  WrappedTH1 *hCtrlUDSGJetsQGL;
+  WrappedTH1 *hCtrlNGJets;
+  WrappedTH1 *hCtrlGJetsPt;
+  WrappedTH1 *hCtrlGJetsEta;
+  WrappedTH1 *hCtrlGJetsPhi;
+  WrappedTH1 *hCtrlGJetsBDisc;
+  WrappedTH1 *hCtrlGJetsQGL;
+  WrappedTH1 *hCtrlNUDSJets;
+  WrappedTH1 *hCtrlUDSJetsPt;
+  WrappedTH1 *hCtrlUDSJetsEta;
+  WrappedTH1 *hCtrlUDSJetsPhi;
+  WrappedTH1 *hCtrlUDSJetsBDisc;
+  WrappedTH1 *hCtrlUDSJetsQGL;
   
-  WrappedTH1 *hLightJetsQGL_65pt80;
-  WrappedTH1 *hLightJetsN_65pt80;  
-  WrappedTH1 *hLightJetsPt_65pt80; 
-  // pT in the range [80,100)
-  WrappedTH1 *hGluonJetsQGL_80pt100;
-  WrappedTH1 *hGluonJetsN_80pt100;  
-  WrappedTH1 *hGluonJetsPt_80pt100; 
+  WrappedTH2 *hBJets_QGLvsPt;
+  WrappedTH2 *hCJets_QGLvsPt;  
+  WrappedTH2 *hUDSGJets_QGLvsPt;
+  WrappedTH2 *hUDSJets_QGLvsPt;
+  WrappedTH2 *hGJets_QGLvsPt;
   
-  WrappedTH1 *hLightJetsQGL_80pt100;
-  WrappedTH1 *hLightJetsN_80pt100;  
-  WrappedTH1 *hLightJetsPt_80pt100; 
-  // pT in the range [100,125)
-  WrappedTH1 *hGluonJetsQGL_100pt125;
-  WrappedTH1 *hGluonJetsN_100pt125;  
-  WrappedTH1 *hGluonJetsPt_100pt125; 
+  WrappedTH1 *hGJetsQGL_30pt35;
+  WrappedTH1 *hGJetsQGL_35pt40;
+  WrappedTH1 *hGJetsQGL_40pt45;
+  WrappedTH1 *hGJetsQGL_45pt50;
+  WrappedTH1 *hGJetsQGL_50pt55;
+  WrappedTH1 *hGJetsQGL_55pt60;
+  WrappedTH1 *hGJetsQGL_60pt65;
+  WrappedTH1 *hGJetsQGL_65pt70;
+  WrappedTH1 *hGJetsQGL_70pt75;
+  WrappedTH1 *hGJetsQGL_75pt80;
+  WrappedTH1 *hGJetsQGL_80pt90;
+  WrappedTH1 *hGJetsQGL_90pt100;
+  WrappedTH1 *hGJetsQGL_100pt110;
+  WrappedTH1 *hGJetsQGL_110pt120;
+  WrappedTH1 *hGJetsQGL_120pt140;
+  WrappedTH1 *hGJetsQGL_140pt160;
+  WrappedTH1 *hGJetsQGL_160pt180;
+  WrappedTH1 *hGJetsQGL_180pt200;
+  WrappedTH1 *hGJetsQGL_200pt250;
+  WrappedTH1 *hGJetsQGL_250pt300;
+  WrappedTH1 *hGJetsQGL_300pt350;
+  WrappedTH1 *hGJetsQGL_350pt400;
+  WrappedTH1 *hGJetsQGL_400pt450;
+  WrappedTH1 *hGJetsQGL_450pt500;
+  WrappedTH1 *hGJetsQGL_500pt550;
+  WrappedTH1 *hGJetsQGL_550pt600;
+  WrappedTH1 *hGJetsQGL_600pt700;
+  WrappedTH1 *hGJetsQGL_700pt800;
+  WrappedTH1 *hGJetsQGL_800pt1000;
+  WrappedTH1 *hGJetsQGL_1000ptInf;
   
-  WrappedTH1 *hLightJetsQGL_100pt125;
-  WrappedTH1 *hLightJetsN_100pt125;  
-  WrappedTH1 *hLightJetsPt_100pt125; 
-  // pT in the range [125,160)
-  WrappedTH1 *hGluonJetsQGL_125pt160;
-  WrappedTH1 *hGluonJetsN_125pt160;  
-  WrappedTH1 *hGluonJetsPt_125pt160; 
+  // UDS Jets
+  WrappedTH1 *hUDSJetsQGL_30pt35;
+  WrappedTH1 *hUDSJetsQGL_35pt40;
+  WrappedTH1 *hUDSJetsQGL_40pt45;
+  WrappedTH1 *hUDSJetsQGL_45pt50;
+  WrappedTH1 *hUDSJetsQGL_50pt55;
+  WrappedTH1 *hUDSJetsQGL_55pt60;
+  WrappedTH1 *hUDSJetsQGL_60pt65;
+  WrappedTH1 *hUDSJetsQGL_65pt70;
+  WrappedTH1 *hUDSJetsQGL_70pt75;
+  WrappedTH1 *hUDSJetsQGL_75pt80;
+  WrappedTH1 *hUDSJetsQGL_80pt90;
+  WrappedTH1 *hUDSJetsQGL_90pt100;
+  WrappedTH1 *hUDSJetsQGL_100pt110;
+  WrappedTH1 *hUDSJetsQGL_110pt120;
+  WrappedTH1 *hUDSJetsQGL_120pt140;
+  WrappedTH1 *hUDSJetsQGL_140pt160;
+  WrappedTH1 *hUDSJetsQGL_160pt180;
+  WrappedTH1 *hUDSJetsQGL_180pt200;
+  WrappedTH1 *hUDSJetsQGL_200pt250;
+  WrappedTH1 *hUDSJetsQGL_250pt300;
+  WrappedTH1 *hUDSJetsQGL_300pt350;
+  WrappedTH1 *hUDSJetsQGL_350pt400;
+  WrappedTH1 *hUDSJetsQGL_400pt450;
+  WrappedTH1 *hUDSJetsQGL_450pt500;
+  WrappedTH1 *hUDSJetsQGL_500pt550;
+  WrappedTH1 *hUDSJetsQGL_550pt600;
+  WrappedTH1 *hUDSJetsQGL_600pt700;
+  WrappedTH1 *hUDSJetsQGL_700pt800;
+  WrappedTH1 *hUDSJetsQGL_800pt1000;
+  WrappedTH1 *hUDSJetsQGL_1000ptInf;
   
-  WrappedTH1 *hLightJetsQGL_125pt160;
-  WrappedTH1 *hLightJetsN_125pt160;  
-  WrappedTH1 *hLightJetsPt_125pt160; 
-  // pT in the range [160,200)
-  WrappedTH1 *hGluonJetsQGL_160pt200;
-  WrappedTH1 *hGluonJetsN_160pt200;  
-  WrappedTH1 *hGluonJetsPt_160pt200; 
-  
-  WrappedTH1 *hLightJetsQGL_160pt200;
-  WrappedTH1 *hLightJetsN_160pt200;  
-  WrappedTH1 *hLightJetsPt_160pt200; 
-  // pT in the range [200,250)
-  WrappedTH1 *hGluonJetsQGL_200pt250;
-  WrappedTH1 *hGluonJetsN_200pt250;  
-  WrappedTH1 *hGluonJetsPt_200pt250; 
-
-  WrappedTH1 *hLightJetsQGL_200pt250;
-  WrappedTH1 *hLightJetsN_200pt250; 
-  WrappedTH1 *hLightJetsPt_200pt250; 
-  // pT in the range [250,320)
-  WrappedTH1 *hGluonJetsQGL_250pt320;
-  WrappedTH1 *hGluonJetsN_250pt320;  
-  WrappedTH1 *hGluonJetsPt_250pt320; 
-  
-  WrappedTH1 *hLightJetsQGL_250pt320;
-  WrappedTH1 *hLightJetsN_250pt320;  
-  WrappedTH1 *hLightJetsPt_250pt320; 
-  // pT in the range [320,400)
-  WrappedTH1 *hGluonJetsQGL_320pt400;
-  WrappedTH1 *hGluonJetsN_320pt400;  
-  WrappedTH1 *hGluonJetsPt_320pt400;  
-
-  WrappedTH1 *hLightJetsQGL_320pt400; 
-  WrappedTH1 *hLightJetsN_320pt400;   
-  WrappedTH1 *hLightJetsPt_320pt400;  
-  // pT in the range [400,630)
-  WrappedTH1 *hGluonJetsQGL_400pt630; 
-  WrappedTH1 *hGluonJetsN_400pt630;   
-  WrappedTH1 *hGluonJetsPt_400pt630;  
-  
-  WrappedTH1 *hLightJetsQGL_400pt630; 
-  WrappedTH1 *hLightJetsN_400pt630;   
-  WrappedTH1 *hLightJetsPt_400pt630;  
-  // pT in the range [630,800)
-  WrappedTH1 *hGluonJetsQGL_630pt800; 
-  WrappedTH1 *hGluonJetsN_630pt800;   
-  WrappedTH1 *hGluonJetsPt_630pt800;  
-  
-  WrappedTH1 *hLightJetsQGL_630pt800; 
-  WrappedTH1 *hLightJetsN_630pt800;   
-  WrappedTH1 *hLightJetsPt_630pt800; 
-  // pT in the range [800,inf)
-  WrappedTH1 *hGluonJetsQGL_800ptInf; 
-  WrappedTH1 *hGluonJetsN_800ptInf;   
-  WrappedTH1 *hGluonJetsPt_800ptInf;  
-
-  WrappedTH1 *hLightJetsQGL_800ptInf; 
-  WrappedTH1 *hLightJetsN_800ptInf;   
-  WrappedTH1 *hLightJetsPt_800ptInf;  
 };
 
 #include "Framework/interface/SelectorFactory.h"
@@ -166,8 +160,6 @@ REGISTER_SELECTOR(QGLAnalysis);
 
 QGLAnalysis::QGLAnalysis(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
-    // cfg_PrelimTopFitChiSqr(config, "FakeBMeasurement.prelimTopFitChiSqrCut"),
-    //cfg_PrelimTopMVACut(config, "FakeBMeasurement.prelimTopMVACut"),
     fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2tbAnalysis, fHistoWrapper),
     cAllEvents(fEventCounter.addCounter("all events")),
     cTrigger(fEventCounter.addCounter("passed trigger")),
@@ -181,7 +173,6 @@ QGLAnalysis::QGLAnalysis(const ParameterSet& config, const TH1* skimCounters)
     cBTaggingSFCounter(fEventCounter.addCounter("b tag SF")),
     // fMETSelection(config.getParameter<ParameterSet>("METSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter
-    // fTopologySelection(config.getParameter<ParameterSet>("TopologySelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cSelected(fEventCounter.addCounter("Selected Events"))
 { }
@@ -201,7 +192,6 @@ void QGLAnalysis::book(TDirectory *dir) {
   fJetSelection.bookHistograms(dir);
   fBJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
-  // fTopologySelection.bookHistograms(dir);
   fTopSelection.bookHistograms(dir);
   
   // Fixed Binning
@@ -209,133 +199,145 @@ void QGLAnalysis::book(TDirectory *dir) {
   const float minQGL = 0.0;
   const float maxQGL = 1.0;
   
-  // Obtain binning
-  const int nNBins        = fCommonPlots.getNjetsBinSettings().bins();
-  const float fNMin       = fCommonPlots.getNjetsBinSettings().min();
-  const float fNMax       = fCommonPlots.getNjetsBinSettings().max();
+  const int nPhiBins = 50;
+  const float fPhiMin = -5.0;
+  const float fPhiMax = +5.0;
   
-  const int  nPtBins      = 2*fCommonPlots.getPtBinSettings().bins();
-  const float fPtMin      = fCommonPlots.getPtBinSettings().min();
-  const float fPtMax      = 2*fCommonPlots.getPtBinSettings().max();
+  // Obtain binning
+  const int  nPtBins = 2*fCommonPlots.getPtBinSettings().bins();
+  const float fPtMin = fCommonPlots.getPtBinSettings().min();
+  const float fPtMax = 2*fCommonPlots.getPtBinSettings().max();
+  
+  const int nMetBins = fCommonPlots.getMetBinSettings().bins();
+  const float fMetMin = fCommonPlots.getMetBinSettings().min();
+  const float fMetMax = fCommonPlots.getMetBinSettings().max();
+  
+  const int  nHtBins = fCommonPlots.getHtBinSettings().bins();
+  const float fHtMin = fCommonPlots.getHtBinSettings().min();
+  const float fHtMax = fCommonPlots.getHtBinSettings().max();
+  
+  const int nEtaBins = fCommonPlots.getEtaBinSettings().bins();
+  const float fEtaMin = fCommonPlots.getEtaBinSettings().min();
+  const float fEtaMax = fCommonPlots.getEtaBinSettings().max();
+
+  const int nBinsBDisc = fCommonPlots.getBJetDiscBinSettings().bins();
+  const float minBDisc = fCommonPlots.getBJetDiscBinSettings().min();
+  const float maxBDisc = fCommonPlots.getBJetDiscBinSettings().max();
   
   // Book non-common histograms
-  hJetsQGL   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "JetsQGL", "Quark-Gluon discriminator for all jets", nBinsQGL, minQGL, maxQGL);
-  hGluonJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL", "Quark-Gluon discriminator for gluon jets", nBinsQGL, minQGL, maxQGL);
-  hLightJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL", "Quark-Gluon discriminator for light jets", nBinsQGL, minQGL, maxQGL);
   
-  // 30-40, 40-50, 50-65, 65-80, 80-100. 100-125, 125-160,160-200, 200-250, 250-320, 320-400,400-630, 630-800, 800-1000
-  // pT in the range [30,40)
-  hGluonJetsQGL_30pt40 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_30pt40", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [30,40)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_30pt40   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_30pt40"  , "Gluon Jets Multiplicity with p_{T} in the range [30,40)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_30pt40  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_30pt40" , "Gluon Jets p_{T} (GeV) in the range [30,40)"                          , nPtBins, fPtMin, fPtMax);
+  // Control Plots
+  hCtrlMETAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlMETAfterJetSelection", ";E_{T}^{miss};Occur / %.1f", nMetBins, fMetMin, fMetMax);
+  hCtrlNVerticesAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlNVerticesAfterJetSelection", ";Number of Vertices;Occur / %.2f", 150, 0, 150.0);
+  hCtrlNJetsAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlNJetsAfterJetSelection", "Jets Multiplicity", 20, 0, 20.0);
+  hCtrlJetsPtAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlJetsPtAfterJetSelection", "Jets p_{T} (GeV)", nPtBins, fPtMin, fPtMax);
+  hCtrlJetsEtaAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlJetsEtaAfterJetSelection", "Jets eta;#eta", nEtaBins, fEtaMin, fEtaMax);
+  hCtrlJetsPhiAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlJetsPhiAfterJetSelection", "Jets phi;#phi", nPhiBins, fPhiMin, fPhiMax);
+  hCtrlJetsBDiscAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlJetsBDiscrAfterJetSelection", "Jets b-discriminator", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlJetsQGLAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlJetsQGLAfterJetSelection", "Jets QGL", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlJetsHadronFlavourAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlJetsHadronFlavourAfterJetSelection", "Jets Hadron Flavour", 22, 0, 22.0);
+  hCtrlJetsPartonFlavourAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlJetsPartonFlavourAfterJetSelection", "Jets Parton Flavour", 22, 0, 22.0);
+  hCtrlHTAfterJetSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlHTAfterJetSelection", "H_{T} (GeV)", nHtBins, fHtMin, fHtMax);
+  hCtrlNBJets = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlNBJets", "Jets Multiplicity", 20, 0, 20.0);
+  hCtrlBJetsPt = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlBJetsPt", "Jets p_{T} (GeV)", nPtBins, fPtMin, fPtMax);
+  hCtrlBJetsEta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlBJetsEta", "Jets eta;#eta", nEtaBins, fEtaMin, fEtaMax);
+  hCtrlBJetsPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlBJetsPhi", "Jets phi;#phi", nPhiBins, fPhiMin, fPhiMax);
+  hCtrlBJetsBDisc = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlBJetsBDisc", "Jets b-discriminator", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlBJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlBJetsQGL", "Jets QGL", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlNCJets = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlNCJets", "Jets Multiplicity", 20, 0, 20.0);
+  hCtrlCJetsPt = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlCJetsPt", "Jets p_{T} (GeV)", nPtBins, fPtMin, fPtMax);
+  hCtrlCJetsEta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlCJetsEta", "Jets eta;#eta", nEtaBins, fEtaMin, fEtaMax);
+  hCtrlCJetsPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlCJetsPhi", "Jets phi;#phi", nPhiBins, fPhiMin, fPhiMax);
+  hCtrlCJetsBDisc = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlCJetsBDisc", "Jets b-discriminator", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlCJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlCJetsQGL", "Jets QGL", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlNUDSGJets = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlNUDSGJets", "Jets Multiplicity", 20, 0, 20.0);
+  hCtrlUDSGJetsPt = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSGJetsPt", "Jets p_{T} (GeV)", nPtBins, fPtMin, fPtMax);
+  hCtrlUDSGJetsEta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSGJetsEt", "Jets eta;#eta", nEtaBins, fEtaMin, fEtaMax);
+  hCtrlUDSGJetsPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSGJetsPhi", "Jets phi;#phi", nPhiBins, fPhiMin, fPhiMax);
+  hCtrlUDSGJetsBDisc = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSGJetsBDisc", "Jets b-discriminator", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlUDSGJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSGJetsQGL", "Jets QGL", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlNGJets = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlNGJets", "Jets Multiplicity", 20, 0, 20.0);
+  hCtrlGJetsPt = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlGJetsPt", "Jets p_{T} (GeV)", nPtBins, fPtMin, fPtMax);
+  hCtrlGJetsEta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlGJetsEta", "Jets eta;#eta", nEtaBins, fEtaMin, fEtaMax);
+  hCtrlGJetsPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlGJetsPhi", "Jets phi;#phi", nPhiBins, fPhiMin, fPhiMax);
+  hCtrlGJetsBDisc = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlGJetsBDisc", "Jets b-discriminator", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlGJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlGJetsQGL", "Jets QGL", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlNUDSJets = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlNUDSJets", "Jets Multiplicity", 20, 0, 20.0);
+  hCtrlUDSJetsPt = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSJetsPt", "Jets p_{T} (GeV)", nPtBins, fPtMin, fPtMax);
+  hCtrlUDSJetsEta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSJetsEta", "Jets eta;#eta", nEtaBins, fEtaMin, fEtaMax);
+  hCtrlUDSJetsPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSJetsPhi", "Jets phi;#phi", nPhiBins, fPhiMin, fPhiMax);
+  hCtrlUDSJetsBDisc = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSJetsBDisc", "Jets b-discriminator", nBinsBDisc, minBDisc, maxBDisc);
+  hCtrlUDSJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "CtrlUDSJetsQGL", "Jets QGL", nBinsBDisc, minBDisc, maxBDisc);
   
-  hLightJetsQGL_30pt40 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_30pt40", "Quark-Gluon discriminator for Light Jets in the p_{T} range [30,40)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_30pt40   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_30pt40"  , "Gluon Jets Multiplicity with p_{T} in the range [30,40)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_30pt40  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_30pt40" , "Gluon Jets p_{T} (GeV) in the range [30,40)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [40,50)
-  hGluonJetsQGL_40pt50 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_40pt50", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [40,50)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_40pt50   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_40pt50"  , "Gluon Jets Multiplicity with p_{T} in the range [40,50)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_40pt50  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_40pt50" , "Gluon Jets p_{T} (GeV) in the range [40,50)"                          , nPtBins, fPtMin, fPtMax);
+  hBJets_QGLvsPt = fHistoWrapper.makeTH<TH2F>(HistoLevel::kInformative, dir, "BJets_QGLvsPt", "BJets QGL vs p_{T}", nBinsQGL, minQGL, maxQGL, nPtBins, fPtMin, fPtMax);
+  hCJets_QGLvsPt = fHistoWrapper.makeTH<TH2F>(HistoLevel::kInformative, dir, "CJets_QGLvsPt", "CJets QGL vs p_{T}", nBinsQGL, minQGL, maxQGL, nPtBins, fPtMin, fPtMax);
+  hUDSGJets_QGLvsPt = fHistoWrapper.makeTH<TH2F>(HistoLevel::kInformative, dir, "UDSGJets_QGLvsPt", "UDSG Jets QGL vs p_{T}", nBinsQGL, minQGL, maxQGL, nPtBins, fPtMin, fPtMax);
+  hUDSJets_QGLvsPt = fHistoWrapper.makeTH<TH2F>(HistoLevel::kInformative, dir, "UDSJets_QGLvsPt", "UDS Jets QGL vs p_{T}", nBinsQGL, minQGL, maxQGL, nPtBins, fPtMin, fPtMax);
+  hGJets_QGLvsPt = fHistoWrapper.makeTH<TH2F>(HistoLevel::kInformative, dir, "GJets_QGLvsPt", "G Jets QGL vs p_{T}", nBinsQGL, minQGL, maxQGL, nPtBins, fPtMin, fPtMax);
   
-  hLightJetsQGL_40pt50 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_40pt50", "Quark-Gluon discriminator for Light Jets in the p_{T} range [40,50)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_40pt50   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_40pt50"  , "Gluon Jets Multiplicity with p_{T} in the range [40,50)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_40pt50  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_40pt50" , "Gluon Jets p_{T} (GeV) in the range [40,50)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [50,65)
-  hGluonJetsQGL_50pt65 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_50pt65", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [50,65)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_50pt65   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_50pt65"  , "Gluon Jets Multiplicity with p_{T} in the range [50,65)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_50pt65  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_50pt65" , "Gluon Jets p_{T} (GeV) in the range [50,65)"                          , nPtBins, fPtMin, fPtMax);
+  // Gluon Jets pT bins
+  hGJetsQGL_30pt35 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_30pt35", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_35pt40 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_35pt40", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_40pt45 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_40pt45", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_45pt50 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_45pt50", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_50pt55 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_50pt55", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_55pt60 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_55pt60", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_60pt65 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_60pt65", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_65pt70 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_65pt70", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_70pt75 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_70pt75", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_75pt80 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_75pt80", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_80pt90 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_80pt90", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_90pt100 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_90pt100", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_100pt110 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_100pt110", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_110pt120 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_110pt120", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_120pt140 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_120pt140", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_140pt160 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_140pt160", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_160pt180 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_160pt180", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_180pt200 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_180pt200", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_200pt250 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_200pt250", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_250pt300 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_250pt300", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_300pt350 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_300pt350", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_350pt400 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_350pt400", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_400pt450 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_400pt450", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_450pt500 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_450pt500", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_500pt550 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_500pt550", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_550pt600 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_550pt600", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_600pt700 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_600pt700", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_700pt800 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_700pt800", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_800pt1000 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_800pt1000", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hGJetsQGL_1000ptInf = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GJetsQGL_1000ptInf", "QGL disc", nBinsQGL, minQGL, maxQGL);
   
-  hLightJetsQGL_50pt65 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_50pt65", "Quark-Gluon discriminator for Light Jets in the p_{T} range [50,65)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_50pt65   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_50pt65"  , "Gluon Jets Multiplicity with p_{T} in the range [50,65)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_50pt65  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_50pt65" , "Gluon Jets p_{T} (GeV) in the range [50,65)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [65,80)
-  hGluonJetsQGL_65pt80 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_65pt80", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [65,80)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_65pt80   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_65pt80"  , "Gluon Jets Multiplicity with p_{T} in the range [65,80)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_65pt80  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_65pt80" , "Gluon Jets p_{T} (GeV) in the range [65,80)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_65pt80 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_65pt80", "Quark-Gluon discriminator for Light Jets in the p_{T} range [65,80)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_65pt80   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_65pt80"  , "Gluon Jets Multiplicity with p_{T} in the range [65,80)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_65pt80  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_65pt80" , "Gluon Jets p_{T} (GeV) in the range [65,80)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [80,100)
-  hGluonJetsQGL_80pt100 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_80pt100", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [80,100)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_80pt100   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_80pt100"  , "Gluon Jets Multiplicity with p_{T} in the range [80,100)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_80pt100  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_80pt100" , "Gluon Jets p_{T} (GeV) in the range [80,100)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_80pt100 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_80pt100", "Quark-Gluon discriminator for Light Jets in the p_{T} range [80,100)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_80pt100   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_80pt100"  , "Gluon Jets Multiplicity with p_{T} in the range [80,100)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_80pt100  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_80pt100" , "Gluon Jets p_{T} (GeV) in the range [80,100)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [100,125)
-  hGluonJetsQGL_100pt125 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_100pt125", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [100,125)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_100pt125   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_100pt125"  , "Gluon Jets Multiplicity with p_{T} in the range [100,125)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_100pt125  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_100pt125" , "Gluon Jets p_{T} (GeV) in the range [100,125)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_100pt125 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_100pt125", "Quark-Gluon discriminator for Light Jets in the p_{T} range [100,125)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_100pt125   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_100pt125"  , "Gluon Jets Multiplicity with p_{T} in the range [100,125)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_100pt125  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_100pt125" , "Gluon Jets p_{T} (GeV) in the range [100,125)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [125,160)
-  hGluonJetsQGL_125pt160 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_125pt160", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [125,160)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_125pt160   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_125pt160"  , "Gluon Jets Multiplicity with p_{T} in the range [125,160)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_125pt160  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_125pt160" , "Gluon Jets p_{T} (GeV) in the range [125,160)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_125pt160 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_125pt160", "Quark-Gluon discriminator for Light Jets in the p_{T} range [125,160)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_125pt160   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_125pt160"  , "Gluon Jets Multiplicity with p_{T} in the range [125,160)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_125pt160  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_125pt160" , "Gluon Jets p_{T} (GeV) in the range [125,160)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [160,200)
-  hGluonJetsQGL_160pt200 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_160pt200", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [160,200)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_160pt200   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_160pt200"  , "Gluon Jets Multiplicity with p_{T} in the range [160,200)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_160pt200  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_160pt200" , "Gluon Jets p_{T} (GeV) in the range [160,200)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_160pt200 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_160pt200", "Quark-Gluon discriminator for Light Jets in the p_{T} range [160,200)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_160pt200   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_160pt200"  , "Gluon Jets Multiplicity with p_{T} in the range [160,200)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_160pt200  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_160pt200" , "Gluon Jets p_{T} (GeV) in the range [160,200)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [200,250)
-  hGluonJetsQGL_200pt250 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_200pt250", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [200,250)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_200pt250   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_200pt250"  , "Gluon Jets Multiplicity with p_{T} in the range [200,250)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_200pt250  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_200pt250" , "Gluon Jets p_{T} (GeV) in the range [200,250)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_200pt250 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_200pt250", "Quark-Gluon discriminator for Light Jets in the p_{T} range [200,250)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_200pt250   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_200pt250" , "Gluon Jets Multiplicity with p_{T} in the range [200,250)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_200pt250  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_200pt250" , "Gluon Jets p_{T} (GeV) in the range [200,250)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [250,320)
-  hGluonJetsQGL_250pt320 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_250pt320", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [250,320)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_250pt320   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_250pt320"  , "Gluon Jets Multiplicity with p_{T} in the range [250,320)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_250pt320  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_250pt320" , "Gluon Jets p_{T} (GeV) in the range [250,320)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_250pt320 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_250pt320", "Quark-Gluon discriminator for Light Jets in the p_{T} range [250,320)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_250pt320   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_250pt320" , "Gluon Jets Multiplicity with p_{T} in the range [250,320)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_250pt320  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_250pt320" , "Gluon Jets p_{T} (GeV) in the range [250,320)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [320,400)
-  hGluonJetsQGL_320pt400 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_320pt400", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [320,400)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_320pt400   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_320pt400"  , "Gluon Jets Multiplicity with p_{T} in the range [320,400)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_320pt400  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_320pt400" , "Gluon Jets p_{T} (GeV) in the range [320,400)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_320pt400 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_320pt400", "Quark-Gluon discriminator for Light Jets in the p_{T} range [320,400)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_320pt400   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_320pt400" , "Gluon Jets Multiplicity with p_{T} in the range [320,400)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_320pt400  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_320pt400" , "Gluon Jets p_{T} (GeV) in the range [320,400)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [400,630)
-  hGluonJetsQGL_400pt630 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_400pt630", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [400,630)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_400pt630   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_400pt630"  , "Gluon Jets Multiplicity with p_{T} in the range [400,630)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_400pt630  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_400pt630" , "Gluon Jets p_{T} (GeV) in the range [400,630)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_400pt630 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_400pt630", "Quark-Gluon discriminator for Light Jets in the p_{T} range [400,630)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_400pt630   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_400pt630" , "Gluon Jets Multiplicity with p_{T} in the range [400,630)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_400pt630  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_400pt630" , "Gluon Jets p_{T} (GeV) in the range [400,630)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [630,800)
-  hGluonJetsQGL_630pt800 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_630pt800", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [630,800)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_630pt800   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_630pt800"  , "Gluon Jets Multiplicity with p_{T} in the range [630,800)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_630pt800  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_630pt800" , "Gluon Jets p_{T} (GeV) in the range [630,800)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_630pt800 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_630pt800", "Quark-Gluon discriminator for Light Jets in the p_{T} range [630,800)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_630pt800   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_630pt800" , "Gluon Jets Multiplicity with p_{T} in the range [630,800)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_630pt800  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_630pt800" , "Gluon Jets p_{T} (GeV) in the range [630,800)"                          , nPtBins, fPtMin, fPtMax);
-  // pT in the range [800,inf)
-  hGluonJetsQGL_800ptInf = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsQGL_800ptInf", "Quark-Gluon discriminator for Gluon Jets in the p_{T} range [630,inf)"  , nBinsQGL, minQGL, maxQGL);
-  hGluonJetsN_800ptInf   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsN_800ptInf"  , "Gluon Jets Multiplicity with p_{T} in the range [630,inf)"              , nNBins, fNMin, fNMax); 
-  hGluonJetsPt_800ptInf  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "GluonJetsPt_800ptInf" , "Gluon Jets p_{T} (GeV) in the range [630,inf)"                          , nPtBins, fPtMin, fPtMax);
-  
-  hLightJetsQGL_800ptInf = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsQGL_800ptInf", "Quark-Gluon discriminator for Light Jets in the p_{T} range [800,inf)"  , nBinsQGL, minQGL, maxQGL);
-  hLightJetsN_800ptInf   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsN_800ptInf" , "Gluon Jets Multiplicity with p_{T} in the range [800,inf)"              , nNBins, fNMin, fNMax); 
-  hLightJetsPt_800ptInf  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "LightJetsPt_800ptInf" , "Gluon Jets p_{T} (GeV) in the range [800,inf)"                          , nPtBins, fPtMin, fPtMax);
+  // UDS Jets pT bins
+  hUDSJetsQGL_30pt35 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_30pt35", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_35pt40 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_35pt40", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_40pt45 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_40pt45", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_45pt50 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_45pt50", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_50pt55 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_50pt55", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_55pt60 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_55pt60", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_60pt65 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_60pt65", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_65pt70 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_65pt70", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_70pt75 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_70pt75", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_75pt80 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_75pt80", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_80pt90 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_80pt90", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_90pt100 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_90pt100", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_100pt110 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_100pt110", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_110pt120 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_110pt120", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_120pt140 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_120pt140", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_140pt160 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_140pt160", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_160pt180 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_160pt180", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_180pt200 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_180pt200", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_200pt250 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_200pt250", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_250pt300 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_250pt300", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_300pt350 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_300pt350", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_350pt400 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_350pt400", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_400pt450 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_400pt450", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_450pt500 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_450pt500", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_500pt550 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_500pt550", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_550pt600 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_550pt600", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_600pt700 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_600pt700", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_700pt800 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_700pt800", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_800pt1000 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_800pt1000", "QGL disc", nBinsQGL, minQGL, maxQGL);
+  hUDSJetsQGL_1000ptInf = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "UDSJetsQGL_1000ptInf", "QGL disc", nBinsQGL, minQGL, maxQGL);
   
   return;
 }
@@ -400,9 +402,17 @@ void QGLAnalysis::process(Long64_t entry) {
   if (0) std::cout << "=== Tau Veto" << std::endl;
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
   if (tauData.hasIdentifiedTaus() ) return;
-
+  
   //================================================================================================
-  // 7) Jet selection
+  // 7) MET selection
+  //================================================================================================
+  if (0) std::cout << "=== MET selection" << std::endl;
+  const METSelection::Data METData = fMETSelection.silentAnalyze(fEvent, nVertices);
+  // if (!METData.passedSelection()) return;
+  double MET = METData.getMET().R();
+  
+  //================================================================================================
+  // 8) Jet selection
   //================================================================================================
   if (0) std::cout << "=== Jet selection" << std::endl;
   const JetSelection::Data jetData = fJetSelection.analyzeWithoutTau(fEvent);
@@ -410,252 +420,181 @@ void QGLAnalysis::process(Long64_t entry) {
   fCommonPlots.fillControlPlotsAfterTopologicalSelections(fEvent, true);
   
   //================================================================================================
-  // 8) QGL selection
+  // Fill Control Plots AfterJetSelection
   //================================================================================================
-  int jet_index = -1;
   
-  // 30-40, 40-50, 50-65, 65-80, 80-100. 100-125, 125-160,160-200, 200-250, 250-320, 320-400,400-630, 630-800, 800-1000
-  int nGluonJets_30pt40   = 0;
-  int nGluonJets_40pt50   = 0;
-  int nGluonJets_50pt65   = 0;
-  int nGluonJets_65pt80   = 0;
-  int nGluonJets_80pt100  = 0;
-  int nGluonJets_100pt125 = 0;
-  int nGluonJets_125pt160 = 0;
-  int nGluonJets_160pt200 = 0;
-  int nGluonJets_200pt250 = 0;
-  int nGluonJets_250pt320 = 0;
-  int nGluonJets_320pt400 = 0;
-  int nGluonJets_400pt630 = 0;
-  int nGluonJets_630pt800 = 0;
-  int nGluonJets_800ptInf = 0;
+  hCtrlMETAfterJetSelection -> Fill(MET);
+  hCtrlNVerticesAfterJetSelection -> Fill(nVertices);
+  hCtrlNJetsAfterJetSelection -> Fill(jetData.getNumberOfSelectedJets());
+  hCtrlHTAfterJetSelection -> Fill(jetData.HT());
+  for(const Jet& jet: jetData.getSelectedJets()) {
+    hCtrlJetsPtAfterJetSelection -> Fill(jet.pt());
+    hCtrlJetsEtaAfterJetSelection -> Fill(jet.eta());
+    hCtrlJetsPhiAfterJetSelection -> Fill(jet.phi());
+    hCtrlJetsQGLAfterJetSelection -> Fill(jet.QGTaggerAK4PFCHSqgLikelihood());
+    hCtrlJetsBDiscAfterJetSelection -> Fill(jet.bjetDiscriminator());
+    hCtrlJetsHadronFlavourAfterJetSelection -> Fill(jet.hadronFlavour());
+    hCtrlJetsPartonFlavourAfterJetSelection -> Fill(std::abs(jet.partonFlavour()));
+  }
   
-  int nLightJets_30pt40   = 0;
-  int nLightJets_40pt50   = 0;
-  int nLightJets_50pt65   = 0;
-  int nLightJets_65pt80   = 0;
-  int nLightJets_80pt100  = 0;
-  int nLightJets_100pt125 = 0;
-  int nLightJets_125pt160 = 0;
-  int nLightJets_160pt200 = 0;
-  int nLightJets_200pt250 = 0;
-  int nLightJets_250pt320 = 0;
-  int nLightJets_320pt400 = 0;
-  int nLightJets_400pt630 = 0;
-  int nLightJets_630pt800 = 0;
-  int nLightJets_800ptInf = 0;
+  //================================================================================================
+  // 9) B-Jet selection
+  //================================================================================================
+  //if (0) std::cout << "B-Jet selection" << std::endl;
+  //const BJetSelection::Data bjetData = fBJetSelection.silentAnalyze(fEvent, jetData);
+  // if (!bjetData.passedSelection()) return;
   
 
+  //================================================================================================
+  // 9) QGL selection
+  //================================================================================================
+  
+  int nCJets = 0;
+  int nBJets = 0;
+  int nUDSGJets = 0;
+  int nGJets = 0;
+  int nUDSJets = 0;
+  
   // Loop over selected jets
   for(const Jet& jet: jetData.getSelectedJets()) {
     
-    jet_index++;
+    double QGL = jet.QGTaggerAK4PFCHSqgLikelihood();
+    double pt  = jet.pt();
+    
+    if (std::abs(jet.hadronFlavour()) == 4 && std::abs(jet.partonFlavour()) == 4)
+      {
+	nCJets++;
+	hCtrlCJetsPt -> Fill(jet.pt());
+	hCtrlCJetsEta -> Fill(jet.eta());
+	hCtrlCJetsPhi -> Fill(jet.phi());
+	hCtrlCJetsBDisc -> Fill(jet.bjetDiscriminator());
+	hCtrlCJetsQGL -> Fill(QGL);
+	hCJets_QGLvsPt -> Fill(QGL, pt);
+      }
+    else if (std::abs(jet.hadronFlavour()) == 5 && std::abs(jet.partonFlavour()) == 5)
+      {
+	nBJets++;
+	hCtrlBJetsPt -> Fill(jet.pt());
+	hCtrlBJetsEta -> Fill(jet.eta());
+	hCtrlBJetsPhi -> Fill(jet.phi());
+	hCtrlBJetsBDisc -> Fill(jet.bjetDiscriminator());
+	hCtrlBJetsQGL -> Fill(QGL);
+	hBJets_QGLvsPt -> Fill(QGL, pt);
+      }
     
     //=== Reject jets consistent with b or c
     if (jet.hadronFlavour() != 0) continue;
     
     const short jetPartonFlavour = std::abs(jet.partonFlavour());
     
+    //=== Keep only jets considered as light
     if (jetPartonFlavour != 21 && jetPartonFlavour != 1 && jetPartonFlavour != 2 && jetPartonFlavour != 3) continue;
     
-    double QGL = jet.QGTaggerAK4PFCHSqgLikelihood();
-    double pt  = jet.pt();
+    nUDSGJets++;
+    hCtrlUDSGJetsPt    -> Fill(jet.pt());
+    hCtrlUDSGJetsEta   -> Fill(jet.eta());
+    hCtrlUDSGJetsPhi   -> Fill(jet.phi());
+    hCtrlUDSGJetsBDisc -> Fill(jet.bjetDiscriminator());
+    hCtrlUDSGJetsQGL   -> Fill(QGL);
+    hUDSGJets_QGLvsPt -> Fill(QGL, pt);
     
-    hJetsQGL -> Fill(QGL);
-   
     // Gluon Jets
     if (jetPartonFlavour == 21)
       {
-	hGluonJetsQGL -> Fill(QGL);
-
-	// 30-40, 40-50, 50-65, 65-80, 80-100. 100-125, 125-160,160-200, 200-250, 250-320, 320-400,400-630, 630-800, 800-1000
-	if (pt >= 30 && pt < 40){
-	  nGluonJets_30pt40++;
-	  hGluonJetsQGL_30pt40 -> Fill(QGL);
-	  hGluonJetsPt_30pt40  -> Fill(pt); 
-	}
-	else if (pt >= 40 && pt < 50){
-	  nGluonJets_40pt50++;
-	  hGluonJetsQGL_40pt50 -> Fill(QGL);
-	  hGluonJetsPt_40pt50  -> Fill(pt); 
-	}
-	else if (pt >= 50 && pt < 65){
-	  nGluonJets_50pt65++;
-	  hGluonJetsQGL_50pt65 -> Fill(QGL);
-	  hGluonJetsPt_50pt65  -> Fill(pt);
-	}
-	else if (pt >= 65 && pt < 80){
-	  nGluonJets_65pt80++;
-	  hGluonJetsQGL_65pt80 -> Fill(QGL);
-	  hGluonJetsPt_65pt80  -> Fill(pt);
-	}
-	else if (pt >= 80 && pt < 100){
-	  nGluonJets_80pt100++;
-	  hGluonJetsQGL_80pt100 -> Fill(QGL);
-	  hGluonJetsPt_80pt100  -> Fill(pt);
-	}
-	else if (pt >= 100 && pt < 125){
-	  nGluonJets_100pt125++;
-	  hGluonJetsQGL_100pt125 -> Fill(QGL);
-	  hGluonJetsPt_100pt125  -> Fill(pt);
-	}
-	else if (pt >= 125 && pt < 160){
-	  nGluonJets_125pt160++;
-	  hGluonJetsQGL_125pt160 -> Fill(QGL);
-	  hGluonJetsPt_125pt160  -> Fill(pt);
-	}
-	else if (pt >= 160 && pt < 200){
-	  nGluonJets_160pt200++;
-	  hGluonJetsQGL_160pt200 -> Fill(QGL);
-	  hGluonJetsPt_160pt200  -> Fill(pt);
-	}
-	else if (pt >= 200 && pt < 250){
-	  nGluonJets_200pt250++;
-	  hGluonJetsQGL_200pt250 -> Fill(QGL);
-	  hGluonJetsPt_200pt250  -> Fill(pt);
-	}
-	else if (pt >= 250 && pt < 320){
-	  nGluonJets_250pt320++;
-	  hGluonJetsQGL_250pt320 -> Fill(QGL);
-	  hGluonJetsPt_250pt320  -> Fill(pt);
-	}
-	else if (pt >= 320 && pt < 400){
-	  nGluonJets_320pt400++;
-	  hGluonJetsQGL_320pt400 -> Fill(QGL);
-	  hGluonJetsPt_320pt400  -> Fill(pt);
-	}
-	else if (pt >= 400 && pt < 630){
-	  nGluonJets_400pt630++;
-	  hGluonJetsQGL_400pt630 -> Fill(QGL);
-	  hGluonJetsPt_400pt630  -> Fill(pt);
-	}
-	else if (pt >= 630 && pt < 800){
-	  nGluonJets_630pt800++;
-	  hGluonJetsQGL_630pt800 -> Fill(QGL);
-	  hGluonJetsPt_630pt800  -> Fill(pt);
-	}
-	else if (pt >= 800){
-	  nGluonJets_800ptInf++;
-	  hGluonJetsQGL_800ptInf -> Fill(QGL);
-	  hGluonJetsPt_800ptInf  -> Fill(pt);
-	}
+	nGJets++;
+	hCtrlGJetsPt -> Fill(jet.pt());
+	hCtrlGJetsEta -> Fill(jet.eta());
+	hCtrlGJetsPhi -> Fill(jet.phi());
+	hCtrlGJetsBDisc -> Fill(jet.bjetDiscriminator());
+	hCtrlGJetsQGL -> Fill(QGL);
+	hGJets_QGLvsPt -> Fill(QGL, pt);
+	
+	if (pt >= 30 && pt < 35) hGJetsQGL_30pt35->Fill(QGL);
+	else if (pt >= 35 && pt < 40) hGJetsQGL_35pt40 -> Fill(QGL);
+	else if (pt >= 40 && pt < 45) hGJetsQGL_40pt45 -> Fill(QGL);
+	else if (pt >= 45 && pt < 50) hGJetsQGL_45pt50 -> Fill(QGL);
+	else if (pt >= 50 && pt < 55) hGJetsQGL_50pt55 -> Fill(QGL);
+	else if (pt >= 55 && pt < 60) hGJetsQGL_55pt60 -> Fill(QGL);
+	else if (pt >= 60 && pt < 65) hGJetsQGL_60pt65 -> Fill(QGL);
+	else if (pt >= 65 && pt < 70) hGJetsQGL_65pt70 -> Fill(QGL);
+	else if (pt >= 70 && pt < 75) hGJetsQGL_70pt75 -> Fill(QGL);
+	else if (pt >= 75 && pt < 80) hGJetsQGL_75pt80 -> Fill(QGL);
+	else if (pt >= 80 && pt < 90) hGJetsQGL_80pt90 -> Fill(QGL);
+	else if (pt >= 90 && pt < 100) hGJetsQGL_90pt100 -> Fill(QGL);
+	else if (pt >= 100 && pt < 110) hGJetsQGL_100pt110 -> Fill(QGL);
+	else if (pt >= 110 && pt < 120) hGJetsQGL_110pt120 -> Fill(QGL);
+	else if (pt >= 120 && pt < 140) hGJetsQGL_120pt140 -> Fill(QGL);
+	else if (pt >= 140 && pt < 160) hGJetsQGL_140pt160 -> Fill(QGL);
+	else if (pt >= 160 && pt < 180) hGJetsQGL_160pt180 -> Fill(QGL);
+	else if (pt >= 180 && pt < 200) hGJetsQGL_180pt200 -> Fill(QGL);
+	else if (pt >= 200 && pt < 250) hGJetsQGL_200pt250 -> Fill(QGL);
+	else if (pt >= 250 && pt < 300) hGJetsQGL_250pt300 -> Fill(QGL);
+	else if (pt >= 300 && pt < 350) hGJetsQGL_300pt350 -> Fill(QGL);
+	else if (pt >= 350 && pt < 400) hGJetsQGL_350pt400 -> Fill(QGL);
+	else if (pt >= 400 && pt < 450) hGJetsQGL_400pt450 -> Fill(QGL);
+	else if (pt >= 450 && pt < 500) hGJetsQGL_450pt500 -> Fill(QGL);
+	else if (pt >= 500 && pt < 550) hGJetsQGL_500pt550 -> Fill(QGL);
+	else if (pt >= 550 && pt < 600) hGJetsQGL_550pt600 -> Fill(QGL);
+	else if (pt >= 600 && pt < 700) hGJetsQGL_600pt700 -> Fill(QGL);
+	else if (pt >= 700 && pt < 800) hGJetsQGL_700pt800 -> Fill(QGL);
+	else if (pt >= 800 && pt < 1000) hGJetsQGL_800pt1000 -> Fill(QGL);
+	else if (pt >= 1000) hGJetsQGL_1000ptInf -> Fill(QGL);
       }
+    
     
     // Light Jets
     if (jetPartonFlavour == 1 || jetPartonFlavour == 2 || jetPartonFlavour == 3)
       {
+	nUDSJets++;
+	hUDSJets_QGLvsPt -> Fill(QGL, pt);
+	hCtrlUDSJetsPt -> Fill(jet.pt());
+	hCtrlUDSJetsEta -> Fill(jet.eta());
+	hCtrlUDSJetsPhi -> Fill(jet.phi());
+	hCtrlUDSJetsQGL -> Fill(QGL);
+	hCtrlUDSJetsBDisc -> Fill(jet.bjetDiscriminator());
 	
-	hLightJetsQGL -> Fill(QGL);
-		
-	// 30-40, 40-50, 50-65, 65-80, 80-100. 100-125, 125-160,160-200, 200-250, 250-320, 320-400,400-630, 630-800, 800-1000
-	if (pt >= 30 && pt < 40){
-	  nLightJets_30pt40++;
-	  hLightJetsQGL_30pt40 -> Fill(QGL);
-	  hLightJetsPt_30pt40  -> Fill(pt); 
-	}
-	else if (pt >= 40 && pt < 50){
-	  nLightJets_40pt50++;
-	  hLightJetsQGL_40pt50 -> Fill(QGL);
-	  hLightJetsPt_40pt50  -> Fill(pt); 
-	}
-	else if (pt >= 50 && pt < 65){
-	  nLightJets_50pt65++;
-	  hLightJetsQGL_50pt65 -> Fill(QGL);
-	  hLightJetsPt_50pt65  -> Fill(pt);
-	}
-	else if (pt >= 65 && pt < 80){
-	  nLightJets_65pt80++;
-	  hLightJetsQGL_65pt80 -> Fill(QGL);
-	  hLightJetsPt_65pt80  -> Fill(pt);
-	}
-	else if (pt >= 80 && pt < 100){
-	  nLightJets_80pt100++;
-	  hLightJetsQGL_80pt100 -> Fill(QGL);
-	  hLightJetsPt_80pt100  -> Fill(pt);
-	}
-	else if (pt >= 100 && pt < 125){
-	  nLightJets_100pt125++;
-	  hLightJetsQGL_100pt125 -> Fill(QGL);
-	  hLightJetsPt_100pt125  -> Fill(pt);
-	}
-	else if (pt >= 125 && pt < 160){
-	  nLightJets_125pt160++;
-	  hLightJetsQGL_125pt160 -> Fill(QGL);
-	  hLightJetsPt_125pt160  -> Fill(pt);
-	}
-	else if (pt >= 160 && pt < 200){
-	  nLightJets_160pt200++;
-	  hLightJetsQGL_160pt200 -> Fill(QGL);
-	  hLightJetsPt_160pt200  -> Fill(pt);
-	}
-	else if (pt >= 200 && pt < 250){
-	  nLightJets_200pt250++;
-	  hLightJetsQGL_200pt250 -> Fill(QGL);
-	  hLightJetsPt_200pt250  -> Fill(pt);
-	}
-	else if (pt >= 250 && pt < 320){
-	  nLightJets_250pt320++;
-	  hLightJetsQGL_250pt320 -> Fill(QGL);
-	  hLightJetsPt_250pt320  -> Fill(pt);
-	}
-	else if (pt >= 320 && pt < 400){
-	  nLightJets_320pt400++;
-	  hLightJetsQGL_320pt400 -> Fill(QGL);
-	  hLightJetsPt_320pt400  -> Fill(pt);
-	}
-	else if (pt >= 400 && pt < 630){
-	  nLightJets_400pt630++;
-	  hLightJetsQGL_400pt630 -> Fill(QGL);
-	  hLightJetsPt_400pt630  -> Fill(pt);
-	}
-	else if (pt >= 630 && pt < 800){
-	  nLightJets_630pt800++;
-	  hLightJetsQGL_630pt800 -> Fill(QGL);
-	  hLightJetsPt_630pt800  -> Fill(pt);
-	}
-	else if (pt >= 800){
-	  nLightJets_800ptInf++;
-	  hLightJetsQGL_800ptInf -> Fill(QGL);
-	  hLightJetsPt_800ptInf  -> Fill(pt);
-	}
+	if (pt >= 30 && pt < 35) hUDSJetsQGL_30pt35->Fill(QGL);
+	else if (pt >= 35 && pt < 40) hUDSJetsQGL_35pt40 -> Fill(QGL);
+	else if (pt >= 40 && pt < 45) hUDSJetsQGL_40pt45 -> Fill(QGL);
+	else if (pt >= 45 && pt < 50) hUDSJetsQGL_45pt50 -> Fill(QGL);
+	else if (pt >= 50 && pt < 55) hUDSJetsQGL_50pt55 -> Fill(QGL);
+	else if (pt >= 55 && pt < 60) hUDSJetsQGL_55pt60 -> Fill(QGL);
+	else if (pt >= 60 && pt < 65) hUDSJetsQGL_60pt65 -> Fill(QGL);
+	else if (pt >= 65 && pt < 70) hUDSJetsQGL_65pt70 -> Fill(QGL);
+	else if (pt >= 70 && pt < 75) hUDSJetsQGL_70pt75 -> Fill(QGL);
+	else if (pt >= 75 && pt < 80) hUDSJetsQGL_75pt80 -> Fill(QGL);
+	else if (pt >= 80 && pt < 90) hUDSJetsQGL_80pt90 -> Fill(QGL);
+	else if (pt >= 90 && pt < 100) hUDSJetsQGL_90pt100 -> Fill(QGL);
+	else if (pt >= 100 && pt < 110) hUDSJetsQGL_100pt110 -> Fill(QGL);
+	else if (pt >= 110 && pt < 120) hUDSJetsQGL_110pt120 -> Fill(QGL);
+	else if (pt >= 120 && pt < 140) hUDSJetsQGL_120pt140 -> Fill(QGL);
+	else if (pt >= 140 && pt < 160) hUDSJetsQGL_140pt160 -> Fill(QGL);
+	else if (pt >= 160 && pt < 180) hUDSJetsQGL_160pt180 -> Fill(QGL);
+	else if (pt >= 180 && pt < 200) hUDSJetsQGL_180pt200 -> Fill(QGL);
+	else if (pt >= 200 && pt < 250) hUDSJetsQGL_200pt250 -> Fill(QGL);
+	else if (pt >= 250 && pt < 300) hUDSJetsQGL_250pt300 -> Fill(QGL);
+	else if (pt >= 300 && pt < 350) hUDSJetsQGL_300pt350 -> Fill(QGL);
+	else if (pt >= 350 && pt < 400) hUDSJetsQGL_350pt400 -> Fill(QGL);
+	else if (pt >= 400 && pt < 450) hUDSJetsQGL_400pt450 -> Fill(QGL);
+	else if (pt >= 450 && pt < 500) hUDSJetsQGL_450pt500 -> Fill(QGL);
+	else if (pt >= 500 && pt < 550) hUDSJetsQGL_500pt550 -> Fill(QGL);
+	else if (pt >= 550 && pt < 600) hUDSJetsQGL_550pt600 -> Fill(QGL);
+	else if (pt >= 600 && pt < 700) hUDSJetsQGL_600pt700 -> Fill(QGL);
+	else if (pt >= 700 && pt < 800) hUDSJetsQGL_700pt800 -> Fill(QGL);
+	else if (pt >= 800 && pt < 1000) hUDSJetsQGL_800pt1000 -> Fill(QGL);
+	else if (pt >= 1000) hUDSJetsQGL_1000ptInf -> Fill(QGL);
       }
   }
-  
-  // 30-40, 40-50, 50-65, 65-80, 80-100. 100-125, 125-160,160-200, 200-250, 250-320, 320-400,400-630, 630-800, 800-1000
-  hGluonJetsN_30pt40   -> Fill(nGluonJets_30pt40);
-  hGluonJetsN_40pt50   -> Fill(nGluonJets_40pt50);
-  hGluonJetsN_50pt65   -> Fill(nGluonJets_50pt65);
-  hGluonJetsN_65pt80   -> Fill(nGluonJets_65pt80);
-  hGluonJetsN_80pt100  -> Fill(nGluonJets_80pt100);
-  hGluonJetsN_100pt125 -> Fill(nGluonJets_100pt125);
-  hGluonJetsN_125pt160 -> Fill(nGluonJets_125pt160);
-  hGluonJetsN_160pt200 -> Fill(nGluonJets_160pt200);
-  hGluonJetsN_200pt250 -> Fill(nGluonJets_200pt250);
-  hGluonJetsN_250pt320 -> Fill(nGluonJets_250pt320);
-  hGluonJetsN_320pt400 -> Fill(nGluonJets_320pt400);
-  hGluonJetsN_400pt630 -> Fill(nGluonJets_400pt630);
-  hGluonJetsN_630pt800 -> Fill(nGluonJets_630pt800);
-  hGluonJetsN_800ptInf -> Fill(nGluonJets_800ptInf);
-  
-  hLightJetsN_30pt40   -> Fill(nLightJets_30pt40);
-  hLightJetsN_40pt50   -> Fill(nLightJets_40pt50);
-  hLightJetsN_50pt65   -> Fill(nLightJets_50pt65);
-  hLightJetsN_65pt80   -> Fill(nLightJets_65pt80);
-  hLightJetsN_80pt100  -> Fill(nLightJets_80pt100);
-  hLightJetsN_100pt125 -> Fill(nLightJets_100pt125);
-  hLightJetsN_125pt160 -> Fill(nLightJets_125pt160);
-  hLightJetsN_160pt200 -> Fill(nLightJets_160pt200);
-  hLightJetsN_200pt250 -> Fill(nLightJets_200pt250);
-  hLightJetsN_250pt320 -> Fill(nLightJets_250pt320);
-  hLightJetsN_320pt400 -> Fill(nLightJets_320pt400);
-  hLightJetsN_400pt630 -> Fill(nLightJets_400pt630);
-  hLightJetsN_630pt800 -> Fill(nLightJets_630pt800);
-  hLightJetsN_800ptInf -> Fill(nLightJets_800ptInf);
+  hCtrlNCJets -> Fill(nCJets);
+  hCtrlNBJets -> Fill(nBJets);
+  hCtrlNUDSGJets -> Fill(nUDSGJets);
+  hCtrlNGJets -> Fill(nGJets);
+  hCtrlNUDSJets -> Fill(nUDSJets);
   
   //================================================================================================
   // Finalize
   //================================================================================================
   fEventSaver.save();
-
+  
   return;
 }
