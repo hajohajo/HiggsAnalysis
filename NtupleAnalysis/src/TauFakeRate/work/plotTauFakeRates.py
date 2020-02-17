@@ -714,7 +714,7 @@ if __name__ == "__main__":
     
     # Default Settings
     ANALYSISNAME = "TauFakeRate" #Hplus2hwAnalysisWithTop"
-    SEARCHMODE   = "80to1000"
+    SEARCHMODE   = "350to3000"
     DATAERA      = "Run2016"
     OPTMODE      = ""
     BATCHMODE    = True

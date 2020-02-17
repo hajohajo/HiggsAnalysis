@@ -5,18 +5,40 @@ https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2016Analysis
 # lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt" # ICHEP dataset 271036-276811
 # lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt" # without L1T certification?
 # lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt" #PromptReco
-lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Final/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt" #ReReco
+lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt"
+
+#================================================================================================ 
+# Import modules
+#================================================================================================ 
+import os
+import subprocess
+import json 
+from subprocess import Popen, PIPE
+import shlex
+import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
+
+
+#================================================================================================ 
+# Variable definition
+#================================================================================================ 
+ss  = ShellStyles.SuccessStyle()
+ns  = ShellStyles.NormalStyle()
+ts  = ShellStyles.NoteStyle()
+hs  = ShellStyles.HighlightAltStyle()
+ls  = ShellStyles.HighlightStyle()
+es  = ShellStyles.ErrorStyle()
+cs  = ShellStyles.CaptionStyle()
+cys = ShellStyles.CyanStyle()
+
 
 #================================================================================================ 
 # Class Definition
 #================================================================================================ 
-import os
-
 class Dataset:
     def __init__(self, url, dbs="global", dataVersion="80Xmc", dasQuery="", lumiMask=lumiMask, name=""):
         self.URL = url
         self.DBS = dbs
-        self.dataVersion = dataVersion
+        self.dataVersion = dataVersion        
         if not os.path.dirname(lumiMask):
             lumiMask = os.path.join(os.environ['CMSSW_BASE'],"src/HiggsAnalysis/MiniAOD2TTree/data",lumiMask)
         self.lumiMask = lumiMask
@@ -693,8 +715,8 @@ datasetsSignalHW_4l.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_4l_PAT_m1500
 
 
 datasetsSignalHW_MG_NLO = []
-datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO/gkole-Hplus2hw_2ta_PAT_m300_mh200-5514f561afe549de22a98231d58a7b06/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
 #datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
+datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO/gkole-Hplus2hw_2ta_PAT_m300_mh200-5514f561afe549de22a98231d58a7b06/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
 datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO/mlotti-Hplus2hw_2ta_w2all_NLO_mhp700_mh200_PAT-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
 
 #datasetsSignalHW_MG_NLO.append(Dataset('/CRAB_PrivateMC/mlotti-Hplus2hw_2ta_PAT_mhp300_mh200_noMatch_2-b023a05347da3c2a313d219710ff54e9/USER', dbs="phys03", dataVersion="80Xmc", dasQuery=das))
