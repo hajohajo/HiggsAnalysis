@@ -17,11 +17,12 @@ endif
 #================================================================================================
 set INITIAL = `echo $USER | cut -c1-1`
 set MYDIR   = ${1} # pseudomulticrab directory name
-set FORMATS = "png" #"png,pdf,C"
-set DSETS   = "QCD|WJets"
+#set FORMATS = "png"
+set FORMATS = "png,pdf,C"
+set DSETS   = "QCD"
 set DATAERA = "Run2016"
 set ANAME   = "TauFakeRate"
-set SMODE   = "80to1000"
+set SMODE   = "350to3000"
 #set ANAME   = "Hplus2hwAnalysis_fake"
 #set SMODE   = "350to3000"
 

@@ -64,17 +64,18 @@ bool MCTools::IsNeutrino(const int pdgId){
 }
 
 
-bool MCTools::IsLepton(const int pdgId){
+bool MCTools::IsLepton(const int pdgId, bool includeNeutrinos){
 
   // 
   // Description:
   // Returns true if genParticle is a lepton (e, mu, tau & associated neutrinos), else false.
   //
+  
+  bool isLepton_wNu  = ( (abs(pdgId) == 11) || (abs(pdgId) == 12) || (abs(pdgId) == 13) || (abs(pdgId) == 14) || (abs(pdgId) == 15) || (abs(pdgId) == 16) );
+  bool isLepton_woNu = ( (abs(pdgId) == 11) || (abs(pdgId) == 13) || (abs(pdgId) == 15) );
 
-  if( (abs(pdgId) == 11) || (abs(pdgId) == 12)  ||
-      (abs(pdgId) == 13) || (abs(pdgId) == 14)  ||
-      (abs(pdgId) == 15) || (abs(pdgId) == 16) ) return true;
-  else return false;
+  if (includeNeutrinos) return isLepton_wNu;
+  else return isLepton_woNu;
 }
 
 

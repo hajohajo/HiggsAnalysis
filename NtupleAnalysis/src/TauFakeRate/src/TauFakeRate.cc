@@ -194,13 +194,13 @@ void TauFakeRate::book(TDirectory *dir) {
   hMET  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "MET" , "; E_{T}^{miss} (GeV)", metN, metMin, metMax);
   hNJet = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "nJet", "; jet multiplicity"  , nN  , nMin  , nMax  );
 
-  hDileptonMass_BeforeLeptonSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_BeforeLeptonSelection", ";m_{#ell#ell} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterLeptonSelection  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterLeptonSelection" , ";m_{#ell#ell} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterTauSelection     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterTauSelection"    , ";m_{#ell#ell} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterJetSelection     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterJetSelection"    , ";m_{#ell#ell} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterBJetSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterBJetSelection"   , ";m_{#ell#ell} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterMetSelection     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterMetSelection"    , ";m_{#ell#ell} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterAllSelections    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterAllSelections"   , ";m_{#ell#ell} (GeV)", mN, mMin, mMax);
+  hDileptonMass_BeforeLeptonSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_BeforeLeptonSelection", ";m_{ll} (GeV)", mN, mMin, mMax);
+  hDileptonMass_AfterLeptonSelection  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterLeptonSelection" , ";m_{ll} (GeV)", mN, mMin, mMax);
+  hDileptonMass_AfterTauSelection     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterTauSelection"    , ";m_{ll} (GeV)", mN, mMin, mMax);
+  hDileptonMass_AfterJetSelection     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterJetSelection"    , ";m_{ll} (GeV)", mN, mMin, mMax);
+  hDileptonMass_AfterBJetSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterBJetSelection"   , ";m_{ll} (GeV)", mN, mMin, mMax);
+  hDileptonMass_AfterMetSelection     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterMetSelection"    , ";m_{ll} (GeV)", mN, mMin, mMax);
+  hDileptonMass_AfterAllSelections    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterAllSelections"   , ";m_{ll} (GeV)", mN, mMin, mMax);
 
   return;
 }
@@ -313,8 +313,8 @@ void TauFakeRate::process(Long64_t entry) {
 
   // Apply on-Z mass requirement for dilepton pair
   hDileptonMass_BeforeLeptonSelection->Fill(dilepton_invMass);
-  if (dilepton_invMass < ( 91.1876 - cfg_massWindow ) ) return;
-  if (dilepton_invMass > ( 91.1876 + cfg_massWindow ) ) return;
+  if (dilepton_invMass < ( 91.1876 - cfg_massWindow ) ) return; // fixme. define in run.py 
+  if (dilepton_invMass > ( 91.1876 + cfg_massWindow ) ) return; // fixme. define in run.py
   cMuonMassCounter.increment(); 
 
   // Apply dR cut for dilepton system?

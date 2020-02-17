@@ -260,14 +260,14 @@ KinematicsBkg::KinematicsBkg(const ParameterSet& config, const TH1* skimCounters
     cfg_MuonPtCut(config.getParameter<float>("MuonSelection.muonPtCut")),
     cfg_MuonEtaCut(config.getParameter<float>("MuonSelection.muonEtaCut")),
     PSet_TauSelection(config.getParameter<ParameterSet>("TauSelection")),
-    cfg_TauPtCut(config.getParameter<std::vector<float>>("TauSelection.tauPtCut")),
+    cfg_TauPtCut(config.getParameter<std::vector<float>>("TauSelection.tauPtCut")), 
     cfg_TauEtaCut(config.getParameter<std::vector<float>>("TauSelection.tauEtaCut")),
     PSet_JetSelection(config.getParameter<ParameterSet>("JetSelection")),
     cfg_JetPtCuts(config.getParameter<std::vector<float>>("JetSelection.jetPtCuts")),
     cfg_JetEtaCuts(config.getParameter<std::vector<float>>("JetSelection.jetEtaCuts")),
     cfg_JetNumberCut(config, "JetSelection.numberOfJetsCut"),
-    cfg_MuonNumberCut(config, "MuonSelection.numberCut"), //fixme
-    cfg_TaujetNumberCut(config, "TauSelection.numberOfJetsCut"), //fixme
+    cfg_MuonNumberCut(config, "MuonSelection.numberCut"),
+    cfg_TaujetNumberCut(config, "TauSelection.numberOfJetsCut"),
     cfg_HtCut(config, "JetSelection.HTCut"),
     PSet_BJetSelection(config.getParameter<ParameterSet>("BJetSelection")),
     cfg_BJetPtCuts(config.getParameter<std::vector<float>>("BJetSelection.jetPtCuts")),
@@ -724,9 +724,9 @@ void KinematicsBkg::process(Long64_t entry) {
 
   // Definitions
   const math::XYVector tau1p = selectedTaus.at(0).p2();
-  const math::XYVector tau2p = selectedTaus.at(1).p2();
+  const math::XYVector tau2p = selectedTaus.at(1).p2(); //fixme
   const math::XYVector tau1j = selectedTauJets.at(0).p2();
-  const math::XYVector tau2j = selectedTauJets.at(1).p2();
+  const math::XYVector tau2j = selectedTauJets.at(1).p2(); //fixme
   const math::XYVector muon  = selectedMuons.at(0).p2();
   const math::XYVector met   = (const math::XYVector) fEvent.genMET().p2();
 
@@ -736,15 +736,15 @@ void KinematicsBkg::process(Long64_t entry) {
 
   // Visible mass
   double mVis_genP = ( selectedTaus.at(0).p4() + selectedTaus.at(1).p4() ).M();
-  double mVis_genJ = ( selectedTauJets.at(0).p4() + selectedTauJets.at(1).p4() ).M();
+  double mVis_genJ = ( selectedTauJets.at(0).p4() + selectedTauJets.at(1).p4() ).M(); //fixme
 
   // Effective visible mass (Provides better discrimination against backgrounds than "visible mass")
   double mEff_genP = GetEffectiveMass((const math::XYZTLorentzVector) selectedTaus.at(0).p4()   , (const math::XYZTLorentzVector) selectedTaus.at(1).p4()   , met);
-  double mEff_genJ = GetEffectiveMass((const math::XYZTLorentzVector) selectedTauJets.at(0).p4(), (const math::XYZTLorentzVector) selectedTauJets.at(1).p4(), met);
+  double mEff_genJ = GetEffectiveMass((const math::XYZTLorentzVector) selectedTauJets.at(0).p4(), (const math::XYZTLorentzVector) selectedTauJets.at(1).p4(), met); //fixme
 
   // Collinear Approximation - mVis/sqrt(x1 x2) where x1 = pvis1/(pvis1 + pmiss1) is= momentum fraction carried away by visible tau decay products
   double mColl_genP = GetCollinearMass((const math::XYZTLorentzVector) selectedTaus.at(0).p4(), (const math::XYZTLorentzVector) selectedTaus.at(1).p4(), met);
-  double mColl_genJ = GetCollinearMass((const math::XYZTLorentzVector) selectedTauJets.at(0).p4(), (const math::XYZTLorentzVector) selectedTauJets.at(1).p4(), met);
+  double mColl_genJ = GetCollinearMass((const math::XYZTLorentzVector) selectedTauJets.at(0).p4(), (const math::XYZTLorentzVector) selectedTauJets.at(1).p4(), met);  //fixme
 
   if (0) cout << "mT_genJ = " << mT_genJ << ", mT_genP = " << mT_genP << ", mEff_genP = " << mEff_genP << ", mEff_genJ = " << mEff_genJ << ", mColl_genP = " << mColl_genP << ", mColl_genJ = " << mColl_genJ << std::endl;
 
@@ -956,11 +956,11 @@ void KinematicsBkg::process(Long64_t entry) {
   // Fill histograms
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (cfg_Verbose) std::cout << "=== Fill histograms (Calculations)" << std::endl;
-  double taujets_dEta   = abs( selectedTauJets.at(0).eta() - selectedTauJets.at(1).eta() );
-  double taujets_dPhi   = abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(0).p4(), selectedTauJets.at(1).p4() ));
-  double taujets_dR     = ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(0).p4(), selectedTauJets.at(1).p4() );
+  double taujets_dEta   = abs( selectedTauJets.at(0).eta() - selectedTauJets.at(1).eta() ); // fixme
+  double taujets_dPhi   = abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(0).p4(), selectedTauJets.at(1).p4() )); //fixme
+  double taujets_dR     = ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(0).p4(), selectedTauJets.at(1).p4() ); // fixme
   double tau1_MET_dPhi  = abs( auxTools.DeltaPhi( selectedTauJets.at(0).phi(), fEvent.genMET().Phi()) );
-  double tau2_MET_dPhi  = abs( auxTools.DeltaPhi( selectedTauJets.at(1).phi(), fEvent.genMET().Phi()) );
+  double tau2_MET_dPhi  = abs( auxTools.DeltaPhi( selectedTauJets.at(1).phi(), fEvent.genMET().Phi()) ); //fixme
   double bjet1_MET_dPhi = abs( auxTools.DeltaPhi( selectedBJets.at(0).phi(), fEvent.genMET().Phi()) );
   double muon1_MET_dPhi = abs( auxTools.DeltaPhi( selectedMuons.at(0).phi(), fEvent.genMET().Phi()) );
   double jet1_MET_dPhi  = +999.9;
@@ -971,15 +971,15 @@ void KinematicsBkg::process(Long64_t entry) {
   double tau1_muon1_dEta = abs(selectedTauJets.at(0).eta() - selectedMuons.at(0).eta() );
   double tau1_muon1_dPhi = abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(0).p4(), selectedMuons.at(0).p4() ));
   double tau1_muon1_dR   = ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(0).p4(), selectedMuons.at(0).p4());
-  double tau2_muon1_dEta = abs(selectedTauJets.at(1).eta() - selectedMuons.at(0).eta() );
-  double tau2_muon1_dPhi = abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(1).p4(), selectedMuons.at(0).p4() ));
-  double tau2_muon1_dR   = ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(1).p4(), selectedMuons.at(0).p4());
+  double tau2_muon1_dEta = abs(selectedTauJets.at(1).eta() - selectedMuons.at(0).eta() ); // fixme
+  double tau2_muon1_dPhi = abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(1).p4(), selectedMuons.at(0).p4() )); //fixme
+  double tau2_muon1_dR   = ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(1).p4(), selectedMuons.at(0).p4()); //fixme
   double tau1_bjet1_dEta = abs(selectedTauJets.at(0).eta() - selectedBJets.at(0).eta() );
   double tau1_bjet1_dPhi = abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(0).p4(), selectedBJets.at(0).p4() ));
   double tau1_bjet1_dR   = ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(0).p4(), selectedBJets.at(0).p4());
-  double tau2_bjet1_dEta = abs(selectedTauJets.at(1).eta() - selectedBJets.at(0).eta() );
-  double tau2_bjet1_dPhi = abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(1).p4(), selectedBJets.at(0).p4() ));
-  double tau2_bjet1_dR   = ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(1).p4(), selectedBJets.at(0).p4());
+  double tau2_bjet1_dEta = abs(selectedTauJets.at(1).eta() - selectedBJets.at(0).eta() ); //fixme
+  double tau2_bjet1_dPhi = abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(1).p4(), selectedBJets.at(0).p4() )); //fixme
+  double tau2_bjet1_dR   = ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(1).p4(), selectedBJets.at(0).p4()); //fixme
 
 
 
@@ -1041,18 +1041,18 @@ void KinematicsBkg::process(Long64_t entry) {
 
   h_MaxDiJetMass_dEta_Vs_dPhi->Fill( maxDijetMass_dEta, maxDijetMass_dPhi );
   h_MaxDiJetMass_dRap_Vs_dPhi->Fill( maxDijetMass_dRap, maxDijetMass_dPhi );
-  h_TauJets_Pt_Vs_Pt         ->Fill( selectedTauJets.at(0).pt() , selectedTauJets.at(1).pt() );
-  h_TauJets_Pt_Vs_MET        ->Fill( (selectedTauJets.at(0).p4() + selectedTauJets.at(1).p4()).pt(), fEvent.genMET().et() );
-  h_TauJets_Eta_Vs_Eta       ->Fill( selectedTauJets.at(0).eta(), selectedTauJets.at(1).eta() );
-  h_TauJets_Phi_Vs_Phi       ->Fill( selectedTauJets.at(0).phi(), selectedTauJets.at(1).phi() );
+  h_TauJets_Pt_Vs_Pt         ->Fill( selectedTauJets.at(0).pt() , selectedTauJets.at(1).pt() ); //fixme
+  h_TauJets_Pt_Vs_MET        ->Fill( (selectedTauJets.at(0).p4() + selectedTauJets.at(1).p4()).pt(), fEvent.genMET().et() ); //fixme
+  h_TauJets_Eta_Vs_Eta       ->Fill( selectedTauJets.at(0).eta(), selectedTauJets.at(1).eta() ); //fixme
+  h_TauJets_Phi_Vs_Phi       ->Fill( selectedTauJets.at(0).phi(), selectedTauJets.at(1).phi() ); //fixme
   h_TauJets_dEta_Vs_dPhi     ->Fill( taujets_dEta, taujets_dPhi);
   h_TauJets_Pt1_Vs_dR        ->Fill( selectedTauJets.at(0).pt(), taujets_dR );
-  h_TauJets_Pt2_Vs_dR        ->Fill( selectedTauJets.at(1).pt(), taujets_dR );  
-  h_TauJet1_TauJet2_dEt      ->Fill( selectedTauJets.at(0).p4().Et() - selectedTauJets.at(1).p4().Et() );
-  h_TauJet1_TauJet2_dEta     ->Fill( abs(selectedTauJets.at(0).eta() - selectedTauJets.at(1).eta()) );
+  h_TauJets_Pt2_Vs_dR        ->Fill( selectedTauJets.at(1).pt(), taujets_dR );   // fixme
+  h_TauJet1_TauJet2_dEt      ->Fill( selectedTauJets.at(0).p4().Et() - selectedTauJets.at(1).p4().Et() ); //fixme
+  h_TauJet1_TauJet2_dEta     ->Fill( abs(selectedTauJets.at(0).eta() - selectedTauJets.at(1).eta()) ); //fixme
   h_TauJet1_TauJet2_dPhi     ->Fill( taujets_dPhi);
   h_TauJet1_TauJet2_dR       ->Fill( taujets_dR);
-  h_TauJet1_TauJet2_dQ       ->Fill( abs(selectedTaus.at(0).charge() - selectedTaus.at(1).charge()) );
+  h_TauJet1_TauJet2_dQ       ->Fill( abs(selectedTaus.at(0).charge() - selectedTaus.at(1).charge()) ); //fixme
   h_TauJet1_MET_dPhi         ->Fill( tau1_MET_dPhi);
   h_TauJet2_MET_dPhi         ->Fill( tau2_MET_dPhi);
   h_Jet1_Jet2_dEta           ->Fill( jet1_jet2_dEta);
@@ -1077,7 +1077,7 @@ void KinematicsBkg::process(Long64_t entry) {
      h_TauJet2_MET_dPhi_Vs_Jet2_MET_dPhi ->Fill(tau2_MET_dPhi, jet2_MET_dPhi);
    }
  
-  h_TauJets_MET_dPhi    ->Fill( abs( auxTools.DeltaPhi( (selectedTauJets.at(0).p4() + selectedTauJets.at(1).p4()).Phi(), fEvent.genMET().Phi())) );
+ h_TauJets_MET_dPhi    ->Fill( abs( auxTools.DeltaPhi( (selectedTauJets.at(0).p4() + selectedTauJets.at(1).p4()).Phi(), fEvent.genMET().Phi())) ); //fixme
   h_TauJet1_BJet1_dEta  ->Fill( tau1_bjet1_dEta );
   h_TauJet1_BJet1_dPhi  ->Fill( tau1_bjet1_dPhi );
   h_TauJet1_BJet1_dR    ->Fill( tau1_bjet1_dR   );
@@ -1096,11 +1096,11 @@ void KinematicsBkg::process(Long64_t entry) {
     {
       // std::cout << "selectedHadJetsCleaned.size() = " << selectedHadJetsCleaned.size() << std::endl;
       h_TauJet1_Jet1_dR     ->Fill(ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(0).p4(), selectedHadJetsCleaned.at(0).p4() ));
-      h_TauJet1_Jet1_dEta   ->Fill(abs(selectedTauJets.at(1).eta() - selectedHadJetsCleaned.at(0).eta() ));
+      h_TauJet1_Jet1_dEta   ->Fill(abs(selectedTauJets.at(1).eta() - selectedHadJetsCleaned.at(0).eta() )); // fixme
       h_TauJet1_Jet1_dPhi   ->Fill(abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(0).p4(), selectedHadJetsCleaned.at(0).p4() )));
-      h_TauJet2_Jet1_dR     ->Fill(ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(1).p4(), selectedHadJetsCleaned.at(0).p4() )); 
-      h_TauJet2_Jet1_dEta   ->Fill(abs(selectedTauJets.at(1).eta() - selectedHadJetsCleaned.at(0).eta() ));
-      h_TauJet2_Jet1_dPhi   ->Fill(abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(1).p4(), selectedHadJetsCleaned.at(0).p4() )));
+      h_TauJet2_Jet1_dR     ->Fill(ROOT::Math::VectorUtil::DeltaR( selectedTauJets.at(1).p4(), selectedHadJetsCleaned.at(0).p4() ));  // fixme
+      h_TauJet2_Jet1_dEta   ->Fill(abs(selectedTauJets.at(1).eta() - selectedHadJetsCleaned.at(0).eta() )); //fixme
+      h_TauJet2_Jet1_dPhi   ->Fill(abs(ROOT::Math::VectorUtil::DeltaPhi( selectedTauJets.at(1).p4(), selectedHadJetsCleaned.at(0).p4() ))); //fixme
     }
 
   h_Muon1_MET_dPhi   ->Fill( abs( auxTools.DeltaPhi( selectedMuons.at(0).p4().Phi(), fEvent.genMET().Phi())) );
@@ -1122,8 +1122,8 @@ void KinematicsBkg::process(Long64_t entry) {
   if (selectedHadJetsCleaned.size() > 1)
     {
       h_Muon1_Jet2_dEta ->Fill(abs(selectedMuons.at(0).eta() - selectedHadJetsCleaned.at(1).eta() ));
-      h_Muon1_Jet2_dPhi ->Fill(abs(ROOT::Math::VectorUtil::DeltaPhi( selectedMuons.at(0).p4(), selectedHadJetsCleaned.at(1).p4() )));  
-      h_Muon1_Jet2_dR   ->Fill(ROOT::Math::VectorUtil::DeltaR( selectedMuons.at(0).p4(), selectedHadJetsCleaned.at(1).p4() )); 
+      h_Muon1_Jet2_dPhi ->Fill(abs(ROOT::Math::VectorUtil::DeltaPhi( selectedMuons.at(0).p4(), selectedHadJetsCleaned.at(1).p4() )));
+      h_Muon1_Jet2_dR   ->Fill(ROOT::Math::VectorUtil::DeltaR( selectedMuons.at(0).p4(), selectedHadJetsCleaned.at(1).p4() ));
 
       h_BJet1_Jet2_dEta ->Fill(abs(selectedBJets.at(0).eta() - selectedHadJetsCleaned.at(1).eta() ));
       h_BJet1_Jet2_dPhi ->Fill(abs(ROOT::Math::VectorUtil::DeltaPhi( selectedBJets.at(0).p4(), selectedHadJetsCleaned.at(1).p4() )));  

@@ -108,6 +108,7 @@ void TauDumper::book(TTree* tree){
 
 pat::Tau TauDumper::TEScorrection(const pat::Tau& tau){
     // https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV
+    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauIDRecommendationForRun2
     if(!bTEScorrection) return tau;
 
     double taupt = tau.p4().pt();
@@ -115,6 +116,7 @@ pat::Tau TauDumper::TEScorrection(const pat::Tau& tau){
 
     double correction = 1.0;
     int dm = tau.decayMode();
+    // DM = 5*(Nc-1)+Np  [Nc = # charged hadrons, Np = # of pi0s]. DN = 0-11
     switch (dm){
 	case reco::PFTau::kOneProng0PiZero:
 	    correction += -0.005;

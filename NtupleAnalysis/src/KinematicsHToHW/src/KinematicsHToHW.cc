@@ -111,7 +111,7 @@ private:
   Count cBJetSelection;
   Count cMETSelection;
   // Count cTopologySelection;
-  Count cTopSelection;
+  // Count cTopSelection;
   Count cSelected;
 
   // BR Counters
@@ -350,7 +350,7 @@ KinematicsHToHW::KinematicsHToHW(const ParameterSet& config, const TH1* skimCoun
     cBJetSelection(fEventCounter.addCounter("b-jets")),
     cMETSelection(fEventCounter.addCounter("MET")),
     // cTopologySelection(fEventCounter.addCounter("Topology")),
-    cTopSelection(fEventCounter.addCounter("Top")),
+    // cTopSelection(fEventCounter.addCounter("Top")),
     cSelected(fEventCounter.addCounter("All Selections")),
     cInclusive(fEventCounter.addSubCounter("Branching", "All events")),
     cbHt_Hpm(fEventCounter.addSubCounter("Branching", "H+->HW")),
@@ -610,9 +610,9 @@ void KinematicsHToHW::process(Long64_t entry) {
   //================================================================================================
   // 1) Apply trigger
   //================================================================================================
-  // if (cfg_Verbose) std::cout << "=== Trigger" << std::endl;
-  // if ( !(fEvent.passTriggerDecision()) ) return;
-  // cTrigger.increment();
+  if (cfg_Verbose) std::cout << "=== Trigger" << std::endl;
+  if ( !(fEvent.passTriggerDecision()) ) return;
+  cTrigger.increment();
 
 
   //================================================================================================
@@ -794,8 +794,8 @@ void KinematicsHToHW::process(Long64_t entry) {
   //================================================================================================
   // 12) Top selection 
   //================================================================================================
-  if (cfg_Verbose) std::cout << "=== Top Selection" << std::endl;
-  cTopSelection.increment();
+  // if (cfg_Verbose) std::cout << "=== Top Selection" << std::endl;
+  //cTopSelection.increment();
 
 
   //================================================================================================
@@ -889,7 +889,7 @@ void KinematicsHToHW::process(Long64_t entry) {
     double genP_vtxX = vtxIdeal.X(); // p.vtxX()*10; // in mm
     double genP_vtxY = vtxIdeal.Y(); // p.vtxY()*10; // in mm
     double genP_vtxZ = vtxIdeal.Z(); // p.vtxZ()*10; // in mm
-
+  
     // Daughter, Mom and Grand-mom properties    
     genParticle m;
     genParticle g;
@@ -1000,9 +1000,16 @@ void KinematicsHToHW::process(Long64_t entry) {
 		// For-loop: All daughters
 		for (auto& d: genP_daughters) 
 		  {
-		    if (mcTools.IsLepton(d.pdgId() )) continue;
-		    nGenP_HToHW_HBoson_Taus++;
-		    bHt_HToHW_HBoson_Tau_p4 += d.p4(); 
+		    if (mcTools.IsLepton(d.pdgId() )) 
+		      {
+			// nGenP_HToHW_HBoson_TauLeptonic++; // fixme - add tau-leptonic counter
+			continue;
+		      }
+		    else
+		      {
+			nGenP_HToHW_HBoson_Taus++; // fixme - nGenP_HToHW_HBoson_TauHadronic
+			bHt_HToHW_HBoson_Tau_p4 += d.p4(); 
+		      }
 		  }
 	      }
 	    else
@@ -1240,7 +1247,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   }// for-loop: genParticles
   
   // Require 2 hadronic taus
-  if (nGenP_HToHW_HBoson_Taus != 2) return;
+  if (nGenP_HToHW_HBoson_Taus != 2) return; // fixme - 1tau_h + 1 lepton. use as if in filling 2 tau_h histograms
   else
     {
       // cout << "nGenP_HToHW_HBoson_Taus = " << nGenP_HToHW_HBoson_Taus << endl;
