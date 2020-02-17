@@ -2290,7 +2290,7 @@ def DeleteFoldersAndWritePU(mcrabTask):
             # No duplicate folders to delete if file already existed (hence was cleaned)
             mergeFileExists = (f in crabTask.GetPreMergedFiles())
             if mergeFileExists:
-                PrintProgressBar("Clean merged ROOT files", i, nMergedFiles, os.path.basename(f))
+                PrintProgressBar("Clean merged ROOT files (SKIP)", i, nMergedFiles, os.path.basename(f))
                 continue
             else:
                 if opts.filesPerMerge != 1:

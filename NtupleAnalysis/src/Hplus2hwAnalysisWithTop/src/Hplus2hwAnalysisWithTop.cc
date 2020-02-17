@@ -210,7 +210,7 @@ void Hplus2hwAnalysisWithTop::process(Long64_t entry) {
   if (0) std::cout << "=== Muon Selection" << std::endl;
   const MuonSelection::Data muData = fMuonSelection.analyze(fEvent);
   if(!(muData.hasIdentifiedMuons())) return;
-  if (muData.getSelectedMuons().size() != 1);
+  if (muData.getSelectedMuons().size() != 1) return;
 
   // Temporary Trigger SF
   if (fEvent.isMC()) 

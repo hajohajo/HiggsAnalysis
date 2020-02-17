@@ -7,24 +7,16 @@ dataset has its own directory with the results (ROOT files with histograms). The
 used as input to plotting scripts to get the desired results.
 
 
-PROOF:
-Enable only if your analysis is CPU-limited (e.g. limit calculation) With one analyzer at
-a time most probably you are I/O -limited. The limit is how much memory one process is using.
-
-
 USAGE:
-./run.py -m <multicrab_directory> -j <numOfCores> -i <DatasetName>
-or
 ./run.py -m <multicrab_directory> -n 10 -e "Keyword1|Keyword2|Keyword3"
 
 
-EXAMPLES:
-./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/800k_multicrab_Hplus2hwAnalysis_v8030_20190414T2017 -n 100 -i 'Charged'
+EXAMPLE:
+./run.py -m <multicrab_directory> -n 10 -e "QCD_bEnriched_HT300|2016|ST_"
 
 
 LAST USED:
-./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2hwAnalysis_v8030_20181205T1455 >& lpc28_KinematicsBkg_12h05m.txt
-
+./run.py -m  /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2hwAnalysis_v8030_20190628T1421
 
 ROOT:
 The available ROOT options for the Error-Ignore-Level are (const Int_t):
@@ -35,7 +27,8 @@ The available ROOT options for the Error-Ignore-Level are (const Int_t):
         kError    =   3000
         kBreak    =   4000
 
-HistoLevel:
+
+HISTOLEVEL:
 For the histogramAmbientLevel each DEEPER level is a SUBSET of the rest. 
 For example "kDebug" will include all kDebug histos but also kInformative, kVital, kSystematics, and kNever.  
 Setting histogramAmbientLevel=kSystematics will include kSystematics AND kNever.
@@ -63,10 +56,10 @@ import ROOT
 #================================================================================================
 # Options
 #================================================================================================
-prefix      = "KinematicsBkg"
+prefix      = "TauFakeRate"
 postfix     = ""
 dataEras    = ["2016"]
-searchModes = ["80to1000"]
+searchModes = ["350to3000"] # ["80to1000"]
 
 ROOT.gErrorIgnoreLevel = 0 
 
@@ -131,7 +124,76 @@ def main():
         Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=opts.excludeTasks)
     else:
-        myBlackList = []
+        myBlackList = ["QCD_Pt_15to20_MuEnrichedPt5",
+                       "QCD_Pt_20to30_MuEnrichedPt5",
+                       "QCD_Pt_30to50_MuEnrichedPt5",
+                       "QCD_Pt_50to80_MuEnrichedPt5",
+                       "QCD_Pt_80to120_MuEnrichedPt5",
+                       "QCD_Pt_80to120_MuEnrichedPt5_ext1",
+                       "QCD_Pt_120to170_MuEnrichedPt5",
+                       "QCD_Pt_170to300_MuEnrichedPt5",
+                       "QCD_Pt_170to300_MuEnrichedPt5_ext1",
+                       "QCD_Pt_300to470_MuEnrichedPt5",
+                       "QCD_Pt_300to470_MuEnrichedPt5_ext1",
+                       "QCD_Pt_300to470_MuEnrichedPt5_ext2",
+                       "QCD_Pt_470to600_MuEnrichedPt5",
+                       "QCD_Pt_470to600_MuEnrichedPt5_ext1",
+                       "QCD_Pt_470to600_MuEnrichedPt5_ext2",
+                       "QCD_Pt_600to800_MuEnrichedPt5",
+                       "QCD_Pt_600to800_MuEnrichedPt5_ext1",
+                       "QCD_Pt_800to1000_MuEnrichedPt5",
+                       "QCD_Pt_800to1000_MuEnrichedPt5_ext1",
+                       "QCD_Pt_800to1000_MuEnrichedPt5_ext2",
+                       "QCD_Pt_1000toInf_MuEnrichedPt5",
+                       "QCD_bEnriched_HT200to300",
+                       "QCD_bEnriched_HT300to500",
+                       "QCD_bEnriched_HT500to700",
+                       "QCD_bEnriched_HT700to1000",
+                       "QCD_bEnriched_HT1000to1500",
+                       "QCD_bEnriched_HT1500to2000",
+                       "QCD_bEnriched_HT2000toInf",
+                       "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
+                       "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
+                       #"ttHJetToGG_M125",
+                       #"ttHJetToNonbb_M125_ext1",
+                       #"ttHJetToTT_M125_ext4",
+                       #"ttHJetTobb_M125_ext3",
+                       #"TTTT",
+                       #"TTWJetsToLNu_ext1",
+                       #"TTWJetsToLNu_ext2",
+                       #"TTZToLLNuNu_M_10_ext3",
+                       #"TTZToQQ",
+                       #"WJetsToLNu_HT_100To200",
+                       #"WJetsToLNu_HT_100To200_ext1",
+                       #"WJetsToLNu_HT_100To200_ext2",
+                       #"WJetsToLNu_HT_1200To2500",
+                       #"WJetsToLNu_HT_1200To2500_ext1",
+                       #"WJetsToLNu_HT_200To400",
+                       #"WJetsToLNu_HT_200To400_ext1",
+                       #"WJetsToLNu_HT_200To400_ext2",
+                       #"WJetsToLNu_HT_2500ToInf",
+                       #"WJetsToLNu_HT_2500ToInf_ext1",
+                       #"WJetsToLNu_HT_400To600",
+                       #"WJetsToLNu_HT_400To600_ext1",
+                       #"WJetsToLNu_HT_600To800",
+                       #"WJetsToLNu_HT_600To800_ext1",
+                       #"WJetsToLNu_HT_70To100",
+                       #"WJetsToLNu_HT_800To1200",
+                       #"WJetsToLNu_HT_800To1200_ext1",
+                       "WWTo4Q",
+                       "SingleElectron_Run2016G_03Feb2017_v1_278820_280385",
+                       "SingleElectron_Run2016F_03Feb2017_v1_277932_278800",
+                       "SingleElectron_Run2016E_03Feb2017_v1_276831_277420",
+                       "SingleElectron_Run2016D_03Feb2017_v1_276315_276811",
+                       "SingleElectron_Run2016B_03Feb2017_ver2_v2_273150_275376",
+                       "SingleElectron_Run2016H_03Feb2017_ver3_v1_284036_284044",
+                       "SingleElectron_Run2016H_03Feb2017_ver2_v1_281613_284035",
+                       "SingleElectron_Run2016F_03Feb2017_v1_278801_278808",
+                       "SingleElectron_Run2016C_03Feb2017_v1_275656_276283",
+                       ]
+
+        #if opts.doSystematics:
+        #    myBlackList.append("QCD")
 
         Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
         Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
@@ -142,17 +204,25 @@ def main():
             process.addDatasetsFromMulticrab(opts.mcrab)
 
 
+
     # ================================================================================================
     # Overwrite Default Settings  
     # ================================================================================================
-    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysisWithTop.py import allSelections
-    #allSelections.verbose = opts.verbose
-    #allSelections.histogramAmbientLevel = opts.histoLevel
-    allSelections.MuonSelection.numberCutValue     = 1 
-    allSelections.TauSelection.tauPtCut             = [30.0] #30.0
-    allSelections.TauSelection.tauEtaCut            = [2.1]  # 2.1
-    allSelections.TauSelection.numberOfJetsCutValue     = 2
-    allSelections.TauSelection.numberOfJetsCutDirection = "=="
+    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysisWithTop import allSelections
+    allSelections.verbose = opts.verbose
+    allSelections.histogramAmbientLevel = opts.histoLevel
+    allSelections.MuonSelection.applyTriggerMatching = False # cannot use it for 2 muons and single-muon trigger
+    #allSelections.MuonSelection.muonPtCut = 40.0 # cannot use it for 2 muons and single-muon trigger
+    allSelections.JetSelection.numberOfJetsCutValue = 1 # [default; 0]
+
+    # allSelections.BjetSelection.triggerMatchingApply = True
+    # allSelections.BJetSelection.numberOfBJetsCutValue = 0
+    # allSelections.BJetSelection.numberOfBJetsCutDirection = "=="
+    
+    #allSelections.TopSelectionMVA.MVACutValue           = 0.90 # [default: 0.4]
+    #allSelections.FakeBTopSelectionMVA.MVACutValue      = 0.00 # [default: -1.0]
+    #allSelections.FakeBMeasurement.LdgTopMVACutValue    = allSelections.TopSelectionMVA.MVACutValue
+    #allSelections.FakeBMeasurement.SubldgTopMVACutValue = allSelections.TopSelectionMVA.MVACutValue
 
     # ================================================================================================
     # Add Analysis Variations
@@ -178,7 +248,7 @@ def main():
                               usePUreweighting       = opts.usePUreweighting,
                               useTopPtReweighting    = opts.useTopPtReweighting,
                               doSystematicVariations = opts.doSystematics,
-                              analysisType="HToTB",
+                              analysisType="HToHW_withTop",
                               verbose=opts.verbose)
 
     # Add variations (e.g. for optimisation)
@@ -280,7 +350,7 @@ if __name__ == "__main__":
     VERBOSE       = False
     NEVTS         = -1
     HISTOLEVEL    = "Debug" #"Informative" #"Debug"
-    PUREWEIGHT    = False
+    PUREWEIGHT    = True
     TOPPTREWEIGHT = False
     DOSYSTEMATICS = False
 
