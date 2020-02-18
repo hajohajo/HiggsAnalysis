@@ -68,6 +68,9 @@ searchModes = ["80to1000"]
 
 ROOT.gErrorIgnoreLevel = 0 
 
+# Define colors
+ns = "\033[0;0m"
+ts = "\033[1;34m"
 
 #================================================================================================
 # Function Definition
@@ -218,7 +221,7 @@ def main():
     # ================================================================================================
     from HiggsAnalysis.NtupleAnalysis.main import PSet
     RecoTopMVASelection = PSet(
-        SelectionsType           = "hadronic", # Options ["hadronic", "semileptonic"]
+        SelectionsType           = "hadronic", # Options ["hadronic", "semiLeptonic"]
         LepBJetDRCutValue        = "9999.99",
         LepBJetDRCutDirection    = "<=",
         MiniIsoCutValue          = "0.1",
@@ -257,10 +260,20 @@ def main():
     # Bjets
     semiLeptonicSelections.BJetSelection.jetPtCuts = [40.0, 40.0]
     semiLeptonicSelections.BJetSelection.numberOfBJetsCutValue = 2
-
-    allSelections = hadronicSelections
-    print "Selections Type: ", RecoTopMVASelection.SelectionsType
     
+    # Define selections type based on the mcrab name
+    if "Hplus2tbAnalysis" in opts.mcrab:
+        RecoTopMVASelection.SelectionsType = "hadronic"
+    elif "TopSyst" in opts.mcrab:
+        RecoTopMVASelection.SelectionsType = "semiLeptonic"
+        
+    # Get allSelections 
+    if (RecoTopMVASelection.SelectionsType == "hadronic"):
+        allSelections = hadronicSelections
+    else:
+        allSelections = semiLeptonicSelections
+
+    Print("Selections Type: %s %s %s" %(ts, RecoTopMVASelection.SelectionsType, ns), True)
     # ================================================================================================
     # Add Analysis Variations
     # ================================================================================================
@@ -273,7 +286,6 @@ def main():
     # ================================================================================================ 
     # from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import applyAnalysisCommandLineOptions
     # applyAnalysisCommandLineOptions(sys.argv, allSelections)
-
     
     #================================================================================================
     # Build analysis modules
@@ -284,7 +296,9 @@ def main():
                               searchModes,
                               usePUreweighting       = opts.usePUreweighting,
                               useTopPtReweighting    = opts.useTopPtReweighting,
-                              doSystematicVariations = opts.doSystematics)
+                              doSystematicVariations = opts.doSystematics,
+                              analysisType="HToTB",
+                              )
 
     # Add variations (e.g. for optimisation)
     # builder.addVariation("METSelection.METCutValue", [100,120,140])

@@ -65,6 +65,16 @@ public:
 
 private:
   // Input parameters
+  const std::string cfg_SelectionsType;
+  const DirectionalCut<double> cfg_MiniIsoCut;
+  const DirectionalCut<double> cfg_METCut;
+  const DirectionalCut<double> cfg_LepBJetDRCut;
+
+  const float cfg_MuonPtCut;
+  const float cfg_MuonEtaCut;
+  const float cfg_ElePtCut;
+  const float cfg_EleEtaCut;
+
   const HistogramSettings cfg_PtBinSetting;
   const HistogramSettings cfg_EtaBinSetting;
   const HistogramSettings cfg_PhiBinSetting;
@@ -72,7 +82,7 @@ private:
   const HistogramSettings cfg_DeltaEtaBinSetting;
   const HistogramSettings cfg_DeltaPhiBinSetting;
   const HistogramSettings cfg_DeltaRBinSetting;
-
+  
 
   Tools auxTools;
 
@@ -209,6 +219,22 @@ private:
   WrappedTH1Triplet *hDRJ1BJetwithJ2;
   WrappedTH1Triplet *hDRJ2BJetwithJ1;
   
+
+  //Ctrl plots for semi-leptonic selections
+  WrappedTH1 *hCtrl_JetMult;
+  WrappedTH1 *hCtrl_JetPt;
+  WrappedTH1 *hCtrl_BJetMult;
+  WrappedTH1 *hCtrl_muonMult;
+  WrappedTH1 *hCtrl_muonIso;
+  WrappedTH1 *hCtrl_eleMult;
+  WrappedTH1 *hCtrl_eleIso;
+  WrappedTH1 *hCtrl_BJetPt;
+  WrappedTH1 *hCtrl_MET;
+  WrappedTH1 *hCtrl_HT;
+  WrappedTH1 *hCtrl_NhadronicTops;
+  WrappedTH1 *hCtrl_hadrGenTopPt;
+  WrappedTH1 *hCtrl_lepGenTopPt;
+
   // All jets 
   WrappedTH1 *hAllJetCvsL;
   WrappedTH1 *hAllJetPtD;
@@ -509,6 +535,18 @@ REGISTER_SELECTOR(TopRecoTree);
 
 TopRecoTree::TopRecoTree(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
+
+    cfg_SelectionsType(config.getParameter<std::string>("RecoTopMVASelection.SelectionsType")),
+    cfg_MiniIsoCut(config,  "RecoTopMVASelection.MiniIsoCut"),
+    cfg_METCut(config,      "RecoTopMVASelection.METCut"),
+    cfg_LepBJetDRCut(config, "RecoTopMVASelection.LepBJetDRCut"),
+
+    // Muon Selection Cuts
+    cfg_MuonPtCut(config.getParameter<float>("MuonSelection.muonPtCut")),
+    cfg_MuonEtaCut(config.getParameter<float>("MuonSelection.muonEtaCut")),
+    cfg_ElePtCut(config.getParameter<float>("ElectronSelection.electronPtCut")),
+    cfg_EleEtaCut(config.getParameter<float>("ElectronSelection.electronEtaCut")),
+
     cfg_PtBinSetting(config.getParameter<ParameterSet>("CommonPlots.ptBins")),
     cfg_EtaBinSetting(config.getParameter<ParameterSet>("CommonPlots.etaBins")),
     cfg_PhiBinSetting(config.getParameter<ParameterSet>("CommonPlots.phiBins")),
@@ -601,6 +639,18 @@ void TopRecoTree::book(TDirectory *dir) {
   // const double minPullAngle = -4.0;
   // const double maxPullAngle = +4.0;
   
+  const int nNBins     = fCommonPlots.getNjetsBinSettings().bins();
+  const float fNMin    = fCommonPlots.getNjetsBinSettings().min();
+  const float fNMax    = fCommonPlots.getNjetsBinSettings().max();
+
+  const int nMetBins  = fCommonPlots.getMetBinSettings().bins();
+  const float fMetMin = fCommonPlots.getMetBinSettings().min();
+  const float fMetMax = 2*fCommonPlots.getMetBinSettings().max();
+
+  const int nHtBins    = fCommonPlots.getHtBinSettings().bins();
+  const float fHtMin   = fCommonPlots.getHtBinSettings().min();
+  const float fHtMax   = fCommonPlots.getHtBinSettings().max();
+
   // Create directories for normalization                                                                                                                                                
   std::string myInclusiveLabel  = "TrijetCandidate";
   std::string myFakeLabel       = myInclusiveLabel+"Fake";
@@ -729,6 +779,21 @@ void TopRecoTree::book(TDirectory *dir) {
   hDRDijetwithBJet = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRDijetwithBJet", ";#Delta R", nBinsDR, minDR, maxDR);
   hDRJ1BJetwithJ2  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1BJetwithJ2" , ";#Delta R", nBinsDR, minDR, maxDR);
   hDRJ2BJetwithJ1  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ2BJetwithJ1" , ";#Delta R", nBinsDR, minDR, maxDR);
+
+  // Ctrl plots for semi-leptonic selections
+  hCtrl_JetMult  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_JetMult", ";Jet multiplicity", nNBins, fNMin, fNMax);
+  hCtrl_JetPt    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_JetPt", ";Jet p_{T}",  nBinsPt, minPt , maxPt);
+  hCtrl_BJetMult = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_BJetMult", ";BJet multiplicity", nNBins, fNMin, fNMax);
+  hCtrl_muonMult = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_muonMult", ";Muon multiplicity", nNBins, fNMin, fNMax);
+  hCtrl_muonIso  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_muonIso", ";Muon Isolation", 20, 0, 1);
+  hCtrl_eleMult = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_eleMult", ";Electron multiplicity", nNBins, fNMin, fNMax);
+  hCtrl_eleIso  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_eleIso", ";Electron Isolation", 20, 0, 1);
+  hCtrl_BJetPt   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_BJetPt", ";BJet p_{T}",  nBinsPt, minPt , maxPt);
+  hCtrl_MET              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_MET", "Ctrl_MET", nMetBins, fMetMin, fMetMax);
+  hCtrl_HT               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_HT", "Ctrl_HT", nHtBins, fHtMin, fHtMax);
+  hCtrl_NhadronicTops    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_NhadronicTops", "Ctrl_NhadronicTops", 4, -0.5, 3.5);
+  hCtrl_hadrGenTopPt     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, myInclusiveDir, "Ctrl_hadrGenTop_Pt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
+  hCtrl_lepGenTopPt     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, myInclusiveDir, "Ctrl_lepGenTop_Pt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
 
   // All jets 
   hAllJetCvsL     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, myInclusiveDir, "AllJetCvsL",";CvsL discr", 200,-1,1);
@@ -1184,7 +1249,7 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================   
   // 1) Apply trigger 
   //================================================================================================   
-  if(0) std::cout << "=== Trigger" << std::endl;
+  if (0) std::cout << "=== Trigger" << std::endl;
   if ( !(fEvent.passTriggerDecision()) ) return;
   
   cTrigger.increment();
@@ -1196,7 +1261,7 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================   
   // 2) MET filters (to remove events with spurious sources of fake MET)
   //================================================================================================   
-  if(0) std::cout << "=== MET Filter" << std::endl;
+  if (0) std::cout << "=== MET Filter" << std::endl;
   const METFilterSelection::Data metFilterData = fMETFilterSelection.analyze(fEvent);
   if (!metFilterData.passedSelection()) return;
   fCommonPlots.fillControlPlotsAfterMETFilter(fEvent);  
@@ -1205,7 +1270,7 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================   
   // 3) Primarty Vertex (Check that a PV exists)
   //================================================================================================   
-  if(0) std::cout << "=== Vertices" << std::endl;
+  if (0) std::cout << "=== Vertices" << std::endl;
   if (nVertices < 1) return;
 
   cVertexSelection.increment();
@@ -1225,32 +1290,95 @@ void TopRecoTree::process(Long64_t entry) {
   
 
   //================================================================================================   
-  // 5) Electron veto (Orthogonality)
+  // 5) Electron Selection
   //================================================================================================   
-  if(0) std::cout << "=== Electron veto" << std::endl;
+  if (0) std::cout << "=== Electron veto" << std::endl;
   const ElectronSelection::Data eData = fElectronSelection.analyze(fEvent);
-  if (eData.hasIdentifiedElectrons()) return;
+  std::vector<Electron> selectedElectrons;
 
+  if (cfg_SelectionsType == "hadronic"){
+    // Electron veto
+    if (eData.hasIdentifiedElectrons()) return;
+  }
+  else{ //semiLeptonic
+    
+    // For-loop: All electrons
+    for (Electron ele: fEvent.electrons()){
+      // Apply cut on pt
+      if (ele.pt() < cfg_ElePtCut) continue;
+      // Apply cut on abs(eta)
+      if (std::fabs(ele.eta()) > cfg_EleEtaCut) continue;
+      //=== Apply cut on electron ID (MVA)
+      //bool passedIDCut   = getEleIdMVADecision(ele);
 
+      //== fixme!
+      bool passedIDCut = false;
+      double AbsEta = std::abs(ele.eta());
+      if (AbsEta<=0.8 && ele.MVA()>=-0.041) passedIDCut = true;
+      if (AbsEta>0.8 && AbsEta<1.479 && ele.MVA()>=0.383) passedIDCut =true;
+      if (AbsEta>=1.479 && ele.MVA()>=-0.515) passedIDCut =true;
+      //=== fixme!
+      
+      if (!passedIDCut) continue;
+      hCtrl_eleIso -> Fill(ele.effAreaMiniIso());
+      //=== Apply cut on electron isolation
+      bool ElePass_Iso = cfg_MiniIsoCut.passedCut(ele.effAreaMiniIso());
+      if (! ElePass_Iso) continue;
+      selectedElectrons.push_back(ele);
+    }
+  } //semiLeptonic
   //================================================================================================
-  // 6) Muon veto (Orthogonality)
+  // 6) Muon Selection
   //================================================================================================
-  if(0) std::cout << "=== Muon veto" << std::endl;
+  if (0) std::cout << "=== Muon veto" << std::endl;
   const MuonSelection::Data muData = fMuonSelection.analyze(fEvent);
-  if (muData.hasIdentifiedMuons()) return;
+  std::vector<Muon> selectedMuons;
 
+  if (cfg_SelectionsType == "hadronic"){
+    // Muon veto
+    if (muData.hasIdentifiedMuons()) return;
+  }
+  else{ //semiLeptonic
+
+    // For-loop: All muons
+    for(Muon muon: fEvent.muons()) {
+      // Apply cut on pt
+      if (muon.pt() < cfg_MuonPtCut) continue;
+      // Apply cut on abs(eta)
+      if (std::fabs(muon.eta()) > cfg_MuonEtaCut) continue;
+      // Apply cut on muon ID
+      if (!muon.muonIDDiscriminator()) continue;
+      hCtrl_muonIso -> Fill(muon.effAreaMiniIso());
+      //Apply cut on mini isolation
+      bool MuPass_Iso       = cfg_MiniIsoCut.passedCut(muon.effAreaMiniIso());
+      if (!MuPass_Iso) continue;
+      selectedMuons.push_back(muon);
+    }
+  }
+
+  bool passElectron = (selectedElectrons.size() == 1);
+  bool passMuon     = (selectedMuons.size() == 1);
+  bool passLepton   = (passElectron && !passMuon) || (!passElectron && passMuon);
+  
+  //if (passElectron) std::cout<<"Electron: "<<passElectron<<" "<<selectedElectrons.size()<<" "<<selectedElectrons.at(0).effAreaMiniIso()<<std::endl;
+  //if (passMuon) std::cout<<"Muons: "<<passMuon<<" "<<selectedMuons.size()<<" "<<selectedMuons.at(0).effAreaMiniIso()<<std::endl;
+
+  //SemiLeptonic: Select exactly one lepton (electron or muon)
+  if (cfg_SelectionsType != "hadronic"){
+    if (!passLepton) return;
+  }
 
   //================================================================================================   
   // 7) Tau Veto (HToTauNu Orthogonality)
   //================================================================================================   
-  if(0) std::cout << "=== Tau-Veto" << std::endl;
+  if (0) std::cout << "=== Tau-Veto" << std::endl;
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
   if (tauData.hasIdentifiedTaus() ) return;
 
   //================================================================================================
   // 8) Jet selection
   //================================================================================================
-  if(0) std::cout << "=== Jet selection" << std::endl;
+  if (0) std::cout << "=== Jet selection" << std::endl;
   const JetSelection::Data jetData = fJetSelection.analyzeWithoutTau(fEvent);
   if (!jetData.passedSelection()) return;
 
@@ -1258,14 +1386,13 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================
   // Standard Selections
   //================================================================================================
-  if(0) std::cout << "=== Standard selection" << std::endl;
-  //fCommonPlots.fillControlPlotsAfterTopologicalSelections(fEvent, true);
-  
+  if (0) std::cout << "=== Standard selection" << std::endl;
+  //fCommonPlots.fillControlPlotsAfterTopologicalSelections(fEvent, true);  
 
   //================================================================================================  
   // 9) BJet selection
   //================================================================================================
-  if(0) std::cout << "=== BJet selection" << std::endl;
+  if (0) std::cout << "=== BJet selection" << std::endl;
   const BJetSelection::Data bjetData = fBJetSelection.analyze(fEvent, jetData);
   if (!bjetData.passedSelection()) return;
   
@@ -1273,7 +1400,7 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================  
   // 10) BJet SF  
   //================================================================================================
-  if(0) std::cout << "=== BJet SF" << std::endl;
+  if (0) std::cout << "=== BJet SF" << std::endl;
   if (fEvent.isMC()) 
     {
       fEventWeight.multiplyWeight(bjetData.getBTaggingScaleFactorEventWeight());
@@ -1284,20 +1411,35 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================
   // 11) MET selection
   //================================================================================================
-  if(0) std::cout << "=== MET selection" << std::endl;
+  if (0) std::cout << "=== MET selection" << std::endl;
   const METSelection::Data METData = fMETSelection.analyze(fEvent, nVertices);
   //if (!METData.passedSelection()) return;
   
-
+  if (cfg_SelectionsType != "hadronic"){
+    bool MetPassCut = cfg_METCut.passedCut(METData.getMET().R());
+    if (!MetPassCut) return;
+  }
 
   //================================================================================================
   // All cuts passed
   //================================================================================================
-  if(0) std::cout << "=== All cuts passed" << std::endl;
+  if (0) std::cout << "=== All cuts passed" << std::endl;
   cSelected.increment();
 
-  // TTree Variables
-  
+  //Ctrl plots for semi-leptonic selections
+  hCtrl_MET      -> Fill(METData.getMET().R());
+  hCtrl_JetMult  -> Fill(jetData.getSelectedJets().size());
+  hCtrl_BJetMult -> Fill(bjetData.getSelectedBJets().size());
+  if (passMuon)     hCtrl_muonMult -> Fill(selectedMuons.size());
+  if (passElectron) hCtrl_eleMult -> Fill(selectedElectrons.size());
+  for (auto& jet: jetData.getSelectedJets()){
+    hCtrl_JetPt  -> Fill(jet.pt());
+  }
+  for (auto& bjet: bjetData.getSelectedBJets()){
+    hCtrl_BJetPt -> Fill(bjet.pt());
+  }
+
+  // TTree Variables  
   //OLD
   TrijetPtDR_S                 -> SetAddress(&trijetPtDR_S);
   TrijetDijetPtDR_S            -> SetAddress(&dijetPtDR_S);
@@ -1580,28 +1722,48 @@ void TopRecoTree::process(Long64_t entry) {
           }
         }
       }
-      // Skip event if any of the tops decays leptonically (the "quarks" vector will be empty causing errors)                                     
-      if (!(quarks.size() == 2 && foundB)) return;
+
+      if (cfg_SelectionsType == "hadronic"){
+	// Skip event if any of the tops decays leptonically (the "quarks" vector will be empty causing errors)                                           
+	if (!(quarks.size() == 2 && foundB)) return;
+      }
+      else{
+	// If top does not decay into W+b return
+	if (!foundB) return;
+      }
+      
       // Fill vectors for b-quarks, leading and subleading quarks coming from tops                                                                                 
       GenTops_BQuark.push_back(bquark);
 
-      GenTops_Quarks.push_back(bquark);
-      GenTops_Quarks.push_back(quarks.at(0));
-      GenTops_Quarks.push_back(quarks.at(1));
-      
-      if (quarks.at(0).pt() > quarks.at(1).pt()) {
-        GenTops_LdgQuark.push_back(quarks.at(0));
-        GenTops_SubldgQuark.push_back(quarks.at(1));
-      }
+      if (0) std::cout<<"W decay products = "<<quarks.size()<<std::endl;
+      if (quarks.size() == 2){
+        hCtrl_hadrGenTopPt -> Fill(top.pt());
+
+	GenTops_Quarks.push_back(bquark);
+	GenTops_Quarks.push_back(quarks.at(0));
+	GenTops_Quarks.push_back(quarks.at(1));
+
+        if (quarks.at(0).pt() > quarks.at(1).pt()) {
+          GenTops_LdgQuark.push_back(quarks.at(0));
+          GenTops_SubldgQuark.push_back(quarks.at(1));
+        }
+        else{
+          GenTops_LdgQuark.push_back(quarks.at(1));
+          GenTops_SubldgQuark.push_back(quarks.at(0));
+        }
+      }//if (quarks.size() == 2){
       else{
-        GenTops_LdgQuark.push_back(quarks.at(1));
-        GenTops_SubldgQuark.push_back(quarks.at(0));
+        hCtrl_lepGenTopPt -> Fill(top.pt());
       }
     }
-    // Keep only events with at least two hadronically decaying tops                                                                                                                     
-    if (GenTops_BQuark.size() < 2) return;
-    
-    
+    if (cfg_SelectionsType == "hadronic"){
+      // Keep only events with at least two hadronically decaying top-quarks
+      if (GenTops_BQuark.size() < 2) return;
+    }
+    else{
+      // Keep only events with at least one hadronically decaying top-quark
+      if (GenTops_BQuark.size() < 1) return;
+    }
     //Pseudo-matching: Used to calculate the dPt/Pt cut
     for (size_t i=0; i<GenTops_Quarks.size(); i++)
       {
@@ -1634,7 +1796,6 @@ void TopRecoTree::process(Long64_t entry) {
 	else hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt200ToInfGeV -> Fill(dPtOverPt);
 	hQuarkJetMinDr03_DeltaR_vs_QuarkPt        -> Fill(dRmin, Quark.pt());
       }
-
     //========================================================================================================
     //                              Matching:  Minimum DeltaR and DeltaPt check
     //========================================================================================================
@@ -1651,7 +1812,7 @@ void TopRecoTree::process(Long64_t entry) {
 	    DeltaR_min = DeltaR;
 	  }
       }
-    
+
     hJetsDeltaRmin -> Fill(DeltaR_min);
 
       //======= B jet matching (Loop over all Jets)
@@ -1683,9 +1844,11 @@ void TopRecoTree::process(Long64_t entry) {
       BJetCand.push_back(mcMatched_BJet);
     }
 
+    if (0) std::cout<<"N hadronic tops "<<GenTops_LdgQuark.size()<<std::endl;
+    hCtrl_NhadronicTops -> Fill(GenTops_LdgQuark.size());
+    
     //======= Dijet matching (Loop over all Jets)
-
-    for (size_t i=0; i<GenTops.size(); i++){
+    for (size_t i=0; i<GenTops_LdgQuark.size(); i++){
       genParticle LdgQuark    = GenTops_LdgQuark.at(i);
       genParticle SubldgQuark = GenTops_SubldgQuark.at(i);
       
@@ -1783,6 +1946,10 @@ void TopRecoTree::process(Long64_t entry) {
     }
     hNmatchedTop ->Fill(imatched);
     
+    if (0) std::cout<<"nmatched top candidates: "<<imatched<<std::endl;
+    //New: Check if genuine tops include the bjet from the leptonic branch
+    //BJet_LeptonicBr
+
     // USED in 2016 analysis
     //Matching criterion: Select events with DeltaR(q,q') > 0.8
     //Otherwise: Event not used for the training    
@@ -2073,8 +2240,7 @@ void TopRecoTree::process(Long64_t entry) {
       //hLdgJetAxis1             -> Fill(isGenuineTop, jet1.axis1());
       hLdgJetMult              -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSmult());
       hLdgJetQGLikelihood      -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood());
-      //hLdgJetPullMagnitude     -> Fill(isGenuineTop, getJetPullMagnitude(jet1));
-      
+      //hLdgJetPullMagnitude     -> Fill(isGenuineTop, getJetPullMagnitude(jet1));      
       
       // Subleading jet from dijet system
       hSubldgJetPt             -> Fill(isGenuineTop, jet2.pt());
