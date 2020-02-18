@@ -833,8 +833,6 @@ void KinematicsHToHW::process(Long64_t entry) {
   unsigned int nGenP_BQuarks          = 0;
   unsigned int nGenP_HToHW_Quarks     = 0;
   unsigned int nGenP_HToHW_HBoson_Taus = 0;
-  //  unsigned int nGenP_HToHW_HBoson_TauLeptonic = 0;
-  //  unsigned int nGenP_HToHW_HBoson_TauHadronic = 0;
   unsigned int nGenP_HToHW_HBoson_TauLeptonic_plus = 0;
   unsigned int nGenP_HToHW_HBoson_TauHadronic_plus = 0;
   unsigned int nGenP_HToHW_HBoson_TauLeptonic_minus = 0;
@@ -844,6 +842,7 @@ void KinematicsHToHW::process(Long64_t entry) {
   unsigned int nGenP_HToHW_WNeutrinos = 0;
   unsigned int nGenP_HBosons          = 0;
   unsigned int nGenP_Taus             = 0;
+  unsigned int nGenP_Taus_Higgs       = 0;
   unsigned int nGenP_tWb_Quarks       = 0;
   unsigned int nGenP_tWb_WLeptons     = 0;
   unsigned int nGenP_tWb_WNeutrinos   = 0;
@@ -984,7 +983,7 @@ void KinematicsHToHW::process(Long64_t entry) {
 
     if ( abs(genP_pdgId) == 15)
       {
-	if (1) cout << genP_pdgId <<" Tau found " << endl;
+	if (0) cout << genP_pdgId <<" Tau found " << endl;
 	// Get last copy (after all radiative corrections)
 	if (!bIsLastCopy) continue;
 	nGenP_Taus++;
@@ -1002,8 +1001,9 @@ void KinematicsHToHW::process(Long64_t entry) {
 	// H0 (or h0) -> tau tau
 	if ( abs(firstMom.pdgId()) == 35 ||  abs(firstMom.pdgId()) == 25 )
 	  {
-	    if (1) cout << genP_pdgId <<" Tau found from Higgs" << endl;
-	    cbHt_HToHW_HBoson_TauTau.increment();
+	    if (0) cout << genP_pdgId <<" Tau found from Higgs" << endl;
+	    nGenP_Taus_Higgs++;
+	    //cbHt_HToHW_HBoson_TauTau.increment();
 	    // unsigned int nGenP_HToHW_HBoson_TauLeptonic_plus = 0;
 	    // unsigned int nGenP_HToHW_HBoson_TauLeptonic_minus = 0;
 	    // unsigned int nGenP_HToHW_HBoson_TauHadronic_plus = 0;
@@ -1017,21 +1017,21 @@ void KinematicsHToHW::process(Long64_t entry) {
 		// For-loop: All daughters
 		for (auto& d: genP_daughters)
 		  {
-		    cout << "sorting for leptonic among all daughter in +ve Tau" << endl;
-		    cout << "+ve Tau dauughters pt, pdgId:=   "<<  d.pt() <<" , " << d.pdgId() << endl;
+		    //cout << "sorting for leptonic among all daughter in +ve Tau" << endl;
+		    if(0) cout << "+ve Tau dauughters pt, pdgId:=   "<<  d.pt() <<" , " << d.pdgId() << endl;
 		    if (abs(d.pdgId()) == 11 || abs(d.pdgId()) == 13){
-		      cout << "positive tau leptonic" << endl;
+		      if(0) cout << "positive tau leptonic" << endl;
 			//mcTools.PrintGenParticle(p);
 			if(nGenP_HToHW_HBoson_TauLeptonic_plus == 0 && genP_daughters.size() >= 1){
 			  nGenP_HToHW_HBoson_TauLeptonic_plus++;
-			} // fixme - add tau-leptonic counter
+			} 
 			bHt_HToHW_HBoson_Tau_p4 += d.p4(); // remove me
 		    }
 		  }
 
 		for (auto& d: genP_daughters)
 		  {
-		    cout << "sorting for hadronic among all daughter in +ve Tau" << endl;
+		    //cout << "sorting for hadronic among all daughter in +ve Tau" << endl;
 		    if(nGenP_HToHW_HBoson_TauLeptonic_plus == 1) nGenP_HToHW_HBoson_TauHadronic_plus = 0;
 		    else{
 		      nGenP_HToHW_HBoson_TauHadronic_plus = 1;
@@ -1085,23 +1085,23 @@ void KinematicsHToHW::process(Long64_t entry) {
 		// For-loop: All daughters
 		for (auto& d: genP_daughters)
 		  {
-		    cout << "sorting for leptonic among all daughter in -ve Tau" << endl;
-		    cout << "-ve Tau dauughters pt, pdgId:=   "<<  d.pt() <<" , " << d.pdgId() << endl;
+		    //cout << "sorting for leptonic among all daughter in -ve Tau" << endl;
+		    if(0) cout << "-ve Tau dauughters pt, pdgId:=   "<<  d.pt() <<" , " << d.pdgId() << endl;
 		    if (abs(d.pdgId()) == 11 || abs(d.pdgId()) == 13){
-		      cout << "positive tau leptonic" << endl;
+		      //cout << "positive tau leptonic" << endl;
 			//mcTools.PrintGenParticle(p);
 			if(nGenP_HToHW_HBoson_TauLeptonic_minus == 0 && genP_daughters.size() >= 1){
 			  nGenP_HToHW_HBoson_TauLeptonic_minus++;
-			} // fixme - add tau-leptonic counter
+			} 
 			bHt_HToHW_HBoson_Antitau_p4 += d.p4(); // remove me
 		    }
 		  }
 
 		for (auto& d: genP_daughters)
 		  {
-		    cout << "sorting for hadronic among all daughter in -ve Tau" << endl;
+		    //cout << "sorting for hadronic among all daughter in -ve Tau" << endl;
 		    if(nGenP_HToHW_HBoson_TauLeptonic_minus == 1) { 
-		      cout << "in if loop " << endl;
+		      //cout << "in if loop " << endl;
 		      nGenP_HToHW_HBoson_TauHadronic_minus = 0;
 		    }
 		    else{
@@ -1148,15 +1148,9 @@ void KinematicsHToHW::process(Long64_t entry) {
 	      }
 
 	    // put the counter here
-	    if ((nGenP_HToHW_HBoson_TauLeptonic_plus + nGenP_HToHW_HBoson_TauLeptonic_minus) >= 2) cbHt_HToHW_HBoson_TauLeptonic.increment(); //  fix me gkole
-	    if ((nGenP_HToHW_HBoson_TauHadronic_plus + nGenP_HToHW_HBoson_TauHadronic_minus) >= 2) cbHt_HToHW_HBoson_TauHadronic.increment(); // fix me gkole
-	    if ((nGenP_HToHW_HBoson_TauLeptonic_plus >= 1 || nGenP_HToHW_HBoson_TauLeptonic_minus >=1) && (nGenP_HToHW_HBoson_TauHadronic_plus >= 1 || nGenP_HToHW_HBoson_TauHadronic_minus >= 1)) cbHt_HToHW_HBoson_1Lep1Had.increment(); // fixme gkole
-	    
-	    cout << "nGenP_HToHW_HBoson_TauLeptonic_plus: " << nGenP_HToHW_HBoson_TauLeptonic_plus << endl;
-	    cout << "nGenP_HToHW_HBoson_TauLeptonic_minus: " << nGenP_HToHW_HBoson_TauLeptonic_minus << endl;
-	    cout << "nGenP_HToHW_HBoson_TauHadronic_plus: " << nGenP_HToHW_HBoson_TauHadronic_plus << endl;
-	    cout << "nGenP_HToHW_HBoson_TauHadronic_minus: " << nGenP_HToHW_HBoson_TauHadronic_minus << endl;
-	    
+	    // if ((nGenP_HToHW_HBoson_TauLeptonic_plus + nGenP_HToHW_HBoson_TauLeptonic_minus) >= 2) cbHt_HToHW_HBoson_TauLeptonic.increment(); //  fix me gkole
+	    // if ((nGenP_HToHW_HBoson_TauHadronic_plus + nGenP_HToHW_HBoson_TauHadronic_minus) >= 2) cbHt_HToHW_HBoson_TauHadronic.increment(); // fix me gkole
+	    // if ((nGenP_HToHW_HBoson_TauLeptonic_plus >= 1 || nGenP_HToHW_HBoson_TauLeptonic_minus >=1) && (nGenP_HToHW_HBoson_TauHadronic_plus >= 1 || nGenP_HToHW_HBoson_TauHadronic_minus >= 1)) cbHt_HToHW_HBoson_1Lep1Had.increment(); // fixme gkole
 	    
 	  } //from h0 or H0
       
@@ -1167,12 +1161,7 @@ void KinematicsHToHW::process(Long64_t entry) {
     // if (nGenP_HToHW_HBoson_TauHadronic >= 2) cbHt_HToHW_HBoson_TauHadronic.increment(); // fix me gkole
     // if (nGenP_HToHW_HBoson_TauLeptonic >= 1 && nGenP_HToHW_HBoson_TauHadronic >= 1) cbHt_HToHW_HBoson_1Lep1Had.increment(); // fixme gkole
     
-    // cout << "debug 0 start" << endl;
-    // cout << "nGenP_HToHW_HBoson_Taus:=  " << nGenP_HToHW_HBoson_Taus << endl;
-    // cout << "nGenP_HToHW_HBoson_TauLeptonic:=   " << nGenP_HToHW_HBoson_TauLeptonic << endl;
-    // cout << "nGenP_HToHW_HBoson_TauHadronic:=   " << nGenP_HToHW_HBoson_TauHadronic << endl;
-    // cout << "debug 0 stop" << endl;    
-
+    
     if (cfg_Verbose) std::cout << "=== t quarks" << std::endl;
     if ( abs(genP_pdgId) == 6)
       {
@@ -1389,22 +1378,30 @@ void KinematicsHToHW::process(Long64_t entry) {
 
 
 
-  cout << "nGenP_HToHW_HBoson_Taus = " << nGenP_HToHW_HBoson_Taus << endl; 
+  //cout << "nGenP_HToHW_HBoson_Taus = " << nGenP_HToHW_HBoson_Taus << endl; 
 
-  // GKOLE no demand now
-  // Require 2 hadronic taus
-  /*
-  if (nGenP_HToHW_HBoson_Taus != 2) return; // fixme - 1tau_h + 1 lepton. use as if in filling 2 tau_h histograms
+  if(0) cout << "nGenP_Taus_Higgs:= " << nGenP_Taus_Higgs << endl;
+
+  if (nGenP_Taus_Higgs == 2){
+    cbHt_HToHW_HBoson_TauTau.increment();
+    if ((nGenP_HToHW_HBoson_TauLeptonic_plus + nGenP_HToHW_HBoson_TauLeptonic_minus) >= 2) cbHt_HToHW_HBoson_TauLeptonic.increment(); 
+    if ((nGenP_HToHW_HBoson_TauHadronic_plus + nGenP_HToHW_HBoson_TauHadronic_minus) >= 2) cbHt_HToHW_HBoson_TauHadronic.increment(); 
+    if ((nGenP_HToHW_HBoson_TauLeptonic_plus >= 1 || nGenP_HToHW_HBoson_TauLeptonic_minus >=1) && (nGenP_HToHW_HBoson_TauHadronic_plus >= 1 || nGenP_HToHW_HBoson_TauHadronic_minus >= 1)) cbHt_HToHW_HBoson_1Lep1Had.increment(); 
+    if(0) cout << "nGenP_HToHW_HBoson_TauLeptonic_plus: " << nGenP_HToHW_HBoson_TauLeptonic_plus << endl;
+    if(0) cout << "nGenP_HToHW_HBoson_TauLeptonic_minus: " << nGenP_HToHW_HBoson_TauLeptonic_minus << endl;
+    if(0) cout << "nGenP_HToHW_HBoson_TauHadronic_plus: " << nGenP_HToHW_HBoson_TauHadronic_plus << endl;
+    if(0) cout << "nGenP_HToHW_HBoson_TauHadronic_minus: " << nGenP_HToHW_HBoson_TauHadronic_minus << endl;
+  }
+
+
+  // Require 2 taus
+  
+  if (nGenP_Taus_Higgs != 2) return; // fixme - 1tau_h + 1 lepton. use as if in filling 2 tau_h histograms
   else
     {
-      // cout << "nGenP_HToHW_HBoson_Taus = " << nGenP_HToHW_HBoson_Taus << endl;
+      //cout << "nGenP_HToHW_HBoson_Taus = " << nGenP_HToHW_HBoson_Taus << endl;
     }
-  */
-
-  // if (cfg_Verbose) cout << "nGenP_HToHW_HBoson_Taus:=  " << nGenP_HToHW_HBoson_Taus << endl;
-  // if (cfg_Verbose) cout << "nGenP_HToHW_HBoson_TauLeptonic:=   " << nGenP_HToHW_HBoson_TauLeptonic << endl;
-  // if (cfg_Verbose) cout << "nGenP_HToHW_HBoson_TauHadronic:=   " << nGenP_HToHW_HBoson_TauHadronic << endl;
-
+  
   ///////////////////////////////////////////////////////////////////////////
   // GenJets (selected)
   ///////////////////////////////////////////////////////////////////////////
@@ -1552,7 +1549,9 @@ void KinematicsHToHW::process(Long64_t entry) {
   if (cfg_Verbose) table.Print();
     
   // Sanity check! Sometimes pruned genParticles are all messed up. And/Or I must improve my code a bit
-  bool bNotOk = (nGenP_Hpm != 1) || (nGenP_HBosons != 1) || (nGenP_TQuarks != 1) || (nGenP_WBosons != 2) || (nGenP_BQuarks != 1) || (nGenP_HToHW_HBoson_Taus != 2);
+  //bool bNotOk = (nGenP_Hpm != 1) || (nGenP_HBosons != 1) || (nGenP_TQuarks != 1) || (nGenP_WBosons != 2) || (nGenP_BQuarks != 1) || (nGenP_HToHW_HBoson_Taus != 2);
+  bool bNotOk = (nGenP_Hpm != 1) || (nGenP_HBosons != 1) || (nGenP_TQuarks != 1) || (nGenP_WBosons != 2) || (nGenP_BQuarks != 1) || (nGenP_Taus_Higgs != 2);
+
   if (bNotOk)
     {      
       if (cfg_Verbose)
@@ -1563,7 +1562,7 @@ void KinematicsHToHW::process(Long64_t entry) {
 	  cout << "nGenP_TQuarks          = " << nGenP_TQuarks           << endl;
 	  cout << "nGenP_WBosons          = " << nGenP_WBosons           << endl;
 	  cout << "nGenP_BQuarks          = " << nGenP_BQuarks           << endl;
-	  cout << "nGenP_HToHW_HBoson_Taus= " << nGenP_HToHW_HBoson_Taus << endl;
+	  cout << "nGenP_HToHW_HBoson_Taus= " << nGenP_HToHW_HBoson_Taus << endl; // old counter
 
 	  // cout << "nGenP_HToHW_HBoson_TauLeptonic:=   " << nGenP_HToHW_HBoson_TauLeptonic << endl;
 	  // cout << "nGenP_HToHW_HBoson_TauHadronic:=   " << nGenP_HToHW_HBoson_TauHadronic << endl;
