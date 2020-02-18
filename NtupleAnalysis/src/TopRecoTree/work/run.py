@@ -18,11 +18,12 @@ USAGE:
 
 EXAMPLE:
 ./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/ -i "TT"
-
+./run.py -m /uscms_data/d3/skonstan/workspace/multicrab/multicrab_TopSystBDT_v8030_20200213T0455 -i "TT" --noPU
+./run.py -m /uscms_data/d3/skonstan/workspace/multicrab/multicrab_TopSystBDT_v8030_20200213T0455 --noPU -i "TT|M_250|M_500|M_800"
 
 LAST USED:
-./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/
-
+./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/ -i "TT" --noPU (hadronic selections)
+./run.py -m /uscms_data/d3/skonstan/workspace/multicrab/multicrab_TopSystBDT_v8030_20200213T0455 -i "TT" --noPU (semi leptonic selections)
 
 ROOT:
 The available ROOT options for the Error-Ignore-Level are (const Int_t):
@@ -221,7 +222,7 @@ def main():
     # ================================================================================================
     from HiggsAnalysis.NtupleAnalysis.main import PSet
     RecoTopMVASelection = PSet(
-        SelectionsType           = "hadronic", # Options ["hadronic", "semiLeptonic"]
+        SelectionsType           = "hadronic", # Default value. This changes according to the mcrab name. Options ["hadronic", "semiLeptonic"]
         LepBJetDRCutValue        = "9999.99",
         LepBJetDRCutDirection    = "<=",
         MiniIsoCutValue          = "0.1",
@@ -237,8 +238,8 @@ def main():
     hadronicSelections.histogramAmbientLevel = opts.histoLevel
     hadronicSelections.RecoTopMVASelection = RecoTopMVASelection
 
-    hadronicSelections.JetSelection.numberOfJetsCutValue  = 5 # [default: 7]
-    hadronicSelections.BJetSelection.numberOfBJetsCutValue = 1 # [default: 3]
+    hadronicSelections.JetSelection.numberOfJetsCutValue  = 7 # [default: 7]
+    hadronicSelections.BJetSelection.numberOfBJetsCutValue = 3 # [default: 3]
 
     # Semi leptonic selections
     from HiggsAnalysis.NtupleAnalysis.parameters.jetTriggers import allSelections as semiLeptonicSelections
@@ -274,6 +275,8 @@ def main():
         allSelections = semiLeptonicSelections
 
     Print("Selections Type: %s %s %s" %(ts, RecoTopMVASelection.SelectionsType, ns), True)
+    # print "pt reweighting", opts.useTopPtReweighting
+
     # ================================================================================================
     # Add Analysis Variations
     # ================================================================================================
@@ -390,7 +393,7 @@ if __name__ == "__main__":
     NEVTS         = -1
     HISTOLEVEL    = "Debug" #"Informative" #"Debug"
     PUREWEIGHT    = True
-    TOPPTREWEIGHT = True
+    TOPPTREWEIGHT = False
     DOSYSTEMATICS = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
@@ -418,8 +421,8 @@ if __name__ == "__main__":
     parser.add_option("--noPU", dest="usePUreweighting", action="store_false", default = PUREWEIGHT, 
                       help="Do NOT apply Pileup re-weighting (default: %s)" % (PUREWEIGHT) )
 
-    parser.add_option("--noTopPt", dest="useTopPtReweighting", action="store_false", default = TOPPTREWEIGHT, 
-                      help="Do NOT apply top-pt re-weighting (default: %s)" % (TOPPTREWEIGHT) )
+    parser.add_option("--topPt", dest="useTopPtReweighting", action="store_true", default = TOPPTREWEIGHT,
+                      help="Do apply top-pt re-weighting (default: %s)" % (TOPPTREWEIGHT) )
 
     parser.add_option("--doSystematics", dest="doSystematics", action="store_true", default = DOSYSTEMATICS, 
                       help="Do systematics variations  (default: %s)" % (DOSYSTEMATICS) )
