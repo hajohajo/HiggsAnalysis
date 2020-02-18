@@ -5,14 +5,14 @@ Script for plotting TH2 histograms only.
 
 
 USAGE:
-./plotTreeToTH2.py -m <pseudo-mcrab> [--options]
+./plotTBranchToTH2.py -m <pseudo-mcrab> [--options]
 
 
 EXAMPLES:
-./plotTreeToTH2.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --url
+./plotTBranchToTH2.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --url
 
 LAST USED:
-./plotTreeToTH2.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --ref TrijetPtDR --url
+./plotTBranchToTH2.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --ref TrijetPtDR --url
 '''
 
 #================================================================================================ 
@@ -168,12 +168,9 @@ def main(opts):
         if 1:
             datasetsMgr.PrintInfo()
                     
-        # Any other way to get the list of branches from the input root files? (soti: fixme!)
-        # Get list of branches to be plotted
-
         # Get reference branch (all the variables will be plotted as a function of the reference) 
         ref = opts.refHisto
-        Plot2DHistograms(datasetsMgr, ref, "treeS")
+        Plot2DHistograms(datasetsMgr, ref, opts.treeName)
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
@@ -246,6 +243,10 @@ def GetHistoKwargs(h, opts):
         _units  = "GeV/c"
         _format = "%0.0f " + _units
         kwargs["xlabel"] = "p_{T} (%s)" % _units
+        if "trijet" in h.lower():
+            kwargs["xlabel"] = "p_{T,t} (%s)" % _units
+        if "dijet" in h.lower():
+            kwargs["xlabel"] = "p_{T,w} (%s)" % _units
         if "ldgjetpt" in h.lower():
             kwargs["xmax"] = 100
     if "trijetmass" in h.lower():
@@ -376,7 +377,7 @@ def CreateHistograms(inputList, ref, kwargs):
 
         Print("%s. %s" % (i, brName), False)
         histoName = "%s_vs_%s" %(brName, ref)
-        # Soti fixme !
+
         xbins = 50 
         xmin = kwargs_ref["xmin"]
         xmax = kwargs_ref["xmax"]
@@ -403,8 +404,8 @@ def GetListOfBranches(tree):
     for i in range(nBranches):
         if "Weight" in brsList[i].GetName():
             continue
-        if "pt" not in brsList[i].GetName().lower():
-            continue
+        #if "pt" not in brsList[i].GetName().lower():
+        #    continue
         branchList.append(brsList[i].GetName())        
     return branchList
 
@@ -572,7 +573,8 @@ if __name__ == "__main__":
     NORM2ONE     = False
     NORM2XSEC    = False
     NORM2LUMI    = False
-    REFHISTO     = "TrijetPt"
+    REFHISTO     = "trijetPt"
+    TREENAME     = "treeS"
     DATASET      = "TT"
     ROOTFILENAME = None
     SAVEFORMATS  = "pdf,png,C"
@@ -651,6 +653,9 @@ if __name__ == "__main__":
 
     parser.add_option("--refHisto", dest="refHisto", type="string", default=REFHISTO, 
                       help="Plot all the histograms as a function of the reference histogram [default: %s]" % REFHISTO)
+
+    parser.add_option("--treeName", dest="treeName", type="string", default=TREENAME, 
+                      help="Plot all the histograms as a function of the reference histogram [default: %s]" % TREENAME)
 
     parser.add_option("--dataset", dest="dataset", type="string", default=DATASET,
                       help="Dataset to draw (only 1 allowed in 2D) [default: %s]" % (DATASET) )
