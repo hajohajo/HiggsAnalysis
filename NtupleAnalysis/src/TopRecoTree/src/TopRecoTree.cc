@@ -94,13 +94,128 @@ private:
   Count              cSelected;
 
   // Histograms  
+// Trijet Distributions
+  WrappedTH1Triplet *hTrijetPt;
+  WrappedTH1Triplet *hTrijetEta;
+  WrappedTH1Triplet *hTrijetPhi;
+  WrappedTH1Triplet *hTrijetMass;
+  WrappedTH1Triplet *hTrijetPtDr;
+  //WrappedTH1Triplet *hTrijetPFCharge;
+  WrappedTH1Triplet *hTrijetCombinedCvsL;
+  //WrappedTH1Triplet *hTrijetDeepCvsL;
+  WrappedTH1Triplet *hTrijetPtD;
+  //WrappedTH1Triplet *hTrijetAxis1;
+  WrappedTH1Triplet *hTrijetAxis2;
+  WrappedTH1Triplet *hTrijetMult;
+  WrappedTH1Triplet *hTrijetQGLikelihood;
+  WrappedTH1Triplet *hTrijetQGLikelihood_avg;
+  WrappedTH1Triplet *hTrijetChiSquared;
+  
+  // Dijet distributions
+  WrappedTH1Triplet *hDijetPt;
+  WrappedTH1Triplet *hDijetEta;
+  WrappedTH1Triplet *hDijetPhi;
+  WrappedTH1Triplet *hDijetMass;
+  WrappedTH1Triplet *hDijetPtDr;
+  //WrappedTH1Triplet *hDijetPFCharge;
+  WrappedTH1Triplet *hDijetCombinedCvsL;
+  //WrappedTH1Triplet *hDijetDeepCvsL;
+  WrappedTH1Triplet *hDijetPtD;
+  //WrappedTH1Triplet *hDijetAxis1;
+  WrappedTH1Triplet *hDijetAxis2;
+  WrappedTH1Triplet *hDijetMult;
+  WrappedTH1Triplet *hDijetQGLikelihood;
+  WrappedTH1Triplet *hDijetQGLikelihood_avg;
+  WrappedTH1Triplet *hDijetMassOverTrijetMass;
+  WrappedTH1Triplet *hDijetChiSquared;
+  
+  // Leading jet from dijet distributions
+  WrappedTH1Triplet *hLdgJetPt;
+  WrappedTH1Triplet *hLdgJetEta;
+  WrappedTH1Triplet *hLdgJetPhi;
+  WrappedTH1Triplet *hLdgJetMass;
+  //WrappedTH1Triplet *hLdgJetPFCharge;
+  WrappedTH1Triplet *hLdgJetCombinedCvsL;
+  //WrappedTH1Triplet *hLdgJetDeepCvsL;
+  WrappedTH1Triplet *hLdgJetBdisc;
+  WrappedTH1Triplet *hLdgJetPtD;
+  //WrappedTH1Triplet *hLdgJetAxis1;
+  WrappedTH1Triplet *hLdgJetAxis2;
+  WrappedTH1Triplet *hLdgJetMult;
+  WrappedTH1Triplet *hLdgJetQGLikelihood;
+  //WrappedTH1Triplet *hLdgJetPullMagnitude;
+  
+  // Subleading jet from dijet distributions
+  WrappedTH1Triplet *hSubldgJetPt;
+  WrappedTH1Triplet *hSubldgJetEta;
+  WrappedTH1Triplet *hSubldgJetPhi;
+  WrappedTH1Triplet *hSubldgJetMass;
+  //WrappedTH1Triplet *hSubldgJetPFCharge;
+  WrappedTH1Triplet *hSubldgJetCombinedCvsL;
+  //WrappedTH1Triplet *hSubldgJetDeepCvsL;
+  WrappedTH1Triplet *hSubldgJetBdisc;
+  WrappedTH1Triplet *hSubldgJetPtD;
+  //WrappedTH1Triplet *hSubldgJetAxis1;
+  WrappedTH1Triplet *hSubldgJetAxis2;
+  WrappedTH1Triplet *hSubldgJetMult;
+  WrappedTH1Triplet *hSubldgJetQGLikelihood;
+  //WrappedTH1Triplet *hSubldgJetPullMagnitude;
+  
+  // b-jet distributions
+  WrappedTH1Triplet *hBJetPt;
+  WrappedTH1Triplet *hBJetEta;
+  WrappedTH1Triplet *hBJetPhi;
+  WrappedTH1Triplet *hBJetMass;
+  //WrappedTH1Triplet *hBJetPFCharge;
+  WrappedTH1Triplet *hBJetCombinedCvsL;
+  //WrappedTH1Triplet *hBJetDeepCvsL;
+  WrappedTH1Triplet *hBJetBdisc;
+  WrappedTH1Triplet *hBJetPtD;
+  //WrappedTH1Triplet *hBJetAxis1;
+  WrappedTH1Triplet *hBJetAxis2;
+  WrappedTH1Triplet *hBJetMult;
+  WrappedTH1Triplet *hBJetQGLikelihood;
+  
+  // b-jet + (sub)leading jet from dijet system
+  WrappedTH1Triplet *hBJetLdgJet_Mass;
+  //WrappedTH1Triplet *hBJetLdgJet_PFCharge;
+  WrappedTH1Triplet *hBJetSubldgJet_Mass;
+  //WrappedTH1Triplet *hBJetSubldgJet_PFCharge;
+  
+  WrappedTH1Triplet *hSoftDrop_n2;
+  //WrappedTH1Triplet *hPullAngleJ1J2;
+  //WrappedTH1Triplet *hPullAngleJ2J1;
+  
+  // Distances
+  //DEta
+  WrappedTH1Triplet *hDEtaJ1withJ2;
+  WrappedTH1Triplet *hDEtaJ1withBJet;
+  WrappedTH1Triplet *hDEtaJ2withBJet;
+  WrappedTH1Triplet *hDEtaDijetwithBJet;
+  WrappedTH1Triplet *hDEtaJ1BJetwithJ2;
+  WrappedTH1Triplet *hDEtaJ2BJetwithJ1;
+  //DPhi
+  WrappedTH1Triplet *hDPhiJ1withJ2;
+  WrappedTH1Triplet *hDPhiJ1withBJet;
+  WrappedTH1Triplet *hDPhiJ2withBJet;
+  WrappedTH1Triplet *hDPhiDijetwithBJet;
+  WrappedTH1Triplet *hDPhiJ1BJetwithJ2;
+  WrappedTH1Triplet *hDPhiJ2BJetwithJ1;
+  //DR
+  WrappedTH1Triplet *hDRJ1withJ2;
+  WrappedTH1Triplet *hDRJ1withBJet;
+  WrappedTH1Triplet *hDRJ2withBJet;
+  WrappedTH1Triplet *hDRDijetwithBJet;
+  WrappedTH1Triplet *hDRJ1BJetwithJ2;
+  WrappedTH1Triplet *hDRJ2BJetwithJ1;
+  
   // All jets 
-   WrappedTH1 *hAllJetCvsL;
-   WrappedTH1 *hAllJetPtD;
-   WrappedTH1 *hAllJetAxis2;
-   WrappedTH1 *hAllJetMult;
-   WrappedTH1 *hAllJetBdisc;
-   WrappedTH1 *hAllJetQGLikelihood;
+  WrappedTH1 *hAllJetCvsL;
+  WrappedTH1 *hAllJetPtD;
+  WrappedTH1 *hAllJetAxis2;
+  WrappedTH1 *hAllJetMult;
+  WrappedTH1 *hAllJetBdisc;
+  WrappedTH1 *hAllJetQGLikelihood;
   // CJets
   WrappedTH1 *hCJetCvsL;
   WrappedTH1 *hCJetPtD;
@@ -434,9 +549,57 @@ void TopRecoTree::book(TDirectory *dir) {
   fMETSelection.bookHistograms(dir);
   
   // Fixed-binning
+  const int nBinsDEta  = cfg_DeltaEtaBinSetting.bins();
+  const double minDEta = cfg_DeltaEtaBinSetting.min();
+  const double maxDEta = cfg_DeltaEtaBinSetting.max();
+  
+  const int nBinsDPhi  = cfg_DeltaPhiBinSetting.bins();
+  const double minDPhi = cfg_DeltaPhiBinSetting.min();
+  const double maxDPhi = cfg_DeltaPhiBinSetting.max();
+  
+  const int nBinsDR  = cfg_DeltaRBinSetting.bins();
+  const double minDR = cfg_DeltaRBinSetting.min();
+  const double maxDR = cfg_DeltaRBinSetting.max();
+  
   const int nBinsPt    = cfg_PtBinSetting.bins();
   const double minPt   = cfg_PtBinSetting.min();
   const double maxPt   = cfg_PtBinSetting.max();
+  
+  const int nBinsEta   = cfg_EtaBinSetting.bins();
+  const double minEta  = cfg_EtaBinSetting.min();
+  const double maxEta  = cfg_EtaBinSetting.max();
+ 
+  const int nBinsPhi   = cfg_PhiBinSetting.bins();
+  const double minPhi  = cfg_PhiBinSetting.min();
+  const double maxPhi  = cfg_PhiBinSetting.max();
+  
+  // const int nBinsAxis1 = 100; 
+  // const double minAxis1 = 0.0;
+  // const double maxAxis1 = 0.40;
+  
+  const int nBinsAxis2 = 50; 
+  const double minAxis2 = 0.0;
+  const double maxAxis2 = 0.20; 
+  
+  const int nBinsMult = 50;
+  const double minMult = 0.0;
+  const double maxMult = 50.0;
+  
+  // const int nBinsCharge  = 100;
+  // const double minCharge = -2.0;
+  // const double maxCharge = +2.0;
+  
+  const int nBinsQGL = 100;
+  const double minQGL = 0.0;
+  const double maxQGL = 1.0;
+  
+  // const int nBinsPullMag = 800;
+  // const double minPullMag = 0.0;
+  // const double maxPullMag = 0.4;
+  
+  // const int nBinsPullAngle = 200;
+  // const double minPullAngle = -4.0;
+  // const double maxPullAngle = +4.0;
   
   // Create directories for normalization                                                                                                                                                
   std::string myInclusiveLabel  = "TrijetCandidate";
@@ -454,6 +617,118 @@ void TopRecoTree::book(TDirectory *dir) {
   TDirectory* myFakeDir_2d    = fHistoWrapper.mkdir(HistoLevel::kSystematics, dir, myFakeLabel_2d);
   TDirectory* myGenuineDir_2d = fHistoWrapper.mkdir(HistoLevel::kSystematics, dir, myGenuineLabel_2d);
   std::vector<TDirectory*> myDirs_2d = {myInclusiveDir_2d, myFakeDir_2d, myGenuineDir_2d};
+
+
+  // Trijet Distributions
+  hTrijetPt           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetPt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
+  hTrijetEta          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetEta", ";|#eta|", nBinsEta/2, minEta, maxEta);
+  hTrijetPhi          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetPhi", ";#phi (rads)", nBinsPhi , minPhi , maxPhi );
+  hTrijetMass         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetMass", ";m_{jjb} (GeV/c^{2})",150,0.0,1500);
+  hTrijetPtDr         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetPtDr", ";p_{T}#Delta R",150,0.0,1500);
+  //hTrijetPFCharge     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetPFCharge", "PF-charge", nBinsCharge, minCharge, maxCharge);
+  hTrijetCombinedCvsL = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetAvgCombinedCvsL", ";avg CombinedCvsL discr", 200,-1,1);
+  //hTrijetDeepCvsL     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetAvgDeepCvsL", ";avg DeepCvsL discr", 200,-1,1);
+  hTrijetPtD          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetAvgPtD", ";avg p_{T}D",100,0.0,1.0);
+  //hTrijetAxis1        = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetAvgAxis1", ";avg axis1", nBinsAxis1, minAxis1, maxAxis1);
+  hTrijetAxis2        = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetAvgAxis2", ";avg axis2", nBinsAxis2, minAxis2, maxAxis2);
+  hTrijetMult         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetAvgMult", ";avg mult", nBinsMult, minMult, maxMult);
+  hTrijetQGLikelihood = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetQGLikelihood",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
+  hTrijetQGLikelihood_avg = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetQGLikelihood_avg",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
+  hTrijetChiSquared       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetChiSquared", ";#chi^{2}", 1000,  0.0, 1000.0);
+  
+  // Dijet Distributions
+  hDijetPt            = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetPt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
+  hDijetEta           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetEta", ";|#eta|", nBinsEta/2, minEta, maxEta);
+  hDijetPhi           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetPhi", ";#phi (rads)", nBinsPhi , minPhi , maxPhi );
+  hDijetMass          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetMass", ";m_{W} (GeV/c^{2})",100,0.0,1000);
+  hDijetPtDr          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetPtDr", ";p_{T}#Delta R",150,0.0,1500);
+  //hDijetPFCharge      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetPFCharge", "PF-charge", nBinsCharge, minCharge, maxCharge);
+  hDijetCombinedCvsL  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetAvgCombinedCvsL", ";avg CombinedCvsL discr", 200,-1,1);
+  //hDijetDeepCvsL      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetAvgDeepCvsL", ";avg DeepCvsL discr", 200,-1,1);
+  hDijetPtD           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetAvgPtD",   ";avg p_{T}D",100,0.0,1.0);
+  //hDijetAxis1         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetAvgAxis1",  ";avg axis1", nBinsAxis1, minAxis1, maxAxis1);
+  hDijetAxis2         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetAvgAxis2",  ";avg axis2", nBinsAxis2, minAxis2, maxAxis2);
+  hDijetMult          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetAvgMult",   ";avg mult",50,0,50);
+  hDijetQGLikelihood  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetQGLikelihood",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
+  hDijetQGLikelihood_avg   = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetQGLikelihood_avg",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
+  hDijetMassOverTrijetMass = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetMassOverTrijetMass", ";m_{W}/m_{top}", 100,0.0,1.0);
+  hDijetChiSquared         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetChiSquared", ";#chi^{2}", 1000,  0.0, 1000.0);
+  
+  // Leading Jet Distributions
+  hLdgJetPt           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetPt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
+  hLdgJetEta          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetEta", ";|#eta|", nBinsEta/2, minEta, maxEta);
+  hLdgJetPhi          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetPhi", ";#phi (rads)", nBinsPhi , minPhi , maxPhi);
+  hLdgJetMass         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetMass", ";m_{j} (GeV)", 100,0.0,1000);
+  //hLdgJetPFCharge     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetPFCharge", "PF-charge", nBinsCharge, minCharge, maxCharge);
+  hLdgJetCombinedCvsL = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetCombinedCvsL",";CombinedCvsL discr", 200,-1,1);
+  //hLdgJetDeepCvsL     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetDeepCvsL",";DeepCvsL discr", 200,-1,1);
+  hLdgJetBdisc        = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetBdisc", ";b-tag discr",100,0.0,1.0);
+  hLdgJetPtD          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetPtD",";p_{T}D",100,0.0,1.0);
+  //hLdgJetAxis1        = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetAxis1",";axis1", nBinsAxis1, minAxis1, maxAxis1);
+  hLdgJetAxis2        = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetAxis2",";axis2", nBinsAxis2, minAxis2, maxAxis2);
+  hLdgJetMult         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetMult",";mult", nBinsMult, minMult, maxMult);
+  hLdgJetQGLikelihood = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetQGLikelihood",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
+  //hLdgJetPullMagnitude= fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetPullMagnitude", ";pull magnitude", nBinsPullMag, minPullMag, maxPullMag);
+  
+  // Subleading Jet Distributions
+  hSubldgJetPt        = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetPt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
+  hSubldgJetEta       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetEta",  ";|#eta|", nBinsEta/2, minEta, maxEta);
+  hSubldgJetPhi       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetPhi", ";#phi (rads)", nBinsPhi , minPhi , maxPhi);
+  hSubldgJetMass      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetMass", ";m_{j} (GeV)", 100,0.0,1000);
+  //hSubldgJetPFCharge  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetPFCharge", "PF-charge", nBinsCharge, minCharge, maxCharge);
+  hSubldgJetBdisc     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetBdisc", ";b-tag discr",100,0.0,1.0);
+  hSubldgJetCombinedCvsL = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetCombinedCvsL",";CombinedCvsL discr", 200,-1,1);
+  //hSubldgJetDeepCvsL  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetDeepCvsL",";DeepCvsL discr", 200,-1,1);
+  hSubldgJetPtD       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetPtD",";p_{T}D",100,0.0,1.0);
+  //hSubldgJetAxis1     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetAxis1",";axis1", nBinsAxis1, minAxis1, maxAxis1);
+  hSubldgJetAxis2     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetAxis2",";axis2", nBinsAxis2, minAxis2, maxAxis2);
+  hSubldgJetMult      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetMult",";mult", nBinsMult, minMult, maxMult);
+  hSubldgJetQGLikelihood  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetQGLikelihood",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
+  // hSubldgJetPullMagnitude = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetPullMagnitude", ";pull magnitude", nBinsPullMag, minPullMag, maxPullMag);
+  
+  // B-Jet Distributions
+  hBJetPt             = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetPt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
+  hBJetEta            = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetEta", ";|#eta|", nBinsEta/2, minEta, maxEta);
+  hBJetPhi            = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetPhi", ";#phi (rads)", nBinsPhi , minPhi , maxPhi);
+  hBJetBdisc          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetBdisc", ";b-tag discr",100,0.0,1.0);
+  hBJetMass           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetMass", ";m_{b} (GeV/c^{2})", 120,0,120);
+  hBJetLdgJet_Mass    = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetLdgJet_Mass", ";M (GeV/c^{2})",100,0.0,1000);
+  //hBJetLdgJet_PFCharge= fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetLdgJet_PFCharge", "PF-charge", nBinsCharge, minCharge, maxCharge);
+  hBJetSubldgJet_Mass = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetSubldgJet_Mass", ";M (GeV/c^{2})",100,0.0,1000);
+  //hBJetSubldgJet_PFCharge = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetSubldgJet_PFCharge", "PF-charge", nBinsCharge, minCharge, maxCharge);
+  hBJetCombinedCvsL   = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetCombinedCvsL",";CombinedCvsL discr", 200,-1,1);
+  //hBJetDeepCvsL       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetDeepCvsL",";DeepCvsL discr", 200,-1,1);
+  hBJetPtD            = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetPtD",";p_{T}D",100,0.0,1.0);
+  //hBJetAxis1          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetAxis1",";axis1", nBinsAxis1, minAxis1, maxAxis1);
+  hBJetAxis2          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetAxis2",";axis2", nBinsAxis2, minAxis2, maxAxis2);
+  //hBJetPFCharge       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetPFCharge", ";PF-charge", nBinsCharge, minCharge, maxCharge);
+  hBJetMult           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetMult",";mult", nBinsMult, minMult, maxMult);
+  hBJetQGLikelihood   = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "BJetQGLikelihood",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
+  
+  hSoftDrop_n2        = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SoftDrop_n2", ";SoftDrop_n2", 50, 0, 2);
+  //hPullAngleJ1J2      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "PullAngleJ1J2", ";#theta(j1, j2)", nBinsPullAngle, minPullAngle, maxPullAngle);
+  //hPullAngleJ2J1      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "PullAngleJ2J1", ";#theta(j2, j1)", nBinsPullAngle, minPullAngle, maxPullAngle);
+  
+  hDEtaJ1withJ2      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DEtaJ1withJ2"  , ";#Delta#eta", nBinsDEta, minDEta, maxDEta);
+  hDEtaJ1withBJet    = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DEtaJ1withBJet", ";#Delta#eta", nBinsDEta, minDEta, maxDEta);
+  hDEtaJ2withBJet    = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DEtaJ2withBJet", ";#Delta#eta", nBinsDEta, minDEta, maxDEta);
+  hDEtaDijetwithBJet = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DEtaDijetwithBJet", ";#Delta#eta", nBinsDEta, minDEta, maxDEta);
+  hDEtaJ1BJetwithJ2  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DEtaJ1BJetwithJ2" , ";#Delta#eta", nBinsDEta, minDEta, maxDEta);
+  hDEtaJ2BJetwithJ1  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DEtaJ2BJetwithJ1" , ";#Delta#eta", nBinsDEta, minDEta, maxDEta);
+  
+  hDPhiJ1withJ2      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DPhiJ1withJ2"  , ";#Delta#phi", nBinsDPhi, minDPhi, maxDPhi);
+  hDPhiJ1withBJet    = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DPhiJ1withBJet", ";#Delta#phi", nBinsDPhi, minDPhi, maxDPhi);
+  hDPhiJ2withBJet    = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DPhiJ2withBJet", ";#Delta#phi", nBinsDPhi, minDPhi, maxDPhi);
+  hDPhiDijetwithBJet = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DPhiDijetwithBJet", ";#Delta#phi", nBinsDPhi, minDPhi, maxDPhi);
+  hDPhiJ1BJetwithJ2  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DPhiJ1BJetwithJ2" , ";#Delta#phi", nBinsDPhi, minDPhi, maxDPhi);
+  hDPhiJ2BJetwithJ1  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DPhiJ2BJetwithJ1" , ";#Delta#phi", nBinsDPhi, minDPhi, maxDPhi);
+  
+  hDRJ1withJ2      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1withJ2"  , ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ1withBJet    = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1withBJet", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ2withBJet    = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ2withBJet", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRDijetwithBJet = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRDijetwithBJet", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ1BJetwithJ2  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1BJetwithJ2" , ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ2BJetwithJ1  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ2BJetwithJ1" , ";#Delta R", nBinsDR, minDR, maxDR);
 
   // All jets 
   hAllJetCvsL     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, myInclusiveDir, "AllJetCvsL",";CvsL discr", 200,-1,1);
@@ -1723,6 +1998,118 @@ void TopRecoTree::process(Long64_t entry) {
       double dRJ12 = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());      
       // Compute Soft drop value N2
       double softDrop_n2 = min(jet2.pt(), jet1.pt())/( (jet2.pt() + jet1.pt() )*dRJ12*dRJ12);
+      
+      hSoftDrop_n2   -> Fill(isGenuineTop, softDrop_n2);
+      //hPullAngleJ1J2 -> Fill(isGenuineTop, getJetPullAngle(jet1, jet2));  
+      //hPullAngleJ2J1 -> Fill(isGenuineTop, getJetPullAngle(jet2, jet1));
+      hDEtaJ1withJ2      -> Fill(isGenuineTop, std::abs(jet1.eta() - jet2.eta()));
+      hDEtaJ1withBJet    -> Fill(isGenuineTop, std::abs(jet1.eta() - bjet.eta()));
+      hDEtaJ2withBJet    -> Fill(isGenuineTop, std::abs(jet2.eta() - bjet.eta()));
+      hDEtaDijetwithBJet -> Fill(isGenuineTop, std::abs(DijetP4.Eta() - bjet.eta()));
+      hDEtaJ1BJetwithJ2  -> Fill(isGenuineTop, std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta()));
+      hDEtaJ2BJetwithJ1  -> Fill(isGenuineTop, std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta()));
+      
+      hDPhiJ1withJ2      -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4())); 
+      hDPhiJ1withBJet    -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4()));
+      hDPhiJ2withBJet    -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4()));
+      hDPhiDijetwithBJet -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4()));
+      hDPhiJ1BJetwithJ2  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4()));
+      hDPhiJ2BJetwithJ1  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4()));
+      
+      hDRJ1withJ2       -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4()));
+      hDRJ1withBJet     -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4()));
+      hDRJ2withBJet     -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4()));
+      hDRDijetwithBJet  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4()));
+      hDRJ1BJetwithJ2   -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR((jet1.p4()+bjet.p4()), jet2.p4()));
+      hDRJ2BJetwithJ1   -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4()));
+      
+      // Trijet system
+      hTrijetPt           -> Fill(isGenuineTop, TrijetP4.Pt());
+      hTrijetEta          -> Fill(isGenuineTop, TrijetP4.Eta());
+      hTrijetPhi          -> Fill(isGenuineTop, TrijetP4.Phi());
+      hTrijetMass         -> Fill(isGenuineTop, TrijetP4.M());
+      hTrijetPtDr         -> Fill(isGenuineTop, TrijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4()));
+      //hTrijetPFCharge     -> Fill(isGenuineTop, jet1.pfcharge()+jet2.pfcharge()+bjet.pfcharge());
+      hTrijetCombinedCvsL -> Fill(isGenuineTop, (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags() + bjet.pfCombinedCvsLJetTags())/3.);
+      //hTrijetDeepCvsL     -> Fill(isGenuineTop, (jet1.pfDeepCSVCvsLJetTags()  + jet2.pfDeepCSVCvsLJetTags()  + bjet.pfDeepCSVCvsLJetTags())/3.);
+      hTrijetPtD              -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD() + bjet.QGTaggerAK4PFCHSptD())/3.);
+      hTrijetAxis2            -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2() + bjet.QGTaggerAK4PFCHSaxis2())/3.);
+      //hTrijetAxis1            -> Fill(isGenuineTop, (jet1.axis1() + jet2.axis1() + bjet.axis1())/3.);
+      hTrijetMult             -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSmult() + jet2.QGTaggerAK4PFCHSmult()  + bjet.QGTaggerAK4PFCHSmult())/3.);
+      hTrijetQGLikelihood     -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood()*bjet.QGTaggerAK4PFCHSqgLikelihood()); //.QGTaggerAK4PFCHSqgLikelihood()
+      hTrijetQGLikelihood_avg -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood()+bjet.QGTaggerAK4PFCHSqgLikelihood())/3.);
+      hTrijetChiSquared -> Fill(isGenuineTop, (TrijetP4.M() - mTopMass)/sigmaTrijet); 
+      
+      // Dijet system
+      hDijetPt                 -> Fill(isGenuineTop, DijetP4.Pt());
+      hDijetEta                -> Fill(isGenuineTop, DijetP4.Eta());
+      hDijetPhi                -> Fill(isGenuineTop, DijetP4.Phi());
+      hDijetMass               -> Fill(isGenuineTop, DijetP4.M());
+      //hDijetPFCharge           -> Fill(isGenuineTop, jet1.pfcharge()+jet2.pfcharge());
+      hDijetPtDr               -> Fill(isGenuineTop, DijetP4.Pt() * dRJ12);
+      hDijetCombinedCvsL       -> Fill(isGenuineTop, (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags())/2.);
+      //hDijetDeepCvsL           -> Fill(isGenuineTop, (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags())/2.);
+      hDijetPtD                -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD())/2.);
+      hDijetAxis2              -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2())/2.);
+      //hDijetAxis1              -> Fill(isGenuineTop, (jet1.axis1() + jet2.axis1())/2.);
+      hDijetMult               -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSmult() + jet2.QGTaggerAK4PFCHSmult())/2.);
+      hDijetQGLikelihood       -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood());
+      hDijetQGLikelihood_avg   -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood())/2.);
+      hDijetMassOverTrijetMass -> Fill(isGenuineTop, DijetP4.M()/TrijetP4.M());
+      hDijetChiSquared         -> Fill(isGenuineTop, (DijetP4.M() - mWMass)/sigmaDijet);
+      
+      
+      // Leading jet from dijet system
+      hLdgJetPt                -> Fill(isGenuineTop, jet1.pt());
+      hLdgJetEta               -> Fill(isGenuineTop, jet1.eta());
+      hLdgJetPhi               -> Fill(isGenuineTop, jet1.phi());
+      hLdgJetMass              -> Fill(isGenuineTop, jet1.p4().M());
+      //hLdgJetPFCharge          -> Fill(isGenuineTop, jet1.pfcharge());
+      hLdgJetBdisc             -> Fill(isGenuineTop, jet1.bjetDiscriminator());
+      hLdgJetCombinedCvsL      -> Fill(isGenuineTop, jet1.pfCombinedCvsLJetTags());
+      //hLdgJetDeepCvsL          -> Fill(isGenuineTop, jet1.pfDeepCSVCvsLJetTags());
+      hLdgJetPtD               -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSptD());
+      hLdgJetAxis2             -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSaxis2());
+      //hLdgJetAxis1             -> Fill(isGenuineTop, jet1.axis1());
+      hLdgJetMult              -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSmult());
+      hLdgJetQGLikelihood      -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood());
+      //hLdgJetPullMagnitude     -> Fill(isGenuineTop, getJetPullMagnitude(jet1));
+      
+      
+      // Subleading jet from dijet system
+      hSubldgJetPt             -> Fill(isGenuineTop, jet2.pt());
+      hSubldgJetEta            -> Fill(isGenuineTop, jet2.eta());
+      hSubldgJetPhi            -> Fill(isGenuineTop, jet2.phi());
+      hSubldgJetBdisc          -> Fill(isGenuineTop, jet2.bjetDiscriminator());
+      
+      hSubldgJetCombinedCvsL   -> Fill(isGenuineTop, jet2.pfCombinedCvsLJetTags());
+      //hSubldgJetDeepCvsL       -> Fill(isGenuineTop, jet2.pfDeepCSVCvsLJetTags());
+      hSubldgJetPtD            -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSptD());
+      hSubldgJetAxis2          -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSaxis2());
+      //hSubldgJetAxis1          -> Fill(isGenuineTop, jet2.axis1());
+      hSubldgJetMult           -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSmult());
+      hSubldgJetQGLikelihood   -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSqgLikelihood());
+      //hSubldgJetPFCharge       -> Fill(isGenuineTop, jet2.pfcharge());
+      //hSubldgJetPullMagnitude  -> Fill(isGenuineTop, getJetPullMagnitude(jet2));
+      
+      hBJetPt                  -> Fill(isGenuineTop, bjet.pt());
+      hBJetEta                 -> Fill(isGenuineTop, bjet.eta());
+      hBJetPhi                 -> Fill(isGenuineTop, bjet.phi());
+      hBJetBdisc               -> Fill(isGenuineTop, bjet.bjetDiscriminator());
+      hBJetMass                -> Fill(isGenuineTop, bjet.p4().M());
+      hBJetQGLikelihood        -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSqgLikelihood());
+      hBJetCombinedCvsL        -> Fill(isGenuineTop, bjet.pfCombinedCvsLJetTags());
+      //hBJetDeepCvsL            -> Fill(isGenuineTop, bjet.pfDeepCSVCvsLJetTags());
+      hBJetPtD                 -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSptD());
+      hBJetAxis2               -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSaxis2());
+      //hBJetAxis1               -> Fill(isGenuineTop, bjet.axis1());
+      hBJetMult                -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSmult());
+      //hBJetPFCharge            -> Fill(isGenuineTop, bjet.pfcharge());
+      
+      hBJetLdgJet_Mass         -> Fill(isGenuineTop, (bjet.p4()+jet1.p4()).M());
+      //hBJetLdgJet_PFCharge     -> Fill(isGenuineTop, bjet.pfcharge() + jet1.pfcharge());
+      hBJetSubldgJet_Mass      -> Fill(isGenuineTop, (bjet.p4()+jet2.p4()).M());
+      //hBJetSubldgJet_PFCharge  -> Fill(isGenuineTop, bjet.pfcharge()+jet2.pfcharge());
 
       if (isGenuineTop){
 	
