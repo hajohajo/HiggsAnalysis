@@ -216,13 +216,50 @@ def main():
     # ================================================================================================
     # Overwrite Default Settings  
     # ================================================================================================
-    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2tbAnalysis import allSelections
-    allSelections.verbose = opts.verbose
-    allSelections.histogramAmbientLevel = opts.histoLevel
-    #allSelections.Trigger.triggerOR = [] 
-    #allSelections.METFilter = []
-    allSelections.JetSelection.numberOfBJetsCutValue  = 5 # [default: 7]
-    allSelections.BJetSelection.numberOfBJetsCutValue = 1 # [default: 3]
+    from HiggsAnalysis.NtupleAnalysis.main import PSet
+    RecoTopMVASelection = PSet(
+        SelectionsType           = "hadronic", # Options ["hadronic", "semileptonic"]
+        LepBJetDRCutValue        = "9999.99",
+        LepBJetDRCutDirection    = "<=",
+        MiniIsoCutValue          = "0.1",
+        MiniIsoCutDirection      = "<=",
+        METCutValue              = "-9999.99",
+        METCutDirection          = ">=",
+        )
+
+    # Hadronic selections
+    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2tbAnalysis import allSelections as hadronicSelections
+
+    hadronicSelections.verbose = opts.verbose
+    hadronicSelections.histogramAmbientLevel = opts.histoLevel
+    hadronicSelections.RecoTopMVASelection = RecoTopMVASelection
+
+    hadronicSelections.JetSelection.numberOfJetsCutValue  = 5 # [default: 7]
+    hadronicSelections.BJetSelection.numberOfBJetsCutValue = 1 # [default: 3]
+
+    # Semi leptonic selections
+    from HiggsAnalysis.NtupleAnalysis.parameters.jetTriggers import allSelections as semiLeptonicSelections
+    
+    semiLeptonicSelections.verbose = opts.verbose
+    semiLeptonicSelections.histogramAmbientLevel = opts.histoLevel
+    semiLeptonicSelections.RecoTopMVASelection = RecoTopMVASelection
+    # Muon
+    semiLeptonicSelections.MuonSelection.muonPtCut = 26
+    # Electron
+    semiLeptonicSelections.ElectronSelection.electronPtCut = 29
+    # Jets
+    semiLeptonicSelections.JetSelection.numberOfJetsCutValue = 4
+    semiLeptonicSelections.JetSelection.jetPtCuts = [40.0, 40.0, 40.0, 30.0]
+    
+    # Trigger
+    semiLeptonicSelections.Trigger.triggerOR = ["HLT_IsoMu24", "HLT_Ele27_eta2p1_WPTight_Gsf"]
+    
+    # Bjets
+    semiLeptonicSelections.BJetSelection.jetPtCuts = [40.0, 40.0]
+    semiLeptonicSelections.BJetSelection.numberOfBJetsCutValue = 2
+
+    allSelections = hadronicSelections
+    print "Selections Type: ", RecoTopMVASelection.SelectionsType
     
     # ================================================================================================
     # Add Analysis Variations

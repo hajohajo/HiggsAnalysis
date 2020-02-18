@@ -13,6 +13,7 @@ EXAMPLES:
 
 LAST USED:
 ./plotTBranchToTH2.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --ref TrijetPtDR --url
+./plotTBranchToTH2.py -m TopRecoTree_200217_114252_FirstNewBranches_hadronic --normalizeToOne --ref trijetPt --url --treeName treeS --logZ
 '''
 
 #================================================================================================ 
@@ -404,8 +405,9 @@ def GetListOfBranches(tree):
     for i in range(nBranches):
         if "Weight" in brsList[i].GetName():
             continue
-        #if "pt" not in brsList[i].GetName().lower():
-        #    continue
+        # Branches with old names
+        if "Trijet" in brsList[i].GetName():
+            continue
         branchList.append(brsList[i].GetName())        
     return branchList
 
