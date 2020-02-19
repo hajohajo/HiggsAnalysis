@@ -56,7 +56,7 @@ from optparse import OptionParser
 from HiggsAnalysis.NtupleAnalysis.main import Process, PSet, Analyzer
 from HiggsAnalysis.NtupleAnalysis.AnalysisBuilder import AnalysisBuilder
 
-
+import copy
 import ROOT
     
 #================================================================================================
@@ -232,36 +232,40 @@ def main():
         )
 
     # Hadronic selections
-    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2tbAnalysis import allSelections as hadronicSelections
+    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2tbAnalysis import allSelections as _hadronicSelections
 
-    hadronicSelections.verbose = opts.verbose
-    hadronicSelections.histogramAmbientLevel = opts.histoLevel
-    hadronicSelections.RecoTopMVASelection = RecoTopMVASelection
+    _hadronicSelections.verbose = opts.verbose
+    _hadronicSelections.histogramAmbientLevel = opts.histoLevel
+    _hadronicSelections.RecoTopMVASelection = RecoTopMVASelection
 
-    hadronicSelections.JetSelection.numberOfJetsCutValue  = 7 # [default: 7]
-    hadronicSelections.BJetSelection.numberOfBJetsCutValue = 3 # [default: 3]
+    _hadronicSelections.JetSelection.numberOfJetsCutValue  = 7 # [default: 7]
+    _hadronicSelections.BJetSelection.numberOfBJetsCutValue = 3 # [default: 3]
+    
+    hadronicSelections = copy.deepcopy(_hadronicSelections)
 
     # Semi leptonic selections
-    from HiggsAnalysis.NtupleAnalysis.parameters.jetTriggers import allSelections as semiLeptonicSelections
+    from HiggsAnalysis.NtupleAnalysis.parameters.jetTriggers import allSelections as _semiLeptonicSelections
     
-    semiLeptonicSelections.verbose = opts.verbose
-    semiLeptonicSelections.histogramAmbientLevel = opts.histoLevel
-    semiLeptonicSelections.RecoTopMVASelection = RecoTopMVASelection
+    _semiLeptonicSelections.verbose = opts.verbose
+    _semiLeptonicSelections.histogramAmbientLevel = opts.histoLevel
+    _semiLeptonicSelections.RecoTopMVASelection = RecoTopMVASelection
     # Muon
-    semiLeptonicSelections.MuonSelection.muonPtCut = 26
+    _semiLeptonicSelections.MuonSelection.muonPtCut = 26
     # Electron
-    semiLeptonicSelections.ElectronSelection.electronPtCut = 29
+    _semiLeptonicSelections.ElectronSelection.electronPtCut = 29
     # Jets
-    semiLeptonicSelections.JetSelection.numberOfJetsCutValue = 5
-    semiLeptonicSelections.JetSelection.jetPtCuts = [40] #[40.0, 40.0, 40.0, 30.0]
+    _semiLeptonicSelections.JetSelection.numberOfJetsCutValue = 5
+    _semiLeptonicSelections.JetSelection.jetPtCuts = [40] #[40.0, 40.0, 40.0, 30.0]
     
     # Trigger
-    semiLeptonicSelections.Trigger.triggerOR = ["HLT_IsoMu24", "HLT_Ele27_eta2p1_WPTight_Gsf"]
+    _semiLeptonicSelections.Trigger.triggerOR = ["HLT_IsoMu24", "HLT_Ele27_eta2p1_WPTight_Gsf"]
     
     # Bjets
-    semiLeptonicSelections.BJetSelection.jetPtCuts = [40.0, 40.0]
-    semiLeptonicSelections.BJetSelection.numberOfBJetsCutValue = 2
+    _semiLeptonicSelections.BJetSelection.jetPtCuts = [40.0, 40.0]
+    _semiLeptonicSelections.BJetSelection.numberOfBJetsCutValue = 2
     
+    semiLeptonicSelections = copy.deepcopy(_semiLeptonicSelections)
+
     # Define selections type based on the mcrab name
     if "Hplus2tbAnalysis" in opts.mcrab:
         RecoTopMVASelection.SelectionsType = "hadronic"
@@ -270,12 +274,18 @@ def main():
         
     # Get allSelections 
     if (RecoTopMVASelection.SelectionsType == "hadronic"):
-        allSelections = hadronicSelections
+        allSelections = copy.deepcopy(hadronicSelections)
     else:
-        allSelections = semiLeptonicSelections
+        allSelections = copy.deepcopy(semiLeptonicSelections)
 
     Print("Selections Type: %s %s %s" %(ts, RecoTopMVASelection.SelectionsType, ns), True)
-    # print "pt reweighting", opts.useTopPtReweighting
+
+    #Print ("Hadronic Selections", True)
+    #print hadronicSelections.Trigger
+    #Print ("SemiLeptonic Selections", True)
+    #print semiLeptonicSelections.Trigger
+    #Print ("All Selections", True)
+    #print allSelections.Trigger
 
     # ================================================================================================
     # Add Analysis Variations
@@ -393,7 +403,7 @@ if __name__ == "__main__":
     NEVTS         = -1
     HISTOLEVEL    = "Debug" #"Informative" #"Debug"
     PUREWEIGHT    = True
-    TOPPTREWEIGHT = False
+    TOPPTREWEIGHT = True
     DOSYSTEMATICS = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
