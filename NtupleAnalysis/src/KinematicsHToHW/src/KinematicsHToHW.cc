@@ -682,7 +682,9 @@ void KinematicsHToHW::process(Long64_t entry) {
       std::cout << "nJets = " << selectedJets.size() << std::endl;
       for (auto& p: selectedJets) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads)" << std::endl;
     }
+
   if (!cfg_JetNumberCut.passedCut(selectedJets.size())) return;
+
 
   // HT Selection
   double genJ_HT = 0.0;
