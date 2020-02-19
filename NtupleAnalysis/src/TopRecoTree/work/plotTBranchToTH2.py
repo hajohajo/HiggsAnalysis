@@ -249,23 +249,41 @@ def GetHistoKwargs(h, opts):
         if "dijet" in h.lower():
             kwargs["xlabel"] = "p_{T,w} (%s)" % _units
         if "ldgjetpt" in h.lower():
-            kwargs["xmax"] = 100
+            kwargs["xmax"] = 200
+            kwargs["xlabel"] = "leading jet p_{T} (%s)" % _units
+
     if "trijetmass" in h.lower():
         _units  = "GeV/c^{2}"
         _format = "%0.0f " + _units
         kwargs["xlabel"] = "m_{top} (%s)" % _units
         kwargs["xmax"] = 805 #1005
+
+    if "jet_mass" in h.lower():
+        kwargs["xmax"] = 750
+
+    if "ldgjetmass" in h.lower():
+        kwargs["xlabel"] = "m_{leading jet} (%s)" % _units
+        kwargs["xmax"] = 50
+        if "subldg" in h.lower():
+            kwargs["xlabel"] = "m_{subleading jet} (%s)" % _units
+
     if "bjetmass" in h.lower():
         kwargs["xlabel"] = "m_{b-tagged jet} (%s)" % _units
         kwargs["xmax"] = 50
+
     if "bjetldgjet_mass" in h.lower():
         kwargs["xlabel"]= "m_{b, ldg jet} (%s)" % _units
         kwargs["xmax"] = 705
     if "bjetsubldgjet_mass" in h.lower():
         kwargs["xlabel"] = "m_{b-tagged, subldg jet} (%s)" % _units
         kwargs["xmax"] = 705
-    if "jet_mass" in h.lower():
-        kwargs["xmax"] = 750
+
+    if "bjetldgjetmass" in h.lower():
+        kwargs["xlabel"]= "m_{b, ldg jet} (%s)" % _units
+        kwargs["xmax"] = 705
+    if "bjetsubldgjetmass" in h.lower():
+        kwargs["xlabel"] = "m_{b-tagged, subldg jet} (%s)" % _units
+        kwargs["xmax"] = 705
 
     if "mult" in h.lower():
         _format = "%0.0f"        
@@ -288,38 +306,12 @@ def GetHistoKwargs(h, opts):
              kwargs["xlabel"] = "Subleading jet CvsL"
         if "avg" in h.lower():
             kwargs["xlabel"] = "avg CvsL"
-    if "axis2" in h.lower():
-        _format = "%0.3f"
-        kwargs["xmax"] = 0.3
-        kwargs["xlabel"] = "axis2"
-        if "ldg" in h.lower():
-            kwargs["xlabel"] = "Leading jet axis2"
-        if "subldg" in h.lower():
-            kwargs["xlabel"] = "Subleading jet axis2"
-        if "avg" in h.lower():
-            kwargs["xlabel"] = "avg axis2"
 
     if "dijetmass" in h.lower():
         _units  = "GeV/c^{2}"
         _format = "%0.0f " + _units
         kwargs["xlabel"] = "m_{W} (%s)" % _units
         kwargs["xmax"] = 600
-
-    if "ptd" in h.lower():
-        _format = "%0.2f"
-        kwargs["xlabel"] = "p_{T}D"
-        kwargs["xmax"] = 1
-        if "ldg" in h.lower():
-            kwargs["xlabel"] = "Leading jet p_{T}D"
-        elif "subldg" in h.lower():
-            kwargs["xlabel"]= "Subleading jet p_{T}D"
-
-    if "ptdr" in h.lower():
-        kwargs["xmax"] =800
-        _format = "%0.0f"
-        kwargs["xlabel"] = "p_{T}#Delta R_{t}"        
-        if "dijetptdr" in h.lower():
-            kwargs["xlabel"] = "p_{T}#Delta R_{W}"
 
     if "bdisc" in h.lower():
         _format = "%0.2f"
@@ -340,10 +332,56 @@ def GetHistoKwargs(h, opts):
 
     if "eta" in h.lower():
          _format = "%0.2f "
-         kwargs["xlabel"] = "|eta|"
+         kwargs["xlabel"] = "#eta"
          kwargs["xmax"] = 5
-         kwargs["xmin"] = -5
-        
+         kwargs["xmin"] = -5         
+         if "DEta" in h:
+             kwargs["xlabel"] = "#Delta#eta"
+             kwargs["xmin"] = 0
+
+    if "phi" in h.lower():
+         _format = "%0.2f "
+         kwargs["xlabel"] = "#phi"
+         kwargs["xmax"] = 3.5
+         kwargs["xmin"] = -3.5         
+         if "DPhi" in h:
+             kwargs["xlabel"] = "#Delta#phi"
+             #kwargs["xmin"] = 0
+
+    if "DR" in h:
+         _format = "%0.2f "
+         kwargs["xlabel"] = "#Delta R"
+         kwargs["xmax"] = 6
+         kwargs["xmin"] = 0
+
+    if "ptd" in h.lower():
+        _format = "%0.2f"
+        kwargs["xlabel"] = "p_{T}D"
+        kwargs["xmax"] = 1
+        if "ldg" in h.lower():
+            kwargs["xlabel"] = "Leading jet p_{T}D"
+        elif "subldg" in h.lower():
+            kwargs["xlabel"]= "Subleading jet p_{T}D"
+
+    if "ptdr" in h.lower():
+        kwargs["xmax"] =800
+        _format = "%0.0f"
+        kwargs["xlabel"] = "p_{T}#Delta R_{t}"        
+        if "dijetptdr" in h.lower():
+            kwargs["xlabel"] = "p_{T}#Delta R_{W}"
+
+    if "axis2" in h.lower():
+        _format = "%0.3f"
+        kwargs["xmax"] = 0.3
+        kwargs["xmin"] = 0
+        kwargs["xlabel"] = "axis2"
+        if "ldg" in h.lower():
+            kwargs["xlabel"] = "Leading jet axis2"
+        if "subldg" in h.lower():
+            kwargs["xlabel"] = "Subleading jet axis2"
+        if "avg" in h.lower():
+            kwargs["xlabel"] = "avg axis2"
+
     if "likelihood" in h.lower():
         _format = "%0.2f"
         kwargs["xmax"] = 1
@@ -358,6 +396,10 @@ def GetHistoKwargs(h, opts):
     if "softdrop" in h.lower():
         kwargs["xlabel"] = "Soft Drop n_{2}"
         kwargs["xmax"] = 2
+
+    if "chisquared" in h.lower():
+        kwargs["xlabel"] = "#chi^{2}"
+        kwargs["xmax"] = 10
     else:
         pass
 
@@ -406,7 +448,9 @@ def GetListOfBranches(tree):
         if "Weight" in brsList[i].GetName():
             continue
         # Branches with old names
-        if "Trijet" in brsList[i].GetName():
+        if "Trijet" not in brsList[i].GetName():
+            continue
+        if "ldgjetmass" not in brsList[i].GetName().lower():
             continue
         branchList.append(brsList[i].GetName())        
     return branchList
@@ -470,6 +514,19 @@ def AddCMSText():
     texcms.SetTextSize(30);
     return texcms
 
+def CreateLegend(xmin=0.55, ymin=0.75, xmax=0.85, ymax=0.85):
+    leg = ROOT.TLegend(xmin, ymin, xmax, ymax)
+    leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
+    leg.SetTextSize(0.045)
+    #leg.SetTextFont(42)
+    leg.SetTextFont(62)
+    leg.SetLineColor(1)
+    leg.SetLineStyle(1)
+    leg.SetLineWidth(1)
+    leg.SetFillColor(0)
+    return leg
+
 def Make2D(h2D, saveName, kwargs):
     canvas = ROOT.TCanvas()
 
@@ -487,23 +544,30 @@ def Make2D(h2D, saveName, kwargs):
 
     #ROOT.gStyle.SetPalette(ROOT.kBlueGreenYellow)
 
-    #h2D.GetYaxis().SetRangeUser(500, 1700)
-    #h2D.GetZaxis().SetRangeUser(0.48, 1.1)
-
     h2D.GetZaxis().SetTitleOffset(1.2)
-    h2D.GetYaxis().SetTitleOffset(1.4)
+    #h2D.GetYaxis().SetTitleOffset(1.4)
     h2D.SetMarkerColor(ROOT.kBlack)
     h2D.SetMarkerSize(1.5)
     h2D.SetMarkerStyle(8)
     
     texcms  = AddCMSText()
     texpre  = AddPreliminaryText()
-    #texlumi = AddLumiText(str(round(lumi/1000.0, 1)))
 
     h2D.Draw("colz")
-
     texcms.Draw("same")
     texpre.Draw("same")
+    
+    # Get dataset name
+    dName = opts.dataset
+    dName = dName.replace("TT", "t#bar{t}")
+    if "ChargedHiggs" in dName:
+        dName = dName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "m_{H^{#pm}} = ")
+        dName = dName+" GeV"
+
+    # Create and draw legend
+    leg = CreateLegend(0.6, 0.75, 0.9, 0.85)
+    leg.AddEntry(h2D, dName, "h")
+    leg.Draw("same")
 
     canvas.Modified()
     canvas.Update()
@@ -514,25 +578,6 @@ def Make2D(h2D, saveName, kwargs):
 
     return
 
-'''
-def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
-    if not os.path.exists(saveDir):
-        os.makedirs(saveDir)
-
-    # Create the name under which plot will be saved
-    saveName = os.path.join(saveDir, plotName.replace("/", "_"))
-    saveName = saveName.replace(" ", "_")
-    saveName = saveName.replace(")", "")
-    saveName = saveName.replace("(", "")
-
-    # For-loop: All save formats
-    for i, ext in enumerate(saveFormats):
-        saveNameURL = saveName + ext
-        saveNameURL = aux.convertToURL(saveNameURL, opts.url)
-        Verbose(saveNameURL, i==0)
-        plot.saveAs(saveName, formats=saveFormats)
-    return
-'''
 #================================================================================================ 
 # Main
 #================================================================================================ 

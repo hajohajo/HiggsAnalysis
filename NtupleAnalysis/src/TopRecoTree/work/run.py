@@ -252,8 +252,8 @@ def main():
     # Electron
     semiLeptonicSelections.ElectronSelection.electronPtCut = 29
     # Jets
-    semiLeptonicSelections.JetSelection.numberOfJetsCutValue = 4
-    semiLeptonicSelections.JetSelection.jetPtCuts = [40.0, 40.0, 40.0, 30.0]
+    semiLeptonicSelections.JetSelection.numberOfJetsCutValue = 5
+    semiLeptonicSelections.JetSelection.jetPtCuts = [40] #[40.0, 40.0, 40.0, 30.0]
     
     # Trigger
     semiLeptonicSelections.Trigger.triggerOR = ["HLT_IsoMu24", "HLT_Ele27_eta2p1_WPTight_Gsf"]
