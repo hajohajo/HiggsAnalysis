@@ -5,15 +5,15 @@ Script for plotting TH2 histograms only.
 
 
 USAGE:
-./plotTBranchToTH2.py -m <pseudo-mcrab> [--options]
+./doReweighting.py -m <pseudo-mcrab> [--options]
 
 
 EXAMPLES:
-./plotTBranchToTH2.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --url
+./doReweighting.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --url
 
 LAST USED:
-./plotTBranchToTH2.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --ref TrijetPtDR --url
-./plotTBranchToTH2.py -m TopRecoTree_200217_114252_FirstNewBranches_hadronic --normalizeToOne --ref trijetPt --url --treeName treeS --logZ
+./doReweighting.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --ref TrijetPtDR --url
+./doReweighting.py -m TopRecoTree_200217_114252_FirstNewBranches_hadronic --normalizeToOne --ref trijetPt --url --treeName treeS --logZ
 '''
 
 #================================================================================================ 
@@ -46,10 +46,10 @@ import HiggsAnalysis.NtupleAnalysis.tools.multicrabConsistencyCheck as consisten
 import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 
 
-import warnings
-warnings.filterwarnings("ignore")
+#import warnings
+#warnings.filterwarnings("ignore")
 
-ROOT.gErrorIgnoreLevel = ROOT.kError
+#ROOT.gErrorIgnoreLevel = ROOT.kError
 
 #================================================================================================ 
 # Function Definition
@@ -171,78 +171,79 @@ def main(opts):
                     
         # Get reference branch (all the variables will be plotted as a function of the reference) 
         ref = opts.refHisto
-        Plot2DHistograms(datasetsMgr, ref, opts.treeName)
-    Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
+        doReweighting(datasetsMgr, ref, opts.treeName)
+    Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)    
     return
 
 
 def GetHistoKwargs(h, opts):
 
     # Defaults
-    xMin  =    0
+    xMin   = 0
     xMax   = 800
-    yMin   =   0
-    yMax   = 800
-    yMaxF  =  10
+    xBins  = 10
+
     zMin   =   0
     zMax   = None
-    zLabel = "z-axis"
+    yLabel = "y-axis"
+
     if opts.logX:
         xMin =  1
     if opts.logY:
         yMin =  1
 
     if opts.normalizeToLumi:
-        zLabel  = "Events"
-        zMin    = 1e0
+        yLabel  = "Events"
+        yMin    = 1e0
+        yMaxF   = 1
     elif opts.normalizeByCrossSection:
-        zLabel  = "#sigma (pb)"
+        yLabel  = "#sigma (pb)"
         #zMin    = 0 #1e-3
+        yMaxF   = 1
     elif opts.normalizeToOne:
-        zLabel  = "Arbitrary Units"
-        zMin    = None #5e-4
-        zMax    = None #1e-1
+        yLabel  = "Arbitrary Units"
+        yMin    = None #5e-4
+        yMax    = None #1e-1
+        yMaxF   = 1.1
     else:
-        zLabel = "Unknown"
+        yLabel = "Unknown"
 
-    yLabel = "ylabel"
     xLabel = "xlabel"
 
-    cutBox      = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True} #box = True works
-    cutBoxY     = {"cutValue": 200.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+    cutBox      = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True} #box = True works
+    cutBoxY     = {"cutValue": 200.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+                       
+    _format = "%0.0f "
 
-    if "_vs_" not in h.lower():
-        yLabel = zLabel
-    else:
-        yLabel = None
-                   
     kwargs = {
         "stackMCHistograms": False,
         "addMCUncertainty" : False,
         "addLuminosityText": opts.normalizeToLumi,
         "addCmsText"       : True,
-        "cmsExtraText"     : "  Preliminary",
+        "cmsExtraText"     : " Preliminary",
         "xmin"             : xMin,
         "xmax"             : xMax,
-        "ymin"             : yMin,
-        "zmin"             : zMin,
-        "zmax"             : zMax,
+        "xbins"            : xBins,
+        "ymin"             : yMin,        
+        "ymax"             : yMax,
         "cutBox"           : cutBox,
         "cutBoxY"          : cutBoxY,
-        "moveLegend"       : {"dx": -2.0, "dy": 0.0, "dh": 0}, #hack to remove legend (tmp)
+        #"moveLegend"       : {"dx": -2.0, "dy": 0.0, "dh": 0}, #hack to remove legend (tmp)
+        "createLegend"     : {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82},
         "xlabel"           : xLabel,
         "ylabel"           : yLabel,
-        "zlabel"           : zLabel,
+        "opts"             : {"ymin": yMin, "ymaxfactor": yMaxF},
+        "format"           : _format
         }
     
     if "mass" in h.lower():
         _units  = "GeV/c^{2}"
-        _format = "%0.0f " + _units
+        kwargs['format'] = "%0.0f " + _units
         kwargs["xlabel"] = "M (%s)" % _units
 
     if "pt" in h.lower():
         _units  = "GeV/c"
-        _format = "%0.0f " + _units
+        kwargs['format'] = "%0.0f " + _units
         kwargs["xlabel"] = "p_{T} (%s)" % _units
         if "trijet" in h.lower():
             kwargs["xlabel"] = "p_{T,t} (%s)" % _units
@@ -254,7 +255,7 @@ def GetHistoKwargs(h, opts):
 
     if "trijetmass" in h.lower():
         _units  = "GeV/c^{2}"
-        _format = "%0.0f " + _units
+        kwargs['format'] = "%0.0f " + _units
         kwargs["xlabel"] = "m_{top} (%s)" % _units
         kwargs["xmax"] = 805 #1005
 
@@ -286,7 +287,7 @@ def GetHistoKwargs(h, opts):
         kwargs["xmax"] = 705
 
     if "mult" in h.lower():
-        _format = "%0.0f"        
+        kwargs['format'] = "%0.0f"        
         kwargs["xmax"] = 50
         kwargs["xlabel"] = "mult"
         if "ldg" in h.lower():
@@ -297,7 +298,7 @@ def GetHistoKwargs(h, opts):
             kwargs["xlabel"] = "avg CvsL"
 
     if "cvsl" in h.lower():
-        _format = "%0.2f"
+        kwargs['format'] = "%0.2f"
         kwargs["xmax"] = 1
         kwargs["xlabel"] = "CvsL"
         if "ldg" in h.lower():
@@ -309,12 +310,12 @@ def GetHistoKwargs(h, opts):
 
     if "dijetmass" in h.lower():
         _units  = "GeV/c^{2}"
-        _format = "%0.0f " + _units
+        kwargs['format'] = "%0.0f " + _units
         kwargs["xlabel"] = "m_{W} (%s)" % _units
         kwargs["xmax"] = 600
 
     if "bdisc" in h.lower():
-        _format = "%0.2f"
+        kwargs['format'] = "%0.2f"
         kwargs["xlabel"] = "CSV"
         kwargs["xmax"] = 1
         if "subldg" in h.lower():
@@ -325,13 +326,13 @@ def GetHistoKwargs(h, opts):
             _xlabel = "b-tagged jet CSV"
 
     if "over" in h.lower():
-         _format = "%0.2f "
+         kwargs['format'] = "%0.2f "
          kwargs["xlabel"] = "m_{W}/m_{t}"
          kwargs["xmax"] = 1
          kwargs["xmin"] = 0
 
     if "eta" in h.lower():
-         _format = "%0.2f "
+         kwargs['format'] = "%0.2f "
          kwargs["xlabel"] = "#eta"
          kwargs["xmax"] = 5
          kwargs["xmin"] = -5         
@@ -340,7 +341,7 @@ def GetHistoKwargs(h, opts):
              kwargs["xmin"] = 0
 
     if "phi" in h.lower():
-         _format = "%0.2f "
+         kwargs['format'] = "%0.2f "
          kwargs["xlabel"] = "#phi"
          kwargs["xmax"] = 3.5
          kwargs["xmin"] = -3.5         
@@ -349,13 +350,13 @@ def GetHistoKwargs(h, opts):
              #kwargs["xmin"] = 0
 
     if "DR" in h:
-         _format = "%0.2f "
+         kwargs['format'] = "%0.2f "
          kwargs["xlabel"] = "#Delta R"
          kwargs["xmax"] = 6
          kwargs["xmin"] = 0
 
     if "ptd" in h.lower():
-        _format = "%0.2f"
+        kwargs['format'] = "%0.2f"
         kwargs["xlabel"] = "p_{T}D"
         kwargs["xmax"] = 1
         if "ldg" in h.lower():
@@ -365,13 +366,13 @@ def GetHistoKwargs(h, opts):
 
     if "ptdr" in h.lower():
         kwargs["xmax"] =800
-        _format = "%0.0f"
+        kwargs['format'] = "%0.0f"
         kwargs["xlabel"] = "p_{T}#Delta R_{t}"        
         if "dijetptdr" in h.lower():
             kwargs["xlabel"] = "p_{T}#Delta R_{W}"
 
     if "axis2" in h.lower():
-        _format = "%0.3f"
+        kwargs['format'] = "%0.3f"
         kwargs["xmax"] = 0.3
         kwargs["xmin"] = 0
         kwargs["xlabel"] = "axis2"
@@ -383,7 +384,7 @@ def GetHistoKwargs(h, opts):
             kwargs["xlabel"] = "avg axis2"
 
     if "likelihood" in h.lower():
-        _format = "%0.2f"
+        kwargs['format'] = "%0.2f"
         kwargs["xmax"] = 1
         kwargs["xlabel"] = "QGL"
         if "ldg" in h.lower():
@@ -400,8 +401,22 @@ def GetHistoKwargs(h, opts):
     if "chisquared" in h.lower():
         kwargs["xlabel"] = "#chi^{2}"
         kwargs["xmax"] = 10
-    else:
-        pass
+
+
+    # Get Bins
+    binWidth = 10
+    Xmax = [0.001, 0.01, 0.1, 1., 10., 100., 1000.]
+
+    for x in Xmax:
+        if kwargs["xmax"] <= x:
+            binWidth = x/100.
+            break
+
+    if (int(kwargs["xmax"] - kwargs["xmin"])/binWidth < 10):
+            binWidth = binWidth/10.
+
+    kwargs["xbins"] = int((kwargs["xmax"] - kwargs["xmin"])/binWidth)
+    #
 
     if 0:
         ROOT.gStyle.SetNdivisions(8, "X")
@@ -409,33 +424,27 @@ def GetHistoKwargs(h, opts):
         
     return kwargs
     
-def CreateHistograms(inputList, ref, kwargs):
+def CreateHistograms(inputList, kwargs, txt):
     histoMap = {}
     Print("List of branches:", True)
 
     for i, brName in enumerate(inputList):
 
         kwargs   = GetHistoKwargs(brName, opts)
-        kwargs_ref   = GetHistoKwargs(ref, opts)
 
         Print("%s. %s" % (i, brName), False)
-        histoName = "%s_vs_%s" %(brName, ref)
-
-        xbins = 50 
-        xmin = kwargs_ref["xmin"]
-        xmax = kwargs_ref["xmax"]
-        ybins = 50
-        ymin = kwargs["xmin"]
-        ymax = kwargs["xmax"]
         
+        xbins = kwargs["xbins"]
+        xmin  = kwargs["xmin"]
+        xmax  = kwargs["xmax"]
+
+        hName = "%s_%s" % (brName, txt)
         # Create histogram
-        histo_vs_ref = ROOT.TH2F(histoName, histoName, xbins, xmin, xmax, ybins, ymin, ymax)
+        histo = ROOT.TH1F(hName, hName, xbins, xmin, xmax)
+        histo.GetXaxis().SetTitle(kwargs["xlabel"])
+        histo.GetYaxis().SetTitle(kwargs["ylabel"])
 
-        histo_vs_ref.GetXaxis().SetTitle(kwargs_ref["xlabel"])
-        histo_vs_ref.GetYaxis().SetTitle(kwargs["xlabel"])
-        histo_vs_ref.GetZaxis().SetTitle(kwargs["zlabel"])
-
-        histoMap.update({brName : histo_vs_ref})
+        histoMap.update({brName : histo})
         
     return histoMap
 
@@ -450,129 +459,280 @@ def GetListOfBranches(tree):
         # Branches with old names
         if "Trijet" not in brsList[i].GetName():
             continue
-        if "ldgjetmass" not in brsList[i].GetName().lower():
+        if "over" not in brsList[i].GetName().lower():
             continue
         branchList.append(brsList[i].GetName())        
     return branchList
-
-def Plot2DHistograms(datasetsMgr, ref, treeName):
-    
-    # Get ROOT file
-    f = ROOT.TFile(opts.rootFileName)
-    # Get TTree 
-    tree = f.Get(treeName)
-    # Get number of entries
-    nEntries = tree.GetEntries();
-
-    # GetListOfBranches
-    inputList = GetListOfBranches(tree)
-    
-    kwargs = {}
-    # Create map with branch names and corresponding TH2 histograms    
-    histoMap = CreateHistograms(inputList, ref, kwargs)
-    # loop over entries
-    for ientry in range(nEntries):    
-        tree.GetEntry(ientry)        
-        # loop over all branches                        
-        for brName in inputList:
-            # Get branch value
-            # https://www.programiz.com/python-programming/methods/built-in/getattr
-            xvalue = getattr(tree, ref)
-            yvalue = getattr(tree, brName)
-            histoMap[brName].Fill(xvalue, yvalue)
+def GetWeights(sigTree, bkgTree, refBranch):
+    kwargs   = GetHistoKwargs(refBranch, opts)    
             
-    for brName in inputList:
-        saveName = "%s_vs_%s" % (brName, ref)
-        #
-        #p = plots.PlotBase(datasetRootHistos=[histoMap[brName]], saveFormats=opts.saveFormats)
-        Make2D(histoMap[brName], saveName, kwargs)
-    return
+    xmin  = kwargs["xmin"]
+    xmax  = kwargs["xmax"]
+    xbins = 2*kwargs["xbins"] #(xmax - xmin)/10 #kwargs["xbins"]
 
-def AddPreliminaryText():
-    # Setting up preliminary text
-    tex = ROOT.TLatex(0.,0., 'Preliminary');
-    tex.SetNDC();
-    tex.SetX(0.27);
-    tex.SetY(0.95);
-    tex.SetTextFont(53);
-    tex.SetTextSize(28);
-    tex.SetLineWidth(2)
-    return tex
+    # Create histogram
+    sigName = "%s_S" % refBranch
+    bkgName = "%s_B" % refBranch
+    Print("Creating reference histograms %s %s" % (sigName, bkgName), True)
 
-def AddCMSText():
-    # Settign up cms text
-    texcms = ROOT.TLatex(0.,0., 'CMS');
-    texcms.SetNDC();
-    texcms.SetTextAlign(31);
-    texcms.SetX(0.26);
-    texcms.SetY(0.95);
-    texcms.SetTextFont(63);
-    texcms.SetLineWidth(2);
-    texcms.SetTextSize(30);
-    return texcms
+    hSig = ROOT.TH1F(sigName, sigName, xbins, xmin, xmax)
+    hBkg = ROOT.TH1F(bkgName, bkgName, xbins, xmin, xmax)
 
-def CreateLegend(xmin=0.55, ymin=0.75, xmax=0.85, ymax=0.85):
-    leg = ROOT.TLegend(xmin, ymin, xmax, ymax)
-    leg.SetFillStyle(0)
-    leg.SetBorderSize(0)
-    leg.SetTextSize(0.045)
-    #leg.SetTextFont(42)
-    leg.SetTextFont(62)
-    leg.SetLineColor(1)
-    leg.SetLineStyle(1)
-    leg.SetLineWidth(1)
-    leg.SetFillColor(0)
-    return leg
+    # Number of entries in trees
+    nEntries_s = sigTree.GetEntries();
+    nEntries_b = nEntries_s #bkgTree.GetEntries();
+       
+    if (nEntries_b == nEntries_s):
+        Print("Warning! using nEntries_b = nEntries_s", True)
 
-def Make2D(h2D, saveName, kwargs):
-    canvas = ROOT.TCanvas()
+    # loop over signal entries and fill hSig
+    for ientry in range(nEntries_s):    
+        sigTree.GetEntry(ientry)
+        xvalue = getattr(sigTree, refBranch)
+        hSig.Fill(xvalue)
 
-    canvas.SetLogx(opts.logX)
-    canvas.SetLogy(opts.logY)
-    canvas.SetLogz(opts.logZ)
+    # loop over background entries and fill hBkg
+    for ientry in range(nEntries_b):    
+        bkgTree.GetEntry(ientry)
+        xvalue = getattr(bkgTree, refBranch)
+        hBkg.Fill(xvalue)
 
-    style = tdrstyle.TDRStyle()
-    style.setOptStat(False)
-    style.setGridX(False)
-    style.setGridY(False)
+    # Normalize histograms to unity
+    hSig.Scale(1./hSig.Integral())
+    hBkg.Scale(1./hBkg.Integral())
 
-    canvas.SetRightMargin(0.20)
-    canvas.SetLeftMargin(0.16)
-
-    #ROOT.gStyle.SetPalette(ROOT.kBlueGreenYellow)
-
-    h2D.GetZaxis().SetTitleOffset(1.2)
-    #h2D.GetYaxis().SetTitleOffset(1.4)
-    h2D.SetMarkerColor(ROOT.kBlack)
-    h2D.SetMarkerSize(1.5)
-    h2D.SetMarkerStyle(8)
+    # Get weights
+    hWeights = hSig.Clone("weights")
+    hWeights.Divide(hBkg)
+        
+    # 
+    hSig.Scale(hWeights.Integral())
+    hBkg.Scale(hWeights.Integral())
     
-    texcms  = AddCMSText()
-    texpre  = AddPreliminaryText()
+    hSig.SetFillColorAlpha(ROOT.kBlue, 0.2)
+    hSig.SetLineColorAlpha(ROOT.kBlue, 0.2)
 
-    h2D.Draw("colz")
-    texcms.Draw("same")
-    texpre.Draw("same")
+    hBkg.SetFillColorAlpha(ROOT.kRed, 0.2)
+    hBkg.SetLineColorAlpha(ROOT.kRed, 0.2)
+
+    hWeights.SetLineWidth(3)
+    kwargs["ymax"] = hWeights.GetMaximum() + 1
     
-    # Get dataset name
+    binwidth = (xmax - xmin)/xbins
+    kwargs["ylabel"] = "Weights (a.u.) / %s GeV" % str(binwidth)
+
+    kwargs["opts"]   = {"ymin": 0.0, "ymaxfactor": 1.1}
+
+    p = plots.ComparisonManyPlot(histograms.Histo(hWeights,"weights", "l", "L"), 
+                                 [histograms.Histo(hBkg,"background", "l", "L"),
+                                  histograms.Histo(hSig,"signal", "l", "L")], saveFormats=[])
+
+    p.histoMgr.setHistoLegendLabelMany({"weights" : "Signal/Bkg", "signal" : "Signal", "background" : "Bkg"})
+    p.histoMgr.setHistoLegendStyle("weights", "L")
+    p.histoMgr.setHistoLegendStyle("signal", "F")
+    p.histoMgr.setHistoLegendStyle("background", "F")
+    kwargs["createLegend"] = {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82}
+
+    # Save plot in all formats    
+    saveName = "weights_%s" % (refBranch)
+    plots.drawPlot(p, saveName, **kwargs)
+    SavePlot(p, saveName, os.path.join(opts.saveDir), opts.saveFormats )
+
+    return hWeights
+
+def PlotOverlay(s,b, kw, saveName):
+    
+    #Define Signal style
+    signalStyle     = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure-3, markerSizes=None, markerStyle=ROOT.kFullDiamond),
+                                            styles.StyleLine(lineColor=ROOT.kAzure-3, lineStyle=ROOT.kSolid, lineWidth=3),
+                                            styles.StyleFill(fillColor=ROOT.kAzure-3)])
+    #Define Background style
+    backgroundStyle = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kRed-4, markerSizes=None, markerStyle=ROOT.kFullDiamond),
+                                            styles.StyleLine(lineColor=ROOT.kRed-4, lineStyle=ROOT.kSolid, lineWidth=3)])
+                                            #styles.StyleFill(fillColor=ROOT.kRed+2, fillStyle=3001)])
+    
+    p = plots.ComparisonPlot(histograms.Histo(b,"background", "pl", "PL"),histograms.Histo(s,"signal", "pl", "PL"),) 
     dName = opts.dataset
     dName = dName.replace("TT", "t#bar{t}")
     if "ChargedHiggs" in dName:
-        dName = dName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "m_{H^{#pm}} = ")
-        dName = dName+" GeV"
-
-    # Create and draw legend
-    leg = CreateLegend(0.6, 0.75, 0.9, 0.85)
-    leg.AddEntry(h2D, dName, "h")
-    leg.Draw("same")
-
-    canvas.Modified()
-    canvas.Update()
+        dName = dName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "m_{H^{^#pm}} = ")
+        dName = dName+"GeV"
         
-    for f in opts.saveFormats:
-        savePath = "%s%s%s" % (opts.saveDir, saveName, f)
-        canvas.SaveAs(savePath)
+    p.histoMgr.setHistoLegendLabelMany({"signal": "Truth-matched", "background": "Unmatched"}) 
+    p.histoMgr.forHisto("background", backgroundStyle ) 
+    p.histoMgr.setHistoDrawStyle("background", "HIST")
+    p.histoMgr.setHistoLegendStyle("background", "L") #F
+    
+    p.histoMgr.forHisto("signal", signalStyle) 
+    p.histoMgr.setHistoDrawStyle("signal" , "HIST")
+    p.histoMgr.setHistoLegendStyle("signal", "L") #L
+    
+    
+    _kwargs = {
+        "xlabel"           : kw['xlabel'],
+        "ylabel"           : "Arbitrary Units / %s" % (kw['format']),
+        "ratioYlabel"      : "Ratio ",
+        "ratio"            : False,
+        "ratioInvert"      : False,
+        "stackMCHistograms": False,
+        "addMCUncertainty" : False,
+        "addLuminosityText": False,
+        "addCmsText"       : True,
+        "cmsExtraText"     : "Preliminary",
+        "xmin"             : kw['xmin'],
+        "xmax"             : kw['xmax'],
+        #"opts"             : {"ymin": 0.0, "ymaxfactor": 1.1},
+        "opts"             : {"ymin": 0.0, "ymaxfactor": 1.1},
+        "opts2"            : {"ymin": 0.6, "ymax": 1.5},
+        "log"              : False,
+        "createLegend"     : {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82}, 
+        }
 
+    # Save plot in all formats    
+    #saveName = "%s_%s" % (brName, txt)
+    plots.drawPlot(p, saveName, **_kwargs)
+    SavePlot(p, saveName, os.path.join(opts.saveDir), opts.saveFormats )
+    
+    return
+    #return p, _kwargs
+
+def doReweighting(datasetsMgr, refBranch, treeName):
+    # https://gitlab.cern.ch/HPlus/HiggsAnalysis/blob/master/NtupleAnalysis/src/Keras_ANN/work/func.py#L49
+    # Get weights
+    #hWeights = GetWeights(ref_sig, ref_bkg) # Do it with branches !
+    
+    # Get ROOT file
+    f = ROOT.TFile(opts.rootFileName)
+
+    # Get signal and background trees
+    sigTree = f.Get("treeS")
+    bkgTree = f.Get("treeB")
+
+    # Get weights in "refBranch" bins
+    hWeights = GetWeights(sigTree, bkgTree, refBranch)
+    
+    # Number of entries in trees
+    nEntries_s = sigTree.GetEntries();
+    nEntries_b = nEntries_s #bkgTree.GetEntries();
+
+    if (nEntries_b == nEntries_s):
+        Print("Warning! using nEntries_b = nEntries_s", True)
+
+    # GetListOfBranches
+    inputList = GetListOfBranches(sigTree)
+
+    kwargs = {}
+    # Create map with branch names and corresponding TH1 histograms
+    histoMap_s = CreateHistograms(inputList, kwargs, "sig")
+    histoMap_b = CreateHistograms(inputList, kwargs, "bkg")
+    
+    # loop over signal entries
+    for ientry in range(nEntries_s):
+        sigTree.GetEntry(ientry)
+        # loop over all branches
+        for brName in inputList:
+            # Get branch value
+            # https://www.programiz.com/python-programming/methods/built-in/getattr
+            xvalue = getattr(sigTree, brName)
+            histoMap_s[brName].Fill(xvalue)
+
+    # loop over bkg entries
+    for ientry in range(nEntries_b):
+        bkgTree.GetEntry(ientry)
+        refValue = getattr(bkgTree, refBranch)
+        bin      = hWeights.FindBin(refValue)
+        weight   = hWeights.GetBinContent(bin)
+        # loop over all branches
+        for brName in inputList:
+            # Get branch value
+            # https://www.programiz.com/python-programming/methods/built-in/getattr
+            xvalue   = getattr(bkgTree, brName)
+            # Fill weighted bkg histogram
+            histoMap_b[brName].Fill(xvalue, weight)
+
+    txt = "Rew"
+    if (refBranch == "trijetMass"):
+        txt = "topMassRew"
+    if (refBranch == "trijetPt"):
+        txt = "topPtRew"
+
+    #Define Signal style
+    signalStyle     = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure-3, markerSizes=None, markerStyle=ROOT.kFullDiamond),
+                                            styles.StyleLine(lineColor=ROOT.kAzure-3, lineStyle=ROOT.kSolid, lineWidth=3),
+                                            styles.StyleFill(fillColor=ROOT.kAzure-3)])
+    #Define Background style
+    backgroundStyle = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kRed-4, markerSizes=None, markerStyle=ROOT.kFullDiamond),
+                                            styles.StyleLine(lineColor=ROOT.kRed-4, lineStyle=ROOT.kSolid, lineWidth=3)])
+                                            #styles.StyleFill(fillColor=ROOT.kRed+2, fillStyle=3001)])
+    for brName in inputList:
+        s = histoMap_s[brName]
+        b = histoMap_b[brName]
+        # Normalize histograms to unity
+        s.Scale(1./s.Integral())
+        b.Scale(1./b.Integral())
+
+        # plot signal and background on same canvas        
+        #p, _kwargs = PlotOverlay(s,b, GetHistoKwargs(brName, opts))
+        PlotOverlay(s,b, GetHistoKwargs(brName, opts), "%s_%s" % (brName, txt))
+            
+    return
+
+def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
+    Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
+
+    # Check that path exists
+    #if not os.path.exists(saveDir):
+    #    os.makedirs(saveDir)
+        
+    # Create the name under which plot will be saved
+    saveName = os.path.join(saveDir, plotName.replace("/", "_"))
+    #print "soti", saveName
+    # For-loop: All save formats
+    for i, ext in enumerate(saveFormats):
+        saveNameURL = saveName + ext
+        saveNameURL = aux.convertToURL(saveNameURL, opts.url)
+        Print(saveNameURL, i==0)
+        plot.saveAs(saveName, formats=saveFormats)
+    return
+
+def SaveInRootFile(inputList, histoMap_s, histoMap_b):
+
+#Save reweighted histograms under input rootFile
+
+    # Open input root file
+    outFileName = "%s.root" % opts.mcrab
+    outputFile = ROOT.TFile.Open(outFileName,"RECREATE")
+    outputFile.cd()
+    
+    # Check if path exists and create
+    outDirName_sig = "reweighted_%s_Genuine" % opts.refHisto
+    outDirName_bkg = "reweighted_%s_Fake" % opts.refHisto
+    
+    nFolders = len(outputFile.GetListOfKeys())
+    makeDir = True
+    for out in [outDirName_sig, outDirName_bkg]:
+        # For-loop: All folders  in ROOT file
+        for k, key in enumerate(outputFile.GetListOfKeys(), 1):
+            kName = key.GetName()
+            if (kName == out):
+                makeDir = False
+        if (makeDir):
+            outDir = outputFile.mkdir(out)
+            Print("Directory %s has been created." % out)
+            outDir.cd()
+        else:
+            outDir = outputFile.Get(out)
+            outDir.cd()
+
+        for brName in inputList:
+            if "Genuine" in out:
+                h = histoMap_s[brName]
+                h.Write()
+            elif "Fake" in out:
+                h = histoMap_b[brName]                
+                h.Write()
+    outputFile.Write()
+    outputFile.Close()
     return
 
 #================================================================================================ 
@@ -617,7 +777,7 @@ if __name__ == "__main__":
     NORM2ONE     = False
     NORM2XSEC    = False
     NORM2LUMI    = False
-    REFHISTO     = "trijetPt"
+    REFHISTO     = "trijetMass"
     TREENAME     = "treeS"
     DATASET      = "TT"
     ROOTFILENAME = None
@@ -732,11 +892,10 @@ if __name__ == "__main__":
     
 
     if opts.saveDir == None:
-        #opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="TH2")
-        # Get username and the initial of the username
+        #opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="reweighted_%s" % opts.refHisto)
         user    = getpass.getuser()
-        initial = getpass.getuser()[0]    
-        opts.saveDir = "/publicweb/%s/%s/%s/TH2/" % (initial, user, opts.mcrab)
+        initial = getpass.getuser()[0]
+        opts.saveDir = "/publicweb/%s/%s/%s/reweighted_%s/" % (initial, user, opts.mcrab, opts.refHisto)
     if not os.path.exists(opts.saveDir):
         os.makedirs(opts.saveDir)
 

@@ -1756,6 +1756,7 @@ void TopRecoTree::process(Long64_t entry) {
         hCtrl_lepGenTopPt -> Fill(top.pt());
       }
     }
+    /*
     if (cfg_SelectionsType == "hadronic"){
       // Keep only events with at least two hadronically decaying top-quarks
       if (GenTops_BQuark.size() < 2) return;
@@ -1764,6 +1765,7 @@ void TopRecoTree::process(Long64_t entry) {
       // Keep only events with at least one hadronically decaying top-quark
       if (GenTops_BQuark.size() < 1) return;
     }
+    */
     //Pseudo-matching: Used to calculate the dPt/Pt cut
     for (size_t i=0; i<GenTops_Quarks.size(); i++)
       {
