@@ -149,7 +149,8 @@ def main(opts):
         plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
 
         # Set signal cross-section
-        newOrder = ["Data", "DYJetsToLLHT", "TT", "Diboson", "SingleTop", "ttX", "WJetsHT"]
+        newOrder = ["Data", "DYJetsToLL", "TT", "Diboson", "SingleTop", "ttX", "WJetsHT"]
+        # newOrder = ["Data", "DYJetsToLLHT", "TT", "Diboson", "SingleTop", "ttX", "WJetsHT"]
 
         # For-loop: All dataset objects
         for d in datasetsMgr.getAllDatasets():
@@ -585,7 +586,7 @@ if __name__ == "__main__":
     
     # Default Settings
     ANALYSISNAME = "TauFakeRate" #Hplus2hwAnalysisWithTop"
-    SEARCHMODE   = "80to1000"
+    SEARCHMODE   = "350to3000"
     DATAERA      = "Run2016"
     GRIDX        = False
     GRIDY        = False

@@ -28,7 +28,7 @@ public:
   ~MCTools();
 
   bool IsChargedLepton(const int pdgId);
-  bool IsLepton(const int pdgId);
+  bool IsLepton(const int pdgId, bool includeNeutrinos=true);
   bool IsNeutrino(const int pdgId);
   bool IsQuark(const int pdgId);
   double DeltaAbs(const double val1, const double val2);
