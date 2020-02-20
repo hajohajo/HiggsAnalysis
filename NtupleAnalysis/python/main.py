@@ -391,7 +391,7 @@ class Process:
                     if match or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
                         isOnWhiteList = True
                 if not isOnWhiteList:
-                    blacklist.append(dset.getName())
+                    blacklist.append("^"+dset.getName()+"$")
 
         for dset in dsets:
             isOnBlackList = False
