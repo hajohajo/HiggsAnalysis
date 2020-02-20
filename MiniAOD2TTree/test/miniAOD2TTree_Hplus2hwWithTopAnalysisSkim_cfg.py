@@ -6,96 +6,29 @@ For miniAOD instructions see: https://twiki.cern.ch/twiki/bin/view/CMSPublic/Wor
 #================================================================================================  
 import FWCore.ParameterSet.Config as cms
 import HiggsAnalysis.MiniAOD2TTree.tools.git as git
+import HiggsAnalysis.MiniAOD2TTree.tools.datasets as datasets
 from HiggsAnalysis.MiniAOD2TTree.tools.HChOptions import getOptionsDataVersion
 
-
 #================================================================================================  
-# Options
+# Definitions
 #================================================================================================  
 maxEvents    = 100
 maxWarnings  = 100
 reportEvery  = 1
-testWithData = False
+dataset      = datasets.datasets_2016["TT"][0] # datasets.datasets_2016["JetHT-03Feb2017"][0]
+dataVersion  = dataset.getDataVersion()
+datasetFiles = dataset.getFiles()
 
-# Define ROOT files for local testing
-testData = {}
-testData["SingleElectron"] = [
-    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver2-v2/110001/FE93EA39-A2EB-E611-A1E5-0CC47AD99176.root',                                                                                   
-    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver2-v2/110001/FE23EF13-84EB-E611-B99A-0025905A6070.root',                                                                                   
-    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver2-v2/110001/FAEF3272-79EB-E611-84C3-0CC47AACFCDE.root',   
-    # '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FEB9169C-39EB-E611-9E94-0CC47AD99116.root',
-    # '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FE9CA978-3CEB-E611-8617-90B11C27E14D.root',
-    # '/store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50001/FCB0EDF4-28EB-E611-ABAF-A0000420FE80.root',
-    # '/store/data/Run2016H/SingleElectron/MINIAOD/PromptReco-v2/000/284/035/00000/F063D9E7-449F-E611-9C38-02163E014291.root',
-    # '/store/data/Run2016H/SingleElectron/MINIAOD/PromptReco-v2/000/284/035/00000/EA3918D4-449F-E611-8B15-FA163E8769C6.root',
-    # '/store/data/Run2016H/SingleElectron/MINIAOD/PromptReco-v2/000/284/035/00000/DEBB0DF5-449F-E611-909F-02163E01425C.root',
-    ]
-testData["SingleMuon"] = [
-    '/store/data/Run2016G/SingleMuon/MINIAOD/03Feb2017-v1/820000/DA8E43DC-61F0-E611-8411-70106F4A94F0.root',
-    '/store/data/Run2016G/SingleMuon/MINIAOD/03Feb2017-v1/820000/C037802E-62F0-E611-94AA-70106F48BBEE.root',
-    '/store/data/Run2016G/SingleMuon/MINIAOD/03Feb2017-v1/820000/AE7F0E4C-62F0-E611-A831-0CC47A7FC7B8.root',
-    #'/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v2/000/284/035/00000/F2E41147-4D9F-E611-A17C-FA163E8E25D7.root',
-    #'/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v2/000/284/035/00000/F29156D1-4E9F-E611-BD9C-FA163EDC8AC8.root',
-    #'/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v2/000/284/035/00000/E6006CCE-4C9F-E611-9197-02163E01391D.root',
-    ]
-testData["DoubleEG"] = [
-    '/store/data/Run2016G/DoubleEG/MINIAOD/03Feb2017-v1/80000/FEA99FAC-F6EA-E611-9BE7-003048F5B69C.root',
-    '/store/data/Run2016G/DoubleEG/MINIAOD/03Feb2017-v1/80000/FE5CB43C-EAEA-E611-BF19-008CFA582BF4.root',
-    '/store/data/Run2016G/DoubleEG/MINIAOD/03Feb2017-v1/80000/FE5134DE-BAEA-E611-A9F6-0CC47A4D7678.root',
-    #'/store/data/Run2016H/DoubleEG/MINIAOD/PromptReco-v2/000/281/707/00000/2C258D6C-C386-E611-866E-02163E014732.root',
-    #'/store/data/Run2016H/DoubleEG/MINIAOD/PromptReco-v2/000/281/707/00000/1E4E52DD-CC86-E611-920F-02163E0142E7.root',
-    #'/store/data/Run2016H/DoubleEG/MINIAOD/PromptReco-v2/000/281/707/00000/0E695BBC-C586-E611-A229-02163E01249F.root',
-    ]
-testData["DoubleMuon"] = [
-    '/store/data/Run2016G/DoubleMuon/MINIAOD/03Feb2017-v1/100000/FE8491B3-F5EA-E611-9708-001E67A3AEB8.root',
-    '/store/data/Run2016G/DoubleMuon/MINIAOD/03Feb2017-v1/100000/FE0B09B4-78EB-E611-956C-ECB1D7B67E10.root',
-    '/store/data/Run2016G/DoubleMuon/MINIAOD/03Feb2017-v1/100000/FCD1A6F4-58EB-E611-8A1D-002481CFE5C4.root',
-    '/store/data/Run2016G/DoubleMuon/MINIAOD/03Feb2017-v1/100000/FAB6B333-EEEA-E611-B18E-90B11C066D31.root',
-    #'/store/data/Run2016H/DoubleMuon/MINIAOD/PromptReco-v2/000/284/035/00000/EEA9D66F-449F-E611-A9B5-02163E0144C7.root',
-    #'/store/data/Run2016H/DoubleMuon/MINIAOD/PromptReco-v2/000/284/035/00000/B4ABD959-449F-E611-8766-FA163EE30F6B.root',
-    #'/store/data/Run2016H/DoubleMuon/MINIAOD/PromptReco-v2/000/284/035/00000/94DAB68C-439F-E611-BDF9-FA163E7CCCBE.root',
-    ]
-testData["MuonEG"] = [    
-    '/store/data/Run2016G/MuonEG/MINIAOD/03Feb2017-v1/80000/FA796197-7DEB-E611-957E-0025904C66EC.root',
-    '/store/data/Run2016G/MuonEG/MINIAOD/03Feb2017-v1/80000/F65CA7FE-6EEB-E611-8BB8-0025905C3D6C.root',
-    '/store/data/Run2016G/MuonEG/MINIAOD/03Feb2017-v1/80000/E023AA96-7DEB-E611-9003-0025905C3D98.root',
-    #'/store/data/Run2016H/MuonEG/MINIAOD/PromptReco-v2/000/281/727/00000/FA84435B-FA86-E611-A578-02163E0139CB.root',
-    #'/store/data/Run2016H/MuonEG/MINIAOD/PromptReco-v2/000/281/727/00000/D4CCAFBD-E686-E611-B6CA-FA163E5B52C5.root',
-    #'/store/data/Run2016H/MuonEG/MINIAOD/PromptReco-v2/000/281/727/00000/86A5CBD5-FF86-E611-AE99-FA163EF1D56D.root',
-    ]
-testData["TT"] = [
-        '/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0693E0E7-97BE-E611-B32F-0CC47A78A3D8.root',
-        '/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0806AB92-99BE-E611-9ECD-0025905A6138.root',
-        '/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/165F54A0-A3BE-E611-B3F7-0025905A606A.root',
-        '/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/18E31463-B3BE-E611-B6A3-0CC47A4D7678.root',
-        ]
-testData["QCD"] = [
-     '/store/mc/RunIISummer16MiniAODv2/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/110000/0055B499-54B6-E611-9F86-FA163E1F94C5.root',
-     '/store/mc/RunIISummer16MiniAODv2/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/110000/02B77462-7CB5-E611-A061-0025905B8568.root',
-     '/store/mc/RunIISummer16MiniAODv2/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/110000/02CDB360-51B5-E611-A568-002590747E0E.root',
-     '/store/mc/RunIISummer16MiniAODv2/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/110000/0486046D-0BB6-E611-B533-002590D9D8C0.root',
-     ]
-testData["ZJetsToQQ"] = [
-    '/store/mc/RunIISummer16MiniAODv2/ZJetsToQQ_HT600toInf_13TeV-madgraph/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/16DC0526-F4FA-E611-938E-6CC2173BBA40.root',
-    '/store/mc/RunIISummer16MiniAODv2/ZJetsToQQ_HT600toInf_13TeV-madgraph/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/18DFBF7B-B5FC-E611-80D2-002481DE49B6.root',
-    '/store/mc/RunIISummer16MiniAODv2/ZJetsToQQ_HT600toInf_13TeV-madgraph/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/20C84FF5-11FB-E611-AA3C-C4346BC70B58.root'
-    ]
-
-if testWithData:
-    dataVersion  = "80Xdata"
-    datasetFiles = testData["SingleElectron"]
-else:
-    dataVersion  = "80Xmc" 
-    datasetFiles = testData["TT"] # "TT", "ZJetsToQQ"
-    
-# For debugging purposes
-debug       = False
-RunNum_1    = 1
-LumiBlock_1 = 2
-EvtNum_1    = 240
-RunNum_2    = 1
-LumiBlock_2 = 2
-EvtNum_2    = 260
+#================================================================================================  
+# Options
+#================================================================================================  
+debug        = False
+RunNum_1     = 1
+LumiBlock_1  = 2
+EvtNum_1     = 240
+RunNum_2     = 1
+LumiBlock_2  = 2
+EvtNum_2     = 260
 
 
 #================================================================================================  
