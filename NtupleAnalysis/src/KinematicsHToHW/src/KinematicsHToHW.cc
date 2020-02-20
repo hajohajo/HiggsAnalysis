@@ -682,10 +682,8 @@ void KinematicsHToHW::process(Long64_t entry) {
       std::cout << "nJets = " << selectedJets.size() << std::endl;
       for (auto& p: selectedJets) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads)" << std::endl;
     }
-
   if (!cfg_JetNumberCut.passedCut(selectedJets.size())) return;
-
-
+  
   // HT Selection
   double genJ_HT = 0.0;
   std::vector<math::XYZTLorentzVector> selJets_p4;
@@ -1005,105 +1003,50 @@ void KinematicsHToHW::process(Long64_t entry) {
 	  {
 	    if (0) cout << genP_pdgId <<" Tau found from Higgs" << endl;
 	    nGenP_Taus_Higgs++;
-	    //cbHt_HToHW_HBoson_TauTau.increment();
-	    // unsigned int nGenP_HToHW_HBoson_TauLeptonic_plus = 0;
-	    // unsigned int nGenP_HToHW_HBoson_TauLeptonic_minus = 0;
-	    // unsigned int nGenP_HToHW_HBoson_TauHadronic_plus = 0;
-	    // unsigned int nGenP_HToHW_HBoson_TauHadronic_minus = 0;
-
+	    
 	    if (genP_pdgId > 0) 
 	      {
-		// cout << "Tau) pdgId = " << genP_pdgId << endl;
-		// bHt_HToHW_HBoson_Tau_p4 = p.p4();
-		// nGenP_HToHW_HBoson_Taus++;
-		// For-loop: All daughters
+		
 		for (auto& d: genP_daughters)
 		  {
-		    //cout << "sorting for leptonic among all daughter in +ve Tau" << endl;
+		
 		    if(0) cout << "+ve Tau dauughters pt, pdgId:=   "<<  d.pt() <<" , " << d.pdgId() << endl;
 		    if (abs(d.pdgId()) == 11 || abs(d.pdgId()) == 13){
-		      if(0) cout << "positive tau leptonic" << endl;
 			//mcTools.PrintGenParticle(p);
 			if(nGenP_HToHW_HBoson_TauLeptonic_plus == 0 && genP_daughters.size() >= 1){
 			  nGenP_HToHW_HBoson_TauLeptonic_plus++;
 			} 
-			bHt_HToHW_HBoson_Tau_p4 += d.p4(); // remove me
+			bHt_HToHW_HBoson_Tau_p4 += d.p4();
 		    }
 		  }
 
 		for (auto& d: genP_daughters)
 		  {
-		    //cout << "sorting for hadronic among all daughter in +ve Tau" << endl;
 		    if(nGenP_HToHW_HBoson_TauLeptonic_plus == 1) nGenP_HToHW_HBoson_TauHadronic_plus = 0;
 		    else{
 		      nGenP_HToHW_HBoson_TauHadronic_plus = 1;
 		      bHt_HToHW_HBoson_Tau_p4 += d.p4();
 		    }
 		  }
-		  
-		/*
-		for (auto& d: genP_daughters) 
-		  {
-		    cout << "+ve Tau dauughters:=   "<< genP_daughters.size() << endl;
-		    cout << "+ve Tau dauughters pt, pdgId:=   "<<  d.pt() <<" , " << d.pdgId() << endl;
-		    if (abs(d.pdgId()) == 11 || abs(d.pdgId()) == 13){
-		      cout << "positive tau leptonic" << endl;
-			//mcTools.PrintGenParticle(p);
-			if(nGenP_HToHW_HBoson_TauLeptonic_plus == 0 && genP_daughters.size() >= 1){
-			  nGenP_HToHW_HBoson_TauLeptonic_plus++;
-			} // fixme - add tau-leptonic counter
-			bHt_HToHW_HBoson_Tau_p4 += d.p4(); // remove me
-		    }
-		    else if (mcTools.IsLepton(d.pdgId(),false )) 
-		      {
-			cout << "positive tau leptonic" << endl;
-			//mcTools.PrintGenParticle(p);
-			if(nGenP_HToHW_HBoson_TauLeptonic_plus == 0 && genP_daughters.size() >= 1){
-			  nGenP_HToHW_HBoson_TauLeptonic_plus++;
-			} // fixme - add tau-leptonic counter
-			bHt_HToHW_HBoson_Tau_p4 += d.p4(); // remove me
-			//continue;
-		      }
-		    else
-		      {
-			cout << "positive tau hadronic" << endl;
-			// mcTools.PrintGenParticle(p);
-			// break from the loop the tau decay to 0p, 1p, 3p 
-			nGenP_HToHW_HBoson_Taus++; // fixme - nGenP_HToHW_HBoson_TauHadronic
-			if(nGenP_HToHW_HBoson_TauHadronic_plus == 0 && genP_daughters.size() >= 1){
-			  nGenP_HToHW_HBoson_TauHadronic_plus++;
-			}
-			bHt_HToHW_HBoson_Tau_p4 += d.p4(); 
-			}
-			}
-		*/
 	      }
 	    else
 	      {
-		// cout << "Antitau) pdgId = " << genP_pdgId << endl;
-		// bHt_HToHW_HBoson_Antitau_p4 = p.p4();
-		// nGenP_HToHW_HBoson_Taus++;
-
 		// For-loop: All daughters
 		for (auto& d: genP_daughters)
 		  {
-		    //cout << "sorting for leptonic among all daughter in -ve Tau" << endl;
 		    if(0) cout << "-ve Tau dauughters pt, pdgId:=   "<<  d.pt() <<" , " << d.pdgId() << endl;
 		    if (abs(d.pdgId()) == 11 || abs(d.pdgId()) == 13){
-		      //cout << "positive tau leptonic" << endl;
 			//mcTools.PrintGenParticle(p);
 			if(nGenP_HToHW_HBoson_TauLeptonic_minus == 0 && genP_daughters.size() >= 1){
 			  nGenP_HToHW_HBoson_TauLeptonic_minus++;
 			} 
-			bHt_HToHW_HBoson_Antitau_p4 += d.p4(); // remove me
+			bHt_HToHW_HBoson_Antitau_p4 += d.p4();
 		    }
 		  }
 
 		for (auto& d: genP_daughters)
 		  {
-		    //cout << "sorting for hadronic among all daughter in -ve Tau" << endl;
 		    if(nGenP_HToHW_HBoson_TauLeptonic_minus == 1) { 
-		      //cout << "in if loop " << endl;
 		      nGenP_HToHW_HBoson_TauHadronic_minus = 0;
 		    }
 		    else{
@@ -1112,58 +1055,12 @@ void KinematicsHToHW::process(Long64_t entry) {
 		    }
 		  }
 
-		/*
-		for (auto& d: genP_daughters) 
-		  {
-		    cout << "-ve Tau dauughters:=   "<< genP_daughters.size() << endl;
-		    cout << "-ve Tau dauughters pt, pdgId:=   "<<  d.pt() <<" , " << d.pdgId() << endl;
-		    // inlude loop for electron or muon
-		    if (abs(d.pdgId()) == 11 || abs(d.pdgId()) == 13){
-		      cout << "negative tau leptonic" << endl;
-		      // mcTools.PrintGenParticle(p);
-		      if(nGenP_HToHW_HBoson_TauLeptonic_minus == 0 && genP_daughters.size() >= 1){
-			nGenP_HToHW_HBoson_TauLeptonic_minus++;
-		      }
-		      bHt_HToHW_HBoson_Antitau_p4 += d.p4();
-		    }
-		    else if (mcTools.IsLepton(d.pdgId(),false )) {
-		      cout << "negative tau leptonic" << endl;
-		      // mcTools.PrintGenParticle(p);
-		      if(nGenP_HToHW_HBoson_TauLeptonic_minus == 0 && genP_daughters.size() >= 1){
-			nGenP_HToHW_HBoson_TauLeptonic_minus++;
-		      }
-		      bHt_HToHW_HBoson_Antitau_p4 += d.p4(); // remove me
-		      //continue;
-		    }
-		    else
-		      {
-			cout << "negative tau hadronic" << endl;
-			//mcTools.PrintGenParticle(p);
-			nGenP_HToHW_HBoson_Taus++;
-			if(nGenP_HToHW_HBoson_TauHadronic_minus == 0 && genP_daughters.size() >= 1){
-			  nGenP_HToHW_HBoson_TauHadronic_minus++;
-			}
-			bHt_HToHW_HBoson_Antitau_p4 += d.p4(); 
-		      }
-		  }
-		*/
 	      }
 
-	    // put the counter here
-	    // if ((nGenP_HToHW_HBoson_TauLeptonic_plus + nGenP_HToHW_HBoson_TauLeptonic_minus) >= 2) cbHt_HToHW_HBoson_TauLeptonic.increment(); //  fix me gkole
-	    // if ((nGenP_HToHW_HBoson_TauHadronic_plus + nGenP_HToHW_HBoson_TauHadronic_minus) >= 2) cbHt_HToHW_HBoson_TauHadronic.increment(); // fix me gkole
-	    // if ((nGenP_HToHW_HBoson_TauLeptonic_plus >= 1 || nGenP_HToHW_HBoson_TauLeptonic_minus >=1) && (nGenP_HToHW_HBoson_TauHadronic_plus >= 1 || nGenP_HToHW_HBoson_TauHadronic_minus >= 1)) cbHt_HToHW_HBoson_1Lep1Had.increment(); // fixme gkole
-	    
 	  } //from h0 or H0
       
       } // taus
   
-    // counter fix me gkole
-    // if (nGenP_HToHW_HBoson_TauLeptonic >= 2) cbHt_HToHW_HBoson_TauLeptonic.increment(); //  fix me gkole
-    // if (nGenP_HToHW_HBoson_TauHadronic >= 2) cbHt_HToHW_HBoson_TauHadronic.increment(); // fix me gkole
-    // if (nGenP_HToHW_HBoson_TauLeptonic >= 1 && nGenP_HToHW_HBoson_TauHadronic >= 1) cbHt_HToHW_HBoson_1Lep1Had.increment(); // fixme gkole
-    
-    
     if (cfg_Verbose) std::cout << "=== t quarks" << std::endl;
     if ( abs(genP_pdgId) == 6)
       {
