@@ -845,7 +845,8 @@ if __name__ == "__main__":
         raise Exception(es + msg + ns)
 
     # Set name for saving
-    opts.saveName = "TauFR_%s" % (opts.denHisto.split("_")[-1])
+    opts.saveName = opts.denHisto.replace("tauPt", "TauFR").replace("num_", "").replace("den_", "")
+    #opts.saveName = "TauFR_%s" % (opts.denHisto.split("_")[-1])
 
     # Create save formats
     if "," in opts.saveFormats:

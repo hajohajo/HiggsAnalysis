@@ -213,7 +213,7 @@ def main():
     allSelections.histogramAmbientLevel = opts.histoLevel
     allSelections.MuonSelection.applyTriggerMatching = False # cannot use it for 2 muons and single-muon trigger
     #allSelections.MuonSelection.muonPtCut = 40.0 # cannot use it for 2 muons and single-muon trigger
-    allSelections.JetSelection.numberOfJetsCutValue = 1 # [default; 0]
+    #allSelections.JetSelection.numberOfJetsCutValue = 1 # [default; 0]
 
     # allSelections.BjetSelection.triggerMatchingApply = True
     # allSelections.BJetSelection.numberOfBJetsCutValue = 0
