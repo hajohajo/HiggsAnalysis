@@ -169,7 +169,7 @@ def main(opts, signalMass):
 def Plot_Comparisons(datasetsMgr, datasetsMgrRef, hT, hR, intLumi):
     _kwargs = {}
 
-    print 
+    #print 
     if opts.normaliseToOne:
         pT = plots.MCPlot(datasetsMgr, hT, normalizeToOne=True, saveFormats=[], **_kwargs)
         pR = plots.MCPlot(datasetsMgrRef, hR, normalizeToOne=True, saveFormats=[], **_kwargs)
@@ -185,8 +185,8 @@ def Plot_Comparisons(datasetsMgr, datasetsMgrRef, hT, hR, intLumi):
     logY    = False
     _opts   = {"ymin": 1e-3, "ymaxfactor": 1.0}
 
-    print "HT", hT
-    print "HR", hR
+    #print "HT", hT
+    #print "HR", hR
 
     xMax = 200
     _units = 0
@@ -348,8 +348,8 @@ def Plot_Comparisons(datasetsMgr, datasetsMgrRef, hT, hR, intLumi):
     HT = ht.getHistogram()
     HR = hr.getHistogram()
 
-    print "target: integral", HT.Integral()
-    print "reference: integral", HR.Integral()
+    #print "target: integral", HT.Integral()
+    #print "reference: integral", HR.Integral()
 
     # styles
     altSignalBDTGStyle  = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure+9, markerSizes=None, markerStyle=ROOT.kFullDiamond),

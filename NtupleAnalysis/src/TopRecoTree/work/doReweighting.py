@@ -471,20 +471,37 @@ def GetWeights(sigTree, bkgTree, refBranch):
     xmax  = kwargs["xmax"]
     xbins = kwargs["xbins"] #(xmax - xmin)/10 #kwargs["xbins"]
 
+    myBins = []
+    if ("trijetMass" in refBranch):
+        for i in range(0, xmax, 10):
+            myBins.append(i)
+
     if ("trijetPt" in refBranch):
-        xbins = xbins/1
+        for i in range(0, 280, 20):
+            myBins.append(i)
+        for i in range(280, 305, 25):
+            myBins.append(i)
+        for i in range(305, 425, 30):
+            myBins.append(i)
+        for i in range(425, 495, 35):
+            myBins.append(i)
+        for i in range(495, xmax, 50):
+            myBins.append(i)
 
     # Create histogram
     sigName = "%s_S" % refBranch
     bkgName = "%s_B" % refBranch
     Print("Creating reference histograms %s %s" % (sigName, bkgName), True)
 
-    hSig = ROOT.TH1F(sigName, sigName, xbins, xmin, xmax)
-    hBkg = ROOT.TH1F(bkgName, bkgName, xbins, xmin, xmax)
+    #hSig = ROOT.TH1F(sigName, sigName, xbins, xmin, xmax)
+    #hBkg = ROOT.TH1F(bkgName, bkgName, xbins, xmin, xmax)
 
+    hSig = ROOT.TH1F(sigName, sigName, len(myBins)-1, array.array("d",myBins))
+    hBkg = ROOT.TH1F(bkgName, bkgName, len(myBins)-1, array.array("d",myBins))
+    
     # Number of entries in trees
     nEntries_s = sigTree.GetEntries();
-    nEntries_b = bkgTree.GetEntries();
+    nEntries_b = nEntries_s #bkgTree.GetEntries();
        
     if (nEntries_b == nEntries_s):
         Print("Warning! using nEntries_b = nEntries_s", True)
@@ -522,8 +539,9 @@ def GetWeights(sigTree, bkgTree, refBranch):
     hWeights.SetLineWidth(3)
     kwargs["ymax"] = hWeights.GetMaximum() + 1
     
-    binwidth = (xmax - xmin)/xbins
-    kwargs["ylabel"] = "Weights (a.u.) / %s GeV" % str(binwidth)
+    #binwidth = (xmax - xmin)/xbins
+    #kwargs["ylabel"] = "Weights (a.u.) / %s GeV" % str(binwidth)
+    kwargs["ylabel"] = "Weights (a.u.)"
 
     kwargs["opts"]   = {"ymin": 0.0, "ymaxfactor": 1.1}
 
@@ -597,7 +615,7 @@ def doReweighting(datasetsMgr, refBranch, treeName):
     
     # Number of entries in trees
     nEntries_s = sigTree.GetEntries();
-    nEntries_b = bkgTree.GetEntries();
+    nEntries_b = nEntries_s #bkgTree.GetEntries();
 
     if (nEntries_b == nEntries_s):
         Print("Warning! using nEntries_b = nEntries_s", True)

@@ -233,6 +233,12 @@ def main():
         DeltaRCutValue           = "0.3"
         )
 
+    # Define selections type based on the mcrab name
+    if "Hplus2tbAnalysis" in opts.mcrab:
+        RecoTopMVASelection.SelectionsType = "hadronic"
+    elif "TopSyst" in opts.mcrab:
+        RecoTopMVASelection.SelectionsType = "semiLeptonic"
+
     # Hadronic selections
     from HiggsAnalysis.NtupleAnalysis.parameters.hplus2tbAnalysis import allSelections as _hadronicSelections
 
@@ -267,12 +273,6 @@ def main():
     _semiLeptonicSelections.BJetSelection.numberOfBJetsCutValue = 2
     
     semiLeptonicSelections = copy.deepcopy(_semiLeptonicSelections)
-
-    # Define selections type based on the mcrab name
-    if "Hplus2tbAnalysis" in opts.mcrab:
-        RecoTopMVASelection.SelectionsType = "hadronic"
-    elif "TopSyst" in opts.mcrab:
-        RecoTopMVASelection.SelectionsType = "semiLeptonic"
         
     # Get allSelections 
     if (RecoTopMVASelection.SelectionsType == "hadronic"):
@@ -280,7 +280,7 @@ def main():
     else:
         allSelections = copy.deepcopy(semiLeptonicSelections)
 
-    Print("Selections Type: %s %s %s" %(ts, RecoTopMVASelection.SelectionsType, ns), True)
+    Print("Selections Type: %s %s %s" %(ts, allSelections.RecoTopMVASelection.SelectionsType, ns), True)
 
     #Print ("Hadronic Selections", True)
     #print hadronicSelections.Trigger
