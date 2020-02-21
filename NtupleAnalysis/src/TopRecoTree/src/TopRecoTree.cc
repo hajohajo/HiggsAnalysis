@@ -56,6 +56,7 @@ public:
   bool isMatchedJet(const Jet& jet, const std::vector<Jet>& jets);
   
   bool isWsubjet(const Jet& jet, const std::vector<Jet>& jets1, const std::vector<Jet>& jets2);
+  bool isLepton(const Jet& jet, const std::vector<Electron>& selectedElectrons, const std::vector<Muon>& selectedMuons);
   ///Are same Jets
   bool areSameJets(const Jet& jet1, const Jet& jet2);
   /// Books histograms
@@ -227,7 +228,20 @@ private:
   WrappedTH1Triplet *hDRDijetwithBJet;
   WrappedTH1Triplet *hDRJ1BJetwithJ2;
   WrappedTH1Triplet *hDRJ2BJetwithJ1;
-  
+  //
+  WrappedTH1Triplet *hDRJ1withElectron;
+  WrappedTH1Triplet *hDRJ2withElectron;
+  WrappedTH1Triplet *hDRBwithElectron;
+  WrappedTH1Triplet *hDRJ1withElectron_ptD0p80;
+  WrappedTH1Triplet *hDRJ2withElectron_ptD0p80;
+  WrappedTH1Triplet *hDRBwithElectron_ptD0p80;
+
+  WrappedTH1Triplet *hDRJ1withMuon;
+  WrappedTH1Triplet *hDRJ2withMuon;
+  WrappedTH1Triplet *hDRBwithMuon;
+  WrappedTH1Triplet *hDRJ1withMuon_ptD0p80;
+  WrappedTH1Triplet *hDRJ2withMuon_ptD0p80;
+  WrappedTH1Triplet *hDRBwithMuon_ptD0p80;
 
   //Ctrl plots for semi-leptonic selections
   WrappedTH1 *hCtrl_JetMult;
@@ -791,6 +805,20 @@ void TopRecoTree::book(TDirectory *dir) {
   hDRJ1BJetwithJ2  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1BJetwithJ2" , ";#Delta R", nBinsDR, minDR, maxDR);
   hDRJ2BJetwithJ1  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ2BJetwithJ1" , ";#Delta R", nBinsDR, minDR, maxDR);
 
+  hDRJ1withElectron = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1withElectron", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ2withElectron = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ2withElectron", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRBwithElectron  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRBwithElectron", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ1withElectron_ptD0p80 = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1withElectron_ptD0p80", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ2withElectron_ptD0p80 = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ2withElectron_ptD0p80", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRBwithElectron_ptD0p80  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRBwithElectron_ptD0p80", ";#Delta R", nBinsDR, minDR, maxDR);
+
+  hDRJ1withMuon = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1withMuon", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ2withMuon = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ2withMuon", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRBwithMuon  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRBwithMuon", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ1withMuon_ptD0p80 = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ1withMuon_ptD0p80", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRJ2withMuon_ptD0p80 = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRJ2withMuon_ptD0p80", ";#Delta R", nBinsDR, minDR, maxDR);
+  hDRBwithMuon_ptD0p80  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DRBwithMuon_ptD0p80", ";#Delta R", nBinsDR, minDR, maxDR);
+
   // Ctrl plots for semi-leptonic selections
   hCtrl_JetMult  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_JetMult", ";Jet multiplicity", nNBins, fNMin, fNMax);
   hCtrl_JetPt    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug,myInclusiveDir,"Ctrl_JetPt", ";Jet p_{T}",  nBinsPt, minPt , maxPt);
@@ -1138,7 +1166,7 @@ void TopRecoTree::getTopDecayProducts(const Event& fEvent, genParticle top, vect
   
   for (size_t i=0; i<top.daughters().size(); i++){
     int dau_index = top.daughters().at(i);
-    genParticle dau = fEvent.genparticles().getGenParticles()[dau_index];
+    genParticle dau = fEvent.genparticles().getGenParticles()[dau_index]; //dau: first copy
 
     // B-Quark                                                                                                                                                                       
     if (std::abs(dau.pdgId()) ==  5) bquarks.push_back(dau);
@@ -1147,17 +1175,19 @@ void TopRecoTree::getTopDecayProducts(const Event& fEvent, genParticle top, vect
     if (std::abs(dau.pdgId()) == 24){
       // Get the last copy                                                                                                        
       genParticle W = GetLastCopy(fEvent.genparticles().getGenParticles(), dau);      
+
       // Find the decay products of W                                                                               
       for (size_t idau=0; idau<W.daughters().size(); idau++){	
 	int Wdau_index = W.daughters().at(idau);
 	genParticle Wdau = fEvent.genparticles().getGenParticles()[Wdau_index];	
+	//std::cout<<"pdgId: "<<Wdau.pdgId()<<std::endl;
 	// Consider only quarks as decaying products                                                                    
 	if (std::abs(Wdau.pdgId()) > 5) continue;
 	quarks.push_back(Wdau);
       }//for (size_t idau=0; idau<W.daughters().size(); idau++)
     }//if (std::abs(dau.pdgId()) == 24)
   }//for (size_t i=0; i<top.daughters().size(); i++)
-
+  
   //sort quarks in pt
   std::sort( quarks.begin(),  quarks.end(),  PtComparator() );
   std::sort( bquarks.begin(), bquarks.end(), PtComparator() );
@@ -1170,11 +1200,10 @@ void TopRecoTree::getTopDecayProducts(const Event& fEvent, genParticle top, vect
 void TopRecoTree::getTopDecayProducts(const Event& fEvent, genParticle top, genParticle &quark1, genParticle &quark2, genParticle &bquark){
   vector<genParticle> quarks, bquarks;
   getTopDecayProducts(fEvent, top, quarks, bquarks);
-  //Skip if at least one top does not decay hadronically
-  if (!(quarks.size() == 2 && bquarks.size()==1)) return;      
-  quark1 = quarks.at(0);
-  quark2 = quarks.at(1);
-  bquark = bquarks.at(0);
+  
+  if (quarks.size() > 0)  quark1 = quarks.at(0);
+  if (quarks.size() > 1)  quark2 = quarks.at(1);
+  if (bquarks.size() > 0) bquark = bquarks.at(0);
 }
 
 //  Get the last copy of a particle.
@@ -1257,7 +1286,16 @@ bool TopRecoTree::isWsubjet(const Jet& jet , const std::vector<Jet>& jets1 , con
   return  (isMatchedJet(jet,jets1)||isMatchedJet(jet,jets2));
 }
 
-
+bool TopRecoTree::isLepton(const Jet& jet, const std::vector<Electron>& selectedElectrons, const std::vector<Muon>& selectedMuons){
+  bool passEle = (selectedElectrons.size() > 0);
+  bool passMu = (selectedMuons.size() > 0);
+  float dR = 999.999;
+  float dR_match = 0.3;
+  
+  if (passEle) dR = ROOT::Math::VectorUtil::DeltaR(selectedElectrons.at(0).p4(), jet.p4());
+  else if (passMu)  dR = ROOT::Math::VectorUtil::DeltaR(selectedMuons.at(0).p4(), jet.p4());  
+  return (dR <= dR_match);
+}
 
   
 bool TopRecoTree::isBJet(const Jet& jet, const std::vector<Jet>& bjets) {
@@ -1744,14 +1782,14 @@ void TopRecoTree::process(Long64_t entry) {
   for (auto& top: GenTops){
     vector<genParticle> quarks, bquarks;
 
-    // Get top decay products
+    // Get top decay products (Returns direct b quarks, quarks from W boson)
     getTopDecayProducts(fEvent, top, quarks, bquarks);
-    bool foundB = (bquarks.size()==1);
-
+    bool foundB = (bquarks.size() == 1);
+    
     //Fill control plots (gen top pt)
     if (quarks.size() == 2) hCtrl_hadrGenTopPt -> Fill(top.pt());
     else hCtrl_lepGenTopPt -> Fill(top.pt());
-
+    
     if (cfg_SelectionsType == "hadronic"){
       // Skip if at least one top does not decay hadronically
       if (!(quarks.size() == 2 && foundB)) return;
@@ -1760,7 +1798,7 @@ void TopRecoTree::process(Long64_t entry) {
       // If top does not decay into W+b return
       if (!foundB) return;
     }
-
+    
     if (quarks.size() == 2){
       // Fill vectors for b-quarks, leading and subleading quarks coming from tops                                                                                                   
       GenTops_Quarks.push_back(bquarks.at(0));
@@ -1773,7 +1811,6 @@ void TopRecoTree::process(Long64_t entry) {
     }
   }//for (auto& top: GenTops)                                                                                                                                                      
   
-
   //Definitions
   int imatched =0;
   vector <Jet> MCtrue_LdgJet, MCtrue_SubldgJet, MCtrue_Bjet;   // Keep matched jets
@@ -1785,7 +1822,7 @@ void TopRecoTree::process(Long64_t entry) {
   //========================================================================================================
   //======= B jet matching (Loop over all Jets)
   //========================================================================================================  
-  for (size_t i=0; i<GenTops.size(); i++){
+  for (size_t i=0; i<GenTops_BQuark.size(); i++){
     genParticle BQuark      = GenTops_BQuark.at(i);
     Jet mcMatched_BJet;
     double dRmin  = 99999.9;
@@ -1811,7 +1848,7 @@ void TopRecoTree::process(Long64_t entry) {
   //======= Dijet matching (Loop over all Jets)
   //========================================================================================================
 
-  for (size_t i=0; i<GenTops_LdgQuark.size(); i++){
+  for (size_t i=0; i<GenTops_BQuark.size(); i++){
     genParticle LdgQuark    = GenTops_LdgQuark.at(i);
     genParticle SubldgQuark = GenTops_SubldgQuark.at(i);
       
@@ -1823,7 +1860,7 @@ void TopRecoTree::process(Long64_t entry) {
 
     for (auto& jet: jetData.getSelectedJets()){
       bool same = false;
-      for (size_t k=0; k<GenTops.size(); k++){
+      for (size_t k=0; k<GenTops_BQuark.size(); k++){
 	if (dRminB.at(k) <= cfg_DeltaRCut){
 	  if( areSameJets(jet,BJetCand.at(k))) same = true; //Skip the jets that are matched with bquarks
 	}
@@ -1936,21 +1973,25 @@ void TopRecoTree::process(Long64_t entry) {
   int index0 = -1;
   for (auto& jet0: jetData.getSelectedJets()){
     index0++;
+    if (isLepton(jet0, selectedElectrons, selectedMuons)) continue;
     int index1 = -1;
     for (auto& jet1: jetData.getSelectedJets()){
       index1++;
+      if (isLepton(jet1, selectedElectrons, selectedMuons)) continue;
       if (index1 < index0) continue;
       if (areSameJets(jet1, jet0)) continue;
       int index2 = -1;
       for (auto& jet2: jetData.getSelectedJets()){
 	index2++;
+	if (isLepton(jet2, selectedElectrons, selectedMuons)) continue;
 	if (index2 < index1) continue;
 	if (areSameJets(jet2,  jet1)) continue;
 	if (areSameJets(jet2,  jet0)) continue;
+
 	  
 	//********************************** Bjet Matched OR dijet matched*********************************//
-	//	  if ( isBJet(jet0, MCtrue_Bjet)    ||    ((isMatchedJet(jet1,MCtrue_LdgJet)||isMatchedJet(jet1,MCtrue_SubldgJet))  &&  (isMatchedJet(jet2,MCtrue_LdgJet)||isMatchedJet(jet2,MCtrue_SubldgJet)))  ){
 	if ( isBJet(jet0, MCtrue_Bjet)    ||    (isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet))){
+	  //getTrijet(jet0, jet1, jet2, applyBjetPtCut, 40);
 	  if (applyBjetPtCut && (jet0.pt() < 40)) continue;
 	  TopCandidates.BJet.push_back(jet0);
 	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
@@ -1972,8 +2013,6 @@ void TopRecoTree::process(Long64_t entry) {
 	}
 	  
 	//********************************** One of the dijet subjets matched*********************************//
-	//	  else if (isMatchedJet(jet0,MCtrue_LdgJet)||isMatchedJet(jet0,MCtrue_SubldgJet)){  //jet0 belongs to dijet
-
 	else if (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)){
 
 	  if (jet1.bjetDiscriminator() > jet2.bjetDiscriminator()){
@@ -2018,9 +2057,7 @@ void TopRecoTree::process(Long64_t entry) {
 	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
 	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
 	  }
-	}
-
-	  	 	  
+	}	  	 	  
 	//********************** Non of the three subjets is matched************************//
 	  
 	else if (jet0.bjetDiscriminator() > jet1.bjetDiscriminator() && jet0.bjetDiscriminator() > jet2.bjetDiscriminator()){            
@@ -2054,8 +2091,12 @@ void TopRecoTree::process(Long64_t entry) {
   for (size_t i=0; i<TopCandidates.BJet.size(); i++){
     bool genuine = false;
     for (size_t j=0; j<MCtrue_Bjet.size(); j++){
-      bool same1 = areSameJets(TopCandidates.Jet1.at(i), MCtrue_LdgJet.at(j))    && areSameJets(TopCandidates.Jet2.at(i), MCtrue_SubldgJet.at(j)) && areSameJets(TopCandidates.BJet.at(i),  MCtrue_Bjet.at(j));
-      bool same2 = areSameJets(TopCandidates.Jet1.at(i), MCtrue_SubldgJet.at(j)) && areSameJets(TopCandidates.Jet2.at(i), MCtrue_LdgJet.at(j))    && areSameJets(TopCandidates.BJet.at(i),  MCtrue_Bjet.at(j));
+      Jet jet1 = TopCandidates.Jet1.at(i);
+      Jet jet2 = TopCandidates.Jet2.at(i);
+      Jet bjet = TopCandidates.BJet.at(i);
+      
+      bool same1 = areSameJets(jet1, MCtrue_LdgJet.at(j))    && areSameJets(jet2, MCtrue_SubldgJet.at(j)) && areSameJets(bjet,  MCtrue_Bjet.at(j));
+      bool same2 = areSameJets(jet1, MCtrue_SubldgJet.at(j)) && areSameJets(jet2, MCtrue_LdgJet.at(j))    && areSameJets(bjet,  MCtrue_Bjet.at(j));
       if (same1 || same2){
 	genuine = true;
       }
@@ -2106,13 +2147,13 @@ void TopRecoTree::process(Long64_t entry) {
     hDEtaDijetwithBJet -> Fill(isGenuineTop, std::abs(DijetP4.Eta() - bjet.eta()));
     hDEtaJ1BJetwithJ2  -> Fill(isGenuineTop, std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta()));
     hDEtaJ2BJetwithJ1  -> Fill(isGenuineTop, std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta()));
-      
-    hDPhiJ1withJ2      -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4())); 
-    hDPhiJ1withBJet    -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4()));
-    hDPhiJ2withBJet    -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4()));
-    hDPhiDijetwithBJet -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4()));
-    hDPhiJ1BJetwithJ2  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4()));
-    hDPhiJ2BJetwithJ1  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4()));
+    
+    hDPhiJ1withJ2      -> Fill(isGenuineTop, std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4()))); 
+    hDPhiJ1withBJet    -> Fill(isGenuineTop, std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4())));
+    hDPhiJ2withBJet    -> Fill(isGenuineTop, std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4())));
+    hDPhiDijetwithBJet -> Fill(isGenuineTop, std::abs(ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4())));
+    hDPhiJ1BJetwithJ2  -> Fill(isGenuineTop, std::abs(ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4())));
+    hDPhiJ2BJetwithJ1  -> Fill(isGenuineTop, std::abs(ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4())));
       
     hDRJ1withJ2       -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4()));
     hDRJ1withBJet     -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4()));
@@ -2121,6 +2162,25 @@ void TopRecoTree::process(Long64_t entry) {
     hDRJ1BJetwithJ2   -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR((jet1.p4()+bjet.p4()), jet2.p4()));
     hDRJ2BJetwithJ1   -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4()));
       
+    if (passElectron){
+      Electron ele = selectedElectrons.at(0);
+      hDRJ1withElectron -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(ele.p4(), jet1.p4()));
+      hDRJ2withElectron -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(ele.p4(), jet2.p4()));
+      hDRBwithElectron  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(ele.p4(), bjet.p4()));      
+      if (jet1.QGTaggerAK4PFCHSptD() > 0.80) hDRJ1withElectron_ptD0p80 -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(ele.p4(), jet1.p4()));
+      if (jet2.QGTaggerAK4PFCHSptD() > 0.80) hDRJ2withElectron_ptD0p80 -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(ele.p4(), jet2.p4()));
+      if (bjet.QGTaggerAK4PFCHSptD() > 0.80) hDRBwithElectron_ptD0p80  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(ele.p4(), bjet.p4()));
+    }
+    if (passMuon){
+      Muon mu = selectedMuons.at(0);
+      hDRJ1withMuon -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(mu.p4(), jet1.p4()));
+      hDRJ2withMuon -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(mu.p4(), jet2.p4()));
+      hDRBwithMuon  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(mu.p4(), bjet.p4()));      
+      if (jet1.QGTaggerAK4PFCHSptD() > 0.80) hDRJ1withMuon_ptD0p80 -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(mu.p4(), jet1.p4()));
+      if (jet2.QGTaggerAK4PFCHSptD() > 0.80) hDRJ2withMuon_ptD0p80 -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(mu.p4(), jet2.p4()));
+      if (bjet.QGTaggerAK4PFCHSptD() > 0.80) hDRBwithMuon_ptD0p80  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(mu.p4(), bjet.p4()));
+    }
+	
     // Trijet system
     hTrijetPt           -> Fill(isGenuineTop, TrijetP4.Pt());
     hTrijetEta          -> Fill(isGenuineTop, TrijetP4.Eta());
@@ -2209,8 +2269,7 @@ void TopRecoTree::process(Long64_t entry) {
     //hBJetSubldgJet_PFCharge  -> Fill(isGenuineTop, bjet.pfcharge()+jet2.pfcharge());
 
     if (isGenuineTop){
-	
-      /////marina
+
       // Fill signal background
       eventWeight_S = fEventWeight.getWeight();
 	  
@@ -2322,12 +2381,12 @@ void TopRecoTree::process(Long64_t entry) {
       DEtaDijetwithBJet_S	    = std::abs(DijetP4.Eta() - bjet.eta());
       DEtaJ1BJetwithJ2_S	    = std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta());
       DEtaJ2BJetwithJ1_S	    = std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta());
-      DPhiJ1withJ2_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4()); 
-      DPhiJ1withBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4());
-      DPhiJ2withBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4());
-      DPhiDijetwithBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4());
-      DPhiJ1BJetwithJ2_S	    = ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4());
-      DPhiJ2BJetwithJ1_S	    = ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4());
+      DPhiJ1withJ2_S	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4())); 
+      DPhiJ1withBJet_S	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4()));
+      DPhiJ2withBJet_S	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4()));
+      DPhiDijetwithBJet_S	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4()));
+      DPhiJ1BJetwithJ2_S	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4()));
+      DPhiJ2BJetwithJ1_S	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4()));
       DRJ1withJ2_S		    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
       DRJ1withBJet_S	    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4());
       DRJ2withBJet_S	    = ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4());
@@ -2336,7 +2395,7 @@ void TopRecoTree::process(Long64_t entry) {
       DRJ2BJetwithJ1_S	    = ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4());
 	  
       dijetMassOverTrijetMass_S = DijetP4.M()/TrijetP4.M();	  
-      /////marina
+
       treeS -> Fill();
     }
     else{
@@ -2452,12 +2511,12 @@ void TopRecoTree::process(Long64_t entry) {
       DEtaDijetwithBJet_B	    = std::abs(DijetP4.Eta() - bjet.eta());
       DEtaJ1BJetwithJ2_B	    = std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta());
       DEtaJ2BJetwithJ1_B	    = std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta());
-      DPhiJ1withJ2_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4()); 
-      DPhiJ1withBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4());
-      DPhiJ2withBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4());
-      DPhiDijetwithBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4());
-      DPhiJ1BJetwithJ2_B	    = ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4());
-      DPhiJ2BJetwithJ1_B	    = ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4());
+      DPhiJ1withJ2_B	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4())); 
+      DPhiJ1withBJet_B	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4()));
+      DPhiJ2withBJet_B	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4()));
+      DPhiDijetwithBJet_B	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4()));
+      DPhiJ1BJetwithJ2_B	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4()));
+      DPhiJ2BJetwithJ1_B	    = std::abs(ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4()));
       DRJ1withJ2_B		    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
       DRJ1withBJet_B	    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4());
       DRJ2withBJet_B	    = ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4());
