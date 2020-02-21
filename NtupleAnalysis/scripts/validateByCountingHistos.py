@@ -25,11 +25,9 @@ def ls(path=""):
 
     ROOT.gFile.cd(path)
     gDir = ROOT.gFile.CurrentDirectory()
-    print "dir",path
     keys = gDir.GetListOfKeys()
     for i in range(gDir.GetNkeys()):
         keyname = keys.At(i).GetName()
-        print "check key",keyname
         obj = gDir.Get(keyname)
 
         if isinstance(obj, ROOT.TH1F) or isinstance(obj, ROOT.TH2F):
