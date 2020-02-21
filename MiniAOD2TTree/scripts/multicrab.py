@@ -999,7 +999,12 @@ def PrintTaskSummary(reportDict):
         if (report.allJobs == report.eosOut):
             outOK = True
 
-        if (not logOK or not outOK):
+        #if (not logOK or not outOK):
+            #status = "%s%s" % (colors.BLINK, status)
+        #if status == "COMPLETED":
+        #    status = "%s" % (status)
+        # Remember that "status" already contains a style (extra characters)
+        if "COMPLETED" not in status:
             status = "%s%s" % (colors.BLINK, status)
 
         idle          = '{0: >3}'.format(report.idle)
@@ -1221,7 +1226,7 @@ def GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, fai
     nOutEOSM  = eosOutMerged 
     txtAlign  = "{:<25} {:>4} {:<1} {:<4}"
     dataset   = taskDir.split("/")[-1]
-    length    = 45 #len(dataset)
+    length    = 60 #len(dataset)
     hLine     = "="*length
     status    = GetTaskStatus(taskDir).replace("\t", "")
     txtAlignB = "{:<%s}" % (length)
