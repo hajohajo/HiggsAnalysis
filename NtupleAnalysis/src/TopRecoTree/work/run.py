@@ -229,6 +229,8 @@ def main():
         MiniIsoCutDirection      = "<=",
         METCutValue              = "-9999.99",
         METCutDirection          = ">=",
+        DeltaPtOverPtCutValue    = "0.32",
+        DeltaRCutValue           = "0.3"
         )
 
     # Hadronic selections

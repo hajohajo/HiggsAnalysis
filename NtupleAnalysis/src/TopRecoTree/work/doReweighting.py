@@ -12,8 +12,7 @@ EXAMPLES:
 ./doReweighting.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --url
 
 LAST USED:
-./doReweighting.py -m TopRecoTree_multFloat_AnalysisSelections --normalizeToOne --ref TrijetPtDR --url
-./doReweighting.py -m TopRecoTree_200217_114252_FirstNewBranches_hadronic --normalizeToOne --ref trijetPt --url --treeName treeS --logZ
+./doReweighting.py -m TopRecoTree_200219_FirstNewBranches_hadronic_fixedTrigger_1 --normalizeToOne --url --saveInRootFile
 '''
 
 #================================================================================================ 
@@ -401,8 +400,7 @@ def GetHistoKwargs(h, opts):
     if "chisquared" in h.lower():
         kwargs["xlabel"] = "#chi^{2}"
         kwargs["xmax"] = 10
-
-
+        
     # Get Bins
     binWidth = 10
     Xmax = [0.001, 0.01, 0.1, 1., 10., 100., 1000.]
@@ -416,6 +414,9 @@ def GetHistoKwargs(h, opts):
             binWidth = binWidth/10.
 
     kwargs["xbins"] = int((kwargs["xmax"] - kwargs["xmin"])/binWidth)
+
+    if "axis2" in h.lower():
+        kwargs["xbins"] = kwargs["xbins"]/4
     #
 
     if 0:
@@ -457,10 +458,10 @@ def GetListOfBranches(tree):
         if "Weight" in brsList[i].GetName():
             continue
         # Branches with old names
-        if "Trijet" not in brsList[i].GetName():
-            continue
-        if "over" not in brsList[i].GetName().lower():
-            continue
+        #if "Trijet" not in brsList[i].GetName():
+        #    continue
+        #if "over" not in brsList[i].GetName().lower():
+        #    continue
         branchList.append(brsList[i].GetName())        
     return branchList
 def GetWeights(sigTree, bkgTree, refBranch):
@@ -468,7 +469,10 @@ def GetWeights(sigTree, bkgTree, refBranch):
             
     xmin  = kwargs["xmin"]
     xmax  = kwargs["xmax"]
-    xbins = 2*kwargs["xbins"] #(xmax - xmin)/10 #kwargs["xbins"]
+    xbins = kwargs["xbins"] #(xmax - xmin)/10 #kwargs["xbins"]
+
+    if ("trijetPt" in refBranch):
+        xbins = xbins/1
 
     # Create histogram
     sigName = "%s_S" % refBranch
@@ -480,7 +484,7 @@ def GetWeights(sigTree, bkgTree, refBranch):
 
     # Number of entries in trees
     nEntries_s = sigTree.GetEntries();
-    nEntries_b = nEntries_s #bkgTree.GetEntries();
+    nEntries_b = bkgTree.GetEntries();
        
     if (nEntries_b == nEntries_s):
         Print("Warning! using nEntries_b = nEntries_s", True)
@@ -540,7 +544,7 @@ def GetWeights(sigTree, bkgTree, refBranch):
 
     return hWeights
 
-def PlotOverlay(s,b, kw, saveName):
+def PlotOverlay(s,b, kwargs, saveName):
     
     #Define Signal style
     signalStyle     = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure-3, markerSizes=None, markerStyle=ROOT.kFullDiamond),
@@ -551,13 +555,11 @@ def PlotOverlay(s,b, kw, saveName):
                                             styles.StyleLine(lineColor=ROOT.kRed-4, lineStyle=ROOT.kSolid, lineWidth=3)])
                                             #styles.StyleFill(fillColor=ROOT.kRed+2, fillStyle=3001)])
     
-    p = plots.ComparisonPlot(histograms.Histo(b,"background", "pl", "PL"),histograms.Histo(s,"signal", "pl", "PL"),) 
-    dName = opts.dataset
-    dName = dName.replace("TT", "t#bar{t}")
-    if "ChargedHiggs" in dName:
-        dName = dName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "m_{H^{^#pm}} = ")
-        dName = dName+"GeV"
-        
+    #####
+    p = plots.ComparisonManyPlot(histograms.Histo(b,"background", "pl", "PL"),
+                                 [histograms.Histo(s,"signal", "pl", "PL")], saveFormats=[])
+
+
     p.histoMgr.setHistoLegendLabelMany({"signal": "Truth-matched", "background": "Unmatched"}) 
     p.histoMgr.forHisto("background", backgroundStyle ) 
     p.histoMgr.setHistoDrawStyle("background", "HIST")
@@ -566,35 +568,17 @@ def PlotOverlay(s,b, kw, saveName):
     p.histoMgr.forHisto("signal", signalStyle) 
     p.histoMgr.setHistoDrawStyle("signal" , "HIST")
     p.histoMgr.setHistoLegendStyle("signal", "L") #L
-    
-    
-    _kwargs = {
-        "xlabel"           : kw['xlabel'],
-        "ylabel"           : "Arbitrary Units / %s" % (kw['format']),
-        "ratioYlabel"      : "Ratio ",
-        "ratio"            : False,
-        "ratioInvert"      : False,
-        "stackMCHistograms": False,
-        "addMCUncertainty" : False,
-        "addLuminosityText": False,
-        "addCmsText"       : True,
-        "cmsExtraText"     : "Preliminary",
-        "xmin"             : kw['xmin'],
-        "xmax"             : kw['xmax'],
-        #"opts"             : {"ymin": 0.0, "ymaxfactor": 1.1},
-        "opts"             : {"ymin": 0.0, "ymaxfactor": 1.1},
-        "opts2"            : {"ymin": 0.6, "ymax": 1.5},
-        "log"              : False,
-        "createLegend"     : {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82}, 
-        }
+
+    kwargs["ylabel"] = "Arbitrary Units / %s" % str(kwargs["format"])
+    kwargs["opts"]   = {"ymin": 0.0, "ymaxfactor": 1.1}
+    kwargs["createLegend"] = {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82}
 
     # Save plot in all formats    
-    #saveName = "%s_%s" % (brName, txt)
-    plots.drawPlot(p, saveName, **_kwargs)
+    plots.drawPlot(p, saveName, **kwargs)
     SavePlot(p, saveName, os.path.join(opts.saveDir), opts.saveFormats )
-    
+
     return
-    #return p, _kwargs
+
 
 def doReweighting(datasetsMgr, refBranch, treeName):
     # https://gitlab.cern.ch/HPlus/HiggsAnalysis/blob/master/NtupleAnalysis/src/Keras_ANN/work/func.py#L49
@@ -613,7 +597,7 @@ def doReweighting(datasetsMgr, refBranch, treeName):
     
     # Number of entries in trees
     nEntries_s = sigTree.GetEntries();
-    nEntries_b = nEntries_s #bkgTree.GetEntries();
+    nEntries_b = bkgTree.GetEntries();
 
     if (nEntries_b == nEntries_s):
         Print("Warning! using nEntries_b = nEntries_s", True)
@@ -674,25 +658,26 @@ def doReweighting(datasetsMgr, refBranch, treeName):
         # plot signal and background on same canvas        
         #p, _kwargs = PlotOverlay(s,b, GetHistoKwargs(brName, opts))
         PlotOverlay(s,b, GetHistoKwargs(brName, opts), "%s_%s" % (brName, txt))
-            
+    
+    if (opts.saveInRootFile):
+        SaveInRootFile(inputList, histoMap_s, histoMap_b)
     return
 
 def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
     Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
 
     # Check that path exists
-    #if not os.path.exists(saveDir):
-    #    os.makedirs(saveDir)
+    if not os.path.exists(saveDir):
+        os.makedirs(saveDir)
         
     # Create the name under which plot will be saved
     saveName = os.path.join(saveDir, plotName.replace("/", "_"))
-    #print "soti", saveName
     # For-loop: All save formats
     for i, ext in enumerate(saveFormats):
         saveNameURL = saveName + ext
         saveNameURL = aux.convertToURL(saveNameURL, opts.url)
         Print(saveNameURL, i==0)
-        plot.saveAs(saveName, formats=saveFormats)
+        plot.saveAs(saveName, formats=saveFormats)        
     return
 
 def SaveInRootFile(inputList, histoMap_s, histoMap_b):
@@ -766,6 +751,7 @@ if __name__ == "__main__":
     LOGX         = False
     LOGY         = False
     LOGZ         = False
+    SAVEROOTFILE = False
     MERGEEWK     = False
     URL          = False
     SAVEDIR      = None
@@ -821,6 +807,9 @@ if __name__ == "__main__":
 
     parser.add_option("--logZ", dest="logZ", action="store_true", default=LOGZ,
                       help="Set z-axis to logarithm scale [default: %s]" % LOGZ)
+
+    parser.add_option("--saveInRootFile", dest="saveInRootFile", action="store_true", default=SAVEROOTFILE,
+                      help="Save reweighted histograms in root file [default: %s]" % SAVEROOTFILE)
 
     parser.add_option("--saveDir", dest="saveDir", type="string", default=SAVEDIR, 
                       help="Directory where all pltos will be saved [default: %s]" % SAVEDIR)

@@ -24,6 +24,12 @@
 
 #include "../work/TopRecoTree.h"
 
+struct PtComparator
+{
+  bool operator() (const genParticle p1, const genParticle p2) const { return ( p1.pt() > p2.pt() ); }
+  bool operator() (const math::XYZTLorentzVector p1, const math::XYZTLorentzVector p2) const { return ( p1.pt() > p2.pt() ); }
+};
+
 struct TrijetSelections{
   std::vector<Jet> Jet1;
   std::vector<Jet> Jet2;
@@ -58,7 +64,8 @@ public:
   virtual void setupBranches(BranchManager& branchManager) override;
   /// Called for each event
   virtual void process(Long64_t entry) override;
-
+  void getTopDecayProducts(const Event& fEvent, genParticle top, vector<genParticle> &quarks, vector<genParticle> &bquarks);
+  void getTopDecayProducts(const Event& fEvent, genParticle top, genParticle &quark1, genParticle &quark2, genParticle &bquark); 
   const genParticle GetLastCopy(const vector<genParticle> genParticles, const genParticle &p);
   vector<genParticle> GetGenParticles(const vector<genParticle> genParticles, const int pdgId);
 
@@ -69,6 +76,8 @@ private:
   const DirectionalCut<double> cfg_MiniIsoCut;
   const DirectionalCut<double> cfg_METCut;
   const DirectionalCut<double> cfg_LepBJetDRCut;
+  const float cfg_DeltaPtOverPtCut;
+  const float cfg_DeltaRCut;
 
   const float cfg_MuonPtCut;
   const float cfg_MuonEtaCut;
@@ -540,6 +549,8 @@ TopRecoTree::TopRecoTree(const ParameterSet& config, const TH1* skimCounters)
     cfg_MiniIsoCut(config,  "RecoTopMVASelection.MiniIsoCut"),
     cfg_METCut(config,      "RecoTopMVASelection.METCut"),
     cfg_LepBJetDRCut(config, "RecoTopMVASelection.LepBJetDRCut"),
+    cfg_DeltaPtOverPtCut(config.getParameter<float>("RecoTopMVASelection.DeltaPtOverPtCutValue")),
+    cfg_DeltaRCut(config.getParameter<float>("RecoTopMVASelection.DeltaRCutValue")),
 
     // Muon Selection Cuts
     cfg_MuonPtCut(config.getParameter<float>("MuonSelection.muonPtCut")),
@@ -1123,6 +1134,49 @@ vector<genParticle> TopRecoTree::GetGenParticles(const vector<genParticle> genPa
 }
 
 
+void TopRecoTree::getTopDecayProducts(const Event& fEvent, genParticle top, vector<genParticle> &quarks, vector<genParticle> &bquarks){
+  
+  for (size_t i=0; i<top.daughters().size(); i++){
+    int dau_index = top.daughters().at(i);
+    genParticle dau = fEvent.genparticles().getGenParticles()[dau_index];
+
+    // B-Quark                                                                                                                                                                       
+    if (std::abs(dau.pdgId()) ==  5) bquarks.push_back(dau);
+    
+    // W-Boson                                                                                                                                                                       
+    if (std::abs(dau.pdgId()) == 24){
+      // Get the last copy                                                                                                        
+      genParticle W = GetLastCopy(fEvent.genparticles().getGenParticles(), dau);      
+      // Find the decay products of W                                                                               
+      for (size_t idau=0; idau<W.daughters().size(); idau++){	
+	int Wdau_index = W.daughters().at(idau);
+	genParticle Wdau = fEvent.genparticles().getGenParticles()[Wdau_index];	
+	// Consider only quarks as decaying products                                                                    
+	if (std::abs(Wdau.pdgId()) > 5) continue;
+	quarks.push_back(Wdau);
+      }//for (size_t idau=0; idau<W.daughters().size(); idau++)
+    }//if (std::abs(dau.pdgId()) == 24)
+  }//for (size_t i=0; i<top.daughters().size(); i++)
+
+  //sort quarks in pt
+  std::sort( quarks.begin(),  quarks.end(),  PtComparator() );
+  std::sort( bquarks.begin(), bquarks.end(), PtComparator() );
+  //Debug
+  if (quarks.size() == 2)
+    if (quarks.at(0).pt() < quarks.at(1).pt()) std::cout<<"not sorted in pt?"<<std::endl;
+}
+
+
+void TopRecoTree::getTopDecayProducts(const Event& fEvent, genParticle top, genParticle &quark1, genParticle &quark2, genParticle &bquark){
+  vector<genParticle> quarks, bquarks;
+  getTopDecayProducts(fEvent, top, quarks, bquarks);
+  //Skip if at least one top does not decay hadronically
+  if (!(quarks.size() == 2 && bquarks.size()==1)) return;      
+  quark1 = quarks.at(0);
+  quark2 = quarks.at(1);
+  bquark = bquarks.at(0);
+}
+
 //  Get the last copy of a particle.
 const genParticle TopRecoTree::GetLastCopy(const vector<genParticle> genParticles, const genParticle &p){
 
@@ -1137,8 +1191,6 @@ const genParticle TopRecoTree::GetLastCopy(const vector<genParticle> genParticle
   }
   return p;
 }
-
-
 
 Jet TopRecoTree::getLeadingSubleadingJet(const Jet& jet0, const Jet& jet1, string selectedJet){
   if (selectedJet != "leading" && selectedJet!="subleading") std::cout<<"WARNING! Unknown option "<<selectedJet<<". Function getLeadingSubleadingJet returns leading Jet"<<std::endl;
@@ -1683,912 +1735,878 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================//
 
   //Soti
-  const double twoSigma = 0.32;
-  const double dRcut    = 0.3;
-  if (fEvent.isMC()){
+  if (!fEvent.isMC()) return;
+  //Get top quarks
+  vector<genParticle> GenTops = GetGenParticles(fEvent.genparticles().getGenParticles(), 6);
+  vector<genParticle> GenTops_BQuark, GenTops_LdgQuark, GenTops_SubldgQuark, GenTops_Quarks;
 
-    vector<genParticle> GenTops = GetGenParticles(fEvent.genparticles().getGenParticles(), 6);
-    vector<genParticle> GenTops_BQuark;
-    vector<genParticle> GenTops_LdgQuark;
-    vector<genParticle> GenTops_SubldgQuark;
-    vector<genParticle> GenTops_Quarks;
+  //For loop: top quarks
+  for (auto& top: GenTops){
+    vector<genParticle> quarks, bquarks;
 
-    for (auto& top: GenTops){
-      vector<genParticle> quarks;
-      genParticle bquark;
-      bool foundB = false;      
-      for (size_t i=0; i<top.daughters().size(); i++){
-        int dau_index = top.daughters().at(i);
-        genParticle dau = fEvent.genparticles().getGenParticles()[dau_index];
-        // B-Quark                                                                                                                                                                       
-        if (std::abs(dau.pdgId()) ==  5){
-	  bquark = dau;
-	  foundB = true;
-	}
-        // W-Boson                                                                                                                                                                       
-        if (std::abs(dau.pdgId()) == 24){
-          // Get the last copy                                                                                                        
-          genParticle W = GetLastCopy(fEvent.genparticles().getGenParticles(), dau);
-	  
-          // Find the decay products of W                                                                               
-          for (size_t idau=0; idau<W.daughters().size(); idau++){
-	    
-            int Wdau_index = W.daughters().at(idau);
-            genParticle Wdau = fEvent.genparticles().getGenParticles()[Wdau_index];
-	    
-            // Consider only quarks as decaying products                                                                    
-            if (std::abs(Wdau.pdgId()) > 5) continue;
-            quarks.push_back(Wdau);
-          }
-        }
-      }
+    // Get top decay products
+    getTopDecayProducts(fEvent, top, quarks, bquarks);
+    bool foundB = (bquarks.size()==1);
 
-      if (cfg_SelectionsType == "hadronic"){
-	// Skip event if any of the tops decays leptonically (the "quarks" vector will be empty causing errors)                                           
-	if (!(quarks.size() == 2 && foundB)) return;
-      }
-      else{
-	// If top does not decay into W+b return
-	if (!foundB) return;
-      }
-      
-      // Fill vectors for b-quarks, leading and subleading quarks coming from tops                                                                                 
-      GenTops_BQuark.push_back(bquark);
+    //Fill control plots (gen top pt)
+    if (quarks.size() == 2) hCtrl_hadrGenTopPt -> Fill(top.pt());
+    else hCtrl_lepGenTopPt -> Fill(top.pt());
 
-      if (0) std::cout<<"W decay products = "<<quarks.size()<<std::endl;
-      if (quarks.size() == 2){
-        hCtrl_hadrGenTopPt -> Fill(top.pt());
-
-	GenTops_Quarks.push_back(bquark);
-	GenTops_Quarks.push_back(quarks.at(0));
-	GenTops_Quarks.push_back(quarks.at(1));
-
-        if (quarks.at(0).pt() > quarks.at(1).pt()) {
-          GenTops_LdgQuark.push_back(quarks.at(0));
-          GenTops_SubldgQuark.push_back(quarks.at(1));
-        }
-        else{
-          GenTops_LdgQuark.push_back(quarks.at(1));
-          GenTops_SubldgQuark.push_back(quarks.at(0));
-        }
-      }//if (quarks.size() == 2){
-      else{
-        hCtrl_lepGenTopPt -> Fill(top.pt());
-      }
-    }
-    /*
     if (cfg_SelectionsType == "hadronic"){
-      // Keep only events with at least two hadronically decaying top-quarks
-      if (GenTops_BQuark.size() < 2) return;
+      // Skip if at least one top does not decay hadronically
+      if (!(quarks.size() == 2 && foundB)) return;
     }
     else{
-      // Keep only events with at least one hadronically decaying top-quark
-      if (GenTops_BQuark.size() < 1) return;
-    }
-    */
-    //Pseudo-matching: Used to calculate the dPt/Pt cut
-    for (size_t i=0; i<GenTops_Quarks.size(); i++)
-      {
-	genParticle Quark      = GenTops_Quarks.at(i);
-	Jet JetClosest;
-	double dRmin  = 99999.9;
-	for (auto& jet: jetData.getSelectedJets())
-	  {
-	    double dR  = ROOT::Math::VectorUtil::DeltaR( jet.p4(), Quark.p4());
-	    if (dR > dRcut)   continue;
-	    if (dR > dRmin)   continue;
-	    dRmin  = dR;
-	    JetClosest = jet;
-	  }
-	if (dRmin > dRcut) continue;
-	double dPtOverPt = (JetClosest.pt() - Quark.pt())/Quark.pt();
-	hQuarkJetMinDr03_DeltaPtOverPt            -> Fill (dPtOverPt);   //2sigma = 2*0.16 = 0.32
-	hQuarkJetMinDr03_DeltaPtOverPt_vs_QuarkPt -> Fill(dPtOverPt, Quark.pt());
-	hQuarkJetMinDr03_DeltaPtOverPt_vs_DeltaRmin -> Fill(dPtOverPt, dRmin);
-
-	if (Quark.pt() < 40)       hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt0To40GeV    -> Fill(dPtOverPt);
-	else if (Quark.pt() < 60)  hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt40To60GeV   -> Fill(dPtOverPt);
-	else if (Quark.pt() < 80)  hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt60To80GeV   -> Fill(dPtOverPt);
-	else if (Quark.pt() < 100) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt80To100GeV  -> Fill(dPtOverPt);
-	else if (Quark.pt() < 120) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt100To120GeV -> Fill(dPtOverPt);
-	else if (Quark.pt() < 140) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt120To140GeV -> Fill(dPtOverPt);
-	else if (Quark.pt() < 160) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt140To160GeV -> Fill(dPtOverPt);
-	else if (Quark.pt() < 180) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt160To180GeV -> Fill(dPtOverPt);
-	else if (Quark.pt() < 200) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt180To200GeV -> Fill(dPtOverPt);
-	else hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt200ToInfGeV -> Fill(dPtOverPt);
-	hQuarkJetMinDr03_DeltaR_vs_QuarkPt        -> Fill(dRmin, Quark.pt());
-      }
-    //========================================================================================================
-    //                              Matching:  Minimum DeltaR and DeltaPt check
-    //========================================================================================================
-
-    //Sanity chack
-    double DeltaR_min = 999.999;
-    for (auto& jet1: jetData.getSelectedJets())
-      {
-	for (auto& jet2: jetData.getSelectedJets())
-	  {
-	    if (areSameJets(jet1, jet2)) continue;
-	    double DeltaR = ROOT::Math::VectorUtil::DeltaR( jet1.p4(), jet2.p4());
-	    if (DeltaR > DeltaR_min) continue;
-	    DeltaR_min = DeltaR;
-	  }
-      }
-
-    hJetsDeltaRmin -> Fill(DeltaR_min);
-
-      //======= B jet matching (Loop over all Jets)
-
-    int imatched =0;
-    vector <Jet> MCtrue_LdgJet, MCtrue_SubldgJet, MCtrue_Bjet;
-    vector <Jet> MC_LdgJet, MC_SubldgJet, MC_Bjet;
-    vector <Jet> BJetCand, MC_Jets;
-    vector <genParticle> MGen_LdgJet, MGen_SubldgJet, MGen_Bjet;
-    vector <double> dRminB;
-    Jet firstBjet;
-    for (size_t i=0; i<GenTops.size(); i++){
-      genParticle BQuark      = GenTops_BQuark.at(i);
-      Jet mcMatched_BJet;
-      double dRmin  = 99999.9;
-      // double dPtOverPtmin = 99999.9;
-      for (auto& bjet: jetData.getSelectedJets()){
-	double dR        = ROOT::Math::VectorUtil::DeltaR( bjet.p4(), BQuark.p4());
-	double dPtOverPt = std::abs((bjet.pt() - BQuark.pt())/BQuark.pt());
-	if (dR > dRcut)   continue;
-	if (dR > dRmin)   continue;
-
-	if (dPtOverPt > twoSigma) continue;
-	dRmin  = dR;
-
-	mcMatched_BJet = bjet;
-      }
-      dRminB.push_back(dRmin);
-      BJetCand.push_back(mcMatched_BJet);
+      // If top does not decay into W+b return
+      if (!foundB) return;
     }
 
-    if (0) std::cout<<"N hadronic tops "<<GenTops_LdgQuark.size()<<std::endl;
-    hCtrl_NhadronicTops -> Fill(GenTops_LdgQuark.size());
+    if (quarks.size() == 2){
+      // Fill vectors for b-quarks, leading and subleading quarks coming from tops                                                                                                   
+      GenTops_Quarks.push_back(bquarks.at(0));
+      GenTops_Quarks.push_back(quarks.at(0));
+      GenTops_Quarks.push_back(quarks.at(1));
+      
+      GenTops_LdgQuark.push_back(quarks.at(0));
+      GenTops_SubldgQuark.push_back(quarks.at(1));
+      GenTops_BQuark.push_back(bquarks.at(0));
+    }
+  }//for (auto& top: GenTops)                                                                                                                                                      
+  
+
+  //Definitions
+  int imatched =0;
+  vector <Jet> MCtrue_LdgJet, MCtrue_SubldgJet, MCtrue_Bjet;   // Keep matched jets
+  vector <genParticle> MGen_LdgJet, MGen_SubldgJet, MGen_Bjet; // Keep get particles
+  vector <Jet> BJetCand, MC_Jets;
+  vector <double> dRminB;
+  Jet firstBjet;
+
+  //========================================================================================================
+  //======= B jet matching (Loop over all Jets)
+  //========================================================================================================  
+  for (size_t i=0; i<GenTops.size(); i++){
+    genParticle BQuark      = GenTops_BQuark.at(i);
+    Jet mcMatched_BJet;
+    double dRmin  = 99999.9;
+
+    for (auto& bjet: jetData.getSelectedJets()){
+      double dR        = ROOT::Math::VectorUtil::DeltaR( bjet.p4(), BQuark.p4());
+      double dPtOverPt = std::abs((bjet.pt() - BQuark.pt())/BQuark.pt());
+      if (dR > cfg_DeltaRCut)   continue;
+      if (dR > dRmin)           continue;
+      if (dPtOverPt > cfg_DeltaPtOverPtCut) continue;
+
+      dRmin  = dR;
+      mcMatched_BJet = bjet;
+    }
+    dRminB.push_back(dRmin);
+    BJetCand.push_back(mcMatched_BJet);
+  } //for (size_t i=0; i<GenTops.size(); i++){
+
+  if (0) std::cout<<"N hadronic tops "<<GenTops_LdgQuark.size()<<std::endl;
+  hCtrl_NhadronicTops -> Fill(GenTops_LdgQuark.size());
     
-    //======= Dijet matching (Loop over all Jets)
-    for (size_t i=0; i<GenTops_LdgQuark.size(); i++){
-      genParticle LdgQuark    = GenTops_LdgQuark.at(i);
-      genParticle SubldgQuark = GenTops_SubldgQuark.at(i);
-      
-      Jet mcMatched_LdgJet;
-      Jet mcMatched_SubldgJet;
-      
-      double dR1min, dR2min, dPtOverPt1min, dPtOverPt2min;
-      dR1min = dR2min = dPtOverPt1min = dPtOverPt2min = 99999.9;
+  //========================================================================================================
+  //======= Dijet matching (Loop over all Jets)
+  //========================================================================================================
 
-      for (auto& jet: jetData.getSelectedJets()){
-	bool same = false;
-	for (size_t k=0; k<GenTops.size(); k++){
-	  if (dRminB.at(k) <= dRcut){
-	    if( areSameJets(jet,BJetCand.at(k))) same = true; //Skip the jets that are matched with bquarks
+  for (size_t i=0; i<GenTops_LdgQuark.size(); i++){
+    genParticle LdgQuark    = GenTops_LdgQuark.at(i);
+    genParticle SubldgQuark = GenTops_SubldgQuark.at(i);
+      
+    Jet mcMatched_LdgJet;
+    Jet mcMatched_SubldgJet;
+      
+    double dR1min, dR2min, dPtOverPt1min, dPtOverPt2min;
+    dR1min = dR2min = dPtOverPt1min = dPtOverPt2min = 99999.9;
+
+    for (auto& jet: jetData.getSelectedJets()){
+      bool same = false;
+      for (size_t k=0; k<GenTops.size(); k++){
+	if (dRminB.at(k) <= cfg_DeltaRCut){
+	  if( areSameJets(jet,BJetCand.at(k))) same = true; //Skip the jets that are matched with bquarks
+	}
+      }
+
+      if (same) continue;
+
+      double dR1 = ROOT::Math::VectorUtil::DeltaR(jet.p4(), LdgQuark.p4());
+      double dR2 = ROOT::Math::VectorUtil::DeltaR(jet.p4(), SubldgQuark.p4());
+	
+      if (std::min(dR1, dR2) > cfg_DeltaRCut) continue;
+	
+      double dPtOverPt1 = std::abs((jet.pt() - LdgQuark.pt())/LdgQuark.pt());
+      double dPtOverPt2 = std::abs( (jet.pt() - SubldgQuark.pt())/SubldgQuark.pt());
+
+      if (dR1 < dR2) // jet is closer to the leading quark
+	{
+	  if (dR1 < dR1min)
+	    {
+	      if(dPtOverPt1 < cfg_DeltaPtOverPtCut)
+		{
+		  dR1min = dR1;
+		  dPtOverPt1min= dPtOverPt1;
+		  mcMatched_LdgJet = jet;
+		}
+	    }	
+	  else if (dR2 <= cfg_DeltaRCut && dR2 < dR2min)
+	    {
+	      if (dPtOverPt2 < cfg_DeltaPtOverPtCut)
+		{
+		  dR2min  = dR2;
+		  dPtOverPt2min = dPtOverPt2;
+		  mcMatched_SubldgJet = jet;
+		}
+	    }
+	} //if (dR1 < dR2)
+
+      else // jet is closer to the subleading quark
+	{
+	  if (dR2 < dR2min)
+	    {
+	      if(dPtOverPt2 < cfg_DeltaPtOverPtCut)
+		{
+		  dR2min  = dR2;
+		  dPtOverPt2min = dPtOverPt2;
+		  mcMatched_SubldgJet = jet;
+		}
+	    }
+	  else if (dR1 <= cfg_DeltaRCut && dR1 < dR1min)
+	    {
+	      if (dPtOverPt1 < cfg_DeltaPtOverPtCut)
+		{
+		  dR1min  = dR1;
+		  dPtOverPt1min = dPtOverPt1;
+		  mcMatched_LdgJet = jet;
+		}
+	    }
+	}// else   
+    } //for (auto& jet: jetData.getSelectedJets()){
+  
+    //Gen Quarks: Pt
+    hGenQuark_Pt -> Fill((dR1min<= cfg_DeltaRCut), LdgQuark.pt());
+    hGenQuark_Pt -> Fill((dR2min <= cfg_DeltaRCut), SubldgQuark.pt());
+    hGenQuark_Pt -> Fill((dRminB.at(i) <= cfg_DeltaRCut), GenTops_BQuark.at(i).pt());
+    //Genuine if all the top quarks are matched
+    genParticle top = GenTops.at(i);
+    bool genuine = (dR1min<= cfg_DeltaRCut && dR2min <= cfg_DeltaRCut && dRminB.at(i) <= cfg_DeltaRCut);
+      
+    if (genuine){
+      imatched ++;
+      hGenTop_Pt->Fill(true, top.pt());
+      MCtrue_LdgJet.push_back(mcMatched_LdgJet);
+      MCtrue_SubldgJet.push_back(mcMatched_SubldgJet);
+      MCtrue_Bjet.push_back(BJetCand.at(i));
+	
+      MC_Jets.push_back(mcMatched_LdgJet);
+      MC_Jets.push_back(mcMatched_SubldgJet);
+      MC_Jets.push_back(BJetCand.at(i));
+
+      MGen_LdgJet.push_back(GenTops_LdgQuark.at(i));
+      MGen_SubldgJet.push_back(GenTops_SubldgQuark.at(i));
+      MGen_Bjet.push_back(GenTops_BQuark.at(i));
+    }
+    else {
+      hGenTop_Pt->Fill(false, top.pt());
+    }
+  } // for (size_t i=0; i<GenTops_LdgQuark.size(); i++){
+  hNmatchedTop ->Fill(imatched);
+  
+  if (0) std::cout<<"nmatched top candidates: "<<imatched<<std::endl;
+
+  // USED in 2016 analysis
+  // Matching criterion: Select events with DeltaR(q,q') > 0.8
+  // Otherwise: Event not used for the training    
+  // size_t nTops = GenTops_BQuark.size();
+  // for (size_t i=0; i<nTops; i++)
+  //   {
+  //  	double dR12 = ROOT::Math::VectorUtil::DeltaR(GenTops_LdgQuark.at(i).p4(),    GenTops_SubldgQuark.at(i).p4());
+  //  	double dR1b = ROOT::Math::VectorUtil::DeltaR(GenTops_LdgQuark.at(i).p4(),    GenTops_BQuark.at(i).p4());
+  //  	double dR2b = ROOT::Math::VectorUtil::DeltaR(GenTops_SubldgQuark.at(i).p4(), GenTops_BQuark.at(i).p4());
+  //  	double dRmin = min(min(dR12, dR1b), dR2b);
+  //  	if (dRmin < 0.8) return;
+  //   }
+
+  //================================================================================================//                      
+  //                                    Top Candidates                                              //
+  //================================================================================================//
+  bool applyBjetPtCut = true;
+  TrijetSelections TopCandidates;
+  int index0 = -1;
+  for (auto& jet0: jetData.getSelectedJets()){
+    index0++;
+    int index1 = -1;
+    for (auto& jet1: jetData.getSelectedJets()){
+      index1++;
+      if (index1 < index0) continue;
+      if (areSameJets(jet1, jet0)) continue;
+      int index2 = -1;
+      for (auto& jet2: jetData.getSelectedJets()){
+	index2++;
+	if (index2 < index1) continue;
+	if (areSameJets(jet2,  jet1)) continue;
+	if (areSameJets(jet2,  jet0)) continue;
+	  
+	//********************************** Bjet Matched OR dijet matched*********************************//
+	//	  if ( isBJet(jet0, MCtrue_Bjet)    ||    ((isMatchedJet(jet1,MCtrue_LdgJet)||isMatchedJet(jet1,MCtrue_SubldgJet))  &&  (isMatchedJet(jet2,MCtrue_LdgJet)||isMatchedJet(jet2,MCtrue_SubldgJet)))  ){
+	if ( isBJet(jet0, MCtrue_Bjet)    ||    (isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet))){
+	  if (applyBjetPtCut && (jet0.pt() < 40)) continue;
+	  TopCandidates.BJet.push_back(jet0);
+	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
+	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));
+	}
+	  
+	else if ( isBJet(jet1, MCtrue_Bjet)    ||  (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet))){
+	  if (applyBjetPtCut && (jet1.pt() < 40)) continue;
+	  TopCandidates.BJet.push_back(jet1);
+	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
+	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
+
+	}
+	else if ( isBJet(jet2, MCtrue_Bjet)    ||  (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet))){
+	  if (applyBjetPtCut && (jet2.pt() < 40)) continue;
+	  TopCandidates.BJet.push_back(jet2);
+	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
+	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
+	}
+	  
+	//********************************** One of the dijet subjets matched*********************************//
+	//	  else if (isMatchedJet(jet0,MCtrue_LdgJet)||isMatchedJet(jet0,MCtrue_SubldgJet)){  //jet0 belongs to dijet
+
+	else if (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)){
+
+	  if (jet1.bjetDiscriminator() > jet2.bjetDiscriminator()){
+	    if (applyBjetPtCut && (jet1.pt() < 40)) continue;
+	    TopCandidates.BJet.push_back(jet1);
+	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
+	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
+	  }
+	  else{
+	    if (applyBjetPtCut && (jet2.pt() < 40)) continue;
+	    TopCandidates.BJet.push_back(jet2);
+	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
+	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
 	  }
 	}
-	if (same) continue;
-	double dR1 = ROOT::Math::VectorUtil::DeltaR(jet.p4(), LdgQuark.p4());
-	double dR2 = ROOT::Math::VectorUtil::DeltaR(jet.p4(), SubldgQuark.p4());
-	
-	if (std::min(dR1, dR2) > dRcut) continue;
-	
-	double dPtOverPt1 = std::abs((jet.pt() - LdgQuark.pt())/LdgQuark.pt());
-	double dPtOverPt2 = std::abs( (jet.pt() - SubldgQuark.pt())/SubldgQuark.pt());
+	else if (isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet)){
 
-	if (dR1 < dR2)
-	  {
-	    if (dR1 < dR1min)
-	      {
-		if(dPtOverPt1 < twoSigma)
-		  {
-		    dR1min = dR1;
-		    dPtOverPt1min= dPtOverPt1;
-		    mcMatched_LdgJet = jet;
-		  }
-	      }
-	    else if (dR2 <= dRcut && dR2 < dR2min)
-	      {
-		if (dPtOverPt2 < twoSigma)
-		  {
-		    dR2min  = dR2;
-		    dPtOverPt2min = dPtOverPt2;
-		    mcMatched_SubldgJet = jet;
-		  }
-	      }
-	  }
-	else
-	  {
-	    if (dR2 < dR2min)
-	      {
-		if(dPtOverPt2 < twoSigma)
-		  {
-		    dR2min  = dR2;
-		    dPtOverPt2min = dPtOverPt2;
-		    mcMatched_SubldgJet = jet;
-		  }
-	      }
-	    else if (dR1 <= dRcut && dR1 < dR1min)
-	      {
-		if (dPtOverPt1 < twoSigma)
-		  {
-		    dR1min  = dR1;
-		    dPtOverPt1min = dPtOverPt1;
-		    mcMatched_LdgJet = jet;
-		  }
-	      }
-	  }   
-      }
-      //Gen Quarks: Pt
-      hGenQuark_Pt -> Fill((dR1min<= dRcut), LdgQuark.pt());
-      hGenQuark_Pt -> Fill((dR2min <= dRcut), SubldgQuark.pt());
-      hGenQuark_Pt -> Fill((dRminB.at(i) <= dRcut), GenTops_BQuark.at(i).pt());
-      //Genuine if all the top quarks are matched
-      genParticle top = GenTops.at(i);
-      bool genuine = (dR1min<= dRcut && dR2min <= dRcut && dRminB.at(i) <= dRcut);
-      
-      if (genuine){
-	imatched ++;
-	hGenTop_Pt->Fill(true, top.pt());
-	MCtrue_LdgJet.push_back(mcMatched_LdgJet);
-	MCtrue_SubldgJet.push_back(mcMatched_SubldgJet);
-	MCtrue_Bjet.push_back(BJetCand.at(i));
-	
-	MC_Jets.push_back(mcMatched_LdgJet);
-	MC_Jets.push_back(mcMatched_SubldgJet);
-	MC_Jets.push_back(BJetCand.at(i));
-
-	MGen_LdgJet.push_back(GenTops_LdgQuark.at(i));
-	MGen_SubldgJet.push_back(GenTops_SubldgQuark.at(i));
-	MGen_Bjet.push_back(GenTops_BQuark.at(i));
-      }
-      else {
-	hGenTop_Pt->Fill(false, top.pt());
-      }
-    }
-    hNmatchedTop ->Fill(imatched);
-    
-    if (0) std::cout<<"nmatched top candidates: "<<imatched<<std::endl;
-    //New: Check if genuine tops include the bjet from the leptonic branch
-    //BJet_LeptonicBr
-
-    // USED in 2016 analysis
-    //Matching criterion: Select events with DeltaR(q,q') > 0.8
-    //Otherwise: Event not used for the training    
-    // size_t nTops = GenTops_BQuark.size();
-    // for (size_t i=0; i<nTops; i++)
-    //   {
-    //  	double dR12 = ROOT::Math::VectorUtil::DeltaR(GenTops_LdgQuark.at(i).p4(),    GenTops_SubldgQuark.at(i).p4());
-    //  	double dR1b = ROOT::Math::VectorUtil::DeltaR(GenTops_LdgQuark.at(i).p4(),    GenTops_BQuark.at(i).p4());
-    //  	double dR2b = ROOT::Math::VectorUtil::DeltaR(GenTops_SubldgQuark.at(i).p4(), GenTops_BQuark.at(i).p4());
-    //  	double dRmin = min(min(dR12, dR1b), dR2b);
-    //  	if (dRmin < 0.8) return;
-    //   }
-    //================================================================================================//                      
-    //                                    Top Candidates                                              //
-    //================================================================================================//
-    bool applyBjetPtCut = true;
-    TrijetSelections TopCandidates;
-    int index0 = -1;
-    for (auto& jet0: jetData.getSelectedJets()){
-      index0++;
-      int index1 = -1;
-      for (auto& jet1: jetData.getSelectedJets()){
-	index1++;
-	if (index1 < index0) continue;
-	if (areSameJets(jet1, jet0)) continue;
-	int index2 = -1;
-	for (auto& jet2: jetData.getSelectedJets()){
-	  index2++;
-	  if (index2 < index1) continue;
-	  if (areSameJets(jet2,  jet1)) continue;
-	  if (areSameJets(jet2,  jet0)) continue;
-	  
-	  //********************************** Bjet Matched OR dijet matched*********************************//
-	  //	  if ( isBJet(jet0, MCtrue_Bjet)    ||    ((isMatchedJet(jet1,MCtrue_LdgJet)||isMatchedJet(jet1,MCtrue_SubldgJet))  &&  (isMatchedJet(jet2,MCtrue_LdgJet)||isMatchedJet(jet2,MCtrue_SubldgJet)))  ){
-	  if ( isBJet(jet0, MCtrue_Bjet)    ||    (isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet))){
+	  if (jet0.bjetDiscriminator() > jet2.bjetDiscriminator()){
 	    if (applyBjetPtCut && (jet0.pt() < 40)) continue;
 	    TopCandidates.BJet.push_back(jet0);
 	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
 	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));
 	  }
-	  
-	  else if ( isBJet(jet1, MCtrue_Bjet)    ||  (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet))){
+	  else{
+	    if (applyBjetPtCut && (jet2.pt() < 40)) continue;
+	    TopCandidates.BJet.push_back(jet2);
+	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
+	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
+	  }
+	}
+	else if (isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet)){
+
+	  if (jet0.bjetDiscriminator() > jet1.bjetDiscriminator()){
+	    if (applyBjetPtCut && (jet0.pt() < 40)) continue;
+	    TopCandidates.BJet.push_back(jet0);
+	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
+	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));
+	  }
+	  else{
 	    if (applyBjetPtCut && (jet1.pt() < 40)) continue;
 	    TopCandidates.BJet.push_back(jet1);
 	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
 	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
-
 	  }
-	  else if ( isBJet(jet2, MCtrue_Bjet)    ||  (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet))){
-	    if (applyBjetPtCut && (jet2.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet2);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
-	  }
-	  
-	  //********************************** One of the dijet subjets matched*********************************//
-	  //	  else if (isMatchedJet(jet0,MCtrue_LdgJet)||isMatchedJet(jet0,MCtrue_SubldgJet)){  //jet0 belongs to dijet
-
-	  else if (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)){
-
-	    if (jet1.bjetDiscriminator() > jet2.bjetDiscriminator()){
-	      if (applyBjetPtCut && (jet1.pt() < 40)) continue;
-	      TopCandidates.BJet.push_back(jet1);
-	      TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
-	      TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
-	    }
-	    else{
-	      if (applyBjetPtCut && (jet2.pt() < 40)) continue;
-	      TopCandidates.BJet.push_back(jet2);
-	      TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
-	      TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
-            }
-	  }
-	  else if (isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet)){
-
-            if (jet0.bjetDiscriminator() > jet2.bjetDiscriminator()){
-	      if (applyBjetPtCut && (jet0.pt() < 40)) continue;
-	      TopCandidates.BJet.push_back(jet0);
-	      TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
-	      TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));
-            }
-            else{
-	      if (applyBjetPtCut && (jet2.pt() < 40)) continue;
-	      TopCandidates.BJet.push_back(jet2);
-	      TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
-	      TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
-            }
-          }
-	  else if (isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet)){
-
-            if (jet0.bjetDiscriminator() > jet1.bjetDiscriminator()){
-	      if (applyBjetPtCut && (jet0.pt() < 40)) continue;
-	      TopCandidates.BJet.push_back(jet0);
-	      TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
-	      TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));
-            }
-            else{
-	      if (applyBjetPtCut && (jet1.pt() < 40)) continue;
-	      TopCandidates.BJet.push_back(jet1);
-	      TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
-	      TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
-            }
-          }
+	}
 
 	  	 	  
-	  //********************** Non of the three subjets is matched************************//
+	//********************** Non of the three subjets is matched************************//
 	  
-	  else if (jet0.bjetDiscriminator() > jet1.bjetDiscriminator() && jet0.bjetDiscriminator() > jet2.bjetDiscriminator()){            
-	    if (applyBjetPtCut && (jet0.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet0);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));	    
-	  }
-	  else if (jet1.bjetDiscriminator() > jet0.bjetDiscriminator() && jet1.bjetDiscriminator() > jet2.bjetDiscriminator()){
-	    if (applyBjetPtCut && (jet1.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet1);	    
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
-	  }
-	  else if (jet2.bjetDiscriminator() > jet0.bjetDiscriminator() && jet2.bjetDiscriminator() > jet1.bjetDiscriminator()){
-	    if (applyBjetPtCut && (jet2.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet2);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
-	  }
-	} //for (auto& jet2: jetData.getSelectedJets()){
-      } //for (auto& jet1: jetData.getSelectedJets()){
-    } //for (auto& jet0: jetData.getSelectedJets()){
-    
+	else if (jet0.bjetDiscriminator() > jet1.bjetDiscriminator() && jet0.bjetDiscriminator() > jet2.bjetDiscriminator()){            
+	  if (applyBjetPtCut && (jet0.pt() < 40)) continue;
+	  TopCandidates.BJet.push_back(jet0);
+	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
+	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));	    
+	}
+	else if (jet1.bjetDiscriminator() > jet0.bjetDiscriminator() && jet1.bjetDiscriminator() > jet2.bjetDiscriminator()){
+	  if (applyBjetPtCut && (jet1.pt() < 40)) continue;
+	  TopCandidates.BJet.push_back(jet1);	    
+	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
+	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
+	}
+	else if (jet2.bjetDiscriminator() > jet0.bjetDiscriminator() && jet2.bjetDiscriminator() > jet1.bjetDiscriminator()){
+	  if (applyBjetPtCut && (jet2.pt() < 40)) continue;
+	  TopCandidates.BJet.push_back(jet2);
+	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
+	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
+	}
+      } //for (auto& jet2: jetData.getSelectedJets()){
+    } //for (auto& jet1: jetData.getSelectedJets()){
+  } //for (auto& jet0: jetData.getSelectedJets()){
+
     //========================================================================================================
     //                       Identification of fake, genuine TopCandidates
     //========================================================================================================
-    vector <bool> GenuineTop; 
-    int jmatched = 0;
-    //    std::cout<<"==="<<std::endl;
-    for (size_t i=0; i<TopCandidates.BJet.size(); i++){
-      bool genuine = false;
-      for (size_t j=0; j<MCtrue_Bjet.size(); j++){
-	bool same1 = areSameJets(TopCandidates.Jet1.at(i), MCtrue_LdgJet.at(j))    && areSameJets(TopCandidates.Jet2.at(i), MCtrue_SubldgJet.at(j)) && areSameJets(TopCandidates.BJet.at(i),  MCtrue_Bjet.at(j));
-	bool same2 = areSameJets(TopCandidates.Jet1.at(i), MCtrue_SubldgJet.at(j)) && areSameJets(TopCandidates.Jet2.at(i), MCtrue_LdgJet.at(j))    && areSameJets(TopCandidates.BJet.at(i),  MCtrue_Bjet.at(j));
-	if (same1 || same2){
-	  genuine = true;
-	}
-      }
-      if (genuine) jmatched++;
-      GenuineTop.push_back(genuine);
-    }
-    hNmatchedTrijets ->Fill(jmatched);
-
-    //========================================================================================================
-    //                           Check Properties of matched objects
-    //========================================================================================================
+  vector <bool> GenuineTop; 
+  int jmatched = 0;
+  //    std::cout<<"==="<<std::endl;
+  for (size_t i=0; i<TopCandidates.BJet.size(); i++){
+    bool genuine = false;
     for (size_t j=0; j<MCtrue_Bjet.size(); j++){
-
-      hTrijetDrMin -> Fill( ROOT::Math::VectorUtil::DeltaR(MCtrue_Bjet.at(j).p4(),      MGen_Bjet.at(j).p4()));
-      hTrijetDrMin -> Fill( ROOT::Math::VectorUtil::DeltaR(MCtrue_LdgJet.at(j).p4(),    MGen_LdgJet.at(j).p4()));
-      hTrijetDrMin -> Fill( ROOT::Math::VectorUtil::DeltaR(MCtrue_SubldgJet.at(j).p4(), MGen_SubldgJet.at(j).p4()));
-      
-      hTrijetDPtOverGenPt -> Fill( (MCtrue_Bjet.at(j).pt()      - MGen_Bjet.at(j).pt())/MGen_Bjet.at(j).pt());
-      hTrijetDPtOverGenPt -> Fill( (MCtrue_LdgJet.at(j).pt()    - MGen_LdgJet.at(j).pt())/MGen_LdgJet.at(j).pt());
-      hTrijetDPtOverGenPt -> Fill( (MCtrue_SubldgJet.at(j).pt() - MGen_SubldgJet.at(j).pt())/MGen_SubldgJet.at(j).pt());
-      
-      hTrijetDPt_matched -> Fill( (MCtrue_Bjet.at(j).pt()      - MGen_Bjet.at(j).pt()));
-      hTrijetDPt_matched -> Fill( (MCtrue_LdgJet.at(j).pt()    - MGen_LdgJet.at(j).pt()));
-      hTrijetDPt_matched -> Fill( (MCtrue_SubldgJet.at(j).pt() - MGen_SubldgJet.at(j).pt()));
-      
-      hTrijetDEtaOverGenEta -> Fill( (MCtrue_Bjet.at(j).eta()      - MGen_Bjet.at(j).eta())/MGen_Bjet.at(j).eta());
-      hTrijetDEtaOverGenEta -> Fill( (MCtrue_LdgJet.at(j).eta()    - MGen_LdgJet.at(j).eta())/MGen_LdgJet.at(j).eta());
-      hTrijetDEtaOverGenEta -> Fill( (MCtrue_SubldgJet.at(j).eta() - MGen_SubldgJet.at(j).eta())/MGen_SubldgJet.at(j).eta());
-      
-      hTrijetDEta_matched -> Fill( (MCtrue_Bjet.at(j).eta()      - MGen_Bjet.at(j).eta()));
-      hTrijetDEta_matched -> Fill( (MCtrue_LdgJet.at(j).eta()    - MGen_LdgJet.at(j).eta()));
-      hTrijetDEta_matched -> Fill( (MCtrue_SubldgJet.at(j).eta() - MGen_SubldgJet.at(j).eta()));
-      
-      hTrijetDPhiOverGenPhi -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_Bjet.at(j).p4(),      MGen_Bjet.at(j).p4()))/MGen_Bjet.at(j).phi());
-      hTrijetDPhiOverGenPhi -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_LdgJet.at(j).p4(),    MGen_LdgJet.at(j).p4()))/MGen_LdgJet.at(j).phi());
-      hTrijetDPhiOverGenPhi -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_SubldgJet.at(j).p4(), MGen_SubldgJet.at(j).p4()))/MGen_SubldgJet.at(j).phi());
-      
-      hTrijetDPhi_matched -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_Bjet.at(j).p4(),      MGen_Bjet.at(j).p4())));
-      hTrijetDPhi_matched -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_LdgJet.at(j).p4(),    MGen_LdgJet.at(j).p4())));
-      hTrijetDPhi_matched -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_SubldgJet.at(j).p4(), MGen_SubldgJet.at(j).p4())));
-      
-    }    
-    
-    //========================================================================================================
-    //                                 Fill trees
-    //========================================================================================================
-    // Definitions
-    Bool_t isGenuineTop = false;
-    // Chi Squared
-    const double mTopMass = 172.34;  // arXiv:1812.10534
-    const double mWMass   = 80.385;    // TopSelection (Chi-Squared Method)
-    const double sigmaTrijet = 27.5; // from Mikela's fitting (Chi-Squared Method)
-    const double sigmaDijet  = 10.59; // from Mikela's fitting (Chi-Squared Method)
-    
-    for (size_t i=0; i<TopCandidates.BJet.size(); i++){
-      Jet jet1 = TopCandidates.Jet1.at(i);
-      Jet jet2 = TopCandidates.Jet2.at(i);
-      Jet bjet = TopCandidates.BJet.at(i);
-      
-      math::XYZTLorentzVector TrijetP4, DijetP4;
-      TrijetP4 = bjet.p4()+jet1.p4()+jet2.p4();
-      DijetP4  = jet1.p4()+jet2.p4();
-      
-      // Keep only tops in the low/high pT range
-      //if (!cfg_TopCandPtCut.passedCut(TrijetP4.pt())) continue;
-      
-      //Debug:
-      if (applyBjetPtCut && TopCandidates.BJet.at(i).pt() < 40) std::cout<<"never reach here"<<std::endl;
-      isGenuineTop = GenuineTop.at(i);
-      
-      // Compute distances
-      double dRJ12 = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());      
-      // Compute Soft drop value N2
-      double softDrop_n2 = min(jet2.pt(), jet1.pt())/( (jet2.pt() + jet1.pt() )*dRJ12*dRJ12);
-      
-      hSoftDrop_n2   -> Fill(isGenuineTop, softDrop_n2);
-      //hPullAngleJ1J2 -> Fill(isGenuineTop, getJetPullAngle(jet1, jet2));  
-      //hPullAngleJ2J1 -> Fill(isGenuineTop, getJetPullAngle(jet2, jet1));
-      hDEtaJ1withJ2      -> Fill(isGenuineTop, std::abs(jet1.eta() - jet2.eta()));
-      hDEtaJ1withBJet    -> Fill(isGenuineTop, std::abs(jet1.eta() - bjet.eta()));
-      hDEtaJ2withBJet    -> Fill(isGenuineTop, std::abs(jet2.eta() - bjet.eta()));
-      hDEtaDijetwithBJet -> Fill(isGenuineTop, std::abs(DijetP4.Eta() - bjet.eta()));
-      hDEtaJ1BJetwithJ2  -> Fill(isGenuineTop, std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta()));
-      hDEtaJ2BJetwithJ1  -> Fill(isGenuineTop, std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta()));
-      
-      hDPhiJ1withJ2      -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4())); 
-      hDPhiJ1withBJet    -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4()));
-      hDPhiJ2withBJet    -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4()));
-      hDPhiDijetwithBJet -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4()));
-      hDPhiJ1BJetwithJ2  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4()));
-      hDPhiJ2BJetwithJ1  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4()));
-      
-      hDRJ1withJ2       -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4()));
-      hDRJ1withBJet     -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4()));
-      hDRJ2withBJet     -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4()));
-      hDRDijetwithBJet  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4()));
-      hDRJ1BJetwithJ2   -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR((jet1.p4()+bjet.p4()), jet2.p4()));
-      hDRJ2BJetwithJ1   -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4()));
-      
-      // Trijet system
-      hTrijetPt           -> Fill(isGenuineTop, TrijetP4.Pt());
-      hTrijetEta          -> Fill(isGenuineTop, TrijetP4.Eta());
-      hTrijetPhi          -> Fill(isGenuineTop, TrijetP4.Phi());
-      hTrijetMass         -> Fill(isGenuineTop, TrijetP4.M());
-      hTrijetPtDr         -> Fill(isGenuineTop, TrijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4()));
-      //hTrijetPFCharge     -> Fill(isGenuineTop, jet1.pfcharge()+jet2.pfcharge()+bjet.pfcharge());
-      hTrijetCombinedCvsL -> Fill(isGenuineTop, (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags() + bjet.pfCombinedCvsLJetTags())/3.);
-      //hTrijetDeepCvsL     -> Fill(isGenuineTop, (jet1.pfDeepCSVCvsLJetTags()  + jet2.pfDeepCSVCvsLJetTags()  + bjet.pfDeepCSVCvsLJetTags())/3.);
-      hTrijetPtD              -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD() + bjet.QGTaggerAK4PFCHSptD())/3.);
-      hTrijetAxis2            -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2() + bjet.QGTaggerAK4PFCHSaxis2())/3.);
-      //hTrijetAxis1            -> Fill(isGenuineTop, (jet1.axis1() + jet2.axis1() + bjet.axis1())/3.);
-      hTrijetMult             -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSmult() + jet2.QGTaggerAK4PFCHSmult()  + bjet.QGTaggerAK4PFCHSmult())/3.);
-      hTrijetQGLikelihood     -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood()*bjet.QGTaggerAK4PFCHSqgLikelihood()); //.QGTaggerAK4PFCHSqgLikelihood()
-      hTrijetQGLikelihood_avg -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood()+bjet.QGTaggerAK4PFCHSqgLikelihood())/3.);
-      hTrijetChiSquared -> Fill(isGenuineTop, (TrijetP4.M() - mTopMass)/sigmaTrijet); 
-      
-      // Dijet system
-      hDijetPt                 -> Fill(isGenuineTop, DijetP4.Pt());
-      hDijetEta                -> Fill(isGenuineTop, DijetP4.Eta());
-      hDijetPhi                -> Fill(isGenuineTop, DijetP4.Phi());
-      hDijetMass               -> Fill(isGenuineTop, DijetP4.M());
-      //hDijetPFCharge           -> Fill(isGenuineTop, jet1.pfcharge()+jet2.pfcharge());
-      hDijetPtDr               -> Fill(isGenuineTop, DijetP4.Pt() * dRJ12);
-      hDijetCombinedCvsL       -> Fill(isGenuineTop, (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags())/2.);
-      //hDijetDeepCvsL           -> Fill(isGenuineTop, (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags())/2.);
-      hDijetPtD                -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD())/2.);
-      hDijetAxis2              -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2())/2.);
-      //hDijetAxis1              -> Fill(isGenuineTop, (jet1.axis1() + jet2.axis1())/2.);
-      hDijetMult               -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSmult() + jet2.QGTaggerAK4PFCHSmult())/2.);
-      hDijetQGLikelihood       -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood());
-      hDijetQGLikelihood_avg   -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood())/2.);
-      hDijetMassOverTrijetMass -> Fill(isGenuineTop, DijetP4.M()/TrijetP4.M());
-      hDijetChiSquared         -> Fill(isGenuineTop, (DijetP4.M() - mWMass)/sigmaDijet);
-      
-      
-      // Leading jet from dijet system
-      hLdgJetPt                -> Fill(isGenuineTop, jet1.pt());
-      hLdgJetEta               -> Fill(isGenuineTop, jet1.eta());
-      hLdgJetPhi               -> Fill(isGenuineTop, jet1.phi());
-      hLdgJetMass              -> Fill(isGenuineTop, jet1.p4().M());
-      //hLdgJetPFCharge          -> Fill(isGenuineTop, jet1.pfcharge());
-      hLdgJetBdisc             -> Fill(isGenuineTop, jet1.bjetDiscriminator());
-      hLdgJetCombinedCvsL      -> Fill(isGenuineTop, jet1.pfCombinedCvsLJetTags());
-      //hLdgJetDeepCvsL          -> Fill(isGenuineTop, jet1.pfDeepCSVCvsLJetTags());
-      hLdgJetPtD               -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSptD());
-      hLdgJetAxis2             -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSaxis2());
-      //hLdgJetAxis1             -> Fill(isGenuineTop, jet1.axis1());
-      hLdgJetMult              -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSmult());
-      hLdgJetQGLikelihood      -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood());
-      //hLdgJetPullMagnitude     -> Fill(isGenuineTop, getJetPullMagnitude(jet1));      
-      
-      // Subleading jet from dijet system
-      hSubldgJetPt             -> Fill(isGenuineTop, jet2.pt());
-      hSubldgJetEta            -> Fill(isGenuineTop, jet2.eta());
-      hSubldgJetPhi            -> Fill(isGenuineTop, jet2.phi());
-      hSubldgJetBdisc          -> Fill(isGenuineTop, jet2.bjetDiscriminator());
-      
-      hSubldgJetCombinedCvsL   -> Fill(isGenuineTop, jet2.pfCombinedCvsLJetTags());
-      //hSubldgJetDeepCvsL       -> Fill(isGenuineTop, jet2.pfDeepCSVCvsLJetTags());
-      hSubldgJetPtD            -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSptD());
-      hSubldgJetAxis2          -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSaxis2());
-      //hSubldgJetAxis1          -> Fill(isGenuineTop, jet2.axis1());
-      hSubldgJetMult           -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSmult());
-      hSubldgJetQGLikelihood   -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSqgLikelihood());
-      //hSubldgJetPFCharge       -> Fill(isGenuineTop, jet2.pfcharge());
-      //hSubldgJetPullMagnitude  -> Fill(isGenuineTop, getJetPullMagnitude(jet2));
-      
-      hBJetPt                  -> Fill(isGenuineTop, bjet.pt());
-      hBJetEta                 -> Fill(isGenuineTop, bjet.eta());
-      hBJetPhi                 -> Fill(isGenuineTop, bjet.phi());
-      hBJetBdisc               -> Fill(isGenuineTop, bjet.bjetDiscriminator());
-      hBJetMass                -> Fill(isGenuineTop, bjet.p4().M());
-      hBJetQGLikelihood        -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSqgLikelihood());
-      hBJetCombinedCvsL        -> Fill(isGenuineTop, bjet.pfCombinedCvsLJetTags());
-      //hBJetDeepCvsL            -> Fill(isGenuineTop, bjet.pfDeepCSVCvsLJetTags());
-      hBJetPtD                 -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSptD());
-      hBJetAxis2               -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSaxis2());
-      //hBJetAxis1               -> Fill(isGenuineTop, bjet.axis1());
-      hBJetMult                -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSmult());
-      //hBJetPFCharge            -> Fill(isGenuineTop, bjet.pfcharge());
-      
-      hBJetLdgJet_Mass         -> Fill(isGenuineTop, (bjet.p4()+jet1.p4()).M());
-      //hBJetLdgJet_PFCharge     -> Fill(isGenuineTop, bjet.pfcharge() + jet1.pfcharge());
-      hBJetSubldgJet_Mass      -> Fill(isGenuineTop, (bjet.p4()+jet2.p4()).M());
-      //hBJetSubldgJet_PFCharge  -> Fill(isGenuineTop, bjet.pfcharge()+jet2.pfcharge());
-
-      if (isGenuineTop){
-	
-	/////marina
-	// Fill signal background
-	eventWeight_S = fEventWeight.getWeight();
-	  
-	// Trijet Variables
-	trijetPt_S		   = TrijetP4.Pt();
-	trijetEta_S		   = TrijetP4.Eta();
-	trijetPhi_S		   = TrijetP4.Phi();
-	trijetMass_S		   = TrijetP4.M();
-	trijetPtDR_S		   = TrijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4());
-	//trijetPFCharge_S	   = jet1.pfcharge() + jet2.pfcharge() + bjet.pfcharge();
-	trijetCombinedCvsL_S	   = (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags() + bjet.pfCombinedCvsLJetTags())/3.;
-	//trijetDeepCvsL_S	   = (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags() + bjet.pfDeepCSVCvsLJetTags())/3.;
-	trijetPtD_S		   = (jet1.QGTaggerAK4PFCHSptD()   + jet2.QGTaggerAK4PFCHSptD()   + bjet.QGTaggerAK4PFCHSptD())/3.;
-	//trijetAxis1_S		   = (jet1.axis1() + jet2.axis1() + bjet.axis1())/3.;
-	trijetAxis2_S		   = (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2() + bjet.QGTaggerAK4PFCHSaxis2())/3.;
-	trijetMult_S		   = (jet1.QGTaggerAK4PFCHSmult()  + jet2.QGTaggerAK4PFCHSmult()  + bjet.QGTaggerAK4PFCHSmult())/3.;
-	trijetQGLikelihood_S	   = jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood()*bjet.QGTaggerAK4PFCHSqgLikelihood();
-	trijetQGLikelihood_avg_S = (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood()+bjet.QGTaggerAK4PFCHSqgLikelihood())/3.;
-	trijetChiSquared_S	   = (TrijetP4.M() - mTopMass)/sigmaTrijet;
-	  
-	// Dijet Variables
-	dijetPt_S		   = DijetP4.Pt();
-	dijetEta_S		   = DijetP4.Eta();
-	dijetPhi_S		   = DijetP4.Phi();
-	dijetMass_S		   = DijetP4.M();
-	dijetPtDR_S		   = DijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
-	//dijetPFCharge_S	   = jet1.pfcharge()+jet2.pfcharge();
-	dijetCombinedCvsL_S	   = (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags())/2.0;
-	//dijetDeepCvsL_S	   = (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags())/2.0;
-	dijetPtD_S		   = (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD())/2.0;
-	//dijetAxis1_S		   = (jet1.axis1() + jet2.axis1())/2.;
-	dijetAxis2_S		   = (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2())/2.;
-	dijetMult_S		   = (jet1.QGTaggerAK4PFCHSmult()  + jet2.QGTaggerAK4PFCHSmult())/2.;
-	dijetQGLikelihood_S	   = jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood();
-	dijetQGLikelihood_avg_S  = (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood())/2.;
-	dijetChiSquared_S	   = (DijetP4.M() - mWMass)/sigmaDijet;
-	  
-	// Leading jet from dijet system
-	LdgJetPt_S		    = jet1.pt();
-	LdgJetEta_S		    = jet1.eta();
-	LdgJetPhi_S		    = jet1.phi();
-	LdgJetMass_S		    = jet1.p4().M();
-	//LdgJetPFCharge_S	    = jet1.pfcharge();
-	if (jet1.bjetDiscriminator() < 0.0)
-	  {
-	    LdgJetBdisc_S	    = -1.0;
-	  }
-	else
-	  {
-	    LdgJetBdisc_S	    = jet1.bjetDiscriminator();
-	  }
-	LdgJetCombinedCvsL_S	    = jet1.pfCombinedCvsLJetTags();
-	//LdgJetDeepCvsL_S	    = jet1.pfDeepCSVCvsLJetTags();
-	LdgJetPtD_S		    = jet1.QGTaggerAK4PFCHSptD();
-	LdgJetAxis2_S		    = jet1.QGTaggerAK4PFCHSaxis2();
-	//LdgJetAxis1_S		    = jet1.axis1();
-	LdgJetMult_S		    = jet1.QGTaggerAK4PFCHSmult();
-	LdgJetQGLikelihood_S	    = jet1.QGTaggerAK4PFCHSqgLikelihood();
-	//LdgJetPullMagnitude_S	    = getJetPullMagnitude(jet1);
-	  
-	// Subleading jet from dijet system
-	SubldgJetPt_S		    = jet2.pt();
-	SubldgJetEta_S	    = jet2.eta();
-	SubldgJetPhi_S	    = jet2.phi();
-	SubldgJetMass_S	    = jet2.p4().M();
-	//SubldgJetPFCharge_S	    = jet2.pfcharge();
-	if (jet2.bjetDiscriminator() < 0.0)
-	  {
-	    SubldgJetBdisc_S	    = -1.0;
-	  }
-	else
-	  {
-	    SubldgJetBdisc_S	    = jet2.bjetDiscriminator();
-	  }
-	SubldgJetCombinedCvsL_S   = jet2.pfCombinedCvsLJetTags();
-	//SubldgJetDeepCvsL_S	    = jet2.pfDeepCSVCvsLJetTags();
-	SubldgJetPtD_S	    = jet2.QGTaggerAK4PFCHSptD();
-	SubldgJetAxis2_S	    = jet2.QGTaggerAK4PFCHSaxis2();
-	//SubldgJetAxis1_S	    = jet2.axis1();
-	SubldgJetMult_S	    = jet2.QGTaggerAK4PFCHSmult();
-	SubldgJetQGLikelihood_S   = jet2.QGTaggerAK4PFCHSqgLikelihood();
-	//SubldgJetPullMagnitude_S  = getJetPullMagnitude(jet2);
-	  
-	// b-jet 
-	bjetPt_S		    = bjet.pt();
-	bjetEta_S		    = bjet.eta();
-	bjetPhi_S		    = bjet.phi();
-	bjetBdisc_S		    = bjet.bjetDiscriminator();
-	bjetMass_S		    = bjet.p4().M();
-	bjetQGLikelihood_S	    = bjet.QGTaggerAK4PFCHSqgLikelihood();
-	bjetCombinedCvsL_S	    = bjet.pfCombinedCvsLJetTags();
-	//bjetDeepCvsL_S	    = bjet.pfDeepCSVCvsLJetTags();
-	bjetPtD_S		    = bjet.QGTaggerAK4PFCHSptD();
-	bjetAxis2_S		    = bjet.QGTaggerAK4PFCHSaxis2();
-	//bjetAxis1_S		    = bjet.axis1();
-	bjetMult_S		    = bjet.QGTaggerAK4PFCHSmult();
-	//bjetPFCharge_S	    = bjet.pfcharge();
-	bjetLdgJetMass_S          = (bjet.p4() + jet1.p4()).M();
-	bjetSubldgJetMass_S       = (bjet.p4() + jet2.p4()).M();
-	  
-	// Others (Soft-drop, distances, pull variables, etc)
-	SoftDrop_n2_S		    = softDrop_n2;
-	//PullAngleJ1J2_S	    = getJetPullAngle(jet1, jet2);  
-	//PullAngleJ2J1_S	    = getJetPullAngle(jet2, jet1);
-	  
-	DEtaJ1withJ2_S	    = std::abs(jet1.eta() - jet2.eta());
-	DEtaJ1withBJet_S	    = std::abs(jet1.eta() - bjet.eta());
-	DEtaJ2withBJet_S	    = std::abs(jet2.eta() - bjet.eta());
-	DEtaDijetwithBJet_S	    = std::abs(DijetP4.Eta() - bjet.eta());
-	DEtaJ1BJetwithJ2_S	    = std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta());
-	DEtaJ2BJetwithJ1_S	    = std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta());
-	DPhiJ1withJ2_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4()); 
-	DPhiJ1withBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4());
-	DPhiJ2withBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4());
-	DPhiDijetwithBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4());
-	DPhiJ1BJetwithJ2_S	    = ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4());
-	DPhiJ2BJetwithJ1_S	    = ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4());
-	DRJ1withJ2_S		    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
-	DRJ1withBJet_S	    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4());
-	DRJ2withBJet_S	    = ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4());
-	DRDijetwithBJet_S	    = ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4());
-	DRJ1BJetwithJ2_S	    = ROOT::Math::VectorUtil::DeltaR((jet1.p4()+bjet.p4()), jet2.p4());
-	DRJ2BJetwithJ1_S	    = ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4());
-	  
-	dijetMassOverTrijetMass_S = DijetP4.M()/TrijetP4.M();	  
-	/////marina
-	treeS -> Fill();
-      }
-      else{
-	
-	// Fill signal background
-	eventWeight_B = fEventWeight.getWeight();
-	  
-	// Trijet Variables
-	trijetPt_B		   = TrijetP4.Pt();
-	trijetEta_B		   = TrijetP4.Eta();
-	trijetPhi_B		   = TrijetP4.Phi();
-	trijetMass_B		   = TrijetP4.M();
-	trijetPtDR_B		   = TrijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4());
-	//trijetPFCharge_B	   = jet1.pfcharge() + jet2.pfcharge() + bjet.pfcharge();
-	trijetCombinedCvsL_B	   = (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags() + bjet.pfCombinedCvsLJetTags())/3.;
-	//trijetDeepCvsL_B	   = (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags() + bjet.pfDeepCSVCvsLJetTags())/3.;
-	trijetPtD_B		   = (jet1.QGTaggerAK4PFCHSptD()   + jet2.QGTaggerAK4PFCHSptD()   + bjet.QGTaggerAK4PFCHSptD())/3.;
-	//trijetAxis1_B		   = (jet1.axis1() + jet2.axis1() + bjet.axis1())/3.;
-	trijetAxis2_B		   = (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2() + bjet.QGTaggerAK4PFCHSaxis2())/3.;
-	trijetMult_B		   = (jet1.QGTaggerAK4PFCHSmult()  + jet2.QGTaggerAK4PFCHSmult()  + bjet.QGTaggerAK4PFCHSmult())/3.;
-	trijetQGLikelihood_B	   = jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood()*bjet.QGTaggerAK4PFCHSqgLikelihood();
-	trijetQGLikelihood_avg_B = (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood()+bjet.QGTaggerAK4PFCHSqgLikelihood())/3.;
-	trijetChiSquared_B	   = (TrijetP4.M() - mTopMass)/sigmaTrijet;
-	  
-	// Dijet Variables
-	dijetPt_B		   = DijetP4.Pt();
-	dijetEta_B		   = DijetP4.Eta();
-	dijetPhi_B		   = DijetP4.Phi();
-	dijetMass_B		   = DijetP4.M();
-	dijetPtDR_B		   = DijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
-	//dijetPFCharge_B	   = jet1.pfcharge()+jet2.pfcharge();
-	dijetCombinedCvsL_B	   = (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags())/2.0;
-	//dijetDeepCvsL_B	   = (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags())/2.0;
-	dijetPtD_B		   = (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD())/2.0;
-	//dijetAxis1_B		   = (jet1.axis1() + jet2.axis1())/2.;
-	dijetAxis2_B		   = (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2())/2.;
-	dijetMult_B		   = (jet1.QGTaggerAK4PFCHSmult()  + jet2.QGTaggerAK4PFCHSmult())/2.;
-	dijetQGLikelihood_B	   = jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood();
-	dijetQGLikelihood_avg_B  = (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood())/2.;
-	dijetChiSquared_B	   = (DijetP4.M() - mWMass)/sigmaDijet;
-	  
-	// Leading jet from dijet system
-	LdgJetPt_B		    = jet1.pt();
-	LdgJetEta_B		    = jet1.eta();
-	LdgJetPhi_B		    = jet1.phi();
-	LdgJetMass_B		    = jet1.p4().M();
-	//LdgJetPFCharge_B	    = jet1.pfcharge();
-	if (jet1.bjetDiscriminator() < 0.0)
-	  {
-	    LdgJetBdisc_B	    = -1.0;
-	  }
-	else
-	  {
-	    LdgJetBdisc_B	    = jet1.bjetDiscriminator();
-	  }
-	LdgJetCombinedCvsL_B	    = jet1.pfCombinedCvsLJetTags();
-	//LdgJetDeepCvsL_B	    = jet1.pfDeepCSVCvsLJetTags();
-	LdgJetPtD_B		    = jet1.QGTaggerAK4PFCHSptD();
-	LdgJetAxis2_B		    = jet1.QGTaggerAK4PFCHSaxis2();
-	//LdgJetAxis1_B		    = jet1.axis1();
-	LdgJetMult_B		    = jet1.QGTaggerAK4PFCHSmult();
-	LdgJetQGLikelihood_B	    = jet1.QGTaggerAK4PFCHSqgLikelihood();
-	//LdgJetPullMagnitude_B	    = getJetPullMagnitude(jet1);
-	  
-	// Subleading jet from dijet system
-	SubldgJetPt_B		    = jet2.pt();
-	SubldgJetEta_B	    = jet2.eta();
-	SubldgJetPhi_B	    = jet2.phi();
-	SubldgJetMass_B	    = jet2.p4().M();
-	//SubldgJetPFCharge_B	    = jet2.pfcharge();
-	if (jet2.bjetDiscriminator() < 0.0)
-	  {
-	    SubldgJetBdisc_B	    = -1.0;
-	  }
-	else
-	  {
-	    SubldgJetBdisc_B	    = jet2.bjetDiscriminator();
-	  }
-	SubldgJetCombinedCvsL_B   = jet2.pfCombinedCvsLJetTags();
-	//SubldgJetDeepCvsL_B	    = jet2.pfDeepCSVCvsLJetTags();
-	SubldgJetPtD_B	    = jet2.QGTaggerAK4PFCHSptD();
-	SubldgJetAxis2_B	    = jet2.QGTaggerAK4PFCHSaxis2();
-	//SubldgJetAxis1_B	    = jet2.axis1();
-	SubldgJetMult_B	    = jet2.QGTaggerAK4PFCHSmult();
-	SubldgJetQGLikelihood_B   = jet2.QGTaggerAK4PFCHSqgLikelihood();
-	//SubldgJetPullMagnitude_B  = getJetPullMagnitude(jet2);
-	  
-	// b-jet 
-	bjetPt_B		    = bjet.pt();
-	bjetEta_B		    = bjet.eta();
-	bjetPhi_B		    = bjet.phi();
-	bjetBdisc_B		    = bjet.bjetDiscriminator();
-	bjetMass_B		    = bjet.p4().M();
-	bjetQGLikelihood_B	    = bjet.QGTaggerAK4PFCHSqgLikelihood();
-	bjetCombinedCvsL_B	    = bjet.pfCombinedCvsLJetTags();
-	//bjetDeepCvsL_B	    = bjet.pfDeepCSVCvsLJetTags();
-	bjetPtD_B		    = bjet.QGTaggerAK4PFCHSptD();
-	bjetAxis2_B		    = bjet.QGTaggerAK4PFCHSaxis2();
-	//bjetAxis1_B		    = bjet.axis1();
-	bjetMult_B		    = bjet.QGTaggerAK4PFCHSmult();
-	//bjetPFCharge_B	    = bjet.pfcharge();
-	bjetLdgJetMass_B          = (bjet.p4() + jet1.p4()).M();
-	bjetSubldgJetMass_B       = (bjet.p4() + jet2.p4()).M();
-	  
-	// Others (Soft-drop, distances, pull variables, etc)
-	SoftDrop_n2_B		    = softDrop_n2;
-	//PullAngleJ1J2_B	    = getJetPullAngle(jet1, jet2);  
-	//PullAngleJ2J1_B	    = getJetPullAngle(jet2, jet1);
-	  
-	DEtaJ1withJ2_B	    = std::abs(jet1.eta() - jet2.eta());
-	DEtaJ1withBJet_B	    = std::abs(jet1.eta() - bjet.eta());
-	DEtaJ2withBJet_B	    = std::abs(jet2.eta() - bjet.eta());
-	DEtaDijetwithBJet_B	    = std::abs(DijetP4.Eta() - bjet.eta());
-	DEtaJ1BJetwithJ2_B	    = std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta());
-	DEtaJ2BJetwithJ1_B	    = std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta());
-	DPhiJ1withJ2_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4()); 
-	DPhiJ1withBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4());
-	DPhiJ2withBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4());
-	DPhiDijetwithBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4());
-	DPhiJ1BJetwithJ2_B	    = ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4());
-	DPhiJ2BJetwithJ1_B	    = ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4());
-	DRJ1withJ2_B		    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
-	DRJ1withBJet_B	    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4());
-	DRJ2withBJet_B	    = ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4());
-	DRDijetwithBJet_B	    = ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4());
-	DRJ1BJetwithJ2_B	    = ROOT::Math::VectorUtil::DeltaR((jet1.p4()+bjet.p4()), jet2.p4());
-	DRJ2BJetwithJ1_B	    = ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4());
-	  
-	dijetMassOverTrijetMass_B = DijetP4.M()/TrijetP4.M();	  
-
-	treeB -> Fill();
-	
-      }            
-    }
-
-    //========================================================================================================
-    //                                    Sanity check
-    //========================================================================================================
-    
-    for (auto& jet: jetData.getSelectedJets()){
-      hAllJetCvsL         -> Fill(jet.pfCombinedCvsLJetTags());
-      hAllJetPtD          -> Fill(jet.QGTaggerAK4PFCHSptD());
-      hAllJetAxis2        -> Fill(jet.QGTaggerAK4PFCHSaxis2());
-      hAllJetMult         -> Fill(jet.QGTaggerAK4PFCHSmult());
-      hAllJetBdisc        -> Fill(jet.bjetDiscriminator());
-      hAllJetQGLikelihood -> Fill(jet.QGTaggerAK4PFCHSqgLikelihood());
-    }
-  
-    vector<genParticle> GenCharm = GetGenParticles(fEvent.genparticles().getGenParticles(), 4);
-    vector<Jet> CJets;
-
-    for (size_t i=0; i<GenCharm.size(); i++){
-      double dRmin = 10000.0;
-
-      // double dPtOverPtmin = 10000.0;
-
-      Jet mcMatched_CJet;
-      for (auto& jet: jetData.getSelectedJets()){
-	double dR  = ROOT::Math::VectorUtil::DeltaR( jet.p4(), GenCharm.at(i).p4());
-	double dPtOverPt = std::abs((jet.pt() - GenCharm.at(i).pt())/ GenCharm.at(i).pt());
-	if (dR > dRcut) continue;
-	if (dR > dRmin) continue;
-	//if (dPtOverPt > dPtOverPtmin) continue;
-	if (dPtOverPt > twoSigma) continue;
-	dRmin = dR;
-	// dPtOverPtmin = dPtOverPt;
-	mcMatched_CJet = jet;
-      }
-      if (dRmin < dRcut){
-	hCJetCvsL         -> Fill(mcMatched_CJet.pfCombinedCvsLJetTags());
-	hCJetPtD          -> Fill(mcMatched_CJet.QGTaggerAK4PFCHSptD());
-	hCJetAxis2        -> Fill(mcMatched_CJet.QGTaggerAK4PFCHSaxis2());
-	hCJetMult         -> Fill(mcMatched_CJet.QGTaggerAK4PFCHSmult());
-	hCJetBdisc        -> Fill(mcMatched_CJet.bjetDiscriminator());
+      bool same1 = areSameJets(TopCandidates.Jet1.at(i), MCtrue_LdgJet.at(j))    && areSameJets(TopCandidates.Jet2.at(i), MCtrue_SubldgJet.at(j)) && areSameJets(TopCandidates.BJet.at(i),  MCtrue_Bjet.at(j));
+      bool same2 = areSameJets(TopCandidates.Jet1.at(i), MCtrue_SubldgJet.at(j)) && areSameJets(TopCandidates.Jet2.at(i), MCtrue_LdgJet.at(j))    && areSameJets(TopCandidates.BJet.at(i),  MCtrue_Bjet.at(j));
+      if (same1 || same2){
+	genuine = true;
       }
     }
-        
-    //================================================================================================
-    // Finalize
-    //================================================================================================
-    fEventSaver.save();
+    if (genuine) jmatched++;
+    GenuineTop.push_back(genuine);
   }
+  hNmatchedTrijets ->Fill(jmatched);
+
+  //========================================================================================================
+  //                                 Fill trees
+  //========================================================================================================
+  // Definitions
+  Bool_t isGenuineTop = false;
+  // Chi Squared
+  const double mTopMass = 172.34;  // arXiv:1812.10534
+  const double mWMass   = 80.385;    // TopSelection (Chi-Squared Method)
+  const double sigmaTrijet = 27.5; // from Mikela's fitting (Chi-Squared Method)
+  const double sigmaDijet  = 10.59; // from Mikela's fitting (Chi-Squared Method)
+    
+  for (size_t i=0; i<TopCandidates.BJet.size(); i++){
+    Jet jet1 = TopCandidates.Jet1.at(i);
+    Jet jet2 = TopCandidates.Jet2.at(i);
+    Jet bjet = TopCandidates.BJet.at(i);
+      
+    math::XYZTLorentzVector TrijetP4, DijetP4;
+    TrijetP4 = bjet.p4()+jet1.p4()+jet2.p4();
+    DijetP4  = jet1.p4()+jet2.p4();
+      
+    // Keep only tops in the low/high pT range
+    //if (!cfg_TopCandPtCut.passedCut(TrijetP4.pt())) continue;
+      
+    //Debug:
+    if (applyBjetPtCut && TopCandidates.BJet.at(i).pt() < 40) std::cout<<"never reach here"<<std::endl;
+    isGenuineTop = GenuineTop.at(i);
+      
+    // Compute distances
+    double dRJ12 = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());      
+    // Compute Soft drop value N2
+    double softDrop_n2 = min(jet2.pt(), jet1.pt())/( (jet2.pt() + jet1.pt() )*dRJ12*dRJ12);
+      
+    hSoftDrop_n2   -> Fill(isGenuineTop, softDrop_n2);
+    //hPullAngleJ1J2 -> Fill(isGenuineTop, getJetPullAngle(jet1, jet2));  
+    //hPullAngleJ2J1 -> Fill(isGenuineTop, getJetPullAngle(jet2, jet1));
+    hDEtaJ1withJ2      -> Fill(isGenuineTop, std::abs(jet1.eta() - jet2.eta()));
+    hDEtaJ1withBJet    -> Fill(isGenuineTop, std::abs(jet1.eta() - bjet.eta()));
+    hDEtaJ2withBJet    -> Fill(isGenuineTop, std::abs(jet2.eta() - bjet.eta()));
+    hDEtaDijetwithBJet -> Fill(isGenuineTop, std::abs(DijetP4.Eta() - bjet.eta()));
+    hDEtaJ1BJetwithJ2  -> Fill(isGenuineTop, std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta()));
+    hDEtaJ2BJetwithJ1  -> Fill(isGenuineTop, std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta()));
+      
+    hDPhiJ1withJ2      -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4())); 
+    hDPhiJ1withBJet    -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4()));
+    hDPhiJ2withBJet    -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4()));
+    hDPhiDijetwithBJet -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4()));
+    hDPhiJ1BJetwithJ2  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4()));
+    hDPhiJ2BJetwithJ1  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4()));
+      
+    hDRJ1withJ2       -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4()));
+    hDRJ1withBJet     -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4()));
+    hDRJ2withBJet     -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4()));
+    hDRDijetwithBJet  -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4()));
+    hDRJ1BJetwithJ2   -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR((jet1.p4()+bjet.p4()), jet2.p4()));
+    hDRJ2BJetwithJ1   -> Fill(isGenuineTop, ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4()));
+      
+    // Trijet system
+    hTrijetPt           -> Fill(isGenuineTop, TrijetP4.Pt());
+    hTrijetEta          -> Fill(isGenuineTop, TrijetP4.Eta());
+    hTrijetPhi          -> Fill(isGenuineTop, TrijetP4.Phi());
+    hTrijetMass         -> Fill(isGenuineTop, TrijetP4.M());
+    hTrijetPtDr         -> Fill(isGenuineTop, TrijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4()));
+    //hTrijetPFCharge     -> Fill(isGenuineTop, jet1.pfcharge()+jet2.pfcharge()+bjet.pfcharge());
+    hTrijetCombinedCvsL -> Fill(isGenuineTop, (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags() + bjet.pfCombinedCvsLJetTags())/3.);
+    //hTrijetDeepCvsL     -> Fill(isGenuineTop, (jet1.pfDeepCSVCvsLJetTags()  + jet2.pfDeepCSVCvsLJetTags()  + bjet.pfDeepCSVCvsLJetTags())/3.);
+    hTrijetPtD              -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD() + bjet.QGTaggerAK4PFCHSptD())/3.);
+    hTrijetAxis2            -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2() + bjet.QGTaggerAK4PFCHSaxis2())/3.);
+    //hTrijetAxis1            -> Fill(isGenuineTop, (jet1.axis1() + jet2.axis1() + bjet.axis1())/3.);
+    hTrijetMult             -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSmult() + jet2.QGTaggerAK4PFCHSmult()  + bjet.QGTaggerAK4PFCHSmult())/3.);
+    hTrijetQGLikelihood     -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood()*bjet.QGTaggerAK4PFCHSqgLikelihood()); //.QGTaggerAK4PFCHSqgLikelihood()
+    hTrijetQGLikelihood_avg -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood()+bjet.QGTaggerAK4PFCHSqgLikelihood())/3.);
+    hTrijetChiSquared -> Fill(isGenuineTop, (TrijetP4.M() - mTopMass)/sigmaTrijet); 
+      
+    // Dijet system
+    hDijetPt                 -> Fill(isGenuineTop, DijetP4.Pt());
+    hDijetEta                -> Fill(isGenuineTop, DijetP4.Eta());
+    hDijetPhi                -> Fill(isGenuineTop, DijetP4.Phi());
+    hDijetMass               -> Fill(isGenuineTop, DijetP4.M());
+    //hDijetPFCharge           -> Fill(isGenuineTop, jet1.pfcharge()+jet2.pfcharge());
+    hDijetPtDr               -> Fill(isGenuineTop, DijetP4.Pt() * dRJ12);
+    hDijetCombinedCvsL       -> Fill(isGenuineTop, (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags())/2.);
+    //hDijetDeepCvsL           -> Fill(isGenuineTop, (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags())/2.);
+    hDijetPtD                -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD())/2.);
+    hDijetAxis2              -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2())/2.);
+    //hDijetAxis1              -> Fill(isGenuineTop, (jet1.axis1() + jet2.axis1())/2.);
+    hDijetMult               -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSmult() + jet2.QGTaggerAK4PFCHSmult())/2.);
+    hDijetQGLikelihood       -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood());
+    hDijetQGLikelihood_avg   -> Fill(isGenuineTop, (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood())/2.);
+    hDijetMassOverTrijetMass -> Fill(isGenuineTop, DijetP4.M()/TrijetP4.M());
+    hDijetChiSquared         -> Fill(isGenuineTop, (DijetP4.M() - mWMass)/sigmaDijet);
+      
+      
+    // Leading jet from dijet system
+    hLdgJetPt                -> Fill(isGenuineTop, jet1.pt());
+    hLdgJetEta               -> Fill(isGenuineTop, jet1.eta());
+    hLdgJetPhi               -> Fill(isGenuineTop, jet1.phi());
+    hLdgJetMass              -> Fill(isGenuineTop, jet1.p4().M());
+    //hLdgJetPFCharge          -> Fill(isGenuineTop, jet1.pfcharge());
+    hLdgJetBdisc             -> Fill(isGenuineTop, jet1.bjetDiscriminator());
+    hLdgJetCombinedCvsL      -> Fill(isGenuineTop, jet1.pfCombinedCvsLJetTags());
+    //hLdgJetDeepCvsL          -> Fill(isGenuineTop, jet1.pfDeepCSVCvsLJetTags());
+    hLdgJetPtD               -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSptD());
+    hLdgJetAxis2             -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSaxis2());
+    //hLdgJetAxis1             -> Fill(isGenuineTop, jet1.axis1());
+    hLdgJetMult              -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSmult());
+    hLdgJetQGLikelihood      -> Fill(isGenuineTop, jet1.QGTaggerAK4PFCHSqgLikelihood());
+    //hLdgJetPullMagnitude     -> Fill(isGenuineTop, getJetPullMagnitude(jet1));      
+      
+    // Subleading jet from dijet system
+    hSubldgJetPt             -> Fill(isGenuineTop, jet2.pt());
+    hSubldgJetEta            -> Fill(isGenuineTop, jet2.eta());
+    hSubldgJetPhi            -> Fill(isGenuineTop, jet2.phi());
+    hSubldgJetBdisc          -> Fill(isGenuineTop, jet2.bjetDiscriminator());
+      
+    hSubldgJetCombinedCvsL   -> Fill(isGenuineTop, jet2.pfCombinedCvsLJetTags());
+    //hSubldgJetDeepCvsL       -> Fill(isGenuineTop, jet2.pfDeepCSVCvsLJetTags());
+    hSubldgJetPtD            -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSptD());
+    hSubldgJetAxis2          -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSaxis2());
+    //hSubldgJetAxis1          -> Fill(isGenuineTop, jet2.axis1());
+    hSubldgJetMult           -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSmult());
+    hSubldgJetQGLikelihood   -> Fill(isGenuineTop, jet2.QGTaggerAK4PFCHSqgLikelihood());
+    //hSubldgJetPFCharge       -> Fill(isGenuineTop, jet2.pfcharge());
+    //hSubldgJetPullMagnitude  -> Fill(isGenuineTop, getJetPullMagnitude(jet2));
+      
+    hBJetPt                  -> Fill(isGenuineTop, bjet.pt());
+    hBJetEta                 -> Fill(isGenuineTop, bjet.eta());
+    hBJetPhi                 -> Fill(isGenuineTop, bjet.phi());
+    hBJetBdisc               -> Fill(isGenuineTop, bjet.bjetDiscriminator());
+    hBJetMass                -> Fill(isGenuineTop, bjet.p4().M());
+    hBJetQGLikelihood        -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSqgLikelihood());
+    hBJetCombinedCvsL        -> Fill(isGenuineTop, bjet.pfCombinedCvsLJetTags());
+    //hBJetDeepCvsL            -> Fill(isGenuineTop, bjet.pfDeepCSVCvsLJetTags());
+    hBJetPtD                 -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSptD());
+    hBJetAxis2               -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSaxis2());
+    //hBJetAxis1               -> Fill(isGenuineTop, bjet.axis1());
+    hBJetMult                -> Fill(isGenuineTop, bjet.QGTaggerAK4PFCHSmult());
+    //hBJetPFCharge            -> Fill(isGenuineTop, bjet.pfcharge());
+      
+    hBJetLdgJet_Mass         -> Fill(isGenuineTop, (bjet.p4()+jet1.p4()).M());
+    //hBJetLdgJet_PFCharge     -> Fill(isGenuineTop, bjet.pfcharge() + jet1.pfcharge());
+    hBJetSubldgJet_Mass      -> Fill(isGenuineTop, (bjet.p4()+jet2.p4()).M());
+    //hBJetSubldgJet_PFCharge  -> Fill(isGenuineTop, bjet.pfcharge()+jet2.pfcharge());
+
+    if (isGenuineTop){
+	
+      /////marina
+      // Fill signal background
+      eventWeight_S = fEventWeight.getWeight();
+	  
+      // Trijet Variables
+      trijetPt_S		   = TrijetP4.Pt();
+      trijetEta_S		   = TrijetP4.Eta();
+      trijetPhi_S		   = TrijetP4.Phi();
+      trijetMass_S		   = TrijetP4.M();
+      trijetPtDR_S		   = TrijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4());
+      //trijetPFCharge_S	   = jet1.pfcharge() + jet2.pfcharge() + bjet.pfcharge();
+      trijetCombinedCvsL_S	   = (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags() + bjet.pfCombinedCvsLJetTags())/3.;
+      //trijetDeepCvsL_S	   = (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags() + bjet.pfDeepCSVCvsLJetTags())/3.;
+      trijetPtD_S		   = (jet1.QGTaggerAK4PFCHSptD()   + jet2.QGTaggerAK4PFCHSptD()   + bjet.QGTaggerAK4PFCHSptD())/3.;
+      //trijetAxis1_S		   = (jet1.axis1() + jet2.axis1() + bjet.axis1())/3.;
+      trijetAxis2_S		   = (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2() + bjet.QGTaggerAK4PFCHSaxis2())/3.;
+      trijetMult_S		   = (jet1.QGTaggerAK4PFCHSmult()  + jet2.QGTaggerAK4PFCHSmult()  + bjet.QGTaggerAK4PFCHSmult())/3.;
+      trijetQGLikelihood_S	   = jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood()*bjet.QGTaggerAK4PFCHSqgLikelihood();
+      trijetQGLikelihood_avg_S = (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood()+bjet.QGTaggerAK4PFCHSqgLikelihood())/3.;
+      trijetChiSquared_S	   = (TrijetP4.M() - mTopMass)/sigmaTrijet;
+	  
+      // Dijet Variables
+      dijetPt_S		   = DijetP4.Pt();
+      dijetEta_S		   = DijetP4.Eta();
+      dijetPhi_S		   = DijetP4.Phi();
+      dijetMass_S		   = DijetP4.M();
+      dijetPtDR_S		   = DijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
+      //dijetPFCharge_S	   = jet1.pfcharge()+jet2.pfcharge();
+      dijetCombinedCvsL_S	   = (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags())/2.0;
+      //dijetDeepCvsL_S	   = (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags())/2.0;
+      dijetPtD_S		   = (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD())/2.0;
+      //dijetAxis1_S		   = (jet1.axis1() + jet2.axis1())/2.;
+      dijetAxis2_S		   = (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2())/2.;
+      dijetMult_S		   = (jet1.QGTaggerAK4PFCHSmult()  + jet2.QGTaggerAK4PFCHSmult())/2.;
+      dijetQGLikelihood_S	   = jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood();
+      dijetQGLikelihood_avg_S  = (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood())/2.;
+      dijetChiSquared_S	   = (DijetP4.M() - mWMass)/sigmaDijet;
+	  
+      // Leading jet from dijet system
+      LdgJetPt_S		    = jet1.pt();
+      LdgJetEta_S		    = jet1.eta();
+      LdgJetPhi_S		    = jet1.phi();
+      LdgJetMass_S		    = jet1.p4().M();
+      //LdgJetPFCharge_S	    = jet1.pfcharge();
+      if (jet1.bjetDiscriminator() < 0.0)
+	{
+	  LdgJetBdisc_S	    = -1.0;
+	}
+      else
+	{
+	  LdgJetBdisc_S	    = jet1.bjetDiscriminator();
+	}
+      LdgJetCombinedCvsL_S	    = jet1.pfCombinedCvsLJetTags();
+      //LdgJetDeepCvsL_S	    = jet1.pfDeepCSVCvsLJetTags();
+      LdgJetPtD_S		    = jet1.QGTaggerAK4PFCHSptD();
+      LdgJetAxis2_S		    = jet1.QGTaggerAK4PFCHSaxis2();
+      //LdgJetAxis1_S		    = jet1.axis1();
+      LdgJetMult_S		    = jet1.QGTaggerAK4PFCHSmult();
+      LdgJetQGLikelihood_S	    = jet1.QGTaggerAK4PFCHSqgLikelihood();
+      //LdgJetPullMagnitude_S	    = getJetPullMagnitude(jet1);
+	  
+      // Subleading jet from dijet system
+      SubldgJetPt_S		    = jet2.pt();
+      SubldgJetEta_S	    = jet2.eta();
+      SubldgJetPhi_S	    = jet2.phi();
+      SubldgJetMass_S	    = jet2.p4().M();
+      //SubldgJetPFCharge_S	    = jet2.pfcharge();
+      if (jet2.bjetDiscriminator() < 0.0)
+	{
+	  SubldgJetBdisc_S	    = -1.0;
+	}
+      else
+	{
+	  SubldgJetBdisc_S	    = jet2.bjetDiscriminator();
+	}
+      SubldgJetCombinedCvsL_S   = jet2.pfCombinedCvsLJetTags();
+      //SubldgJetDeepCvsL_S	    = jet2.pfDeepCSVCvsLJetTags();
+      SubldgJetPtD_S	    = jet2.QGTaggerAK4PFCHSptD();
+      SubldgJetAxis2_S	    = jet2.QGTaggerAK4PFCHSaxis2();
+      //SubldgJetAxis1_S	    = jet2.axis1();
+      SubldgJetMult_S	    = jet2.QGTaggerAK4PFCHSmult();
+      SubldgJetQGLikelihood_S   = jet2.QGTaggerAK4PFCHSqgLikelihood();
+      //SubldgJetPullMagnitude_S  = getJetPullMagnitude(jet2);
+	  
+      // b-jet 
+      bjetPt_S		    = bjet.pt();
+      bjetEta_S		    = bjet.eta();
+      bjetPhi_S		    = bjet.phi();
+      bjetBdisc_S		    = bjet.bjetDiscriminator();
+      bjetMass_S		    = bjet.p4().M();
+      bjetQGLikelihood_S	    = bjet.QGTaggerAK4PFCHSqgLikelihood();
+      bjetCombinedCvsL_S	    = bjet.pfCombinedCvsLJetTags();
+      //bjetDeepCvsL_S	    = bjet.pfDeepCSVCvsLJetTags();
+      bjetPtD_S		    = bjet.QGTaggerAK4PFCHSptD();
+      bjetAxis2_S		    = bjet.QGTaggerAK4PFCHSaxis2();
+      //bjetAxis1_S		    = bjet.axis1();
+      bjetMult_S		    = bjet.QGTaggerAK4PFCHSmult();
+      //bjetPFCharge_S	    = bjet.pfcharge();
+      bjetLdgJetMass_S          = (bjet.p4() + jet1.p4()).M();
+      bjetSubldgJetMass_S       = (bjet.p4() + jet2.p4()).M();
+	  
+      // Others (Soft-drop, distances, pull variables, etc)
+      SoftDrop_n2_S		    = softDrop_n2;
+      //PullAngleJ1J2_S	    = getJetPullAngle(jet1, jet2);  
+      //PullAngleJ2J1_S	    = getJetPullAngle(jet2, jet1);
+	  
+      DEtaJ1withJ2_S	    = std::abs(jet1.eta() - jet2.eta());
+      DEtaJ1withBJet_S	    = std::abs(jet1.eta() - bjet.eta());
+      DEtaJ2withBJet_S	    = std::abs(jet2.eta() - bjet.eta());
+      DEtaDijetwithBJet_S	    = std::abs(DijetP4.Eta() - bjet.eta());
+      DEtaJ1BJetwithJ2_S	    = std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta());
+      DEtaJ2BJetwithJ1_S	    = std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta());
+      DPhiJ1withJ2_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4()); 
+      DPhiJ1withBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4());
+      DPhiJ2withBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4());
+      DPhiDijetwithBJet_S	    = ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4());
+      DPhiJ1BJetwithJ2_S	    = ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4());
+      DPhiJ2BJetwithJ1_S	    = ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4());
+      DRJ1withJ2_S		    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
+      DRJ1withBJet_S	    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4());
+      DRJ2withBJet_S	    = ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4());
+      DRDijetwithBJet_S	    = ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4());
+      DRJ1BJetwithJ2_S	    = ROOT::Math::VectorUtil::DeltaR((jet1.p4()+bjet.p4()), jet2.p4());
+      DRJ2BJetwithJ1_S	    = ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4());
+	  
+      dijetMassOverTrijetMass_S = DijetP4.M()/TrijetP4.M();	  
+      /////marina
+      treeS -> Fill();
+    }
+    else{
+	
+      // Fill signal background
+      eventWeight_B = fEventWeight.getWeight();
+	  
+      // Trijet Variables
+      trijetPt_B		   = TrijetP4.Pt();
+      trijetEta_B		   = TrijetP4.Eta();
+      trijetPhi_B		   = TrijetP4.Phi();
+      trijetMass_B		   = TrijetP4.M();
+      trijetPtDR_B		   = TrijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4());
+      //trijetPFCharge_B	   = jet1.pfcharge() + jet2.pfcharge() + bjet.pfcharge();
+      trijetCombinedCvsL_B	   = (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags() + bjet.pfCombinedCvsLJetTags())/3.;
+      //trijetDeepCvsL_B	   = (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags() + bjet.pfDeepCSVCvsLJetTags())/3.;
+      trijetPtD_B		   = (jet1.QGTaggerAK4PFCHSptD()   + jet2.QGTaggerAK4PFCHSptD()   + bjet.QGTaggerAK4PFCHSptD())/3.;
+      //trijetAxis1_B		   = (jet1.axis1() + jet2.axis1() + bjet.axis1())/3.;
+      trijetAxis2_B		   = (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2() + bjet.QGTaggerAK4PFCHSaxis2())/3.;
+      trijetMult_B		   = (jet1.QGTaggerAK4PFCHSmult()  + jet2.QGTaggerAK4PFCHSmult()  + bjet.QGTaggerAK4PFCHSmult())/3.;
+      trijetQGLikelihood_B	   = jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood()*bjet.QGTaggerAK4PFCHSqgLikelihood();
+      trijetQGLikelihood_avg_B = (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood()+bjet.QGTaggerAK4PFCHSqgLikelihood())/3.;
+      trijetChiSquared_B	   = (TrijetP4.M() - mTopMass)/sigmaTrijet;
+	  
+      // Dijet Variables
+      dijetPt_B		   = DijetP4.Pt();
+      dijetEta_B		   = DijetP4.Eta();
+      dijetPhi_B		   = DijetP4.Phi();
+      dijetMass_B		   = DijetP4.M();
+      dijetPtDR_B		   = DijetP4.Pt() * ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
+      //dijetPFCharge_B	   = jet1.pfcharge()+jet2.pfcharge();
+      dijetCombinedCvsL_B	   = (jet1.pfCombinedCvsLJetTags() + jet2.pfCombinedCvsLJetTags())/2.0;
+      //dijetDeepCvsL_B	   = (jet1.pfDeepCSVCvsLJetTags() + jet2.pfDeepCSVCvsLJetTags())/2.0;
+      dijetPtD_B		   = (jet1.QGTaggerAK4PFCHSptD() + jet2.QGTaggerAK4PFCHSptD())/2.0;
+      //dijetAxis1_B		   = (jet1.axis1() + jet2.axis1())/2.;
+      dijetAxis2_B		   = (jet1.QGTaggerAK4PFCHSaxis2() + jet2.QGTaggerAK4PFCHSaxis2())/2.;
+      dijetMult_B		   = (jet1.QGTaggerAK4PFCHSmult()  + jet2.QGTaggerAK4PFCHSmult())/2.;
+      dijetQGLikelihood_B	   = jet1.QGTaggerAK4PFCHSqgLikelihood()*jet2.QGTaggerAK4PFCHSqgLikelihood();
+      dijetQGLikelihood_avg_B  = (jet1.QGTaggerAK4PFCHSqgLikelihood()+jet2.QGTaggerAK4PFCHSqgLikelihood())/2.;
+      dijetChiSquared_B	   = (DijetP4.M() - mWMass)/sigmaDijet;
+	  
+      // Leading jet from dijet system
+      LdgJetPt_B		    = jet1.pt();
+      LdgJetEta_B		    = jet1.eta();
+      LdgJetPhi_B		    = jet1.phi();
+      LdgJetMass_B		    = jet1.p4().M();
+      //LdgJetPFCharge_B	    = jet1.pfcharge();
+      if (jet1.bjetDiscriminator() < 0.0)
+	{
+	  LdgJetBdisc_B	    = -1.0;
+	}
+      else
+	{
+	  LdgJetBdisc_B	    = jet1.bjetDiscriminator();
+	}
+      LdgJetCombinedCvsL_B	    = jet1.pfCombinedCvsLJetTags();
+      //LdgJetDeepCvsL_B	    = jet1.pfDeepCSVCvsLJetTags();
+      LdgJetPtD_B		    = jet1.QGTaggerAK4PFCHSptD();
+      LdgJetAxis2_B		    = jet1.QGTaggerAK4PFCHSaxis2();
+      //LdgJetAxis1_B		    = jet1.axis1();
+      LdgJetMult_B		    = jet1.QGTaggerAK4PFCHSmult();
+      LdgJetQGLikelihood_B	    = jet1.QGTaggerAK4PFCHSqgLikelihood();
+      //LdgJetPullMagnitude_B	    = getJetPullMagnitude(jet1);
+	  
+      // Subleading jet from dijet system
+      SubldgJetPt_B		    = jet2.pt();
+      SubldgJetEta_B	    = jet2.eta();
+      SubldgJetPhi_B	    = jet2.phi();
+      SubldgJetMass_B	    = jet2.p4().M();
+      //SubldgJetPFCharge_B	    = jet2.pfcharge();
+      if (jet2.bjetDiscriminator() < 0.0)
+	{
+	  SubldgJetBdisc_B	    = -1.0;
+	}
+      else
+	{
+	  SubldgJetBdisc_B	    = jet2.bjetDiscriminator();
+	}
+      SubldgJetCombinedCvsL_B   = jet2.pfCombinedCvsLJetTags();
+      //SubldgJetDeepCvsL_B	    = jet2.pfDeepCSVCvsLJetTags();
+      SubldgJetPtD_B	    = jet2.QGTaggerAK4PFCHSptD();
+      SubldgJetAxis2_B	    = jet2.QGTaggerAK4PFCHSaxis2();
+      //SubldgJetAxis1_B	    = jet2.axis1();
+      SubldgJetMult_B	    = jet2.QGTaggerAK4PFCHSmult();
+      SubldgJetQGLikelihood_B   = jet2.QGTaggerAK4PFCHSqgLikelihood();
+      //SubldgJetPullMagnitude_B  = getJetPullMagnitude(jet2);
+	  
+      // b-jet 
+      bjetPt_B		    = bjet.pt();
+      bjetEta_B		    = bjet.eta();
+      bjetPhi_B		    = bjet.phi();
+      bjetBdisc_B		    = bjet.bjetDiscriminator();
+      bjetMass_B		    = bjet.p4().M();
+      bjetQGLikelihood_B	    = bjet.QGTaggerAK4PFCHSqgLikelihood();
+      bjetCombinedCvsL_B	    = bjet.pfCombinedCvsLJetTags();
+      //bjetDeepCvsL_B	    = bjet.pfDeepCSVCvsLJetTags();
+      bjetPtD_B		    = bjet.QGTaggerAK4PFCHSptD();
+      bjetAxis2_B		    = bjet.QGTaggerAK4PFCHSaxis2();
+      //bjetAxis1_B		    = bjet.axis1();
+      bjetMult_B		    = bjet.QGTaggerAK4PFCHSmult();
+      //bjetPFCharge_B	    = bjet.pfcharge();
+      bjetLdgJetMass_B          = (bjet.p4() + jet1.p4()).M();
+      bjetSubldgJetMass_B       = (bjet.p4() + jet2.p4()).M();
+	  
+      // Others (Soft-drop, distances, pull variables, etc)
+      SoftDrop_n2_B		    = softDrop_n2;
+      //PullAngleJ1J2_B	    = getJetPullAngle(jet1, jet2);  
+      //PullAngleJ2J1_B	    = getJetPullAngle(jet2, jet1);
+	  
+      DEtaJ1withJ2_B	    = std::abs(jet1.eta() - jet2.eta());
+      DEtaJ1withBJet_B	    = std::abs(jet1.eta() - bjet.eta());
+      DEtaJ2withBJet_B	    = std::abs(jet2.eta() - bjet.eta());
+      DEtaDijetwithBJet_B	    = std::abs(DijetP4.Eta() - bjet.eta());
+      DEtaJ1BJetwithJ2_B	    = std::abs((jet1.p4() + bjet.p4()).Eta() - jet2.eta());
+      DEtaJ2BJetwithJ1_B	    = std::abs((jet2.p4() + bjet.p4()).Eta() - jet1.eta());
+      DPhiJ1withJ2_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), jet2.p4()); 
+      DPhiJ1withBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet1.p4(), bjet.p4());
+      DPhiJ2withBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(jet2.p4(), bjet.p4());
+      DPhiDijetwithBJet_B	    = ROOT::Math::VectorUtil::DeltaPhi(DijetP4, bjet.p4());
+      DPhiJ1BJetwithJ2_B	    = ROOT::Math::VectorUtil::DeltaPhi((jet1.p4()+bjet.p4()), jet2.p4());
+      DPhiJ2BJetwithJ1_B	    = ROOT::Math::VectorUtil::DeltaPhi((jet2.p4()+bjet.p4()), jet1.p4());
+      DRJ1withJ2_B		    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());
+      DRJ1withBJet_B	    = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), bjet.p4());
+      DRJ2withBJet_B	    = ROOT::Math::VectorUtil::DeltaR(jet2.p4(), bjet.p4());
+      DRDijetwithBJet_B	    = ROOT::Math::VectorUtil::DeltaR(DijetP4, bjet.p4());
+      DRJ1BJetwithJ2_B	    = ROOT::Math::VectorUtil::DeltaR((jet1.p4()+bjet.p4()), jet2.p4());
+      DRJ2BJetwithJ1_B	    = ROOT::Math::VectorUtil::DeltaR((jet2.p4()+bjet.p4()), jet1.p4());
+	  
+      dijetMassOverTrijetMass_B = DijetP4.M()/TrijetP4.M();	  
+
+      treeB -> Fill();
+	
+    }            
+  }
+
+  //========================================================================================================
+  // Pseudo-matching: Used to calculate the dPt/Pt cut
+  //========================================================================================================  
+  for (size_t i=0; i<GenTops_Quarks.size(); i++)
+    {
+      genParticle Quark      = GenTops_Quarks.at(i);
+      Jet JetClosest;
+      double dRmin  = 99999.9;
+      for (auto& jet: jetData.getSelectedJets())
+	{
+	  double dR  = ROOT::Math::VectorUtil::DeltaR( jet.p4(), Quark.p4());
+	  if (dR > cfg_DeltaRCut)   continue;
+	  if (dR > dRmin)   continue;
+	  dRmin  = dR;
+	  JetClosest = jet;
+	}
+      if (dRmin > cfg_DeltaRCut) continue;
+      double dPtOverPt = (JetClosest.pt() - Quark.pt())/Quark.pt();
+      hQuarkJetMinDr03_DeltaPtOverPt            -> Fill (dPtOverPt);   //2sigma = 2*0.16 = 0.32
+      hQuarkJetMinDr03_DeltaPtOverPt_vs_QuarkPt -> Fill(dPtOverPt, Quark.pt());
+      hQuarkJetMinDr03_DeltaPtOverPt_vs_DeltaRmin -> Fill(dPtOverPt, dRmin);
+
+      if (Quark.pt() < 40)       hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt0To40GeV    -> Fill(dPtOverPt);
+      else if (Quark.pt() < 60)  hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt40To60GeV   -> Fill(dPtOverPt);
+      else if (Quark.pt() < 80)  hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt60To80GeV   -> Fill(dPtOverPt);
+      else if (Quark.pt() < 100) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt80To100GeV  -> Fill(dPtOverPt);
+      else if (Quark.pt() < 120) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt100To120GeV -> Fill(dPtOverPt);
+      else if (Quark.pt() < 140) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt120To140GeV -> Fill(dPtOverPt);
+      else if (Quark.pt() < 160) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt140To160GeV -> Fill(dPtOverPt);
+      else if (Quark.pt() < 180) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt160To180GeV -> Fill(dPtOverPt);
+      else if (Quark.pt() < 200) hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt180To200GeV -> Fill(dPtOverPt);
+      else hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt200ToInfGeV -> Fill(dPtOverPt);
+      hQuarkJetMinDr03_DeltaR_vs_QuarkPt        -> Fill(dRmin, Quark.pt());
+    }
+
+  //========================================================================================================
+  // Matching:  Minimum DeltaR and DeltaPt check
+  //========================================================================================================
+  
+  //Sanity chack
+  double DeltaR_min = 999.999;
+  for (auto& jet1: jetData.getSelectedJets())
+    {
+      for (auto& jet2: jetData.getSelectedJets())
+	{
+	  if (areSameJets(jet1, jet2)) continue;
+	  double DeltaR = ROOT::Math::VectorUtil::DeltaR( jet1.p4(), jet2.p4());
+	  if (DeltaR > DeltaR_min) continue;
+	  DeltaR_min = DeltaR;
+	}
+    }
+
+  hJetsDeltaRmin -> Fill(DeltaR_min);
+
+  //========================================================================================================
+  // Check Properties of matched objects
+  //========================================================================================================
+  for (size_t j=0; j<MCtrue_Bjet.size(); j++){
+
+    hTrijetDrMin -> Fill( ROOT::Math::VectorUtil::DeltaR(MCtrue_Bjet.at(j).p4(),      MGen_Bjet.at(j).p4()));
+    hTrijetDrMin -> Fill( ROOT::Math::VectorUtil::DeltaR(MCtrue_LdgJet.at(j).p4(),    MGen_LdgJet.at(j).p4()));
+    hTrijetDrMin -> Fill( ROOT::Math::VectorUtil::DeltaR(MCtrue_SubldgJet.at(j).p4(), MGen_SubldgJet.at(j).p4()));
+      
+    hTrijetDPtOverGenPt -> Fill( (MCtrue_Bjet.at(j).pt()      - MGen_Bjet.at(j).pt())/MGen_Bjet.at(j).pt());
+    hTrijetDPtOverGenPt -> Fill( (MCtrue_LdgJet.at(j).pt()    - MGen_LdgJet.at(j).pt())/MGen_LdgJet.at(j).pt());
+    hTrijetDPtOverGenPt -> Fill( (MCtrue_SubldgJet.at(j).pt() - MGen_SubldgJet.at(j).pt())/MGen_SubldgJet.at(j).pt());
+      
+    hTrijetDPt_matched -> Fill( (MCtrue_Bjet.at(j).pt()      - MGen_Bjet.at(j).pt()));
+    hTrijetDPt_matched -> Fill( (MCtrue_LdgJet.at(j).pt()    - MGen_LdgJet.at(j).pt()));
+    hTrijetDPt_matched -> Fill( (MCtrue_SubldgJet.at(j).pt() - MGen_SubldgJet.at(j).pt()));
+      
+    hTrijetDEtaOverGenEta -> Fill( (MCtrue_Bjet.at(j).eta()      - MGen_Bjet.at(j).eta())/MGen_Bjet.at(j).eta());
+    hTrijetDEtaOverGenEta -> Fill( (MCtrue_LdgJet.at(j).eta()    - MGen_LdgJet.at(j).eta())/MGen_LdgJet.at(j).eta());
+    hTrijetDEtaOverGenEta -> Fill( (MCtrue_SubldgJet.at(j).eta() - MGen_SubldgJet.at(j).eta())/MGen_SubldgJet.at(j).eta());
+      
+    hTrijetDEta_matched -> Fill( (MCtrue_Bjet.at(j).eta()      - MGen_Bjet.at(j).eta()));
+    hTrijetDEta_matched -> Fill( (MCtrue_LdgJet.at(j).eta()    - MGen_LdgJet.at(j).eta()));
+    hTrijetDEta_matched -> Fill( (MCtrue_SubldgJet.at(j).eta() - MGen_SubldgJet.at(j).eta()));
+      
+    hTrijetDPhiOverGenPhi -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_Bjet.at(j).p4(),      MGen_Bjet.at(j).p4()))/MGen_Bjet.at(j).phi());
+    hTrijetDPhiOverGenPhi -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_LdgJet.at(j).p4(),    MGen_LdgJet.at(j).p4()))/MGen_LdgJet.at(j).phi());
+    hTrijetDPhiOverGenPhi -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_SubldgJet.at(j).p4(), MGen_SubldgJet.at(j).p4()))/MGen_SubldgJet.at(j).phi());
+      
+    hTrijetDPhi_matched -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_Bjet.at(j).p4(),      MGen_Bjet.at(j).p4())));
+    hTrijetDPhi_matched -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_LdgJet.at(j).p4(),    MGen_LdgJet.at(j).p4())));
+    hTrijetDPhi_matched -> Fill( (ROOT::Math::VectorUtil::DeltaPhi(MCtrue_SubldgJet.at(j).p4(), MGen_SubldgJet.at(j).p4())));
+      
+  }
+
+  //========================================================================================================
+  // Sanity check
+  //========================================================================================================
+    
+  for (auto& jet: jetData.getSelectedJets()){
+    hAllJetCvsL         -> Fill(jet.pfCombinedCvsLJetTags());
+    hAllJetPtD          -> Fill(jet.QGTaggerAK4PFCHSptD());
+    hAllJetAxis2        -> Fill(jet.QGTaggerAK4PFCHSaxis2());
+    hAllJetMult         -> Fill(jet.QGTaggerAK4PFCHSmult());
+    hAllJetBdisc        -> Fill(jet.bjetDiscriminator());
+    hAllJetQGLikelihood -> Fill(jet.QGTaggerAK4PFCHSqgLikelihood());
+  }
+  
+  vector<genParticle> GenCharm = GetGenParticles(fEvent.genparticles().getGenParticles(), 4);
+  vector<Jet> CJets;
+
+  for (size_t i=0; i<GenCharm.size(); i++){
+    double dRmin = 10000.0;
+
+    // double dPtOverPtmin = 10000.0;
+
+    Jet mcMatched_CJet;
+    for (auto& jet: jetData.getSelectedJets()){
+      double dR  = ROOT::Math::VectorUtil::DeltaR( jet.p4(), GenCharm.at(i).p4());
+      double dPtOverPt = std::abs((jet.pt() - GenCharm.at(i).pt())/ GenCharm.at(i).pt());
+      if (dR > cfg_DeltaRCut) continue;
+      if (dR > dRmin) continue;
+      //if (dPtOverPt > dPtOverPtmin) continue;
+      if (dPtOverPt > cfg_DeltaPtOverPtCut) continue;
+      dRmin = dR;
+      // dPtOverPtmin = dPtOverPt;
+      mcMatched_CJet = jet;
+    }
+    if (dRmin < cfg_DeltaRCut){
+      hCJetCvsL         -> Fill(mcMatched_CJet.pfCombinedCvsLJetTags());
+      hCJetPtD          -> Fill(mcMatched_CJet.QGTaggerAK4PFCHSptD());
+      hCJetAxis2        -> Fill(mcMatched_CJet.QGTaggerAK4PFCHSaxis2());
+      hCJetMult         -> Fill(mcMatched_CJet.QGTaggerAK4PFCHSmult());
+      hCJetBdisc        -> Fill(mcMatched_CJet.bjetDiscriminator());
+    }
+  }
+  
+  //================================================================================================
+  // Finalize
+  //================================================================================================
+  fEventSaver.save();
 }
+
   
