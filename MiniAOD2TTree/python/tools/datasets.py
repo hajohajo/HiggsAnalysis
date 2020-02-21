@@ -988,8 +988,8 @@ datasets_2016["ZJetsToQQ"].append(dset)
 
 # W+jets
 datasets_2016["WJetsToLNu"] = []
-dset = Dataset("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", campaign, pString, PU, gTag, 2, 1, "MINIAODSIM", "global", "80Xmc", None, False)
-datasets_2016["WJetsToLNu"].append(dset)
+datasets_2016["WJetsToLNu"].append(Dataset("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", campaign, pString, PU, gTag, 0, 1, "MINIAODSIM", "global", "80Xmc", None, False))
+datasets_2016["WJetsToLNu"].append(Dataset("WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", campaign, pString, PU, gTag, 2, 1, "MINIAODSIM", "global", "80Xmc", None, False))
 
 datasets_2016["WJetsToLNu_HT"] = []
 for htRange in ["70To100", "100To200", "200To400", "400To600", "600To800", "800To1200", "1200To2500", "2500ToInf"]:
@@ -1211,7 +1211,7 @@ dsetGroups_2016["HToHW"].extend(datasets_2016["TT"])
 dsetGroups_2016["HToHW"].extend(datasets_2016["SingleTop"])
 #dsetGroups_2016["HToHW"].extend(datasets_2016["DYJetsToLL"])
 dsetGroups_2016["HToHW"].extend(datasets_2016["DYJetsToLL_HT"])
-#dsetGroups_2016["HToHW"].extend(datasets_2016["WJetsToLNu"] ) #for doing the HT binned 0To70
+dsetGroups_2016["HToHW"].extend(datasets_2016["WJetsToLNu"] ) #for doing the HT binned 0To70
 dsetGroups_2016["HToHW"].extend(datasets_2016["WJetsToLNu_HT"] )
 #dsetGroups_2016["HToHW"].extend(datasets_2016["ZJetsToQQ"])
 dsetGroups_2016["HToHW"].extend(datasets_2016["Diboson"])
