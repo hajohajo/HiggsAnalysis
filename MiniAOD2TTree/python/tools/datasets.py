@@ -76,7 +76,9 @@ class DatasetGroup:
         Create dataset grouping in a dictionary for easy access.
         '''
 
-        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "Hplus2hwWithTopAnalysis", "JetTriggers", "TopSystBDT", "TauLeg", "METLeg", "L1Study"]
+        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "Hplus2hwAnalysis", "Hplus2hwWithTopAnalysis", "HToHWTrgEff",
+                    "JetTriggers", "TopSystBDT", "TauLeg", "METLeg", "L1Study"]
+        
         analysisTypes = ["HToTauNu", "HToTB", "HToHW", "HToHW_withTop"]
         analyses.extend(analysisTypes)
         if self.analysis not in analyses:
@@ -95,6 +97,7 @@ class DatasetGroup:
         self.GroupDict["L1Study"]          = dsetGroups_2016["L1Study"]
         self.GroupDict["JetTriggers"]      = dsetGroups_2016["JetTriggers"]
         self.GroupDict["TopSystBDT"]       = dsetGroups_2016["TopTagSys"]
+        self.GroupDict["HToHWTrgEff"]      = dsetGroups_2016["HToHWTrgEff"]
         return
 
     def GetDatasetNames(self):
@@ -1223,6 +1226,9 @@ dsetGroups_2016["HToHW"].extend(datasets_2016["TTTT"])
 dsetGroups_2016["HToHW"].extend(datasets_2016["TTZToLLNuNu"])
 dsetGroups_2016["HToHW"].extend(datasets_2016["TTZToQQ"])
 dsetGroups_2016["HToHW"].extend(datasets_2016["ttHJet"])
+
+dsetGroups_2016["HToHWTrgEff"] = []
+dsetGroups_2016["HToHWTrgEff"].extend(datasets_2016["HplusToHW"])
 
 dsetGroups_2016["HToHW_withTop"] = []
 dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["HplusToHW"])
