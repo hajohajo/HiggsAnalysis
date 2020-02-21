@@ -94,10 +94,6 @@ crab getoutput <dir> --command=LCG --checksum=no
 To retrieve a range of jobs for a given task:
 crab getoutput -d <task_dir> --jobids <comma-separated-list-of-jobs-and/or-job-ranges>
 
-To check whether you have write persmissions on a T2 centre use the command
-crab checkwrite --site 
-For example:
-crab checkwrite --site T2_CH_CERN
 '''
 
 #================================================================================================
@@ -109,6 +105,7 @@ import sys
 import time
 import datetime
 import subprocess
+import shlex
 import tarfile
 from optparse import OptionParser
 from collections import OrderedDict
@@ -1994,6 +1991,30 @@ def ConvertCommandToEOS(cmd, opts):
 
     return cmdMap[cmd]
 
+def CheckStorageSitePermissions(opts):
+    '''
+    To check whether you have write persmissions on a T2 centre use the command
+    crab checkwrite --site 
+
+    For example:
+    crab checkwrite --site T2_CH_CERN
+    '''
+    # Provide an array of arguments (not a string of arguments) to subprocess
+    cmd  = "crab checkwrite --site %s" % (opts.storageSite)
+    cmds = shlex.split(cmd)
+    p    = subprocess.Popen(cmds, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, err = p.communicate()
+    if len(err) > 0:
+        raise Exception(es + err + ns)
+    else:
+        if "success" in output.lower():
+            msg = "%sSuccess%s: Able to write in /store/user/%s on site %s" % (ss, ns, getUsernameFromSiteDB(), hs + opts.storageSite + ns)
+            Print(msg, True)
+        else:
+            msg = output
+            raise Exception(es + msg + ns, True)
+    return
+
 
 def CreateJob(opts, args):
     '''
@@ -2007,6 +2028,9 @@ def CreateJob(opts, args):
     datasets     = DatasetGroup(analysis).GetDatasets()
     taskDirName  = GetTaskDirName(analysis, version, datasets)
     opts.dirName = taskDirName
+
+    # Check that user has write permission to chosen storage site
+    CheckStorageSitePermissions(opts)
 
     # Give user last chance to abort
     PrintInfo(opts.dirName, analysis, opts)
