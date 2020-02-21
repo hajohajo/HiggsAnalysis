@@ -22,11 +22,12 @@
 #include "TBranch.h"
 #include <TLorentzVector.h>
 
-#include "../work/TopRecoTree.h"
+#include "topRecoTree.h"
 
 struct PtComparator
 {
   bool operator() (const genParticle p1, const genParticle p2) const { return ( p1.pt() > p2.pt() ); }
+  bool operator() (const Jet j1, const Jet j2) const { return ( j1.pt() > j2.pt() ); }
   bool operator() (const math::XYZTLorentzVector p1, const math::XYZTLorentzVector p2) const { return ( p1.pt() > p2.pt() ); }
 };
 
@@ -45,10 +46,6 @@ public:
   explicit TopRecoTree(const ParameterSet& config, const TH1* skimCounters);
   virtual ~TopRecoTree() {}
 
-  Jet getLeadingSubleadingJet(const Jet& jet0, const Jet& jet1, string selectedJet);
-  std::vector<int> SortInPt(std::vector<int> Vector);
-  //Vector sorting according to the pt. - Descending order
-  std::vector<math::XYZTLorentzVector> SortInPt(std::vector<math::XYZTLorentzVector> Vector);
   //returns the last copy of a gen particle
   genParticle findLastCopy(int index);
   //is Bjet
@@ -70,7 +67,6 @@ public:
   const genParticle GetLastCopy(const vector<genParticle> genParticles, const genParticle &p);
   vector<genParticle> GetGenParticles(const vector<genParticle> genParticles, const int pdgId);
 
-
 private:
   // Input parameters
   const std::string cfg_SelectionsType;
@@ -84,6 +80,7 @@ private:
   const float cfg_MuonEtaCut;
   const float cfg_ElePtCut;
   const float cfg_EleEtaCut;
+  const std::vector<float> cfg_BjetsPtCut;
 
   const HistogramSettings cfg_PtBinSetting;
   const HistogramSettings cfg_EtaBinSetting;
@@ -93,9 +90,7 @@ private:
   const HistogramSettings cfg_DeltaPhiBinSetting;
   const HistogramSettings cfg_DeltaRBinSetting;
   
-
   Tools auxTools;
-
 
   // Common plots
   CommonPlots fCommonPlots;
@@ -571,6 +566,7 @@ TopRecoTree::TopRecoTree(const ParameterSet& config, const TH1* skimCounters)
     cfg_MuonEtaCut(config.getParameter<float>("MuonSelection.muonEtaCut")),
     cfg_ElePtCut(config.getParameter<float>("ElectronSelection.electronPtCut")),
     cfg_EleEtaCut(config.getParameter<float>("ElectronSelection.electronEtaCut")),
+    cfg_BjetsPtCut(config.getParameter<std::vector<float>>("BJetSelection.jetPtCuts")),
 
     cfg_PtBinSetting(config.getParameter<ParameterSet>("CommonPlots.ptBins")),
     cfg_EtaBinSetting(config.getParameter<ParameterSet>("CommonPlots.etaBins")),
@@ -1221,53 +1217,6 @@ const genParticle TopRecoTree::GetLastCopy(const vector<genParticle> genParticle
   return p;
 }
 
-Jet TopRecoTree::getLeadingSubleadingJet(const Jet& jet0, const Jet& jet1, string selectedJet){
-  if (selectedJet != "leading" && selectedJet!="subleading") std::cout<<"WARNING! Unknown option "<<selectedJet<<". Function getLeadingSubleadingJet returns leading Jet"<<std::endl;
-  Jet leadingJet, subleadingJet;
-  if (jet0.pt() > jet1.pt()){
-    leadingJet    = jet0;
-    subleadingJet = jet1;                                                                                                                                                                              
-  } 
-  else{                                                                                                                                                                           
-    leadingJet    = jet1;
-    subleadingJet = jet0;
-  }
-
-  if (selectedJet == "subleading") return subleadingJet;
-  return leadingJet;
-}
-
-std::vector<int> TopRecoTree::SortInPt(std::vector<int> Vector)
-{
-  int size = Vector.size();
-  for (int i=0; i<size-1; i++){
-    genParticle genPart1 = fEvent.genparticles().getGenParticles()[Vector.at(i)];
-    for (int j=i+1;  j<size; j++){
-      genParticle genPart2 = fEvent.genparticles().getGenParticles()[Vector.at(j)];
-      if (genPart1.pt() > genPart2.pt()) continue;
-      int temp = Vector.at(i);
-      Vector.at(i) = Vector.at(j);
-      Vector.at(j) = temp;
-    }
-  }
-  return Vector;
-}
-std::vector<math::XYZTLorentzVector> TopRecoTree::SortInPt(std::vector<math::XYZTLorentzVector> Vector)
-{
-  int size = Vector.size();
-  for (int i=0; i<size-1; i++){
-    math::XYZTLorentzVector p4_i = Vector.at(i);
-    for (int j=i+1;  j<size; j++){
-      math::XYZTLorentzVector p4_j = Vector.at(j);
-      if (p4_i.pt() > p4_j.pt()) continue;
-      Vector.at(i) = p4_j;
-      Vector.at(j) = p4_i;
-    }
-  }
-  return Vector;
-}
-
-
 genParticle TopRecoTree::findLastCopy(int index){
   genParticle gen_particle = fEvent.genparticles().getGenParticles()[index];
   int gen_pdgId = gen_particle.pdgId();
@@ -1280,7 +1229,6 @@ genParticle TopRecoTree::findLastCopy(int index){
   }
   return gen_particle;
 }
-
 
 bool TopRecoTree::isWsubjet(const Jet& jet , const std::vector<Jet>& jets1 , const std::vector<Jet>& jets2){
   return  (isMatchedJet(jet,jets1)||isMatchedJet(jet,jets2));
@@ -1296,7 +1244,6 @@ bool TopRecoTree::isLepton(const Jet& jet, const std::vector<Electron>& selected
   else if (passMu)  dR = ROOT::Math::VectorUtil::DeltaR(selectedMuons.at(0).p4(), jet.p4());  
   return (dR <= dR_match);
 }
-
   
 bool TopRecoTree::isBJet(const Jet& jet, const std::vector<Jet>& bjets) {
   for (auto bjet: bjets)
@@ -1326,7 +1273,6 @@ void TopRecoTree::setupBranches(BranchManager& branchManager) {
   return;
 }
 
-
 void TopRecoTree::process(Long64_t entry) {
 
   //====== Initialize
@@ -1334,7 +1280,6 @@ void TopRecoTree::process(Long64_t entry) {
   fCommonPlots.setFactorisationBinForEvent(std::vector<float> {});
 
   cAllEvents.increment();
-
   
   //================================================================================================   
   // 1) Apply trigger 
@@ -1450,9 +1395,6 @@ void TopRecoTree::process(Long64_t entry) {
   bool passMuon     = (selectedMuons.size() == 1);
   bool passLepton   = (passElectron && !passMuon) || (!passElectron && passMuon);
   
-  //if (passElectron) std::cout<<"Electron: "<<passElectron<<" "<<selectedElectrons.size()<<" "<<selectedElectrons.at(0).effAreaMiniIso()<<std::endl;
-  //if (passMuon) std::cout<<"Muons: "<<passMuon<<" "<<selectedMuons.size()<<" "<<selectedMuons.at(0).effAreaMiniIso()<<std::endl;
-
   //SemiLeptonic: Select exactly one lepton (electron or muon)
   if (cfg_SelectionsType != "hadronic"){
     if (!passLepton) return;
@@ -1471,7 +1413,6 @@ void TopRecoTree::process(Long64_t entry) {
   if (0) std::cout << "=== Jet selection" << std::endl;
   const JetSelection::Data jetData = fJetSelection.analyzeWithoutTau(fEvent);
   if (!jetData.passedSelection()) return;
-
   
   //================================================================================================
   // Standard Selections
@@ -1485,8 +1426,7 @@ void TopRecoTree::process(Long64_t entry) {
   if (0) std::cout << "=== BJet selection" << std::endl;
   const BJetSelection::Data bjetData = fBJetSelection.analyze(fEvent, jetData);
   if (!bjetData.passedSelection()) return;
-  
-  
+    
   //================================================================================================  
   // 10) BJet SF  
   //================================================================================================
@@ -1496,7 +1436,6 @@ void TopRecoTree::process(Long64_t entry) {
       fEventWeight.multiplyWeight(bjetData.getBTaggingScaleFactorEventWeight());
     }
   cBTaggingSFCounter.increment();
-
 
   //================================================================================================
   // 11) MET selection
@@ -1969,6 +1908,8 @@ void TopRecoTree::process(Long64_t entry) {
   //                                    Top Candidates                                              //
   //================================================================================================//
   bool applyBjetPtCut = true;
+  float BjetPtCut = cfg_BjetsPtCut.at(cfg_BjetsPtCut.size()-1);
+
   TrijetSelections TopCandidates;
   int index0 = -1;
   for (auto& jet0: jetData.getSelectedJets()){
@@ -1987,97 +1928,85 @@ void TopRecoTree::process(Long64_t entry) {
 	if (index2 < index1) continue;
 	if (areSameJets(jet2,  jet1)) continue;
 	if (areSameJets(jet2,  jet0)) continue;
-
 	  
+	Jet BJet;
+	std::vector<Jet> DiJet;
 	//********************************** Bjet Matched OR dijet matched*********************************//
 	if ( isBJet(jet0, MCtrue_Bjet)    ||    (isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet))){
-	  //getTrijet(jet0, jet1, jet2, applyBjetPtCut, 40);
-	  if (applyBjetPtCut && (jet0.pt() < 40)) continue;
-	  TopCandidates.BJet.push_back(jet0);
-	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
-	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));
-	}
-	  
+	  BJet = jet0;
+	  DiJet = {jet1, jet2};
+	}	  
 	else if ( isBJet(jet1, MCtrue_Bjet)    ||  (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet))){
-	  if (applyBjetPtCut && (jet1.pt() < 40)) continue;
-	  TopCandidates.BJet.push_back(jet1);
-	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
-	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
-
+	  BJet = jet1;
+	  DiJet = {jet0, jet2};
 	}
 	else if ( isBJet(jet2, MCtrue_Bjet)    ||  (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)  &&  isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet))){
-	  if (applyBjetPtCut && (jet2.pt() < 40)) continue;
-	  TopCandidates.BJet.push_back(jet2);
-	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
-	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
+	  BJet = jet2;
+	  DiJet = {jet0, jet1};
 	}
 	  
 	//********************************** One of the dijet subjets matched*********************************//
 	else if (isWsubjet(jet0,MCtrue_LdgJet, MCtrue_SubldgJet)){
 
 	  if (jet1.bjetDiscriminator() > jet2.bjetDiscriminator()){
-	    if (applyBjetPtCut && (jet1.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet1);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
+	    BJet = jet1;
+	    DiJet = {jet0, jet2};
 	  }
 	  else{
-	    if (applyBjetPtCut && (jet2.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet2);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
+	    BJet = jet2;
+	    DiJet = {jet0, jet1};
 	  }
 	}
 	else if (isWsubjet(jet1,MCtrue_LdgJet, MCtrue_SubldgJet)){
 
 	  if (jet0.bjetDiscriminator() > jet2.bjetDiscriminator()){
-	    if (applyBjetPtCut && (jet0.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet0);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));
+	    BJet = jet0;
+	    DiJet = {jet1,jet2};
 	  }
 	  else{
-	    if (applyBjetPtCut && (jet2.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet2);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
+	    BJet = jet2;
+	    DiJet = {jet0, jet1};
 	  }
 	}
 	else if (isWsubjet(jet2,MCtrue_LdgJet, MCtrue_SubldgJet)){
 
 	  if (jet0.bjetDiscriminator() > jet1.bjetDiscriminator()){
-	    if (applyBjetPtCut && (jet0.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet0);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));
+	    BJet = jet0;
+	    DiJet = {jet1,jet2};
 	  }
 	  else{
-	    if (applyBjetPtCut && (jet1.pt() < 40)) continue;
-	    TopCandidates.BJet.push_back(jet1);
-	    TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
-	    TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
+	    BJet = jet1;
+	    DiJet = {jet0,jet2};
 	  }
 	}	  	 	  
 	//********************** Non of the three subjets is matched************************//
 	  
 	else if (jet0.bjetDiscriminator() > jet1.bjetDiscriminator() && jet0.bjetDiscriminator() > jet2.bjetDiscriminator()){            
-	  if (applyBjetPtCut && (jet0.pt() < 40)) continue;
-	  TopCandidates.BJet.push_back(jet0);
-	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet1,jet2,"leading"));
-	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet1,jet2,"subleading"));	    
+	  BJet = jet0;
+	  DiJet = {jet1,jet2};
 	}
 	else if (jet1.bjetDiscriminator() > jet0.bjetDiscriminator() && jet1.bjetDiscriminator() > jet2.bjetDiscriminator()){
-	  if (applyBjetPtCut && (jet1.pt() < 40)) continue;
-	  TopCandidates.BJet.push_back(jet1);	    
-	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet2,"leading"));
-	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet2,"subleading"));
+	  BJet = jet1;
+	  DiJet = {jet0,jet2};
 	}
 	else if (jet2.bjetDiscriminator() > jet0.bjetDiscriminator() && jet2.bjetDiscriminator() > jet1.bjetDiscriminator()){
-	  if (applyBjetPtCut && (jet2.pt() < 40)) continue;
-	  TopCandidates.BJet.push_back(jet2);
-	  TopCandidates.Jet1.push_back(getLeadingSubleadingJet(jet0,jet1,"leading"));
-	  TopCandidates.Jet2.push_back(getLeadingSubleadingJet(jet0,jet1,"subleading"));
+	  BJet = jet2;
+	  DiJet = {jet0,jet1};
 	}
+	else{
+	  std::cout<<"Never reach here"<<std::endl;
+	}
+	
+	//Apply bjet pt cut
+	if (applyBjetPtCut && (BJet.pt() < BjetPtCut)) continue;
+	//sort W subjets in pt
+	std::sort( DiJet.begin(),  DiJet.end(),  PtComparator() );	
+
+	//Store top candidate
+	TopCandidates.BJet.push_back(BJet);
+	TopCandidates.Jet1.push_back(DiJet.at(0));
+	TopCandidates.Jet2.push_back(DiJet.at(1));
+
       } //for (auto& jet2: jetData.getSelectedJets()){
     } //for (auto& jet1: jetData.getSelectedJets()){
   } //for (auto& jet0: jetData.getSelectedJets()){
@@ -2129,8 +2058,6 @@ void TopRecoTree::process(Long64_t entry) {
     // Keep only tops in the low/high pT range
     //if (!cfg_TopCandPtCut.passedCut(TrijetP4.pt())) continue;
       
-    //Debug:
-    if (applyBjetPtCut && TopCandidates.BJet.at(i).pt() < 40) std::cout<<"never reach here"<<std::endl;
     isGenuineTop = GenuineTop.at(i);
       
     // Compute distances
@@ -2667,5 +2594,3 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================
   fEventSaver.save();
 }
-
-  
