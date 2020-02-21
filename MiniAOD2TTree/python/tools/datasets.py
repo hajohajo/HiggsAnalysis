@@ -703,7 +703,7 @@ datasets_2016["HplusToHW"] = []
 #datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_4l_PAT_m350_f", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
 #datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_4l_PAT_m1500_f", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
 datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO", "gkole-Hplus2hw_2ta_PAT_m300_mh200", "5514f561afe549de22a98231d58a7b06", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
-datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO", "gkole-Hplus2hw_2ta_PAT_m700_mh200", "5514f561afe549de22a98231d58a7b06", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )crat 
+datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO", "gkole-Hplus2hw_2ta_PAT_m700_mh200", "5514f561afe549de22a98231d58a7b06", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
 #datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO", "mlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT", "b023a05347da3c2a313d219710ff54e9", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
 #datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO", "mlotti-Hplus2hw_2ta_w2all_NLO_mhp700_mh200_PAT", "b023a05347da3c2a313d219710ff54e9", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
 
