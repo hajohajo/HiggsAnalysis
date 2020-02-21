@@ -1,78 +1,103 @@
 #!/usr/bin/env python
 '''
-Creation/Submission:
+DESCRIPTION:
+This script is used to create & submiut CRAB jobs.
+It can also be used to retrieve output and check the status of submitted CRAB jobs.
+
+The file datasets.py is used an an auxiliary file to determine the samples to be processesed.
+These are seperately defined depending on the analysis, which itself is determined from the
+name of the input PSet file. For example, by using the option
+-p miniAOD2TTree_Hplus2tbAnalysisSkim_cfg.py 
+
+the "HToTB" analysis samples are used, while the option
+-p miniAOD2TTree_Hplus2hwWithTopAnalysisSkim_cfg.py
+
+means that the "HToHW_withTop" analysis samples are used, and 
+-p miniAOD2TTree_SignalAnalysisSkim_cfg.py 
+means that the "HToTauNu" analysis samples are used.
+
+
+EXAMPLES (create & submit):
+cd CMSSW_X_Y_Y/src/HiggsAnalysis/MiniAOD2TTree/test/
 multicrab.py --create -s T2_CH_CERN -p miniAOD2TTree_Hplus2tbAnalysisSkim_cfg.py 
 multicrab.py --create -s T3_US_FNALLPC -p miniAOD2TTree_Hplus2tbAnalysisSkim_cfg.py
 
 
-Re-Create (for example, when you get "Cannot find .requestcache" for a given task):
-multicrab.py --create -s T2_CH_CERN -p miniAOD2TTree_Hplus2tbAnalysisSkim_cfg.py -d <task_dir> 
-Example:
+EXAMPLES (create only):
+cd CMSSW_X_Y_Y/src/HiggsAnalysis/MiniAOD2TTree/test/
+multicrab.py --create -s T2_CH_CERN -p miniAOD2TTree_Hplus2tbAnalysisSkim_cfg.py  --noSubmit
+multicrab.py --create -s T3_US_FNALLPC -p miniAOD2TTree_Hplus2tbAnalysisSkim_cfg.py
+
+
+EXAMPLES (recreate in a CRAB task in a pre-existing multicrab directory):
+cd CMSSW_X_Y_Y/src/HiggsAnalysis/MiniAOD2TTree/test
 cd <multicrab_dir>
 rm -rf <task_dir>
-cd CMSSW_X_Y_Y/src/HiggsAnalysis/MiniAOD2TTree/test
+cd - 
 multicrab.py --create -s T3_US_FNALLPC -p miniAOD2TTree_Hplus2tbAnalysisSkim_cfg.py -d <multicrab_dir>
 
 
-Check Status:
-multicrab.py --status --url --verbose -d <task_dir>
-or
+EXAMPLES (check status):
+cd CMSSW_X_Y_Y/src/HiggsAnalysis/MiniAOD2TTree/test/<multicrab_dir>
+multicrab.py --status
 multicrab.py --status -i "QCD_bEnriched_HT300|2016B|2016E|2016F|2016G|ST_tW_antitop|ST_t_channel_top"
+multicrab.py --status -e "SingleElectron" --filesInEOS
 
 
-Get Output:
-multicrab.py --get --ask -d <task_dir>
-
-
-Get Logfiles (ROOT files will will be copied. Only available  on EOS):
-multicrab.py --log
-
-
-Get Output (from specific datasets):
-multicrab.py --get -d <task_dir> -i <keyword>
+EXAMPLES (retrieve output locally from EOS):
+cd CMSSW_X_Y_Y/src/HiggsAnalysis/MiniAOD2TTree/test/<multicrab_dir>
+multicrab.py --get -d <task_dir>
+multicrab.py --get -d <task_dir> -e "JetHT"
 multicrab.py --get -d <task_dir> -i QCD
 
 
-Get Output (from all datasets except a specific datasets):
-multicrab.py --get -d <task_dir> -e <keyword>
-multicrab.py --get -d <task_dir> -e JetHT
+EXAMPLES (retrieve log files locally from EOS):
+cd CMSSW_X_Y_Y/src/HiggsAnalysis/MiniAOD2TTree/test/<multicrab_dir>
+multicrab.py --log
 
 
-Resubmit Failed Jobs:
-multicrab.py --resubmit --ask -d <task_dir>
-
-
-Kill All Jobs:
+EXAMPLES (resubmit failed jobs):
+cd CMSSW_X_Y_Y/src/HiggsAnalysis/MiniAOD2TTree/test/<multicrab_dir>
+multicrab.py --resubmit
+multicrab.py --resubmit -i "QCD|TT|WJets"
+multicrab.py --resubmit -e "SingleElectro"
+multicrab.py --kill -d <task_dir>
 multicrab.py --kill -d <task_dir>
 
 
-Description:
-This script is used to create CRAB jobs, with certain customisable options.
-It is also used retrieve output and check status of submitted CRAB jobs.
-The file datasets.py is used an an auxiliary file to determine the samples to be processesed.
-To retrieve some logs which refuse to come out otherwise:
-crab log <dir> --command=LCG --checksum=no
-crab getoutput <dir> --command=LCG --checksum=no
+LAST USED:
+multicrab.py --create -s T3_US_FNALLPC -p miniAOD2TTree_Hplus2hwWithTopAnalysisSkim_cfg.py -d multicrab_Hplus2hwWithTopAnalysis_v8030_20200124T0402 --noSubmit
 
 
-Hint 1:
-To check whether you have write persmissions on a T2 centre use the command
-crab checkwrite --site 
-For example:
-crab checkwrite --site T2_CH_CERN
-
-
-Hint 2:
-To retrieve a range of jobs for a given task:
-crab getoutput -d <task_dir> --jobids <comma-separated-list-of-jobs-and/or-job-ranges>
-
-
-Useful Links:
+LINKS:
 https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
 https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCRAB3Tutorial#Setup_the_environment
 https://github.com/dmwm/CRABClient/tree/master/src/python/CRABClient/Commands
 https://github.com/dmwm/CRABClient/blob/be9eebfa41268e836fa186259ef3391f998c8fff/src/python/CRABAPI/RawCommand.py
 https://github.com/dmwm/CRABClient/blob/master/src/python/CRABClient/Commands/kill.py
+
+
+CRAB Monitor:
+https://test-cmssst.web.cern.ch/sitereadiness/report.html
+https://hypernews.cern.ch/HyperNews/CMS/get/computing-tools.html
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMonitoringTutorial
+https://monit-grafana.cern.ch/d/000000185/crab-metrics?orgId=11&refresh=1h
+https://monit-grafana.cern.ch/d/cmsTMGlobal/cms-tasks-monitoring-globalview?orgId=11&from=now-1d%2Fd&to=now-1d%2Fd&var-user=attikis&var-site=All&var-current_url=%2Fd%2FcmsTMDetail%2Fcms_task_monitoring&var-task=All
+https://cmsweb.cern.ch/crabserver/ui/task/200123_120641%3Aattikis_crab_SingleElectron_Run2016D_03Feb2017_v1_276315_276811
+
+
+HINTS:
+To retrieve some logs which refuse to come out otherwise:
+crab log <dir> --command=LCG --checksum=no
+crab getoutput <dir> --command=LCG --checksum=no
+
+To retrieve a range of jobs for a given task:
+crab getoutput -d <task_dir> --jobids <comma-separated-list-of-jobs-and/or-job-ranges>
+
+To check whether you have write persmissions on a T2 centre use the command
+crab checkwrite --site 
+For example:
+crab checkwrite --site T2_CH_CERN
 '''
 
 #================================================================================================
@@ -100,18 +125,28 @@ from CRABClient.ClientUtilities import LOGLEVEL_MUTE
 from CRABClient.UserUtilities import getConsoleLogLevel
  
 gitFound = False
-try: #sami please fix me-28Nov2017 (alex)
+try:
     import HiggsAnalysis.MiniAOD2TTree.tools.git as git
-    #from HiggsAnalysis.MiniAOD2TTree.tools.datasets import *
     from HiggsAnalysis.MiniAOD2TTree.tools.datasets import DatasetGroup
+    import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
     gitfound = True
-except: #sami please fix me-28Nov2017 (alex)
-    pass
-#from HiggsAnalysis.MiniAOD2TTree.tools.datasets import DatasetGroup
+except:
+    msg = "Failed at importing HiggsAnalysis-related modules"
+    raise Exception(msg)
+
 
 #================================================================================================ 
 # Global Definitions
 #================================================================================================ 
+ss  = ShellStyles.SuccessStyle()
+ns  = ShellStyles.NormalStyle()
+ts  = ShellStyles.NoteStyle()
+hs  = ShellStyles.HighlightAltStyle()
+ls  = ShellStyles.HighlightStyle()
+es  = ShellStyles.ErrorStyle()
+cs  = ShellStyles.CaptionStyle()
+cys = ShellStyles.CyanStyle()
+
 PBARLENGTH = 20
 
 # A map pairing local <task-name> to EOS <task-name>
@@ -1427,34 +1462,44 @@ def GetAnalysis():
     return analysis
 
 
-def AbortTask(keystroke):
+def Abort(keystroke):
     '''
     Give user last chance to abort CRAB task creation.
     '''
-    Verbose("AbortTask()")
+    Verbose("Abort()")
     
-    message = "=== %s:\n\tPress %s to abort, any other key to proceed: " % (GetSelfName(), keystroke)
+    message = "=== %s:\n\tPress \"%s\" to proceed, or any other key to abort: " % (GetSelfName(), keystroke)
 
     response = raw_input(message)
-    if (response!= keystroke):
+    if (response == keystroke):
 	return
     else:
-	print "=== %s:\n\tEXIT" % (GetSelfName())
+	#print "=== %s:\n\tEXIT" % (GetSelfName())
+        print
 	sys.exit()
     return
 
 
-def AskToContinue(taskDirName, analysis, opts):
+def PrintInfo(taskDirName, analysis, opts):
     '''
     Inform user of the analysis type and datasets to be user in the multi-CRAB job creation. Offer chance to abort sequence 
     '''
-    Verbose("AskToContinue()")
-
-    Print("Creating CRAB task %s for analysis %s with PSet=%s:" % (taskDirName, analysis, opts.pset) )
-    DatasetGroup(analysis).PrintDatasets(False)
-    Print("Will submit to Storage Site %s [User MUST have write access to destination site!]" % (opts.storageSite))
+    Verbose("PrintInfo()")
     
-    AbortTask(keystroke="q")
+    dsetList = DatasetGroup(analysis).GetDatasetNames()
+    if len(dsetList) < 1:
+        raise Exception(es + "Cannot create CRAB task. The list of datasets is empty" + ns)
+
+    table = []
+    align = "{:>15}: {:<60}"
+    table.append(align.format("Directory", ts + taskDirName + ns) )
+    table.append(align.format("User Analysis", hs + analysis + ns) )
+    table.append(align.format("Input PSet", ls + opts.pset + ns) )
+    table.append(align.format("CRAB tasks", len(dsetList)) )
+    table.append(align.format("Storage Site", ss + opts.storageSite + ns) )
+    for i, row in enumerate(table, 0):
+        Print(row, i==0)
+    # DatasetGroup(analysis).PrintDatasets()
     return
 
 
@@ -1473,7 +1518,7 @@ def GetTaskDirName(analysis, version, datasets):
     
     # Add dataset-specific info, like bunch-crossing info
     bx_re = re.compile("\S+(?P<bx>\d\dns)_\S+")
-    match = bx_re.search(datasets[0].URL)
+    match = bx_re.search(datasets[0].getURL())
     if match:
 	dirName+= "_"+match.group("bx")
 
@@ -1543,9 +1588,9 @@ def GetRequestName(dataset):
     '''
     Verbose("GetRequestName()")
 
-    if len(dataset.getName()) > 0:
-	return dataset.getName()
-    
+    if len(dataset.getRequestName()) > 0:
+	return dataset.getRequestName()
+
     # Create compiled regular expression objects
     datadataset_re = re.compile("^/(?P<name>\S+?)/(?P<run>Run\S+?)/")
     mcdataset_re   = re.compile("^/(?P<name>\S+?)/")
@@ -1553,14 +1598,11 @@ def GetRequestName(dataset):
     tev_re         = re.compile("(?P<name>\S+)_13TeV")
     ext_re         = re.compile("(?P<name>_ext\d+)-")
     runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15(?P<BunchSpacing>\S*)_JSON(?P<Silver>(_\S+|))\.")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15(?P<BunchSpacing>\S*)_JSON")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15_(?P<BunchSpacing>\d+ns)_JSON_v")
     
-    # Scan through the string 'dataset.URL' & look for any location where the compiled RE 'mcdataset_re' matches
-    match = mcdataset_re.search(dataset.URL)
-    if dataset.isData():
-	match = datadataset_re.search(dataset.URL)
+    # Scan through the string 'dataset.getURL()' & look for any location where the compiled RE 'mcdataset_re' matches
+    match = mcdataset_re.search(dataset.getDataset()) # dataset.getURL()
+    if dataset.getIsData():
+	match = datadataset_re.search(dataset.getDataset()) # dataset.getURL()
         
     # Append the dataset name
     if match:
@@ -1568,7 +1610,7 @@ def GetRequestName(dataset):
     firstName = requestName
 
     # Append the Run number (for Data samples only)
-    if dataset.isData():
+    if dataset.getIsData():
 	requestName+= "_"
 	requestName+= match.group("run")
 
@@ -1586,21 +1628,18 @@ def GetRequestName(dataset):
     requestName = GetTTbarSystematicsName(firstName, requestName) 
 
     # Append the Ext
-    ext_match = ext_re.search(dataset.URL)
+    ext_match = ext_re.search(dataset.getURL())
     if ext_match:
 	requestName+=ext_match.group("name")
 
     # Append the Run Range (for Data samples only)
-    if dataset.isData():
-	runRangeMatch = runRange_re.search(dataset.lumiMask)
+    if dataset.getIsData():
+	runRangeMatch = runRange_re.search(dataset.getLumiMask()) # fixme! replace with line below
+        #runRangeMatch = dataset.getRunRange() # fixme! this is actually more accurate. (uses LumiList.py cmssw module)
 	if runRangeMatch:
 	    runRange= runRangeMatch.group("RunRange")
 	    runRange = runRange.replace("-","_")
-	    #bunchSpace = runRangeMatch.group("BunchSpacing")
-	    requestName += "_" + runRange #+ bunchSpace
-	    #Ag = runRangeMatch.group("Silver")
-	    #if Ag == "_Silver": # Use  chemical element of silver (Ag)
-            #    requestName += Ag
+	    requestName += "_" + runRange
 
     # Finally, replace dashes with underscores    
     requestName = requestName.replace("-","_")
@@ -1720,7 +1759,8 @@ def CreateCfgFile(dataset, taskDirName, requestName, infilePath, opts):
 	# Set the "inputDataset" field which specifies the name of the dataset. Can be official CMS dataset or a dataset produced by a user.
         match = crab_dataset_re.search(line)
 	if match:
-	    line = "config.Data.inputDataset = '" + dataset.URL + "'\n"
+	    #line = "config.Data.inputDataset = '" + dataset.getURL() + "'\n"
+	    line = "config.Data.inputDataset = '" + dataset.getDataset() + "'\n"
 
 	# Set the "requestName" field which specifies the request/task name. Used by CRAB to create a project directory (named crab_<requestName>)    
 	match = crab_requestName_re.search(line)
@@ -1740,12 +1780,12 @@ def CreateCfgFile(dataset, taskDirName, requestName, infilePath, opts):
 	# Set the "pyCfgParams" field which contains list of parameters to pass to the pset_cfg.py file.            
 	match = crab_psetParams_re.search(line)
 	if match:
-	    line = "config.JobType.pyCfgParams = ['dataVersion=" + dataset.dataVersion +"']\n"
+	    line = "config.JobType.pyCfgParams = ['dataVersion=" + dataset.getDataVersion() +"']\n"
 
 	# Set the "inputDBS" field which specifies the URL of the DBS reader instance where the input dataset is published     
 	match = crab_dbs_re.search(line)
 	if match:
-	    line = "config.Data.inputDBS = '" + dataset.DBS + "'\n"
+	    line = "config.Data.inputDBS = '" + dataset.getDBS() + "'\n"
 
 	# Set the "storageSite" field which specifies the destination site for submission [User MUST have write access to destination site!]
 	match = crab_storageSite_re.search(line)
@@ -1762,7 +1802,7 @@ def CreateCfgFile(dataset, taskDirName, requestName, infilePath, opts):
             line     = "config.Data.outLFNDirBase = '" + fullDir + "'\n"
 
 	# Only if dataset is real data
-	if dataset.isData():
+	if dataset.getIsData():
 
 	    # Set the "splitting" field which specifies the mode to use to split the task in jobs ('FileBased', 'LumiBased', or 'EventAwareLumiBased') 
 	    match = crab_split_re.search(line)
@@ -1959,33 +1999,43 @@ def CreateJob(opts, args):
     # Get general info
     version      = GetCMSSW()
     analysis     = GetAnalysis()
-    datasets     = DatasetGroup(analysis).GetDatasetList()
+    datasets     = DatasetGroup(analysis).GetDatasets()
     taskDirName  = GetTaskDirName(analysis, version, datasets)
     opts.dirName = taskDirName
 
     # Give user last chance to abort
-    if opts.ask:
-        AskToContinue(taskDirName, analysis, opts)
+    PrintInfo(opts.dirName, analysis, opts)
     
     # Create CRAB task diractory
-    CreateTaskDir(taskDirName)
-    
+    CreateTaskDir(opts.dirName)
+
+    # Get full list and remove pre-existing dataset CRAB tasks
+    allDatasets = DatasetGroup(analysis).GetDatasets()
+    newDatasets = [d for d in allDatasets if not os.path.exists(os.path.join(opts.dirName, GetRequestName(d))) and not os.path.isdir(os.path.join(opts.dirName, GetRequestName(d)))]
+
+    # Create object and set the new list of datasets (without pre-existing CRAB tasks)
+    Print("Will create %s CRAB task(s):" % (str(len(newDatasets))), True)
+    for i, d in enumerate(newDatasets, 1):
+        Print("%d) %s" % (i, cys + GetRequestName(d) + ns), False)
+
+    if opts.ask:
+        Abort(keystroke="y")
+
     # For-loop: All datasets
-    for dataset in datasets:
+    for dataset in newDatasets:
         
         Verbose("Task %s, creating CRAB configuration file" % (dataset) )
         requestName = GetRequestName(dataset)
-        fullDir     = taskDirName + "/" + requestName
+        fullDir     = opts.dirName + requestName
 
-        if os.path.exists(fullDir) and os.path.isdir(fullDir):
-            Verbose("Task %s already exists! Skipping ..." % (requestName), False)
-            continue 
+        Verbose("Task %s, creating crabConfig_%s.py file" % (requestName, requestName), True)
+	CreateCfgFile(dataset, opts.dirName, requestName, "crabConfig.py", opts)
 
-        Verbose("Task %s, creating crabConfig_%s.py file" % (dataset, dataset), True)
-	CreateCfgFile(dataset, taskDirName, requestName, "crabConfig.py", opts)
-
-        Verbose("Task %s, submitting jobs" % (dataset), True)
-	SubmitTaskDir(taskDirName, requestName)
+        if not opts.noSubmit:
+            Verbose("Task %s, submitting jobs" % (dataset), True)
+            SubmitTaskDir(opts.dirName, requestName)
+        else:
+            Print("File %s/crabConfig_%s.py%s created" % (ss + opts.dirName, requestName, ns), True)
 		
     return 0
 
@@ -2012,7 +2062,8 @@ if __name__ == "__main__":
     PSET    = "miniAOD2TTree_SignalAnalysisSkim_cfg.py"
     SITE    = "T2_FI_HIP"
     DIRNAME = ""
-    ASK     = False
+    ASK     = True
+    NOSUBMIT= False
 
     parser = OptionParser(usage="Usage: %prog [options]")
     parser.add_option("--create", dest="create", default=False, action="store_true", 
@@ -2062,6 +2113,9 @@ if __name__ == "__main__":
 
     parser.add_option("--filesInEOS", dest="filesInEOS", default=False, action="store_true",
                       help="The CRAB files are in a local EOS. Do not use files from the local multicrab directory [default: 'False']")
+
+    parser.add_option("--noSubmit", dest="noSubmit", default=NOSUBMIT, action="store_true",
+                      help="Create the CRAB tasks but don't submit them  [default: %s]" % (NOSUBMIT) )
 
     (opts, args) = parser.parse_args()
 

@@ -50,8 +50,26 @@ class Dataset:
             return True
         return False
 
+    def getIsData(self):
+        return self.isData()
+
+    def getDataVersion(self):
+        return self.dataVersion
+
     def getName(self):
 	return self.name
+
+    def getDBS(self):
+	return self.DBS
+
+    def getLumiMaskl(self):
+	return self.lumiMask
+
+    def getRequestName(self):
+	return self.getName()
+
+    def getURL(self):
+        return self.URL
 
 
 #================================================================================================ 
@@ -858,7 +876,7 @@ hplus2hwAnalysisDatasets.extend(datasets_ttHJet)
 
 
 hplus2hwWithTopAnalysisDatasets = [] 
-hplus2hwWithTopAnalysisDatasets.extend(datasetsSignalHW)
+#hplus2hwWithTopAnalysisDatasets.extend(datasetsSignalHW)
 hplus2hwWithTopAnalysisDatasets.extend(datasetsMuonData03Feb)
 hplus2hwWithTopAnalysisDatasets.extend(datasetsElectronData03Feb)
 hplus2hwWithTopAnalysisDatasets.extend(datasetsTop)
@@ -996,6 +1014,9 @@ class DatasetGroup:
         Uses pre-defined dictionary mapping: analysis->dataset list
         '''
         return self.GroupDict[self.analysis]
+
+    def GetDatasets(self):
+        return self.GetDatasetList()
 
     def PrintDatasets(self, printHeader=False):
         '''

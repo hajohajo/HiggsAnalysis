@@ -44,6 +44,7 @@ class DatasetGroup:
         self.analysis  = analysis
         self.GroupDict = {}
         self.CreateGroups()
+        return
 
     def SetVerbose(verbose):
         self.verbose = verbose
@@ -96,26 +97,31 @@ class DatasetGroup:
         self.GroupDict["TopSystBDT"]       = dsetGroups_2016["TopTagSys"]
         return
 
-    def GetDatasetList(self):
+    def GetDatasetNames(self):
         '''
         Return the dataset list according to the analysis name. 
         Uses pre-defined dictionary mapping: analysis->dataset list
         '''
         dsetNames = [d.getDataset() for d in self.GroupDict[self.analysis]]
-        #for d in dsetNames:
-        #    print d
         return dsetNames
+
+    def GetDatasets(self):
+        '''
+        Return the dataset list according to the analysis name. 
+        Uses pre-defined dictionary mapping: analysis->dataset list
+        '''
+        datasets = [d for d in self.GroupDict[self.analysis]]
+        return datasets
 
     def PrintDatasets(self, printHeader=False):
         '''
         Print all datasets for given analysis
         '''
-        datasetList = self.GroupDict[self.analysis]
-
-        if printHeader==True:
-            self.Print("The datasets for analysis \"%s\" are:\n\t%s" % (self.analysis, "\n\t".join(str(d.URL) for d in datasetList) ), True)
-        else:
-            self.Print("\n\t".join(str(d.URL) for d in datasetList), False)
+        if printHeader:
+            self.Print("The datasets for analysis %s are:" % (hs + self.analysis + ns), True)
+            
+        for i, d in enumerate(self.GetDatasetNames(), 1):
+            self.Print("%d) %s" % (i, d), False)
         return
 
 class Dataset:
@@ -147,7 +153,8 @@ class Dataset:
         self.NumFile       = 0
         self.NumLumi       = 0
         self.URL           = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod/%s&input=dataset=%s" % (self.DBS, self.getDataset())
-        self.LumiMask      = self.getLumiMask(lumiMask)
+        self.LumiMask      = self.getLumiMask_(lumiMask)
+        self.RequestName   = "" # handled in multicrab.py
         if validate:
             self.validate()
         return
@@ -196,6 +203,13 @@ class Dataset:
         '''
         return self.PDName
 
+    def getRequestName(self):
+        '''
+        For usage when creating CRAB task.
+        
+        This is handled later with the multicrab.py script (for now)
+        '''
+        return self.RequestName
 
     def getDataset(self):
         '''
@@ -251,6 +265,8 @@ class Dataset:
             msg = "Please provide a valid string for the dataset TIER (e.g. \"MINIAOD\", \"MINIAODSIM\")."
             raise Exception(es + msg + ns)        
 
+        # Sometimes it can happen that a string is empty resulting in "--" character. Simple fix below
+        dataset = dataset.replace("--", "-")
         return dataset
 
     def getCampaign(self):
@@ -490,7 +506,7 @@ class Dataset:
         self.Print("", False)
         return
         
-    def getLumiMask(self, lumiMask):
+    def getLumiMask_(self, lumiMask):
         '''
         For GOLDEN JSON files see: https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2016Analysis
 
@@ -526,6 +542,9 @@ class Dataset:
             return "N/A"
         else:
             return os.path.basename(self.LumiMask)
+
+    def getLumiMask(self):
+        return self.getLumiMaskFileBase()
 
     def getLumiMaskFile(self):
         if self.LumiMask == None:
@@ -678,16 +697,15 @@ for mass in [140, 150, 155, 160]:
 
 
 datasets_2016["HplusToHW"] = []
-datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_2ta_PAT_m350_f", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
-datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_2ta_PAT_mhp350_mh150", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
-datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-CRAB3_Hplus_PAT", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
-datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_4l_PAT_m350_f", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
-datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_4l_PAT_m1500_f", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
-datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO", "mlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT", "b023a05347da3c2a313d219710ff54e9", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
+#datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_2ta_PAT_m350_f", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
+#datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_2ta_PAT_mhp350_mh150", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
+#datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-CRAB3_Hplus_PAT", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
+#datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_4l_PAT_m350_f", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
+#datasets_2016["HplusToHW"].append( Dataset("CRAB_PrivateMC", "mlotti-Hplus2hw_4l_PAT_m1500_f", "71a58a62b6d71fe0f402eda209b9b80f", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
 datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO", "gkole-Hplus2hw_2ta_PAT_m300_mh200", "5514f561afe549de22a98231d58a7b06", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
 datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO", "gkole-Hplus2hw_2ta_PAT_m700_mh200", "5514f561afe549de22a98231d58a7b06", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
-
-datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO", "mlotti-Hplus2hw_2ta_w2all_NLO_mhp700_mh200_PAT", "b023a05347da3c2a313d219710ff54e9", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
+#datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO", "mlotti-Hplus2hw_2ta_w2all_NLO_mhp300_mh200_PAT", "b023a05347da3c2a313d219710ff54e9", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
+#datasets_2016["HplusToHW"].append( Dataset("CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO", "mlotti-Hplus2hw_2ta_w2all_NLO_mhp700_mh200_PAT", "b023a05347da3c2a313d219710ff54e9", None, None, None, None, "USER", "phys03", "80Xmc", None, False) )
 
 
 # Single Top
@@ -999,8 +1017,8 @@ datasets_2016["Diboson"].append( Dataset("WZ_TuneCUETP8M1_13TeV-pythia8", campai
 datasets_2016["Diboson"].append( Dataset("WZ_TuneCUETP8M1_13TeV-pythia8", campaign, pString, PU, gTag, 1, 1, "MINIAODSIM", "global", "80Xmc", None, False) )
 datasets_2016["Diboson"].append( Dataset("ZZ_TuneCUETP8M1_13TeV-pythia8", campaign, pString, PU, gTag, 0, 1, "MINIAODSIM", "global", "80Xmc", None, False) )
 datasets_2016["Diboson"].append( Dataset("ZZ_TuneCUETP8M1_13TeV-pythia8", campaign, pString, PU, gTag, 1, 1, "MINIAODSIM", "global", "80Xmc", None, False) )
-datasets_2016["Diboson"].append( Dataset("WW_TuneCUETP8M1_13TeV-pythia8", campaign, pString, PU, gTag, 0, 1, "MINIAODSIM", "global", "80Xmc", None, False) )
-datasets_2016["Diboson"].append( Dataset("WW_TuneCUETP8M1_13TeV-pythia8", campaign, pString, PU, gTag, 1, 1, "MINIAODSIM", "global", "80Xmc", None, False) )
+#datasets_2016["Diboson"].append( Dataset("WW_TuneCUETP8M1_13TeV-pythia8", campaign, pString, PU, gTag, 0, 1, "MINIAODSIM", "global", "80Xmc", None, False) )#xenios
+#datasets_2016["Diboson"].append( Dataset("WW_TuneCUETP8M1_13TeV-pythia8", campaign, pString, PU, gTag, 1, 1, "MINIAODSIM", "global", "80Xmc", None, False) )#xenios
 
 datasets_2016["DibosonTo4Q"] = []
 datasets_2016["DibosonTo4Q"].append( Dataset("WWTo4Q_13TeV-powheg", campaign, pString, PU, gTag, 0, 1, "MINIAODSIM", "global", "80Xmc", None, False) )
@@ -1214,7 +1232,7 @@ dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["TT"])
 dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["SingleTop"])
 dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["DYJetsToLL"])
 dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["DYJetsToLL_HT"])
-dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["WJetsToLNu"] ) #for doing the HT binned 0To70
+#dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["WJetsToLNu"] ) #for doing the HT binned 0To70
 dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["WJetsToLNu_HT"] )
 dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["Diboson"])
 #dsetGroups_2016["HToHW_withTop"].extend(datasets_2016["QCD"])
