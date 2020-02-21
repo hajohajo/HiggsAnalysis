@@ -110,16 +110,18 @@ tauSelection = PSet(
 # tau mis-id fake rate measurement
 looseTauSelection = PSet(
   applyTriggerMatching = False, # no effect now
-   triggerMatchingCone = 0.1,   # DeltaR for matching offline tau with trigger tau
-              tauPtCut = 20.0,
-             tauEtaCut = 2.3,
-        tauLdgTrkPtCut = 1.0,
-                prongs = -1,    # options: 1, 2, 3, 12, 13, 23, 123 or -1 (all)
-                  rtau = 0.0,   # to disable set to 0.0
-  againstElectronDiscr = "againstElectronVLooseMVA6",
-      againstMuonDiscr = "againstMuonLoose3", #"againstMuonTight3", #"againstMuonLoose3",
-        isolationDiscr = "byVLooseIsolationMVArun2v1DBoldDMwLT", #"byMediumIsolationMVArun2v1DBnewDMwLT",
-)
+  triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
+  tauPtCut             = 20.0,
+  tauEtaCut            = 2.3,
+  tauLdgTrkPtCut       = 1.0,
+  prongs               = -1,    # options: 1, 2, 3, 12, 13, 23, 123 or -1 (all)
+  rtau                 = 0.0,   # to disable set to 0.0
+  # againstElectronDiscr = "againstElectronVLooseMVA6",
+  # againstMuonDiscr     = "againstMuonLoose3", #"againstMuonTight3", #"againstMuonLoose3",
+  againstElectronDiscr = tauSelection.againstElectronDiscr,
+  againstMuonDiscr     = tauSelection.againstMuonDiscr,
+  isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
+  )
 
 # tau identification scale factors
 scaleFactors.assignTauIdentificationSF(tauSelection)

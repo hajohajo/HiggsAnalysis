@@ -15,9 +15,9 @@ endif
 #================================================================================================
 set INITIAL = `echo $USER | cut -c1-1`
 set PSEUDO_MCRAB_DIR = ${1}
-#set FORMATS = "png,pdf,C"
-set FORMATS = "png"
-set DSETS1 = "QCD|WJets"
+set FORMATS = "png,pdf,C"
+#set FORMATS = "png"
+set DSETS1 = "QCD"
 set DSETS = ""
 
 #================================================================================================

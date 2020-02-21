@@ -144,11 +144,15 @@ def main(opts):
         datasetsMgr.loadLuminosities() # from lumi.json
 
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
-        datasetsMgr.PrintInfo()
+        if 0:
+            datasetsMgr.PrintInfo()
         plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
 
         # Set signal cross-section
-        newOrder = datasetsMgr.getAllDatasetNames()
+        newOrder = ["Data", "DYJetsToLL", "TT", "Diboson", "SingleTop", "ttX", "WJetsHT"]
+        # newOrder = ["Data", "DYJetsToLLHT", "TT", "Diboson", "SingleTop", "ttX", "WJetsHT"]
+
+        # For-loop: All dataset objects
         for d in datasetsMgr.getAllDatasets():
             if "ChargedHiggs" in d.getName():
                 datasetsMgr.getDataset(d.getName()).setCrossSection(1.0) # ATLAS 13 TeV H->tb exclusion limits
@@ -158,7 +162,7 @@ def main(opts):
         if opts.verbose:
             datasetsMgr.PrintCrossSections()
             datasetsMgr.PrintLuminosities()
-            datasetsMgr.PrintInfo()
+        datasetsMgr.PrintInfo()
 
         # Ensure that signal dataset is plotted last
         if 1:
@@ -203,8 +207,16 @@ def main(opts):
 
         # For-loop: All histograms
         for h in histoPaths:
-            #if "MET_AfterAll" not in h:
-            #    continue
+            if "resolution" in h.lower():
+                continue
+            if "angular" in h.lower():
+                continue
+            if "backtoback" in h.lower():
+                continue
+            if "DeltaPhiMuonMet" in h:
+                continue
+            if "DeltaPhiTauMet" in h:
+                continue
             myHistos.append(h)
 
         # For-loop: All histos
@@ -225,7 +237,8 @@ def main(opts):
     Print("All plots saved under directory %s" % (ts + aux.convertToURL(opts.saveDir, opts.url) + ns), True)    
     return
 
-def GetHistoKwargs(h, opts):
+def GetHistoKwargs(histoName, opts):
+    h = histoName.rsplit("/")[-1]
 
     # Common bin settings
     _legRM  = {"dx": -10000.23, "dy": -10000.01, "dh": -0.1}
@@ -273,14 +286,12 @@ def GetHistoKwargs(h, opts):
     if "phi" in h.lower():
         kwargs["moveLegend"] = _legNW
 
-    if "mht" in h.lower():
-       kwargs["opts"]   = {"xmax": +900.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-       kwargs["rebinX"] = 2
-
     if "pt" in h.lower():
         kwargs["units"]      = "GeV"
-        #if "resolution" not in h.lower():
-            #kwargs["rebinX"] = systematics.DataMCBinningHToHW["MuonPt"]
+        if "eSelection" in histoName:
+            kwargs["rebinX"] = systematics.DataMCBinningHToHW["ElectronPt"]
+        if "tauSelection" in histoName:
+            kwargs["rebinX"] = systematics.DataMCBinningHToHW["TauPt"]
         kwargs["xlabel"]     = "p_{T} (%s)" % kwargs["units"]
         kwargs["ylabel"]     = _yLabel + kwargs["units"]
         kwargs["moveLegend"] = _legNE
@@ -298,9 +309,22 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmax": +8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "miniiso" in h.lower():
-        kwargs["opts"] = {"xmax": +10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-    if "reliso" in h.lower():
+        kwargs["units"]  = ""
+        kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"] = {"xmax": +30.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["MiniIso"]
+        kwargs["divideByBinWidth"] = True
+        if "after" in h.lower() or "passed" in h.lower():
+            kwargs["opts"]   = {"xmax": +0.8, "ymin": _yMin, "ymaxfactor": _yMaxF}
+            kwargs["rebinX"] = 1
+            kwargs["divideByBinWidth"] = False
+            
+    if "reliso" in h.lower():
+        kwargs["units"]  = ""
+        kwargs["ylabel"] = "Events / %.2f "
+        kwargs["opts"] = {"xmax": +30.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["RelIso"]
+        kwargs["divideByBinWidth"] = True
 
     if "bdisc" in h.lower():
         kwargs["rebinX"] = 2
@@ -309,7 +333,33 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 0.8484, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0.4, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["moveLegend"] = _legSW
- 
+
+    if "Nvtx" in h or "IsolVtx" in h or "nvertices" in h.lower():
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["Vertices"]
+        kwargs["units"]  = ""
+        kwargs["xlabel"] = "vertex multiplicity"
+        kwargs["divideByBinWidth"] = True
+
+    if "HT" in h:
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["HT"]
+        kwargs["units"]  = "GeV" #"GeV/c"
+        kwargs["xlabel"] = "H_{T} (%s)" % kwargs["units"]
+        kwargs["divideByBinWidth"] = True
+
+        if "mht" in h.lower():
+            kwargs["units"]      = "GeV"
+            kwargs["xlabel"]     = "MHT (%s)" % kwargs["units"]
+            kwargs["ylabel"]     = _yLabel + kwargs["units"]
+            kwargs["moveLegend"] = _legNE
+            kwargs["divideByBinWidth"] = True
+
+
+    if "Njets" in h:
+        kwargs["xlabel"] = "jet multiplicity"
+    if "NBjets" in h:
+        kwargs["xlabel"] = "b-jet multiplicity"
+        kwargs["opts"]   = {"xmax": 10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
     if "JetPt" in h or "jetPt" in h:        
         if "BJetPt" in h or "BjetPt" in h:
             kwargs["rebinX"] = systematics.DataMCBinningHToHW["BJetPt"]
@@ -363,6 +413,21 @@ def GetHistoKwargs(h, opts):
             kwargs["xlabel"] = ""
             kwargs["ylabel"] = "Events / %.0f "
             kwargs["opts"]   = {"xmin": 0.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "deltaphi" in h.lower():
+        kwargs["units"]  = "rads"
+        #kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaPhi"]
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaPhiRads"]
+        kwargs["xlabel"] = "#Delta#phi"
+        kwargs["ylabel"] = "Events / %.2f "
+        kwargs["opts"]   = {"xmin": 0.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "deltar" in h.lower():
+        kwargs["units"]  = ""
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaR"]
+        kwargs["xlabel"] = "#DeltaR"
+        kwargs["ylabel"] = "Events / %.2f "
+        kwargs["opts"]   = {"xmin": 0.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         
     if "DecayMode" in h:
         kwargs["moveLegend"] = _legRM
@@ -457,8 +522,8 @@ def PlotDataMCHistograms(datasetsMgr, histoName):
             pass
 
     # Get Histogram name and its kwargs
+    kwargs_  = GetHistoKwargs(histoName, opts)
     saveName = histoName.rsplit("/")[-1]
-    kwargs_  = GetHistoKwargs(saveName, opts)
 
     # Create the plotting object
     p = plots.DataMCPlot(datasetsMgr, histoName, saveFormats=[])
@@ -521,7 +586,7 @@ if __name__ == "__main__":
     
     # Default Settings
     ANALYSISNAME = "TauFakeRate" #Hplus2hwAnalysisWithTop"
-    SEARCHMODE   = "80to1000"
+    SEARCHMODE   = "350to3000"
     DATAERA      = "Run2016"
     GRIDX        = False
     GRIDY        = False

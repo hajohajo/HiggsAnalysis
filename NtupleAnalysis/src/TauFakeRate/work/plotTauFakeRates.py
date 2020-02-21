@@ -13,9 +13,11 @@ EXAMPLES:
 ./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr"
 ./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" -s png --cutLineX 45.0 --cutLineY 0.4
 ./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" -s png --gridX --gridY --yMin 0.0 --yMax 0.6
+./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" -s png --gridX --gridY --yMin 0.0 --yMax 0.6 -e "WJets" --individualMC
+
 
 LAST USED (HToHW_withTop):
-./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" -s png --gridX --gridY --yMin 0.0 --yMax 0.6 -e "WJets"
+./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" --gridX --gridY --yMin 0.0 --yMax 1.0 -e "WJets" --individualMC
 
 
 LAST USED (HToHW):
@@ -117,7 +119,7 @@ def main(opts):
     style = tdrstyle.TDRStyle()
     style.setGridX(opts.gridX)
     style.setGridY(opts.gridY)
-    style.setLogY(opts.logY)
+    #style.setLogY(opts.logY) # problem if kwargs["ratio"] = True
     style.setLogX(opts.logX)
 
     # Obtain dsetMgrCreator and register it to module selector
@@ -377,7 +379,8 @@ def GetHistoKwargs(opts):
     kwargs = {
         "xlabel"           : "#tau_{h} p_{T} (GeV)",
         "ylabel"           : "Fake Rate (jet #rightarrow #tau_{h})",
-        "rebinX"           : 1, #use with caution!
+        "rebinX"           : 1,
+        #"rebinX"           : [0, 30, 60, 90, 120], #use with caution!
         "rebinY"           : None,
         "ratioType"        : "errorScale",
         "ratioErrorOptions": {"numeratorStatSyst": False},
@@ -519,7 +522,7 @@ def convertHisto2TGraph(datasetsMgr, p_num, pMC_num, p_den, pMC_den, printValues
         yErrH  = []
         
         # For-loop: All histo bins
-        for j in range (1,  hEff_Data.GetNbinsX()+2):
+        for j in range (1, hEff_Data.GetNbinsX()+2):
             
             # Calculate the values
             x     = hEff.GetBinCenter(j)
@@ -609,8 +612,8 @@ def GetEfficiencyHisto(numHisto, denHisto, hName, hTitle, printValues=False):
 
     # Construct info table (debugging)
     table  = []
-    align  = "{:>6} {:^20} {:>15} {:>15} {:>10} {:^3} {:<10}"
-    header = align.format("Bin", "Range", "Numerator", "Denominator", "Eff Value", "+/-", "Eff Error")
+    align  = "{:>6} {:>10} {:>10} {:>10} {:>12} {:>12} {:>10} {:^3} {:<10}"
+    header = align.format("#", "pT-low", "pT", "pT-high", "Numerator", "Denominator", "Eff", "+/-", "Error")
     hLine  = "="*100
     nBinsX = denHisto.GetNbinsX()
     table.append("{:^100}".format(hName))
@@ -656,9 +659,12 @@ def GetEfficiencyHisto(numHisto, denHisto, hName, hTitle, printValues=False):
         effError = teff.GetEfficiencyErrorLow(1)
 
         # Bin-range or overflow bin?
-        binRange = "%.1f -> %.1f" % (denHisto.GetXaxis().GetBinLowEdge(j), denHisto.GetXaxis().GetBinUpEdge(j) )
+        ptLow  = "%.1f" % (denHisto.GetXaxis().GetBinLowEdge(j))
+        ptVal  = "%.1f" % (denHisto.GetXaxis().GetBinCenter(j))
+        ptHigh = "%.1f" % (denHisto.GetXaxis().GetBinUpEdge(j) )
+
         if j >= nBinsX+1:
-            binRange = "> %.1f"   % (denHisto.GetXaxis().GetBinLowEdge(j) )
+            ptHigh = "infty"
 
         # Fill histogram
         hEff.SetBinContent(j, effValue)
@@ -667,7 +673,7 @@ def GetEfficiencyHisto(numHisto, denHisto, hName, hTitle, printValues=False):
         hEff.SetBinError(j, effError)
 
         # Save information in table
-        row = align.format(j, binRange, "%.3f" % numValue, "%.3f" % denValue, "%.4f" % effValue, "+/-", "%.4f" % effError)
+        row = align.format(j, ptLow, ptVal, ptHigh, "%.1f" % numValue, "%.1f" % denValue, "%.2f" % effValue, "+/-", "%.2f" % effError)
         table.append(row)
 
         # Reset histos 
@@ -708,7 +714,7 @@ if __name__ == "__main__":
     
     # Default Settings
     ANALYSISNAME = "TauFakeRate" #Hplus2hwAnalysisWithTop"
-    SEARCHMODE   = "80to1000"
+    SEARCHMODE   = "350to3000"
     DATAERA      = "Run2016"
     OPTMODE      = ""
     BATCHMODE    = True
@@ -839,7 +845,8 @@ if __name__ == "__main__":
         raise Exception(es + msg + ns)
 
     # Set name for saving
-    opts.saveName = "TauFR_%s" % (opts.denHisto.split("_")[-1])
+    opts.saveName = opts.denHisto.replace("tauPt", "TauFR").replace("num_", "").replace("den_", "")
+    #opts.saveName = "TauFR_%s" % (opts.denHisto.split("_")[-1])
 
     # Create save formats
     if "," in opts.saveFormats:
