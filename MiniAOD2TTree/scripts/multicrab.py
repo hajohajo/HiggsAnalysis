@@ -1224,7 +1224,7 @@ def GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, fai
     nLogsEOS  = ''.join( str(eosLog).split() ) 
     nOutEOS   = ''.join( str(eosOut).split() )
     nOutEOSM  = eosOutMerged 
-    txtAlign  = "{:<25} {:>4} {:<1} {:<4}"
+    txtAlign  = "{:<31} {:>4} {:<1} {:<4}"
     dataset   = taskDir.split("/")[-1]
     length    = 60 #len(dataset)
     hLine     = "="*length

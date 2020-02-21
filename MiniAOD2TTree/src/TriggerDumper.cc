@@ -213,6 +213,7 @@ bool TriggerDumper::fill(edm::Event& iEvent, const edm::EventSetup& iSetup){
 	    {
 	      
 	      // Search for the selected triggers 
+	      // std::cout <<  names.triggerName(j) << "\n";
 	      // std::cout << selectedTriggers[i] << "\n";
 	      size_t pos = names.triggerName(j).find(selectedTriggers[i]);
 	      
