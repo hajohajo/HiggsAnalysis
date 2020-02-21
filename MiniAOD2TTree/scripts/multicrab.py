@@ -2023,8 +2023,7 @@ def CreateJob(opts, args):
     for i, d in enumerate(newDatasets, 1):
         Print("%d) %s" % (i, cys + GetRequestName(d) + ns), False)
 
-    if opts.ask:
-        Abort(keystroke="y")
+    Abort(keystroke="y")
 
     # For-loop: All datasets
     for dataset in newDatasets:
@@ -2067,7 +2066,7 @@ if __name__ == "__main__":
     PSET    = "miniAOD2TTree_SignalAnalysisSkim_cfg.py"
     SITE    = "T2_FI_HIP"
     DIRNAME = ""
-    ASK     = True
+    ASK     = False
     NOSUBMIT= False
 
     parser = OptionParser(usage="Usage: %prog [options]")
