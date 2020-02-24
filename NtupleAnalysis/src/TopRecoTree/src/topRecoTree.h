@@ -28,7 +28,7 @@ float dijetDeepCvsL_S, dijetDeepCvsL_B;
 float dijetPtD_S, dijetPtD_B;
 float dijetAxis1_S, dijetAxis1_B;
 float dijetAxis2_S, dijetAxis2_B;
-int dijetMult_S, dijetMult_B;
+float dijetMult_S, dijetMult_B;
 float dijetQGLikelihood_S, dijetQGLikelihood_B;
 float dijetQGLikelihood_avg_S, dijetQGLikelihood_avg_B;
 float dijetChiSquared_S, dijetChiSquared_B;

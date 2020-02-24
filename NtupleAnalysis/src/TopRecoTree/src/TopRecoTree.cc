@@ -36,8 +36,7 @@ struct TrijetSelections{
   std::vector<Jet> Jet2;
   std::vector<Jet> BJet;
   std::vector <double> MVA;
-  std::vector<math::XYZTLorentzVector> TrijetP4;
-  std::vector<math::XYZTLorentzVector> DijetP4;
+  std::vector<bool> IsGenuineTop;
 };
 
 
@@ -53,6 +52,9 @@ public:
   bool isMatchedJet(const Jet& jet, const std::vector<Jet>& jets);
   
   bool isWsubjet(const Jet& jet, const std::vector<Jet>& jets1, const std::vector<Jet>& jets2);
+  bool isGenuineTopCandidate(const Jet& BJet, const Jet& jet1, const Jet& jet2, 
+			     const std::vector<Jet>& MCtrue_Bjet, const std::vector<Jet>& MCtrue_LdgJet, const std::vector<Jet>& MCtrue_SubldgJet);
+
   bool isLepton(const Jet& jet, const std::vector<Electron>& selectedElectrons, const std::vector<Muon>& selectedMuons);
   ///Are same Jets
   bool areSameJets(const Jet& jet1, const Jet& jet2);
@@ -1234,6 +1236,19 @@ bool TopRecoTree::isWsubjet(const Jet& jet , const std::vector<Jet>& jets1 , con
   return  (isMatchedJet(jet,jets1)||isMatchedJet(jet,jets2));
 }
 
+bool TopRecoTree::isGenuineTopCandidate(const Jet& bjet, const Jet& jet1, const Jet& jet2, 
+					const std::vector<Jet>& MCtrue_Bjet, const std::vector<Jet>& MCtrue_LdgJet, const std::vector<Jet>& MCtrue_SubldgJet){
+  bool isGenuine = false;
+  for (size_t j=0; j<MCtrue_Bjet.size(); j++){
+    bool same1 = areSameJets(jet1, MCtrue_LdgJet.at(j))    && areSameJets(jet2, MCtrue_SubldgJet.at(j)) && areSameJets(bjet,  MCtrue_Bjet.at(j));
+    bool same2 = areSameJets(jet1, MCtrue_SubldgJet.at(j)) && areSameJets(jet2, MCtrue_LdgJet.at(j))    && areSameJets(bjet,  MCtrue_Bjet.at(j));
+    if (same1 || same2){
+      isGenuine = true;
+    }
+  }
+  return isGenuine;
+}
+
 bool TopRecoTree::isLepton(const Jet& jet, const std::vector<Electron>& selectedElectrons, const std::vector<Muon>& selectedMuons){
   bool passEle = (selectedElectrons.size() > 0);
   bool passMu = (selectedMuons.size() > 0);
@@ -1440,6 +1455,7 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================
   // 11) MET selection
   //================================================================================================
+  /*
   if (0) std::cout << "=== MET selection" << std::endl;
   const METSelection::Data METData = fMETSelection.analyze(fEvent, nVertices);
   //if (!METData.passedSelection()) return;
@@ -1448,7 +1464,7 @@ void TopRecoTree::process(Long64_t entry) {
     bool MetPassCut = cfg_METCut.passedCut(METData.getMET().R());
     if (!MetPassCut) return;
   }
-
+  */
   //================================================================================================
   // All cuts passed
   //================================================================================================
@@ -1456,7 +1472,7 @@ void TopRecoTree::process(Long64_t entry) {
   cSelected.increment();
 
   //Ctrl plots for semi-leptonic selections
-  hCtrl_MET      -> Fill(METData.getMET().R());
+  //hCtrl_MET      -> Fill(METData.getMET().R());
   hCtrl_JetMult  -> Fill(jetData.getSelectedJets().size());
   hCtrl_BJetMult -> Fill(bjetData.getSelectedBJets().size());
   if (passMuon)     hCtrl_muonMult -> Fill(selectedMuons.size());
@@ -1706,7 +1722,6 @@ void TopRecoTree::process(Long64_t entry) {
   branch_DRJ2BJetwithJ1_B -> SetAddress(&DRJ2BJetwithJ1_B);
   branch_dijetMassOverTrijetMass_B -> SetAddress(&dijetMassOverTrijetMass_B);
 
-
   //================================================================================================//
   //                            Gen Trijet subjets selection                                        //
   //================================================================================================//
@@ -1909,7 +1924,7 @@ void TopRecoTree::process(Long64_t entry) {
   //================================================================================================//
   bool applyBjetPtCut = true;
   float BjetPtCut = cfg_BjetsPtCut.at(cfg_BjetsPtCut.size()-1);
-
+  int jmatched = 0;
   TrijetSelections TopCandidates;
   int index0 = -1;
   for (auto& jet0: jetData.getSelectedJets()){
@@ -1978,68 +1993,50 @@ void TopRecoTree::process(Long64_t entry) {
 	    BJet = jet1;
 	    DiJet = {jet0,jet2};
 	  }
-	}	  	 	  
-	//********************** Non of the three subjets is matched************************//
-	  
-	else if (jet0.bjetDiscriminator() > jet1.bjetDiscriminator() && jet0.bjetDiscriminator() > jet2.bjetDiscriminator()){            
+	}
+	//********************** None of the three subjets is matched************************//
+	else if (max(jet0.bjetDiscriminator(), max(jet1.bjetDiscriminator(), jet2.bjetDiscriminator())) == jet0.bjetDiscriminator()){
 	  BJet = jet0;
 	  DiJet = {jet1,jet2};
 	}
-	else if (jet1.bjetDiscriminator() > jet0.bjetDiscriminator() && jet1.bjetDiscriminator() > jet2.bjetDiscriminator()){
+	else if (max(jet0.bjetDiscriminator(), max(jet1.bjetDiscriminator(), jet2.bjetDiscriminator())) == jet1.bjetDiscriminator()){
 	  BJet = jet1;
 	  DiJet = {jet0,jet2};
 	}
-	else if (jet2.bjetDiscriminator() > jet0.bjetDiscriminator() && jet2.bjetDiscriminator() > jet1.bjetDiscriminator()){
+	else if (max(jet0.bjetDiscriminator(), max(jet1.bjetDiscriminator(), jet2.bjetDiscriminator())) == jet2.bjetDiscriminator()){
 	  BJet = jet2;
 	  DiJet = {jet0,jet1};
 	}
-	else{
+	if (DiJet.size() == 0){
+	  std::cout<<jet0.bjetDiscriminator()<<" "<<jet1.bjetDiscriminator()<<" "<<jet2.bjetDiscriminator()<<std::endl;
 	  std::cout<<"Never reach here"<<std::endl;
 	}
+	
+	if (DiJet.size() < 1) continue; // What's the case?
 	
 	//Apply bjet pt cut
 	if (applyBjetPtCut && (BJet.pt() < BjetPtCut)) continue;
 	//sort W subjets in pt
 	std::sort( DiJet.begin(),  DiJet.end(),  PtComparator() );	
 
+	//Check if is a genuine (truth-matched) top
+	bool isGenuineTop = isGenuineTopCandidate(BJet, DiJet.at(0), DiJet.at(1), MCtrue_Bjet, MCtrue_LdgJet, MCtrue_SubldgJet);	
+	if (isGenuineTop) jmatched++;
 	//Store top candidate
 	TopCandidates.BJet.push_back(BJet);
 	TopCandidates.Jet1.push_back(DiJet.at(0));
 	TopCandidates.Jet2.push_back(DiJet.at(1));
-
+	TopCandidates.IsGenuineTop.push_back(isGenuineTop);
       } //for (auto& jet2: jetData.getSelectedJets()){
     } //for (auto& jet1: jetData.getSelectedJets()){
   } //for (auto& jet0: jetData.getSelectedJets()){
 
-    //========================================================================================================
-    //                       Identification of fake, genuine TopCandidates
-    //========================================================================================================
-  vector <bool> GenuineTop; 
-  int jmatched = 0;
-  //    std::cout<<"==="<<std::endl;
-  for (size_t i=0; i<TopCandidates.BJet.size(); i++){
-    bool genuine = false;
-    for (size_t j=0; j<MCtrue_Bjet.size(); j++){
-      Jet jet1 = TopCandidates.Jet1.at(i);
-      Jet jet2 = TopCandidates.Jet2.at(i);
-      Jet bjet = TopCandidates.BJet.at(i);
-      
-      bool same1 = areSameJets(jet1, MCtrue_LdgJet.at(j))    && areSameJets(jet2, MCtrue_SubldgJet.at(j)) && areSameJets(bjet,  MCtrue_Bjet.at(j));
-      bool same2 = areSameJets(jet1, MCtrue_SubldgJet.at(j)) && areSameJets(jet2, MCtrue_LdgJet.at(j))    && areSameJets(bjet,  MCtrue_Bjet.at(j));
-      if (same1 || same2){
-	genuine = true;
-      }
-    }
-    if (genuine) jmatched++;
-    GenuineTop.push_back(genuine);
-  }
   hNmatchedTrijets ->Fill(jmatched);
 
   //========================================================================================================
   //                                 Fill trees
   //========================================================================================================
-  // Definitions
-  Bool_t isGenuineTop = false;
+
   // Chi Squared
   const double mTopMass = 172.34;  // arXiv:1812.10534
   const double mWMass   = 80.385;    // TopSelection (Chi-Squared Method)
@@ -2050,6 +2047,7 @@ void TopRecoTree::process(Long64_t entry) {
     Jet jet1 = TopCandidates.Jet1.at(i);
     Jet jet2 = TopCandidates.Jet2.at(i);
     Jet bjet = TopCandidates.BJet.at(i);
+    Bool_t isGenuineTop = TopCandidates.IsGenuineTop.at(i);
       
     math::XYZTLorentzVector TrijetP4, DijetP4;
     TrijetP4 = bjet.p4()+jet1.p4()+jet2.p4();
@@ -2057,8 +2055,6 @@ void TopRecoTree::process(Long64_t entry) {
       
     // Keep only tops in the low/high pT range
     //if (!cfg_TopCandPtCut.passedCut(TrijetP4.pt())) continue;
-      
-    isGenuineTop = GenuineTop.at(i);
       
     // Compute distances
     double dRJ12 = ROOT::Math::VectorUtil::DeltaR(jet1.p4(), jet2.p4());      
@@ -2164,6 +2160,7 @@ void TopRecoTree::process(Long64_t entry) {
     hSubldgJetPt             -> Fill(isGenuineTop, jet2.pt());
     hSubldgJetEta            -> Fill(isGenuineTop, jet2.eta());
     hSubldgJetPhi            -> Fill(isGenuineTop, jet2.phi());
+    hSubldgJetMass           -> Fill(isGenuineTop, jet2.p4().M());
     hSubldgJetBdisc          -> Fill(isGenuineTop, jet2.bjetDiscriminator());
       
     hSubldgJetCombinedCvsL   -> Fill(isGenuineTop, jet2.pfCombinedCvsLJetTags());
