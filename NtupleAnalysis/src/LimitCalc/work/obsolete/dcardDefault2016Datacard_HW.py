@@ -33,7 +33,7 @@ if HeavyAnalysis:
 
 ##############################################################################
 # Options
-OptionIncludeSystematics=True # Include shape systematics (multicrabs must beproduced with doSystematics=True)
+OptionIncludeSystematics=False # Include shape systematics (multicrabs must beproduced with doSystematics=True)
 OptionDoControlPlots= True #FIXME: If you want control plots, switch this to true!
 OptionUseWJetsHT = True  # Use HT binned WJets samples instead of inclusive for WJets background
 OptionDoMergeEWKttbar = False #FIXME: if true, Wjets+DY+diboson into one background and for heavy H+, also merges ttbar and singleTop into one background

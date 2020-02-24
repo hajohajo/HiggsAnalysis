@@ -71,8 +71,8 @@ class MulticrabPathFinder:
 
     def _GetPaths(self):
         
-        self._signal_path = self.signalfind(self._multicrabpaths)
-        if self._analysisType in ["HToTB", "HToTauNu"]:
+        self._signal_path    = self.signalfind(self._multicrabpaths)
+        if self._analysisType in ["HToTB", "HToTauNu","HToHW"]:
             self._ewk_path       = self.ewkfind(self._multicrabpaths)
             self._qcdfact_path   = self.qcdfactfind(self._multicrabpaths)
             self._qcdinv_path    = self.qcdinvfind(self._multicrabpaths)
@@ -123,7 +123,9 @@ class MulticrabPathFinder:
             table.append( align.format("QCD Factorised" , "", self._qcdfact_path) )
             table.append( align.format("QCD Inverted"   , "", self._qcdinv_path ) )
         elif (self._analysisType == "HToHW"):
-            self.Print("This is still under constrution!", True)
+            table.append( align.format("EWK Path"       , "", self._ewk_path) )
+            table.append( align.format("QCD Factorised" , "", self._qcdfact_path) )
+            table.append( align.format("QCD Inverted"   , "", self._qcdinv_path ) )
         else:
             pass
         table.append(hLine)
@@ -222,6 +224,9 @@ class MulticrabPathFinder:
     def ewkfind(self,dirs):
         if (self._analysisType == "HToTB"):
             myWord = "Hplus2tbAnalysis"
+            myFile = "multicrab.cfg"
+        elif (self._analysisType == "HToHW"):
+            myWord = "Hplus2hwAnalysis"
             myFile = "multicrab.cfg"
         else:
             myWord = "mbedded"

@@ -2,23 +2,40 @@ import ROOT
 import array
 import sys
 
-f = ROOT.TFile.Open(sys.argv[1]+"/ChargedHiggs_HplusTB_HplusToTauNu_M_350/res/histograms-ChargedHiggs_HplusTB_HplusToTauNu_M_350.root", 'read')
+
+
+if len(sys.argv) < 2:
+  print "we need two arguments"
+  print "example: python antiIso.py Hplus2hwAnalysis_background_ele_190806_125428 --ele"
+
+f = ROOT.TFile.Open(sys.argv[1]+"/CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO/res/histograms-CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO.root", 'read')
 
 f2 = ROOT.TFile.Open(sys.argv[1]+"/TT/res/histograms-TT.root", 'read')
 
-hist_signal = f.Get('Hplus2hwAnalysis_background_350to3000_Run2016/TransverseMass')
+type = sys.argv[2]
 
-hist_TT = f2.Get('Hplus2hwAnalysis_background_350to3000_Run2016/TransverseMass')
+if type == "--ele":
+  type = "_ele_"
+elif type == "--muon":
+  type = "_"
+else:
+  print "wrong type provided"
+
+
+hist_signal = f.Get('Hplus2hwAnalysis_background'+type+'350to3000_Run2016/TransverseMass')
+
+hist_TT = f2.Get('Hplus2hwAnalysis_background'+type+'350to3000_Run2016/TransverseMass')
 
 ##############################################
 ##############################################
+
 
 ls = 35916.636
 
 print ls
 
-#signal normalised to 10 fb
-xs_signal = 0.01
+#signal normalised to 100 fb
+xs_signal = 0.1 #pb
 xs_TT = 831.76
 
 #normalisation factors
@@ -58,7 +75,7 @@ hist_signal.Draw("SAME")
 #hist_signal.GetXaxis().SetRangeUser(20,120)
 hist_signal.SetMarkerStyle(1)
 
-canvas.Print('signalInAntiIsoArea.png')
+canvas.Print('signalInAntiIsoArea'+type+'.png')
 
 
 f.Close()

@@ -430,7 +430,7 @@ void TauFakeRate::process(Long64_t entry) {
   //================================================================================================   
   if (0) std::cout << "=== Tau Selection" << std::endl;
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
-  const TauSelection::Data looseTauData = fLooseTauSelection.analyzeTight(fEvent);
+  const TauSelection::Data looseTauData = fLooseTauSelection.analyzeLoose(fEvent);
 
   if (!looseTauData.hasIdentifiedTaus() ) return;
   cTauNCounter.increment(); 

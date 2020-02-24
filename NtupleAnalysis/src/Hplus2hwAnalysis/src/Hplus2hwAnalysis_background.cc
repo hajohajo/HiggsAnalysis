@@ -55,9 +55,6 @@ private:
   void doBaselineAnalysis(const Event& event, const TauSelection::Data& tauData, const int nVertices);
   void doSignalAnalysis(const Event& event, const TauSelection::Data& tauData, const int nVertices);
 
-//  double drMuTau1;
-//  double drMuTau2;
-
   // Non-common histograms
   HistoSplitter::SplittedTripletTH1s hMtInvertedTauAfterStdSelections;
 
@@ -88,7 +85,7 @@ REGISTER_SELECTOR(Hplus2hwAnalysis_background);
 
 Hplus2hwAnalysis_background::Hplus2hwAnalysis_background(const ParameterSet& config, const TH1* skimCounters)
 : BaseSelector(config, skimCounters),
-  fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kQCDMeasurement, fHistoWrapper),
+  fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kQCDMeasurement_muon, fHistoWrapper),
   cAllEvents(fEventCounter.addCounter("All events")),
   fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
   fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -115,8 +112,6 @@ void Hplus2hwAnalysis_background::book(TDirectory *dir) {
 
   // Book common plots histograms
   fCommonPlots.book(dir, isData());
-//  fNormalizationSystematicsSignalRegion.book(dir, isData());
-
 
   // Book histograms in event selection classes
   fMETFilterSelection.bookHistograms(dir);
@@ -129,9 +124,8 @@ void Hplus2hwAnalysis_background::book(TDirectory *dir) {
   fJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
   fBJetSelection.bookHistograms(dir);
+
   // Book non-common histograms
-  // hAssociatedTop_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "associatedTop_Pt", "Associated t pT;p_{T} (G$
-  // hAssociatedTop_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "associatedTop_Eta", "Associated t eta;#eta",$
 
 
 
@@ -158,7 +152,7 @@ void Hplus2hwAnalysis_background::book(TDirectory *dir) {
 
 void Hplus2hwAnalysis_background::setupBranches(BranchManager& branchManager) {
   fEvent.setupBranches(branchManager);
-//  return;
+  return;
 }
 
 void Hplus2hwAnalysis_background::process(Long64_t entry) {
@@ -231,11 +225,8 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   // Tau
   ////////////
 
-  const TauSelection::Data looseTauData = fLooseTauSelection.analyzeTight(fEvent);
+  const TauSelection::Data looseTauData = fLooseTauSelection.analyzeLoose(fEvent);
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
-
-//  double drTauTau0 = 0;
-//  double drTauTau1 = 0;
 
   std::vector<float> myFactorisationInfo;
 
@@ -245,7 +236,7 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   if(looseTauData.getSelectedTaus().size() != 2)
     return;
 
-  if(looseTauData.getSelectedTaus()[0].charge() != looseTauData.getSelectedTaus()[1].charge())
+  if(looseTauData.getSelectedTaus()[0].charge() == looseTauData.getSelectedTaus()[1].charge())
     return;
 
 //  if (fEvent.isMC() && looseTauData.getSelectedTaus()[0].isGenuineTau() && looseTauData.getSelectedTaus()[1].isGenuineTau()) { //if genuine tau, reject the event
@@ -375,7 +366,8 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   // Jet selection
   ////////////
 
-  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, looseTauData.getSelectedTau());
+//  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, looseTauData.getSelectedTau());
+  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, looseTauData.getSelectedTaus()[0],looseTauData.getSelectedTaus()[1]);
   if (!jetData.passedSelection())
     return;
 
@@ -459,6 +451,8 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   // Fill final plots
   ////////////
 
+//  std::cout << "DEBUG: before all selections";
+
   fCommonPlots.fillControlPlotsAfterAllSelections(fEvent);
 //  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hNormalizationInvertedTauAfterStdSelections, isGenuineTau, METvalue);
 //  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hMtInvertedTauAfterStdSelections, tauData.getAntiIsolatedTauIsGenuineTau(), myTransverseMass);
@@ -466,6 +460,8 @@ void Hplus2hwAnalysis_background::process(Long64_t entry) {
   ////////////
   // Finalize
   ////////////
+
+//  std::cout << "DEBUG: after all selections";
 
   fEventSaver.save();
 

@@ -8,9 +8,11 @@ CommonPlotsBase::CommonPlotsBase(HistoWrapper& histoWrapper, bool isEnabled)
 : fHistoWrapper(histoWrapper),
   bIsEnabled(isEnabled) { }
 CommonPlotsBase::~CommonPlotsBase() { }
+//CommonPlotsBase::CommonPlotsBase() { }
   
 void CommonPlotsBase::book(TDirectory* dir, bool isData) { }
 void CommonPlotsBase::reset() { }
+
 
 //===== unique filling methods (to be called inside the event selection routine only, i.e. (before a passing decision is done))
 //void CommonPlotsBase::fillControlPlotsAtVetoTauSelection(const Event& event, const VetoTauSelection::Data& tauVetoData) { }
@@ -42,7 +44,10 @@ void CommonPlotsBase::fillControlPlotsAfterStandardSelections(const Event& event
 							      const TopSelection::Data& topData,
 							      bool bIsInverted){ }
 void CommonPlotsBase::fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau) { }
-void CommonPlotsBase::fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau) { }
+void CommonPlotsBase::fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau, int i, int j) { }
 void CommonPlotsBase::fillControlPlotsAfterAllSelections(const Event& event, int isInverted) { }
 void CommonPlotsBase::fillControlPlotsAfterAllSelectionsWithProbabilisticBtag(const Event& event, const METSelection::Data& metData, double btagWeight) { }
+
+int CommonPlotsBase::nVertices() { return iVertices; }
+
 //void CommonPlotsBase::fillControlPlotsAfterAllSelectionsWithFullMass(const Event& event, FullHiggsMassCalculator::Data& data) { }
