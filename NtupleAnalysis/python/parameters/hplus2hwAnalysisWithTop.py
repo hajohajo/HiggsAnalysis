@@ -14,6 +14,8 @@ histogramAmbientLevel = "Debug"  # ("Systematics", "Vital", "Informative", "Debu
 # Trigger [scanned in range _v1--_v100 (=>remove the '_v' suffix)]
 #================================================================================================
 trigger = PSet(
+    # No need to specify version numbers, they are automatically scanned in range 1--100 (remove the '_v' suffix)
+    MuontriggerEfficiencyJsonName = "muonPAGEff.json",
     triggerOR = [
         # SingleMuon Primary Dataset (PD)
         "HLT_IsoMu24",
@@ -123,18 +125,27 @@ looseTauSelection = PSet(
   isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
   )
 
-# tau identification scale factors
-scaleFactors.assignTauIdentificationSF(tauSelection)
-scaleFactors.assignTauIdentificationSF(looseTauSelection)
 
-# tau misidentification scale factor
+#================================================================================================
+# Muon id & trigger SF
+#================================================================================================
+scaleFactors.assignMuonIdentificationSF(muonSelection, "nominal", "Data")
+scaleFactors.assignMuonTriggerSF(muonSelection, "nominal", trigger.MuontriggerEfficiencyJsonName, "Data")
+
+
+#================================================================================================
+# Tau id & trigger SF
+#================================================================================================
+scaleFactors.assignTauIdentificationSF(tauSelection)
 scaleFactors.assignTauMisidentificationSF(tauSelection, "eToTau", "nominal")
 scaleFactors.assignTauMisidentificationSF(tauSelection, "muToTau", "nominal")
 scaleFactors.assignTauMisidentificationSF(tauSelection, "jetToTau",  "nominal")
 
+scaleFactors.assignTauIdentificationSF(looseTauSelection)
 scaleFactors.assignTauMisidentificationSF(looseTauSelection, "eToTau", "nominal")
 scaleFactors.assignTauMisidentificationSF(looseTauSelection, "muToTau", "nominal")
 scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau",  "nominal")
+
 '''
 newer version still unsuported in this branch
 scaleFactors.assignTauMisidentificationSF(tauSelection, "eToTau", "full", "nominal")

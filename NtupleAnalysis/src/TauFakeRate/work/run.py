@@ -190,6 +190,19 @@ def main():
                        "SingleElectron_Run2016H_03Feb2017_ver2_v1_281613_284035",
                        "SingleElectron_Run2016F_03Feb2017_v1_278801_278808",
                        "SingleElectron_Run2016C_03Feb2017_v1_275656_276283",
+                       "DYJetsToLL_M_50_HT_70to100",
+                       "DYJetsToLL_M_50_HT_100to200",
+                       "DYJetsToLL_M_50_HT_100to200_ext1",
+                       "DYJetsToLL_M_50_HT_200to400",
+                       "DYJetsToLL_M_50_HT_200to400_ext1",
+                       "DYJetsToLL_M_50_HT_400to600",
+                       "DYJetsToLL_M_50_HT_400to600_ext1",
+                       "DYJetsToLL_M_50_HT_600to800",
+                       "DYJetsToLL_M_50_HT_800to1200",
+                       "DYJetsToLL_M_50_HT_1200to2500",
+                       "DYJetsToLL_M_50_HT_2500toInf",
+                       #"DYJetsToLL_M_50_ext1",
+                       #"DYJetsToLL_M_50_ext2",
                        ]
 
         #if opts.doSystematics:
