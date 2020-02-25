@@ -195,7 +195,7 @@ def main(opts):
 
         # Merge all MC datasets into a a MC-soup dataset called "Simulation"  ?
         if 0:
-            datasetsMgr.merge(mcName, mcList) #iro
+            datasetsMgr.merge(mcName, mcList)
 
         if not foundData:
             raise Exception("Data samples are required for this script! (foundData = %s)" % (foundData) )
@@ -307,7 +307,7 @@ def PlotHistoGraphs(hGraphList, kwargs):
 
     # For-loop: All efficiencie TGraphs    
     for g in hGraphList:
-        # g.getRootHisto().GetXaxis().SetTitle(_kwargs["xlabel"]) #iro
+        # g.getRootHisto().GetXaxis().SetTitle(_kwargs["xlabel"])
         g.getRootHisto().GetYaxis().SetTitle(_kwargs["ylabel"])
         if opts.yMin != None:
             g.getRootHisto().SetMinimum(_kwargs["opts"]["ymin"])
