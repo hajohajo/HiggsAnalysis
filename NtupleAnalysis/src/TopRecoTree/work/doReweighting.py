@@ -119,8 +119,6 @@ def main(opts):
     style.setGridY(opts.gridY)
     style.setLogX(opts.logX)
     style.setLogY(opts.logY)
-    style.setLogZ(opts.logZ)
-
 
     # For-loop: All opt Mode
     for opt in optModes:
@@ -129,7 +127,7 @@ def main(opts):
         # Setup & configure the dataset manager 
         datasetsMgr = GetDatasetsFromDir(opts)
         datasetsMgr.updateNAllEventsToPUWeighted()
-        datasetsMgr.loadLuminosities() # from lumi.json
+        #datasetsMgr.loadLuminosities() # from lumi.json
         if opts.verbose:
             datasetsMgr.PrintCrossSections()
             datasetsMgr.PrintLuminosities()
@@ -244,13 +242,18 @@ def GetHistoKwargs(h, opts):
         _units  = "GeV/c"
         kwargs['format'] = "%0.0f " + _units
         kwargs["xlabel"] = "p_{T} (%s)" % _units
-        if "trijet" in h.lower():
+        if "trijetpt" in h.lower():
             kwargs["xlabel"] = "p_{T,t} (%s)" % _units
-        if "dijet" in h.lower():
+        if "dijetpt" in h.lower():
             kwargs["xlabel"] = "p_{T,w} (%s)" % _units
         if "ldgjetpt" in h.lower():
             kwargs["xmax"] = 200
             kwargs["xlabel"] = "leading jet p_{T} (%s)" % _units
+        if "subldgjetpt" in h.lower():
+            kwargs["xmax"] = 200
+            kwargs["xlabel"] = "subleading jet p_{T} (%s)" % _units
+        if "bjetpt" in h.lower():
+            kwargs["xlabel"] = "bjet p_{T} (%s)" % _units
 
     if "trijetmass" in h.lower():
         _units  = "GeV/c^{2}"
@@ -294,10 +297,11 @@ def GetHistoKwargs(h, opts):
         if "subldg" in h.lower():
             kwargs["xlabel"] = "Subleading jet mult"
         if "avg" in h.lower():
-            kwargs["xlabel"] = "avg CvsL"
+            kwargs["xlabel"] = "avg mult"
 
     if "cvsl" in h.lower():
         kwargs['format'] = "%0.2f"
+        kwargs["xmin"] = -1
         kwargs["xmax"] = 1
         kwargs["xlabel"] = "CvsL"
         if "ldg" in h.lower():
@@ -330,7 +334,7 @@ def GetHistoKwargs(h, opts):
          kwargs["xmax"] = 1
          kwargs["xmin"] = 0
 
-    if "eta" in h.lower():
+    if "Eta" in h:
          kwargs['format'] = "%0.2f "
          kwargs["xlabel"] = "#eta"
          kwargs["xmax"] = 5
@@ -346,7 +350,7 @@ def GetHistoKwargs(h, opts):
          kwargs["xmin"] = -3.5         
          if "DPhi" in h:
              kwargs["xlabel"] = "#Delta#phi"
-             #kwargs["xmin"] = 0
+             kwargs["xmin"] = 0
 
     if "DR" in h:
          kwargs['format'] = "%0.2f "
@@ -554,6 +558,29 @@ def GetWeights(sigTree, bkgTree, refBranch):
     p.histoMgr.setHistoLegendStyle("signal", "F")
     p.histoMgr.setHistoLegendStyle("background", "F")
     kwargs["createLegend"] = {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82}
+    
+    if "ChargedHiggs" in opts.dataset:
+        datasetName = opts.dataset
+        datasetName = datasetName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "")
+        datasetName = "m_{H^{#pm}} = %s GeV" % (datasetName)
+    else:
+        datasetName = plots._legendLabels[opts.dataset]
+
+    if "hadronic" in opts.mcrab.lower():
+        extra_text = "hadronic"# (%s)" % datasetName
+    elif "semileptonic" in opts.mcrab.lower():
+        extra_text = "semi leptonic"# (%s)" % datasetName
+    else:
+        extra_text = ""
+
+    xleg = 0.595#0.665
+    if (extra_text != ""):
+        if (opts.dataset == "TT"):
+             p.appendPlotObject(histograms.PlotText(xleg, 0.57, "%s (%s)" % (datasetName, extra_text), bold=True, size=20))
+        else:
+            p.appendPlotObject(histograms.PlotText(xleg, 0.57, "%s" % (datasetName), bold=True, size=20))
+    else:
+        p.appendPlotObject(histograms.PlotText(0.67, 0.83, plots._legendLabels[opts.dataset], bold=True, size=20))
 
     # Save plot in all formats    
     saveName = "weights_%s" % (refBranch)
@@ -562,7 +589,7 @@ def GetWeights(sigTree, bkgTree, refBranch):
 
     return hWeights
 
-def PlotOverlay(s,b, kwargs, saveName):
+def PlotOverlay(s,b, kwargs, saveName, refBranch):
     
     #Define Signal style
     signalStyle     = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure-3, markerSizes=None, markerStyle=ROOT.kFullDiamond),
@@ -579,6 +606,38 @@ def PlotOverlay(s,b, kwargs, saveName):
 
 
     p.histoMgr.setHistoLegendLabelMany({"signal": "Truth-matched", "background": "Unmatched"}) 
+
+    if "ChargedHiggs" in opts.dataset:
+        datasetName = opts.dataset
+        datasetName = datasetName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "")
+        datasetName = "m_{H^{#pm}} = %s GeV" % (datasetName)
+    else:
+        datasetName = plots._legendLabels[opts.dataset]
+
+    if "hadronic" in opts.mcrab.lower():
+        extra_text = "hadronic"# (%s)" % datasetName
+    elif "semileptonic" in opts.mcrab.lower():
+        extra_text = "semi leptonic"# (%s)" % datasetName
+    else:
+        extra_text = ""
+
+    xleg = 0.595#0.665
+    if (extra_text != ""):
+        if (opts.dataset == "TT"):
+             p.appendPlotObject(histograms.PlotText(xleg, 0.57, "%s (%s)" % (datasetName, extra_text), bold=True, size=20))
+        else:
+            p.appendPlotObject(histograms.PlotText(xleg, 0.57, "%s" % (datasetName), bold=True, size=20))
+    else:
+        p.appendPlotObject(histograms.PlotText(0.67, 0.83, plots._legendLabels[opts.dataset], bold=True, size=20))
+
+    txt = ""
+    if (refBranch == "trijetMass"):
+        txt = "mass reweighted"
+    if (refBranch == "trijetPt"):
+        txt = "p_{T} reweighted"
+
+    p.appendPlotObject(histograms.PlotText(xleg, 0.52, txt, bold=True, size=20))
+
     p.histoMgr.forHisto("background", backgroundStyle ) 
     p.histoMgr.setHistoDrawStyle("background", "HIST")
     p.histoMgr.setHistoLegendStyle("background", "L") #F
@@ -589,7 +648,7 @@ def PlotOverlay(s,b, kwargs, saveName):
 
     kwargs["ylabel"] = "Arbitrary Units / %s" % str(kwargs["format"])
     kwargs["opts"]   = {"ymin": 0.0, "ymaxfactor": 1.1}
-    kwargs["createLegend"] = {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82}
+    kwargs["createLegend"] = {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.8}
 
     # Save plot in all formats    
     plots.drawPlot(p, saveName, **kwargs)
@@ -674,8 +733,7 @@ def doReweighting(datasetsMgr, refBranch, treeName):
         b.Scale(1./b.Integral())
 
         # plot signal and background on same canvas        
-        #p, _kwargs = PlotOverlay(s,b, GetHistoKwargs(brName, opts))
-        PlotOverlay(s,b, GetHistoKwargs(brName, opts), "%s_%s" % (brName, txt))
+        PlotOverlay(s,b, GetHistoKwargs(brName, opts), "%s_%s" % (brName, txt), refBranch)
     
     if (opts.saveInRootFile):
         SaveInRootFile(inputList, histoMap_s, histoMap_b)
@@ -768,7 +826,6 @@ if __name__ == "__main__":
     GRIDY        = False
     LOGX         = False
     LOGY         = False
-    LOGZ         = False
     SAVEROOTFILE = False
     MERGEEWK     = False
     URL          = False
@@ -822,9 +879,6 @@ if __name__ == "__main__":
 
     parser.add_option("--logY", dest="logY", action="store_true", default=LOGY,
                       help="Set y-axis to logarithm scale [default: %s]" % LOGY)
-
-    parser.add_option("--logZ", dest="logZ", action="store_true", default=LOGZ,
-                      help="Set z-axis to logarithm scale [default: %s]" % LOGZ)
 
     parser.add_option("--saveInRootFile", dest="saveInRootFile", action="store_true", default=SAVEROOTFILE,
                       help="Save reweighted histograms in root file [default: %s]" % SAVEROOTFILE)

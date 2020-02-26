@@ -61,18 +61,6 @@ def Verbose(msg, printHeader=True, verbose=False):
     aux.Print(msg, printHeader)
     return
 
-def GetLumi(datasetsMgr):
-    Verbose("Determininig Integrated Luminosity")
-    
-    lumi = 0.0
-    for d in datasetsMgr.getAllDatasets():
-        if d.isMC():
-            continue
-        else:
-            lumi += d.getLuminosity()
-    Verbose("Luminosity = %s (pb)" % (lumi), True)
-    return lumi
-
 def GetDatasetsFromDir(opts, mcrab):
     Verbose("Getting datasets")
     
@@ -100,7 +88,7 @@ def GetDatasetsFromDir(opts, mcrab):
         raise Exception("This should never be reached")
 
     datasets.updateNAllEventsToPUWeighted()
-    datasets.loadLuminosities() # from lumi.json
+    #datasets.loadLuminosities() # from lumi.json
     return datasets
     
 
@@ -127,32 +115,32 @@ def main(opts, signalMass):
         datasetOrder.append(d.getName())
     for m in signalMass:
         datasetOrder.insert(0, m)
-    datasetsMgr.selectAndReorder(datasetOrder)
+    #datasetsMgr.selectAndReorder(datasetOrder)
     datasetsMgrRef.selectAndReorder(datasetOrder)
 
     # Print dataset information
     datasetsMgr.PrintInfo()
+    datasetsMgrRef.PrintInfo()
 
     # Apply TDR style
     style = tdrstyle.TDRStyle()
-    style.setOptStat(True)
-    style.setGridX(False)
-    style.setGridY(False)
+    style.setOptStat(False)
+    style.setGridX(opts.gridX)
+    style.setGridY(opts.gridY)
+    style.setLogX(opts.logX)
+    style.setLogY(opts.logY)
 
     # Get folder
     folderTarg     = opts.folder
     folderRef      = opts.folder
 
     # Get histo names
-    histoListTarg = datasetsMgr.getDataset(datasetOrder[0]).getDirectoryContent(folderTarg)
+    # histoListTarg = datasetsMgr.getDataset(datasetOrder[0]).getDirectoryContent(folderTarg)
+    histoListTarg = datasetsMgr.getDataset("TT").getDirectoryContent(folderTarg)
     histoListRef  = datasetsMgrRef.getDataset(datasetOrder[0]).getDirectoryContent(folderRef)
 
     histoPathsTarg = [os.path.join(folderTarg, h) for h in histoListTarg]
     histoPathsRef  = [os.path.join(folderRef, h) for h in histoListRef]
-    #histoPathsTarg = [os.path.join(folderTarg, h) for h in ["Ctrl_lepGenTop_Pt"]] #Ctrl_hadrGenTop_Pt
-    #histoPathsRef  = [os.path.join(folderRef, h) for h in ["GenTop_Pt"]] #GenTop_Pt
-    #histoPathsTarg = [os.path.join(folderTarg, h) for h in ["LdgJetCvsL", "SubldgJetCvsL"]] #Ctrl_hadrGenTop_Pt
-    #histoPathsRef  = [os.path.join(folderRef, h) for h in ["LdgJetCvsL", "SubldgJetCvsL"]]
     for i in range(len(histoPathsRef)):            
         _continue = False
         hR = histoPathsRef[i]
@@ -162,252 +150,353 @@ def main(opts, signalMass):
                 _continue = True
         if _continue:
             continue
+        #if "mass" not in hR.lower():
+        #    continue
         hT = hR #histoPathsTarg[i]
-        Plot_Comparisons(datasetsMgr, datasetsMgrRef, hT, hR, intLumi)
+        Plot_Comparisons(datasetsMgr, datasetsMgrRef, hT, hR, intLumi, signalMass)
     return
 
-def Plot_Comparisons(datasetsMgr, datasetsMgrRef, hT, hR, intLumi):
+def Plot_Comparisons(datasetsMgr, datasetsMgrRef, hT, hR, intLumi, signalMass):
     _kwargs = {}
 
     #print 
     if opts.normaliseToOne:
-        pT = plots.MCPlot(datasetsMgr, hT, normalizeToOne=True, saveFormats=[], **_kwargs)
-        pR = plots.MCPlot(datasetsMgrRef, hR, normalizeToOne=True, saveFormats=[], **_kwargs)
+        pT = plots.MCPlot(datasetsMgr, hT, normalizeToOne=True, saveFormats=[], **_kwargs) # semi leptonic selections
+        pR = plots.MCPlot(datasetsMgrRef, hR, normalizeToOne=True, saveFormats=[], **_kwargs) # hadronic selections
     else:
-        pT = plots.MCPlot(datasetsMgr, hT, normalizeToLumi=intLumi, saveFormats=[], **_kwargs)
-        pR = plots.MCPlot(datasetsMgrRef, hR, normalizeToLumi=intLumi, saveFormats=[], **_kwargs)
-
-    # Draw the histograms                                                                                                                                                                
-    _cutBox = None
-    _rebinX = 1
-    _format = "%0.0f"
-    _xlabel = None
-    logY    = False
-    _opts   = {"ymin": 1e-3, "ymaxfactor": 1.0}
-
-    #print "HT", hT
-    #print "HR", hR
-
-    xMax = 200
-    _units = 0
-    if "pt" in hT.lower():
-        _units = "GeV/c"
-
-    _ylabel = "Events"
-    _log = True
-    if opts.normaliseToOne:
-        _ylabel = "Arbitrary Units"
-        _log = False
-    
-    if "mass" in hR.lower():
-        _units  = "GeV/c^{2}"
-        _format = "%0.0f " + _units
-        _xlabel = "M (%s)" % _units
-
-    if "trijetmass" in hR.lower():
-        _units  = "GeV/c^{2}"
-        _format = "%0.0f " + _units
-        _xlabel = "m_{top} (%s)" % _units
-        _opts["xmax"] = 805 #1005
-        
-    if "bjetmass" in hR.lower():
-        _xlabel = "m_{b-tagged jet} (%s)" % _units
-        _opts["xmax"] = 50
-    if "bjetldgjet_mass" in hR.lower():
-        _xlabel = "m_{b, ldg jet} (%s)" % _units
-        _opts["xmax"] = 705
-    if "bjetsubldgjet_mass" in hR.lower():
-        _xlabel = "m_{b-tagged, subldg jet} (%s)" % _units
-        _opts["xmax"] = 705
-    if "jet_mass" in hR.lower():
-        _opts["xmax"] = 750
-
-    if "mult" in hR.lower():
-        _format = "%0.0f"
-        if "ldg" in hR.lower():
-            _xlabel = "Leading jet mult"
-        if "subldg" in hR.lower():
-            _xlabel = "Subleading jet mult"
-        if "avg" in hR.lower():
-            _xlabel = "avg CvsL"
-
-    if "cvsl" in hR.lower():
-        _format = "%0.2f"
-        if "ldg" in hR.lower():
-            _xlabel = "Leading jet CvsL"
-        if "subldg" in hR.lower():
-             _xlabel = "Subleading jet CvsL"
-        if "avg" in hR.lower():
-            _xlabel = "avg CvsL"
-    if "axis2" in hR.lower():
-        _format = "%0.3f"
-        if "ldg" in hR.lower():
-            _xlabel = "Leading jet axis2"
-        if "subldg" in hR.lower():
-            _xlabel = "Subleading jet axis2"
-        if "avg" in hR.lower():
-            _xlabel = "avg axis2"
-
-    if "dijetmass" in hR.lower():
-        _units  = "GeV/c^{2}"
-        _format = "%0.0f " + _units
-        _xlabel = "m_{W} (%s)" % _units
-        _opts["xmax"] = 600
-        #_opts   = {"xmin": 0.0, "xmax": 605, "ymin": 1e-3, "ymaxfactor": 1.0}
-
-    if "trijetptdr" in hR.lower():
-        _opts["xmax"] =800
-        _format = "%0.0f"
-        _xlabel = "p_{T}#Delta R_{t}"
-
-    if "dijetptdr" in hR.lower():
-        _opts["xmax"] =800
-        _format = "%0.0f"
-        _xlabel = "p_{T}#Delta R_{W}"
-    if "dgjetptd" in hR.lower():
-        _format = "%0.2f"
-        _xlabel = "Leading jet p_{T}D"
-        if "subldg" in hR.lower():
-            _xlabel = "Subleading jet p_{T}D"
-
-    if "bdisc" in hR.lower():
-        _format = "%0.2f"
-        if "subldg" in hR.lower():
-            _xlabel = "Subleading jet CSV"
-            _opts   = {"ymin": 1e-3, "ymax": 0.06}
-        elif "ldg" in hR.lower():
-            _xlabel = "Leading jet CSV"
-            _opts   = {"ymin": 1e-3, "ymax": 0.06}
-        else:
-            _xlabel = "b-tagged jet CSV"
-            _opts   = {"ymin": 1e-3, "ymax": 0.35}
-
-    if "over" in hR.lower():
-         _format = "%0.2f "
-         _xlabel = "m_{W}/m_{t}"
-         _opts["xmax"] = 1
-         _opts["xmin"] = 0
-    if "likelihood" in hR.lower():
-        _format = "%0.2f"
-        if "ldg" in hR.lower():
-            _xlabel = "Leading jet QGL"
-        if "subldg" in hR.lower():
-            _xlabel = "Subleading jet QGL"
-        if "avg" in hR.lower():
-            _xlabel = "avg QGL"
-
-    else:
-        pass
-
-    if logY:
-        yMaxFactor = 2.0
-    else:
-        yMaxFactor = 1.5
-
-    _opts["ymaxfactor"] = yMaxFactor
-    if opts.normaliseToOne:
-        _opts["ymin"] = 1e-3
-    else:
-        _opts["ymin"] = 1e0
-    
-    _kwargs = {
-        "xlabel"           : _xlabel,
-        "ylabel"           : "%s / %s" % (_ylabel, _format),
-        "ratioYlabel"      : "Ratio ",
-        "ratio"            : opts.ratio,
-        "ratioInvert"      : False,
-        "stackMCHistograms": False,
-        "addMCUncertainty" : False,
-        "addLuminosityText": False,
-        "addCmsText"       : True,
-        "cmsExtraText"     : "Preliminary",
-        "opts"             : {"ymin": 0.0, "ymaxfactor": 1.2},
-        #"opts"             : {"ymin": 0.1  ,"ymaxfactor": 1.2, "xmin":0, "xmax":xMax},
-        "opts2"            : {"ymin": 0.1, "ymax": 1.9},
-        "log"              : _log,
-        "createLegend"     : {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82}, 
-        "rebinX"           : 1,
-        }
-    
-    myList = []
+        pT = plots.MCPlot(datasetsMgr, hT, normalizeToLumi=intLumi, saveFormats=[], **_kwargs) # semi leptonic selections
+        pR = plots.MCPlot(datasetsMgrRef, hR, normalizeToLumi=intLumi, saveFormats=[], **_kwargs) # hadronic selections
+            
     # Customise styling
     pT.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetLineStyle(ROOT.kSolid))
     pR.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetLineStyle(ROOT.kSolid))
 
-    datasetTarg = datasetsMgr.getDataset("TT") #ChargedHiggs_HplusTB_HplusToTB_M_500
-    datasetRef  = datasetsMgrRef.getDataset("TT") #ChargedHiggs_HplusTB_HplusToTB_M_500
+    histoList   = []
+    datasetsRef = []
+    legendMap   = {}
+    datasetTarg = datasetsMgr.getDataset("TT")
+
+    for dName in datasetsMgrRef.getAllDatasetNames():
+        datasetsRef.append(datasetsMgrRef.getDataset(dName))
     
-    ht = datasetTarg.getDatasetRootHisto(hT)
-    hr = datasetRef.getDatasetRootHisto(hR)
+    ht = datasetTarg.getDatasetRootHisto(hT)    
     if (opts.normaliseToOne):
         ht.normalizeToOne()
-        hr.normalizeToOne()
     else:
         ht.normalizeToLuminosity(intLumi)
-        hr.normalizeToLuminosity(intLumi)
     HT = ht.getHistogram()
-    HR = hr.getHistogram()
+    histoT = histograms.Histo(HT,"Target", "pl", "PL")
+    legendMap.update({"Target": "t#bar{t} (semi-leptonic)"})
 
-    #print "target: integral", HT.Integral()
-    #print "reference: integral", HR.Integral()
+    # Hadronic datasets
+    for k, d in enumerate(datasetsRef):
+        hr = d.getDatasetRootHisto(hR)
+        if (opts.normaliseToOne):
+            hr.normalizeToOne()
+        else:
+            hr.normalizeToLuminosity(intLumi)
+        HR = hr.getHistogram()
 
-    # styles
-    altSignalBDTGStyle  = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure+9, markerSizes=None, markerStyle=ROOT.kFullDiamond),
-                                                styles.StyleLine(lineColor=ROOT.kAzure+9, lineStyle=ROOT.kSolid, lineWidth=3),
-                                                styles.StyleFill(fillColor=ROOT.kAzure+9, fillStyle=3001)])
+        if "ChargedHiggs" in d.getName():
+            ApplyStyle(HR, k)
+            datasetName = d.getName()
+            datasetName = datasetName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "")
+            datasetName = "m_{H^{#pm}} = %s GeV" % (datasetName)
+            legendMap.update({d.getName() : "%s" % datasetName})
+        else:
+            datasetName = plots._legendLabels[d.getName()]
+            legendMap.update({d.getName() : "%s" % datasetName})
 
-    altBackgroundBDTGStyle = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kRed-4, markerSizes=None, markerStyle=ROOT.kFullDiamond),
-                                                   styles.StyleLine(lineColor=ROOT.kRed-4, lineStyle=ROOT.kSolid, lineWidth=3),
-                                                   ])
+        histoList.append(histograms.Histo(HR, d.getName(), "pl", "PL"))
 
+
+    p = plots.ComparisonManyPlot(histoT, histoList, saveFormats=[])        
+    p.histoMgr.setHistoLegendLabelMany(legendMap)
+    
+        
     backgroundStyle = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta+3, markerSizes=None, markerStyle=ROOT.kFullDiamond),
-                                                   styles.StyleLine(lineColor=ROOT.kMagenta+3, lineStyle=ROOT.kSolid, lineWidth=3),
-                                                   ])
+                                            styles.StyleLine(lineColor=ROOT.kMagenta+3, lineStyle=ROOT.kSolid, lineWidth=3)])
 
-    signalStyle = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kGreen+1, markerSizes=None, markerStyle=ROOT.kFullTriangleUp), # kTeal+2
-                                        styles.StyleLine(lineColor=ROOT.kGreen+1, lineStyle=ROOT.kSolid, lineWidth=3),
-                                        styles.StyleFill(fillColor=ROOT.kGreen+1, fillStyle=3001)])
+    signalStyle = styles.StyleCompound([styles.StyleMarker(markerSize=1.2, markerColor=ROOT.kCyan, markerSizes=None, markerStyle=ROOT.kFullTriangleUp), # kTeal+2
+                                        styles.StyleLine(lineColor=ROOT.kCyan, lineStyle=ROOT.kSolid, lineWidth=3),
+                                        styles.StyleFill(fillColor=ROOT.kCyan)])
 
+    extra_text = "Inclusive"
+    if ("Genuine" in hT):
+        extra_text = "Truth-matched"
+    elif ("Fake" in hT):
+        extra_text = "Unmatched"
 
-    p = plots.ComparisonPlot(histograms.Histo(HT,"Target", "pl", "PL"), histograms.Histo(HR,"Reference", "pl", "PL"),) 
-    p.histoMgr.setHistoLegendLabelMany({"Target": "semi-leptonic (t#bar{t})", "Reference": "hadronic (t#bar{t})"}) 
-
-    if ("TT" in datasetTarg.getName()):    
-        p.histoMgr.forHisto("Target", backgroundStyle ) 
-        p.histoMgr.forHisto("Reference", signalStyle) 
-    elif ("QCD" in datasetTarg.getName()):
-        p.histoMgr.forHisto("Target"  , altBackgroundBDTGStyle)#styles.getABCDStyle("VR"))
-        p.histoMgr.forHisto("Reference", styles.qcdFillStyle)
-    elif ("Charged" in datasetTarg.getName()):
-        p.histoMgr.forHisto("Target", altBackgroundBDTGStyle) 
-        p.histoMgr.forHisto("Reference", signalStyle)
-
+    p.appendPlotObject(histograms.PlotText(0.58, 0.83, extra_text, bold=True, size=20)) #fixme
+    
+    #Set Draw style    
+    p.histoMgr.forHisto("Target", backgroundStyle ) 
     p.histoMgr.setHistoDrawStyle("Target", "HIST") 
-    p.histoMgr.setHistoLegendStyle("Target", "LP") #F
+    p.histoMgr.setHistoLegendStyle("Target", "L") #F
 
-    p.histoMgr.setHistoDrawStyle("Reference" , "HIST") 
-    p.histoMgr.setHistoLegendStyle("Reference", "F") #LP
+    for i, m in enumerate(signalMass):
+    #    p.histoMgr.forHisto(m, Styles(i))
+        p.histoMgr.setHistoDrawStyle(m, "HIST")
+                
+    p.histoMgr.forHisto("TT", signalStyle ) 
+    p.histoMgr.setHistoDrawStyle("TT", "HIST") 
+    p.histoMgr.setHistoLegendStyle("TT", "F") #F
+                                            
+    kwargs   = GetHistoKwargs(hT, opts)        
+    kwargs["ylabel"] = "Arbitrary Units / %s" % str(kwargs["format"])
+    #kwargs["createLegend"] = {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82}
+    kwargs["createLegend"] = {"x1": 0.58, "y1": 0.60, "x2": 0.92, "y2": 0.8}
+    kwargs["opts"]   = {"ymin": 0.0, "ymaxfactor": 1.1, "xmin" : kwargs["xmin"], "xmax" : kwargs["xmax"]}
 
-    dName = datasetTarg.getName()
-    dName = dName.replace("ChargedHiggs_HplusTB_HplusToTB_", "")
+    # Save plot in all formats    
+    saveName = hT.split("/")[-1]
+    plots.drawPlot(p, saveName, **kwargs)
+    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.folder))
 
-    saveName = hT.split("/")[-1] + "_" + dName
-    savePath = os.path.join(opts.saveDir, hT.split("/")[0], opts.optMode)
-
-    plots.drawPlot(p, savePath, **_kwargs)
-
-    #leg = ROOT.TLegend(0.2, 0.8, 0.81, 0.87)
-    leg = ROOT.TLegend(0.2, 0.8, 0.51, 0.87)
-    leg.SetFillStyle( 0)
-    leg.SetFillColor(0)
-    leg.SetBorderSize(0)
-    datasetName = datasetTarg.getName()
-    datasetName = datasetName.replace("TT", "t#bar{t}")
-    if "ChargedHiggs" in datasetName:
-        datasetName = datasetName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "m_{H+} = ")
-        datasetName = datasetName+"GeV"
-    SavePlot(p, saveName, savePath)
     return
+
+def ApplyStyle(h, i):
+    colors = [ROOT.kOrange-3, ROOT.kRed, ROOT.kGreen+2, ROOT.kMagenta, ROOT.kCyan]
+    color = colors[i]
+
+    h.SetLineWidth(3)
+    h.SetLineColor(color)
+    h.SetLineStyle(2)#ROOT.kDashed)
+
+    
+def GetHistoKwargs(h, opts):
+
+    # Defaults
+    xMin   = 0
+    xMax   = 800
+    xBins  = 10
+
+    zMin   =   0
+    zMax   = None
+    yLabel = "y-axis"
+
+    if opts.logX:
+        xMin =  1
+    if opts.logY:
+        yMin =  1
+
+    if opts.normaliseToOne:
+        yLabel  = "Arbitrary Units"
+        yMin    = None #5e-4
+        yMax    = None #1e-1
+        yMaxF   = 1.1
+    else:
+        yLabel  = "Events"
+        yMin    = 1e0
+        yMaxF   = 1
+        yMaxF   = 1
+
+    xLabel = "xlabel"
+
+    cutBox      = {"cutValue": 400.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True} #box = True works
+    cutBoxY     = {"cutValue": 200.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+                       
+    _format = "%0.0f "
+    
+    kwargs = {
+        "stackMCHistograms": False,
+        "addMCUncertainty" : False,
+        "addLuminosityText": (not opts.normaliseToOne),
+        "addCmsText"       : True,
+        "cmsExtraText"     : " Preliminary",
+        "xmin"             : xMin,
+        "xmax"             : xMax,
+        "xbins"            : xBins,
+        "ymin"             : yMin,        
+        "ymax"             : yMax,
+        "cutBox"           : cutBox,
+        "cutBoxY"          : cutBoxY,
+        #"moveLegend"       : {"dx": -2.0, "dy": 0.0, "dh": 0}, #hack to remove legend (tmp)
+        "createLegend"     : {"x1": 0.58, "y1": 0.65, "x2": 0.92, "y2": 0.82},
+        "xlabel"           : xLabel,
+        "ylabel"           : yLabel,
+        "opts"             : {"ymin": yMin, "ymaxfactor": yMaxF},
+        "format"           : _format
+        }
+    
+    if "mass" in h.lower():
+        _units  = "GeV/c^{2}"
+        kwargs['format'] = "%0.0f " + _units
+        kwargs["xlabel"] = "M (%s)" % _units
+        kwargs["xmax"] = 800
+    if "pt" in h.lower():
+        _units  = "GeV/c"
+        kwargs['format'] = "%0.0f " + _units
+        kwargs["xlabel"] = "p_{T} (%s)" % _units
+        if "trijetpt" in h.lower():
+            kwargs["xlabel"] = "p_{T,t} (%s)" % _units
+        if "dijetpt" in h.lower():
+            kwargs["xlabel"] = "p_{T,w} (%s)" % _units
+        if "ldgjetpt" in h.lower():
+            kwargs["xmax"] = 200
+            kwargs["xlabel"] = "leading jet p_{T} (%s)" % _units
+        if "subldgjetpt" in h.lower():
+            kwargs["xmax"] = 200
+            kwargs["xlabel"] = "subleading jet p_{T} (%s)" % _units
+        if "bjetpt" in h.lower():
+            kwargs["xlabel"] = "bjet p_{T} (%s)" % _units
+
+    if "trijetmass" in h.lower():
+        _units  = "GeV/c^{2}"
+        kwargs['format'] = "%0.0f " + _units
+        kwargs["xlabel"] = "m_{top} (%s)" % _units
+        kwargs["xmax"] = 805 #1005
+        
+    if "jet_mass" in h.lower():
+        kwargs["xmax"] = 750
+
+    if "ldgjetmass" in h.lower():
+        kwargs["xlabel"] = "m_{leading jet} (%s)" % _units
+        kwargs["xmax"] = 50
+        if "subldg" in h.lower():
+            kwargs["xlabel"] = "m_{subleading jet} (%s)" % _units
+
+    if "bjetmass" in h.lower():
+        kwargs["xlabel"] = "m_{b-tagged jet} (%s)" % _units
+        kwargs["xmax"] = 50
+
+    if "bjetldgjet_mass" in h.lower():
+        kwargs["xlabel"]= "m_{b, ldg jet} (%s)" % _units
+        kwargs["xmax"] = 705
+    if "bjetsubldgjet_mass" in h.lower():
+        kwargs["xlabel"] = "m_{b-tagged, subldg jet} (%s)" % _units
+        kwargs["xmax"] = 705
+
+    if "bjetldgjetmass" in h.lower():
+        kwargs["xlabel"]= "m_{b, ldg jet} (%s)" % _units
+        kwargs["xmax"] = 705
+    if "bjetsubldgjetmass" in h.lower():
+        kwargs["xlabel"] = "m_{b-tagged, subldg jet} (%s)" % _units
+        kwargs["xmax"] = 705
+
+    if "mult" in h.lower():
+        kwargs['format'] = "%0.0f"        
+        kwargs["xmax"] = 50
+        kwargs["xlabel"] = "mult"
+        if "ldg" in h.lower():
+            kwargs["xlabel"] = "Leading jet mult"
+        if "subldg" in h.lower():
+            kwargs["xlabel"] = "Subleading jet mult"
+        if "avg" in h.lower():
+            kwargs["xlabel"] = "avg mult"
+
+    if "cvsl" in h.lower():
+        kwargs['format'] = "%0.2f"
+        kwargs["xmin"] = -1
+        kwargs["xmax"] = 1
+        kwargs["xlabel"] = "CvsL"
+        if "ldg" in h.lower():
+            kwargs["xlabel"] = "Leading jet CvsL"
+        if "subldg" in h.lower():
+             kwargs["xlabel"] = "Subleading jet CvsL"
+        if "avg" in h.lower():
+            kwargs["xlabel"] = "avg CvsL"
+
+    if "dijetmass" in h.lower():
+        _units  = "GeV/c^{2}"
+        kwargs['format'] = "%0.0f " + _units
+        kwargs["xlabel"] = "m_{W} (%s)" % _units
+        kwargs["xmax"] = 600
+
+    if "bdisc" in h.lower():
+        kwargs['format'] = "%0.2f"
+        kwargs["xlabel"] = "CSV"
+        kwargs["xmax"] = 1
+        if "subldg" in h.lower():
+            kwargs["xlabel"] = "Subleading jet CSV"
+        elif "ldg" in h.lower():
+            _xlabel = "Leading jet CSV"
+        else:
+            _xlabel = "b-tagged jet CSV"
+
+    if "over" in h.lower():
+         kwargs['format'] = "%0.2f "
+         kwargs["xlabel"] = "m_{W}/m_{t}"
+         kwargs["xmax"] = 1
+         kwargs["xmin"] = 0
+
+    if "Eta" in h:#.lower():
+         kwargs['format'] = "%0.2f "
+         kwargs["xlabel"] = "#eta"
+         kwargs["xmax"] = 5
+         kwargs["xmin"] = -5         
+         if "DEta" in h:
+             kwargs["xlabel"] = "#Delta#eta"
+             kwargs["xmin"] = 0
+
+    if "phi" in h.lower():
+         kwargs['format'] = "%0.2f "
+         kwargs["xlabel"] = "#phi"
+         kwargs["xmax"] = 3.5
+         kwargs["xmin"] = -3.5         
+         if "DPhi" in h:
+             kwargs["xlabel"] = "#Delta#phi"
+             kwargs["xmin"] = 0
+
+    if "DR" in h:
+         kwargs['format'] = "%0.2f "
+         kwargs["xlabel"] = "#Delta R"
+         kwargs["xmax"] = 6
+         kwargs["xmin"] = 0
+
+    if "ptd" in h.lower():
+        kwargs['format'] = "%0.2f"
+        kwargs["xlabel"] = "p_{T}D"
+        kwargs["xmax"] = 1
+        if "ldg" in h.lower():
+            kwargs["xlabel"] = "Leading jet p_{T}D"
+        elif "subldg" in h.lower():
+            kwargs["xlabel"]= "Subleading jet p_{T}D"
+
+    if "ptdr" in h.lower():
+        kwargs["xmax"] =800
+        kwargs['format'] = "%0.0f"
+        kwargs["xlabel"] = "p_{T}#Delta R_{t}"        
+        if "dijetptdr" in h.lower():
+            kwargs["xlabel"] = "p_{T}#Delta R_{W}"
+
+    if "axis2" in h.lower():
+        kwargs['format'] = "%0.3f"
+        kwargs["xmax"] = 0.3
+        kwargs["xmin"] = 0
+        kwargs["xlabel"] = "axis2"
+        if "ldg" in h.lower():
+            kwargs["xlabel"] = "Leading jet axis2"
+        if "subldg" in h.lower():
+            kwargs["xlabel"] = "Subleading jet axis2"
+        if "avg" in h.lower():
+            kwargs["xlabel"] = "avg axis2"
+
+    if "likelihood" in h.lower():
+        kwargs['format'] = "%0.2f"
+        kwargs["xmax"] = 1
+        kwargs["xlabel"] = "QGL"
+        if "ldg" in h.lower():
+            kwargs["xlabel"] = "Leading jet QGL"
+        if "subldg" in h.lower():
+            kwargs["xlabel"] = "Subleading jet QGL"
+        if "avg" in h.lower():
+            kwargs["xlabel"] = "avg QGL"
+
+    if "softdrop" in h.lower():
+        kwargs["xlabel"] = "Soft Drop n_{2}"
+        kwargs["xmax"] = 2
+
+    if "chisquared" in h.lower():
+        kwargs["xlabel"] = "#chi^{2}"
+        kwargs["xmax"] = 10
+        
+    if 0:
+        ROOT.gStyle.SetNdivisions(8, "X")
+        ROOT.gStyle.SetNdivisions(8, "Y")
+        
+    return kwargs
+
 def SavePlot(plot, plotName, saveDir):#, saveFormats = [".C", ".png", ".pdf"]):
     Verbose("Saving the plot in %s formats: %s" % (len(opts.saveFormats), ", ".join(opts.saveFormats) ) )
 
@@ -456,7 +545,7 @@ if __name__ == "__main__":
     OPTMODE      = ""
     BATCHMODE    = True
     PRECISION    = 3
-    SIGNALMASS   = []
+    SIGNALMASS   = [250, 500, 800]
     INTLUMI      = 35920
     SUBCOUNTERS  = False
     LATEX        = False
@@ -468,6 +557,10 @@ if __name__ == "__main__":
     HISTOLEVEL   = "Vital" # 'Vital' , 'Informative' , 'Debug'
     NORMALISE    = False
     FOLDER       = "TrijetCandidate" #"topSelection_" #"ForDataDrivenCtrlPlots" #"topologySelection_"
+    GRIDX        = False
+    GRIDY        = False
+    LOGX         = False
+    LOGY         = False
     SAVEFORMATS  = "png"
     RATIO        = False
     # Define the available script options
@@ -529,6 +622,18 @@ if __name__ == "__main__":
 
     parser.add_option("--folder", dest="folder", type="string", default = FOLDER,
                       help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOLDER) )
+
+    parser.add_option("--gridX", dest="gridX", action="store_true", default=GRIDX, 
+                      help="Enable the x-axis grid lines [default: %s]" % GRIDX)
+
+    parser.add_option("--gridY", dest="gridY", action="store_true", default=GRIDY, 
+                      help="Enable the y-axis grid lines [default: %s]" % GRIDY)
+
+    parser.add_option("--logX", dest="logX", action="store_true", default=LOGX, 
+                      help="Set x-axis to logarithm scale [default: %s]" % LOGX)
+
+    parser.add_option("--logY", dest="logY", action="store_true", default=LOGY,
+                      help="Set y-axis to logarithm scale [default: %s]" % LOGY)
 
     parser.add_option("-s", "--saveFormats", dest="saveFormats", default = SAVEFORMATS,
                       help="Save formats for all plots [default: %s]" % SAVEFORMATS)

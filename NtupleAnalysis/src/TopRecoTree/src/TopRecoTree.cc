@@ -614,8 +614,8 @@ void TopRecoTree::book(TDirectory *dir) {
   const double minDEta = cfg_DeltaEtaBinSetting.min();
   const double maxDEta = cfg_DeltaEtaBinSetting.max();
   
-  const int nBinsDPhi  = cfg_DeltaPhiBinSetting.bins();
-  const double minDPhi = cfg_DeltaPhiBinSetting.min();
+  const int nBinsDPhi  = 2*cfg_DeltaPhiBinSetting.bins();
+  const double minDPhi = 0.0;//cfg_DeltaPhiBinSetting.min();
   const double maxDPhi = cfg_DeltaPhiBinSetting.max();
   
   const int nBinsDR  = cfg_DeltaRBinSetting.bins();
@@ -707,7 +707,7 @@ void TopRecoTree::book(TDirectory *dir) {
   hTrijetMult         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetAvgMult", ";avg mult", nBinsMult, minMult, maxMult);
   hTrijetQGLikelihood = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetQGLikelihood",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
   hTrijetQGLikelihood_avg = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetQGLikelihood_avg",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
-  hTrijetChiSquared       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetChiSquared", ";#chi^{2}", 1000,  0.0, 1000.0);
+  hTrijetChiSquared       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "TrijetChiSquared", ";#chi^{2}", 500,  0.0, 50.0);
   
   // Dijet Distributions
   hDijetPt            = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetPt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
@@ -725,13 +725,13 @@ void TopRecoTree::book(TDirectory *dir) {
   hDijetQGLikelihood  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetQGLikelihood",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
   hDijetQGLikelihood_avg   = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetQGLikelihood_avg",";Quark-Gluon Likelihood", nBinsQGL, minQGL, maxQGL);
   hDijetMassOverTrijetMass = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetMassOverTrijetMass", ";m_{W}/m_{top}", 100,0.0,1.0);
-  hDijetChiSquared         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetChiSquared", ";#chi^{2}", 1000,  0.0, 1000.0);
+  hDijetChiSquared         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "DijetChiSquared", ";#chi^{2}",  500,  0.0, 50.0);
   
   // Leading Jet Distributions
   hLdgJetPt           = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetPt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
   hLdgJetEta          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetEta", ";|#eta|", nBinsEta/2, minEta, maxEta);
   hLdgJetPhi          = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetPhi", ";#phi (rads)", nBinsPhi , minPhi , maxPhi);
-  hLdgJetMass         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetMass", ";m_{j} (GeV)", 100,0.0,1000);
+  hLdgJetMass         = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetMass", ";m_{j} (GeV)", 50,0.0,50);
   //hLdgJetPFCharge     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetPFCharge", "PF-charge", nBinsCharge, minCharge, maxCharge);
   hLdgJetCombinedCvsL = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetCombinedCvsL",";CombinedCvsL discr", 200,-1,1);
   //hLdgJetDeepCvsL     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "LdgJetDeepCvsL",";DeepCvsL discr", 200,-1,1);
@@ -747,7 +747,7 @@ void TopRecoTree::book(TDirectory *dir) {
   hSubldgJetPt        = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetPt", ";p_{T} (GeV/c)", 2*nBinsPt, minPt , 2*maxPt);
   hSubldgJetEta       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetEta",  ";|#eta|", nBinsEta/2, minEta, maxEta);
   hSubldgJetPhi       = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetPhi", ";#phi (rads)", nBinsPhi , minPhi , maxPhi);
-  hSubldgJetMass      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetMass", ";m_{j} (GeV)", 100,0.0,1000);
+  hSubldgJetMass      = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetMass", ";m_{j} (GeV)", 50,0.0,50);
   //hSubldgJetPFCharge  = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetPFCharge", "PF-charge", nBinsCharge, minCharge, maxCharge);
   hSubldgJetBdisc     = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetBdisc", ";b-tag discr",100,0.0,1.0);
   hSubldgJetCombinedCvsL = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "SubldgJetCombinedCvsL",";CombinedCvsL discr", 200,-1,1);
