@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
 DESCRIPTION:
-Script for plotting TH2 histograms only.
+1;95;0cScript for plotting TH2 histograms only.
 
 
 USAGE:
@@ -69,17 +69,6 @@ def Verbose(msg, printHeader=True, verbose=False):
     Print(msg, printHeader)
     return
 
-def GetLumi(datasetsMgr):
-    lumi = 0.0
-    for d in datasetsMgr.getAllDatasets():
-        if d.isMC():
-            continue
-        else:
-            lumi += d.getLuminosity()
-    Verbose("Luminosity = %s (pb)" % (lumi), True)
-    return lumi
-
-
 def GetDatasetsFromDir(opts):
     if (not opts.includeOnlyTasks and not opts.excludeTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
@@ -130,7 +119,7 @@ def main(opts):
         # Setup & configure the dataset manager 
         datasetsMgr = GetDatasetsFromDir(opts)
         datasetsMgr.updateNAllEventsToPUWeighted()
-        datasetsMgr.loadLuminosities() # from lumi.json
+        #datasetsMgr.loadLuminosities() # from lumi.json
         if opts.verbose:
             datasetsMgr.PrintCrossSections()
             datasetsMgr.PrintLuminosities()
@@ -244,14 +233,19 @@ def GetHistoKwargs(h, opts):
         _units  = "GeV/c"
         _format = "%0.0f " + _units
         kwargs["xlabel"] = "p_{T} (%s)" % _units
-        if "trijet" in h.lower():
+        if "trijetpt" in h.lower():
             kwargs["xlabel"] = "p_{T,t} (%s)" % _units
-        if "dijet" in h.lower():
+        if "dijetpt" in h.lower():
             kwargs["xlabel"] = "p_{T,w} (%s)" % _units
         if "ldgjetpt" in h.lower():
             kwargs["xmax"] = 200
             kwargs["xlabel"] = "leading jet p_{T} (%s)" % _units
-
+        if "subldgjetpt" in h.lower():
+            kwargs["xmax"] = 200
+            kwargs["xlabel"] = "subleading jet p_{T} (%s)" % _units
+        if "bjetpt" in h.lower():
+            kwargs["xlabel"] = "bjet p_{T} (%s)" % _units
+            
     if "trijetmass" in h.lower():
         _units  = "GeV/c^{2}"
         _format = "%0.0f " + _units
@@ -294,10 +288,11 @@ def GetHistoKwargs(h, opts):
         if "subldg" in h.lower():
             kwargs["xlabel"] = "Subleading jet mult"
         if "avg" in h.lower():
-            kwargs["xlabel"] = "avg CvsL"
+            kwargs["xlabel"] = "avg mult"
 
     if "cvsl" in h.lower():
         _format = "%0.2f"
+        kwargs["xmin"] = -1
         kwargs["xmax"] = 1
         kwargs["xlabel"] = "CvsL"
         if "ldg" in h.lower():
@@ -330,7 +325,7 @@ def GetHistoKwargs(h, opts):
          kwargs["xmax"] = 1
          kwargs["xmin"] = 0
 
-    if "eta" in h.lower():
+    if "Eta" in h:
          _format = "%0.2f "
          kwargs["xlabel"] = "#eta"
          kwargs["xmax"] = 5
@@ -346,7 +341,7 @@ def GetHistoKwargs(h, opts):
          kwargs["xmin"] = -3.5         
          if "DPhi" in h:
              kwargs["xlabel"] = "#Delta#phi"
-             #kwargs["xmin"] = 0
+             kwargs["xmin"] = 0
 
     if "DR" in h:
          _format = "%0.2f "
@@ -448,10 +443,10 @@ def GetListOfBranches(tree):
         if "Weight" in brsList[i].GetName():
             continue
         # Branches with old names
-        if "Trijet" not in brsList[i].GetName():
-            continue
-        if "ldgjetmass" not in brsList[i].GetName().lower():
-            continue
+        #if "Trijet" not in brsList[i].GetName():
+        #    continue
+        #if "ldgjetmass" not in brsList[i].GetName().lower():
+        #    continue
         branchList.append(brsList[i].GetName())        
     return branchList
 
@@ -515,7 +510,7 @@ def CreateLegend(xmin=0.55, ymin=0.75, xmax=0.85, ymax=0.85):
     leg = ROOT.TLegend(xmin, ymin, xmax, ymax)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
-    leg.SetTextSize(0.045)
+    leg.SetTextSize(0.04)
     #leg.SetTextFont(42)
     leg.SetTextFont(62)
     leg.SetLineColor(1)
@@ -560,12 +555,28 @@ def Make2D(h2D, saveName, kwargs):
     if "ChargedHiggs" in dName:
         dName = dName.replace("ChargedHiggs_HplusTB_HplusToTB_M_", "m_{H^{#pm}} = ")
         dName = dName+" GeV"
-
+        
+    text = ""
+    if ("hadronic" in opts.mcrab.lower()):
+        text = "%s (hadronic)" % dName
+    elif ("semileptonic" in opts.mcrab.lower()):
+        text = "%s (semi-leptonic)" % dName
     # Create and draw legend
-    leg = CreateLegend(0.6, 0.75, 0.9, 0.85)
-    leg.AddEntry(h2D, dName, "h")
+    leg = CreateLegend(0.45, 0.75, 0.75, 0.85)
+    leg.AddEntry(h2D, text, "h")
     leg.Draw("same")
 
+    if ("treeS" in opts.treeName):
+        text = "Truth-matched"
+    elif ("treeS" in opts.treeName):
+        text = "Unmatched"
+    else:
+        text = ""
+    leg1 = CreateLegend(0.45, 0.83, 0.75, 0.87)
+    leg1.AddEntry(h2D, text, "h")
+    leg1.Draw("same")
+
+    #opts.treeName
     canvas.Modified()
     canvas.Update()
         
