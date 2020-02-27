@@ -15,7 +15,8 @@ histogramAmbientLevel = "Debug"  # ("Systematics", "Vital", "Informative", "Debu
 #================================================================================================
 trigger = PSet(
     # No need to specify version numbers, they are automatically scanned in range 1--100 (remove the '_v' suffix)
-    MuontriggerEfficiencyJsonName = "muonPAGEff.json",
+    ElectrontriggerEfficiencyJsonName = "ElePOGEff.json",
+    MuontriggerEfficiencyJsonName     = "muonPAGEff.json",
     triggerOR = [
         # SingleMuon Primary Dataset (PD)
         "HLT_IsoMu24",
@@ -65,7 +66,7 @@ electronSelection = PSet(
     applyTriggerMatching = False,
     triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
     electronPtCut        = 10.0,    # [default: 10.0]
-    electronEtaCut       = 2.4,     # [default: 2.4]
+    electronEtaCut       = 2.5,     # [default: 2.4]
     electronIDType       = "MVA",   # [default: "MVA] ("default", "MVA")
     electronID           = "cutBasedElectronID_Spring15_25ns_V1_standalone_veto",
     electronMVA          = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
@@ -81,7 +82,7 @@ muonSelection = PSet(
     applyTriggerMatching = True ,       # HLTMuon_Pt Missing from tree!
     triggerMatchingCone  = 0.1,         # DeltaR for matching offline tau with trigger tau
     muonPtCut            = 26.0,        # [default: 10.0]
-    muonEtaCut           = 2.4,         # [default: 2.4]
+    muonEtaCut           = 2.5,         # [default: 2.4]
     muonID               = "muIDTight", # [default: "muIDTight"] ("muIDLoose", "muIDMedium", "muIDTight")
     muonIsolation        = "tight",     # [default: "tight"]
     muonIsolType         = "default",   # [default: "default"]
