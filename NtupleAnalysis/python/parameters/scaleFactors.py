@@ -21,15 +21,25 @@ etc..
 # Imports
 #================================================================================================  
 from HiggsAnalysis.NtupleAnalysis.main import PSet
+import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 import json
 import csv
 import os
 import sys
 import math
 
+
 #================================================================================================
-# Global Definition
+# Global Definitions
 #================================================================================================
+ss = ShellStyles.SuccessStyle()
+ns = ShellStyles.NormalStyle()
+ts = ShellStyles.NoteStyle()
+hs = ShellStyles.HighlightAltStyle()
+ls = ShellStyles.HighlightStyle()
+es = ShellStyles.ErrorStyle()
+cs = ShellStyles.CaptionStyle()
+
 DEBUG = False
 
 #================================================================================================
@@ -52,6 +62,17 @@ def Verbose(msg, printHeader=False):
         print "\t", msg
     else:
         print "\t", msg
+    return
+
+def PrintSFs(result, title=""):
+    align  = "{:>5} {:>20} {:>10}"
+    Print("="*45)
+    if len(title) > 0:
+        Print("{:^45}".format(title), False)
+    Print(align.format("#", "Bin Edge (GeV)", "SF"), False)
+    Print("="*45)
+    for i, r in enumerate(result["binEdges"], 0):
+        Print(align.format(i, result["binEdges"][i], "%.3f" %  result["SF"][i]), False)
     return
 
 def assignTauIdentificationSF(tauSelectionPset):
@@ -116,9 +137,13 @@ def _assignJetToTauSF(tauSelectionPset, dirNumber):
     tauSelectionPset.tauMisidetificationJetToTauBarrelSF = 1.0 + dirNumber*0.20
     tauSelectionPset.tauMisidetificationJetToTauEndcapSF = 1.0 + dirNumber*0.20
 #    tauSelectionPset.tauMisidetificationJetToTauSF = 1.0 + dirNumber*0.20
+    return
 
-# Top-tagging
+
 def assignMisIDSF(pset, direction, jsonfile, variationType="MC"):
+    '''
+    Top-tagging
+    '''
     reader = TriggerSFJsonReader("2016", "runs_273150_284044", jsonfile)
     result = reader.getResult()
     if variationType == "MC":
@@ -137,20 +162,14 @@ def assignMuonIdentificationSF(muonSelectionPset, direction, variationType="Data
     '''
     # FIXME: there is no mechanic right now to choose correct era / run range
     # FIXME: this approach works as long as there is just one efficiency for the simulated samples
-
     muonIDJson = "muonPAGID.json"
 
-    print "Taking muon ID SF from", muonIDJson
+    Print("Taking muon ID SF from json file %s" % (ts + muonIDJson + ns), True)
 
+    # Create json reader and get result
     reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", muonIDJson, "Tight")
     result = reader.getResult()
-
-
-    print result["binEdges"]
-
-    print "-------"
-
-    print result["SF"]
+    PrintSFs(result, title="")
 
     if variationType == "MC":
         _assignTrgSF("muonIDSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], muonSelectionPset, direction)
@@ -172,8 +191,9 @@ def assignElectronIdentificationSF(electronSelectionPset, direction, variationTy
 
     electronIDJson = "ElePOGID.json"
 
-    print "Taking electron ID SF from", electronIDJson
+    Print("Taking electron ID SF from json file %s" % (ts + electronIDJson + ns), True)
 
+    # Create json reader and get result
     reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", electronIDJson, "Tight")
     result = reader.getResult()
 
@@ -252,20 +272,15 @@ def assignMuonTriggerSF(muonSelectionPset, direction, muonTrgJson, variationType
     \param muonSelectionPset  the muon config PSet
     \param direction         "nominal, "up", "down"
     \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
+
+    FIXME: 
+    - there is no mechanic right now to choose correct era / run range
+    - this approach works as long as there is just one efficiency for the simulated samples
     '''
-    # FIXME: there is no mechanic right now to choose correct era / run range
-    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
-
-    print "Taking muon trigger eff/sf from",  muonTrgJson
-
-    #Print("Taking muon trigger eff/sf from" % (muonTrgJson), True)
+    Print("Taking muon trigger eff/sf from json file %s" % (ts + muonTrgJson + ns), True)
     reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", muonTrgJson,"IsoMu24_OR_IsoTkMu24_PtBins")
     result = reader.getResult()
-
-    print result["binEdges"]
-
-    print "-------"
-    print result["SF"]
+    PrintSFs(result, title="")
 
     if variationType == "MC":
         _assignTrgSF("muonTriggerSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], muonSelectionPset, direction)
@@ -281,13 +296,12 @@ def assignElectronTriggerSF(electronSelectionPset, direction, electronTrgJson, v
     \param muonSelectionPset  the muon config PSet
     \param direction         "nominal, "up", "down"
     \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
+
+    FIXME:
+    - there is no mechanic right now to choose correct era / run range
+    - this approach works as long as there is just one efficiency for the simulated samples
     '''
-    # FIXME: there is no mechanic right now to choose correct era / run range
-    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
-
-    print "Taking electron trigger eff/sf from",  electronTrgJson
-
-    #Print("Taking muon trigger eff/sf from" % (muonTrgJson), True)
+    Print("Taking electron trigger eff/sf from json file %s" % (ts + electronTrgJson + ns), True)
     reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", electronTrgJson,"Ele25_eta2p1_WPTight_Gsf")
     result = reader.getResult()
 
@@ -340,18 +354,19 @@ def setupToptagSFInformation(topTagPset, topTagMisidFilename, topTagEfficiencyFi
     \param variationInfo  "tag"/"mistag" This parameter specifies if the variation is applied for the top->top component or non-top->top component
     '''
     if not variationInfo in [None, "tag", "mistag"]:
-        raise Exception("Error: unknown parameter for variationInfo given (%s)! Valid options are: %s" % (variationInfo, ", ".join(variationInfo)) )
+        msg = "Unknown parameter for variationInfo given (%s)! Valid options are: %s" % ( variationInfo, ", ".join(variationInfo) ) 
+        raise Exception(es + msg + ns)
 
     # Process the misidentification rates (MC and data)
-    Print("Setting top-tag misid (data and MC) filename to \"%s\"" % (topTagMisidFilename), True)
+    Print("Taking top-tag mis-ID from json file %s" % (ts + topTagMisidFilename + ns), True)
     _setupToptagMisid(topTagPset, topTagMisidFilename, direction, variationInfo)
 
     # Process the tagging efficiencies (MC and data)
-    Print("Setting top-tag tagging efficiency (data and MC) filename to \"%s\"" % (topTagEfficiencyFilename), False)
+    Print("Taking top-tag tagging efficiency from json file %s" % (ts + topTagEfficiencyFilename + ns), False)
     _setupToptagEfficiency(topTagPset, topTagEfficiencyFilename, direction, variationInfo)
     
     # Process the tagging efficiency uncertainties (MC)
-    Print("Setting top-tag tagging efficiency uncertainties (MC) filename to \"%s\"" % (topTagEffUncertaintiesFilename), False)
+    Print("Taking top-tag tagging efficiency uncertainties from json file %s" % (ts + topTagEffUncertaintiesFilename + ns), False)
     _setupToptagEffUncertainties(topTagPset, topTagEffUncertaintiesFilename, direction, variationInfo)
     
     # Set syst. uncert. variation information
@@ -610,7 +625,7 @@ def _setupToptagEffUncertainties(topTagPset, topTagEffUncertaintiesFilename, dir
         raise Exception("Could not find the top-tagging eff. uncertainties file! (tried: %s)" % fullname)
     
     # Read the json file
-    Print("Opening file \"%s\" for reading the top-tag efficiency ucertainties" % (fullname), True)
+    Verbose("Opening file \"%s\" for reading the top-tag efficiency ucertainties" % (fullname), True)
     f = open(fullname)
     contents = json.load(f)
     f.close()
@@ -683,7 +698,7 @@ def _setupToptagEfficiency(topTagPset, topTagEfficiencyFilename, direction, vari
         raise Exception("Could not find the top-tag efficiency json file! (tried: %s)" % fullname)
 
     # Read the json file
-    Print("Opening file \"%s\" for reading the top-tag efficiencies" % (fullname), True)
+    Verbose("Opening file \"%s\" for reading the top-tag efficiencies" % (fullname), True)
     f = open(fullname)
     contents = json.load(f)
     f.close()
@@ -817,75 +832,73 @@ def _assignTrgSF(name, binEdges, SF, SFup, SFdown, pset, direction):
         binLeftEdges = binEdges[:],
         scaleFactors = myScaleFactors
     ))
+    return
+
 
 class TriggerMuonSFJsonReader:
     '''
     Reader for trigger SF json files
     '''
     def __init__(self, era, runrange, jsonname, myParameter):
-        # Read json
-        _jsonpath = os.path.join(os.getenv("HIGGSANALYSIS_BASE"), "NtupleAnalysis", "data", "TriggerEfficiency")
-        filename = os.path.join(_jsonpath, jsonname)
-        if not os.path.exists(filename):
-            raise Exception("Error: file '%s' does not exist!"%filename)
-        f = open(filename)
-        contents = json.load(f)
-        f.close()
+        self.era       = era
+        self.runrange  = runrange
+        self.jsonName  = jsonname        
+        self.parameter = myParameter
+        self.jsonPath  = os.path.join(os.getenv("HIGGSANALYSIS_BASE"), "NtupleAnalysis", "data", "TriggerEfficiency")
+        self.fileName  = os.path.join(self.jsonPath, jsonname)
+        self.contents  = self._getJsonFileContents()
+        self.dataDict  = self._getScaleFactorDict()
+        self.result    = self._getResultsDict()
+        return
 
-        # Obtain SFs
-        param = myParameter #"IsoMu24_OR_IsoTkMu24_PtBins"
-        if not param in contents.keys():
-            raise Exception("Error: missing key '%s' in json '%s'! Options: %s"%(param,filename,", ".join(map(str,contents.keys()))))
-        if not "pt_ratio" in contents[param].keys():
-            print "pt_ratio missing in json"
-            raise Exception("Error: missing run range '%s' for data in json '%s'! Options: %s"(runrange,filename,", ".join(map(str,contents[param].keys()))))
-        datadict = self._muonReadValues(contents[param]["pt_ratio"], "data")
-
-        # Obtain MC efficiencies
-#        param = "mcParameters"
-#        if not param in contents.keys():
-#            raise Exception("Error: missing key '%s' in json '%s'! Options: %s"%(param,filename,", ".join(map(str,contents.keys()))))
-#        if not era in contents[param].keys():
-#            raise Exception("Error: missing era '%s' for mc in json '%s'! Options: %s"(runrange,filename,", ".join(map(str,contents[param].keys()))))
-#        mcdict = self._readValues(contents[param][era], "mc")
-        # Calculate SF's
-
-        keys = sorted(datadict.keys(), key=lambda x:float(x))
-#        keys = datadict.keys()
-
-#        if len(keys) != len(mcdict.keys()):
-#            raise Exception("Error: different number of bins for data and mc in json '%s'!"%filename)
-#        keys.sort()
-
-        self.result = {}
-        self.result["binEdges"] = []
-        self.result["SF"] = []
-        self.result["SFdataUp"] = []
-        self.result["SFdataDown"] = []
-        self.result["SFmcUp"] = []
-        self.result["SFmcDown"] = []
+    def _getResultsDict(self):
+        keys = sorted(self.dataDict.keys(), key=lambda x:float(x))
+        result = {}
+        result["binEdges"]   = []
+        result["SF"]         = []
+        result["SFdataUp"]   = []
+        result["SFdataDown"] = []
+        result["SFmcUp"]     = []
+        result["SFmcDown"]   = []
         i = 0
+
+        # For-loop: All dictionary keys
         for key in keys:
             if i > 0:
-                self.result["binEdges"].append(key)
+                result["binEdges"].append(key)
             i += 1
+            # Store results
+            result["SF"].append(self.dataDict[key]["dataSF"])
+            result["SFdataUp"].append(self.dataDict[key]["dataSFup"])
+            result["SFdataDown"].append(self.dataDict[key]["dataSFdown"])
+        return result
 
-#	    print key
-#	    print datadict[key]["dataSF"]
-#	    print datadict[key]["dataSFup"]
-#	    print datadict[key]["dataSFdown"]
+    def _getJsonFileContents(self):
+        if not os.path.exists(self.fileName):
+            msg = "The json file %s does not exist!" % (self.fileName)
+            raise Exception(es + msg + ns)
+        
+        # Open the json file, get the contents and close it
+        f = open(self.fileName)
+        contents = json.load(f)
+        f.close()
+        return contents
 
-            self.result["SF"].append(datadict[key]["dataSF"])
-            self.result["SFdataUp"].append(datadict[key]["dataSFup"])
-            self.result["SFdataDown"].append(datadict[key]["dataSFdown"])
+    def _getScaleFactorDict(self):
 
-#            self.result["SFmcUp"].append(datadict[key]["dataeff"] / mcdict[key]["mceffup"])
-#            if abs(mcdict[key]["mceffdown"]) < 0.000001:
-#                raise Exception("Down variation in bin '%s' is zero in json '%s'"%(key, filename))
-#            self.result["SFmcDown"].append(datadict[key]["dataeff"] / mcdict[key]["mceffdown"])
-            # Sanity check
-#            if self.result["SF"][len(self.result["SF"])-1] < 0.000001:
-#                raise Exception("Error: In file '%s' bin %s the SF is zero! Please fix!"%(filename, key))
+        if not self.parameter in self.contents.keys():
+            opts = ", ".join( map(str, self.contents.keys() ) )
+            msg  = "Missing key '%s' in json '%s'! Options: %s" % (self.parameter, self.fileName, opts)
+            raise Exception(es + msg + ns)
+
+        if not "pt_ratio" in self.contents[self.parameter].keys():
+            msg  = "Missing run range '%s' for data in json '%s'! Options: %s"(self.runrange, self.fileName, opts)
+            opts = ", ".join( map(str,contents[self.parameter].keys()) )
+            raise Exception(es + msg + ns)
+
+        # Get the SFs
+        dataDict = self._muonReadValues(self.contents[self.parameter]["pt_ratio"], "data")
+        return dataDict
 
     def getResult(self):
         return self.result
