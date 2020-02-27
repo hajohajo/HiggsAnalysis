@@ -46,7 +46,7 @@ DEBUG = False
 # Function Definition
 #================================================================================================
 def Print(msg, printHeader=False):
-    fName = __file__.split("/")[-1]
+    fName = __file__.split("/")[-1].replace(".pyc", ".py")
     if printHeader==True:
         print "=== ", fName
         print "\t", msg
@@ -65,14 +65,15 @@ def Verbose(msg, printHeader=False):
     return
 
 def PrintSFs(result, title=""):
-    align  = "{:>5} {:>20} {:>10}"
-    Print("="*45)
+    align  = "{:>5} {:>10} {:>20}"
+    Print("="*40)
     if len(title) > 0:
-        Print("{:^45}".format(title), False)
-    Print(align.format("#", "Bin Edge (GeV)", "SF"), False)
-    Print("="*45)
+        Print("{:^40}".format(title), False)
+    Print(align.format("#", "Bin Edge", "SF"), False)
+    Print("="*40)
     for i, r in enumerate(result["binEdges"], 0):
-        Print(align.format(i, result["binEdges"][i], "%.3f" %  result["SF"][i]), False)
+        Print(align.format(i, result["binEdges"][i], result["SF"][i]), False)
+        #Print(align.format(i, result["binEdges"][i], "%.3f" %  result["SF"][i]), False)
     return
 
 def assignTauIdentificationSF(tauSelectionPset):
@@ -159,14 +160,15 @@ def assignMuonIdentificationSF(muonSelectionPset, direction, variationType="Data
     Muon ID SF (SF as function of pT)
     \param muonSelectionPset  the muon config PSet
     \param direction         "nominal, "up", "down"
+
+    FIXME:
+    - there is no mechanic right now to choose correct era / run range
+    - this approach works as long as there is just one efficiency for the simulated samples
     '''
-    # FIXME: there is no mechanic right now to choose correct era / run range
-    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
     muonIDJson = "muonPAGID.json"
 
-    Print("Taking muon ID SF from json file %s" % (ts + muonIDJson + ns), True)
-
     # Create json reader and get result
+    Print("Taking muon ID SF from json file %s" % (ts + muonIDJson + ns), True)
     reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", muonIDJson, "Tight")
     result = reader.getResult()
     PrintSFs(result, title="")
@@ -185,24 +187,18 @@ def assignElectronIdentificationSF(electronSelectionPset, direction, variationTy
     Muon ID SF (SF as function of pT)
     \param muonSelectionPset  the muon config PSet
     \param direction         "nominal, "up", "down"
-    '''
-    # FIXME: there is no mechanic right now to choose correct era / run range
-    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
 
+    FIXME:
+    - there is no mechanic right now to choose correct era / run range
+    - this approach works as long as there is just one efficiency for the simulated samples
+    '''
     electronIDJson = "ElePOGID.json"
 
-    Print("Taking electron ID SF from json file %s" % (ts + electronIDJson + ns), True)
-
     # Create json reader and get result
+    Print("Taking electron ID SF from json file %s" % (ts + electronIDJson + ns), True)
     reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", electronIDJson, "Tight")
     result = reader.getResult()
-
-
-    print result["binEdges"]
-
-    print "-------"
-
-    print result["SF"]
+    PrintSFs(result, title="") 
 
     if variationType == "MC":
         _assignTrgSF("electronIDSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], electronSelectionPset, direction)
@@ -220,9 +216,11 @@ def assignTauTriggerSF(tauSelectionPset, direction, tauTrgJson, variationType="M
     \param tauSelectionPset  the tau config PSet
     \param direction         "nominal, "up", "down"
     \param variationType     "MC", "data"  (the uncertainty in MC and data are variated separately)
+
+    FIXME: 
+    - there is no mechanic right now to choose correct era / run range
+    - this approach works as long as there is just one efficiency for the simulated samples
     '''
-    # FIXME: there is no mechanic right now to choose correct era / run range
-    # FIXME: this approach works as long as there is just one efficiency for the simulated samples
     nprongs = "13prong"
     if tauSelectionPset.prongs == 1:
         nprongs = "1prong"
@@ -231,9 +229,10 @@ def assignTauTriggerSF(tauSelectionPset, direction, tauTrgJson, variationType="M
 
     # tauTrgJson = "tauLegTriggerEfficiency2015_"+nprongs+".json"
     # tauTrgJson = "tauLegTriggerEfficiency2016_ICHEP.json"
-    Print("Taking tau trigger eff/sf from %s" % (tauTrgJson), True)
+    Print("Taking tau trigger eff/sf from json file %s" % (ts + tauTrgJson + ns), True)
     reader = TriggerSFJsonReader("2016", "runs_273150_284044", tauTrgJson)
     result = reader.getResult()
+
     if variationType == "MC":
         _assignTrgSF("tauTriggerSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], tauSelectionPset, direction)
     elif variationType == "Data":
@@ -304,11 +303,7 @@ def assignElectronTriggerSF(electronSelectionPset, direction, electronTrgJson, v
     Print("Taking electron trigger eff/sf from json file %s" % (ts + electronTrgJson + ns), True)
     reader = TriggerMuonSFJsonReader("2016", "runs_273150_284044", electronTrgJson,"Ele25_eta2p1_WPTight_Gsf")
     result = reader.getResult()
-
-    print result["binEdges"]
-
-    print "-------"
-    print result["SF"]
+    PrintSFs(result, title="") 
 
     if variationType == "MC":
         _assignTrgSF("electronTriggerSF", result["binEdges"], result["SF"], result["SFmcUp"], result["SFmcDown"], electronSelectionPset, direction)
@@ -362,11 +357,11 @@ def setupToptagSFInformation(topTagPset, topTagMisidFilename, topTagEfficiencyFi
     _setupToptagMisid(topTagPset, topTagMisidFilename, direction, variationInfo)
 
     # Process the tagging efficiencies (MC and data)
-    Print("Taking top-tag tagging efficiency from json file %s" % (ts + topTagEfficiencyFilename + ns), False)
+    Print("Taking top-tag efficiency from json file %s" % (ts + topTagEfficiencyFilename + ns), True)
     _setupToptagEfficiency(topTagPset, topTagEfficiencyFilename, direction, variationInfo)
     
     # Process the tagging efficiency uncertainties (MC)
-    Print("Taking top-tag tagging efficiency uncertainties from json file %s" % (ts + topTagEffUncertaintiesFilename + ns), False)
+    Print("Taking top-tag efficiency uncertainties from json file %s" % (ts + topTagEffUncertaintiesFilename + ns), True)
     _setupToptagEffUncertainties(topTagPset, topTagEffUncertaintiesFilename, direction, variationInfo)
     
     # Set syst. uncert. variation information
@@ -595,7 +590,7 @@ def _setupToptagMisid(topTagPset, topTagMisidFilename, direction, variationInfo)
         # Sanity check
         if result["SF"][len(result["SF"])-1] < 0.00001:
             raise Exception("In file '%s' bin %s the SF is zero! Please fix!" % (filename, pT) )
-    
+
         # Define the PSet
         p = PSet(ptMin         = pTMin,
                  ptMax         = pTMax,
@@ -611,9 +606,9 @@ def _setupToptagMisid(topTagPset, topTagMisidFilename, direction, variationInfo)
                  )
         psetList.append(p)
     topTagPset.topTagMisid = psetList
-    if 0:
-        print topTagPset
-        #print topTagPset.topTagMisid
+
+    PrintSFs(result, title="")
+    Verbose(topTagPset)
     return
 
 def _setupToptagEffUncertainties(topTagPset, topTagEffUncertaintiesFilename, direction, variationInfo):
@@ -631,9 +626,9 @@ def _setupToptagEffUncertainties(topTagPset, topTagEffUncertaintiesFilename, dir
     f.close()
     
     # Obtain uncertainties (Use top-mass systematic only once! Take maximum deviation (31 July 2018)
-    #params = ["TT_hdampUP", "TT_mtop1715", "TT_mtop1755", "TT_fsrdown", "TT_fsrup", "TT_isrdown", "TT_mtop1735", "TT_mtop1785", "TT_TuneEE5C",
-    #          "TT_hdampDOWN", "TT_mtop1695", "TT_evtgen", "TT_ isrup", "TT_mtop1665", "matching"]
-    params = ["TT_hdampUP", "TT_fsrdown", "TT_fsrup", "TT_isrdown", "TT_TuneEE5C", "TT_hdampDOWN", "TT_evtgen", "TT_isrup", "TT_mtop1665", "matching"]
+    params = ["TT_hdampUP", "TT_fsrdown", "TT_fsrup", "TT_isrdown", 
+              "TT_TuneEE5C", "TT_hdampDOWN", "TT_evtgen", "TT_isrup", 
+              "TT_mtop1665", "matching"]
     
     for param in params:
         if not param in contents.keys():
@@ -684,6 +679,8 @@ def _setupToptagEffUncertainties(topTagPset, topTagEffUncertaintiesFilename, dir
         
     # Save the PSet
     topTagPset.topTagEffUncertainties = psetList
+
+    Verbose(psetList, False)
     return
 
 def _setupToptagEfficiency(topTagPset, topTagEfficiencyFilename, direction, variationInfo):
@@ -769,7 +766,7 @@ def _setupToptagEfficiency(topTagPset, topTagEfficiencyFilename, direction, vari
         # Sanity check
         if result["SF"][len(result["SF"])-1] < 0.00001:
             raise Exception("In file '%s' bin %s the SF is zero! Please fix!" % (fileName, pT) )
-    
+
         # Define the PSet
         p = PSet(ptMin       = pTMin,
                  ptMax       = pTMax,
@@ -785,9 +782,9 @@ def _setupToptagEfficiency(topTagPset, topTagEfficiencyFilename, direction, vari
                  )
         psetList.append(p)
         topTagPset.topTagEfficiency = psetList
-    if 0:
-        print topTagPset
-        #print topTagPset.topTagEfficiency
+
+    PrintSFs(result, title="")
+    Verbose(topTagPset)
     return
 
 def readValues(inputdict, label):
