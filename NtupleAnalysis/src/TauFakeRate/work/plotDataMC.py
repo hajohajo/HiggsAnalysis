@@ -147,10 +147,10 @@ def main(opts):
         if 0:
             datasetsMgr.PrintInfo()
         plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
+        datasetsMgr.PrintInfo()
 
         # Set signal cross-section
-        newOrder = ["Data", "DYJetsToLL", "TT", "Diboson", "SingleTop", "ttX", "WJetsHT"]
-        # newOrder = ["Data", "DYJetsToLLHT", "TT", "Diboson", "SingleTop", "ttX", "WJetsHT"]
+        newOrder = ["Data", "DYJetsToLL", "TT", "Diboson", "SingleTop", "ttX"]
 
         # For-loop: All dataset objects
         for d in datasetsMgr.getAllDatasets():
@@ -274,7 +274,8 @@ def GetHistoKwargs(histoName, opts):
         "addCmText"        : True,
         "cmsExtraText"     : "Very Preliminary",
         "opts"             : {"ymin": _yMin, "ymaxfactor": _yMaxF},
-        "opts2"            : {"ymin": 0.0, "ymax": 3.0},
+        #"opts2"            : {"ymin": 0.0, "ymax": 3.0},
+        "opts2"            : {"ymin": 0.65, "ymax": 1.35},
         "divideByBinWidth" : False,
         "log"              : _logY,
         "moveLegend"       : _legNE,
@@ -299,10 +300,14 @@ def GetHistoKwargs(histoName, opts):
 
     if "eta" in h.lower():
         kwargs["rebinX"] = 2
+        kwargs["xlabel"] = "#eta"
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["moveLegend"] = _legRM #_legNE
         kwargs["divideByBinWidth"] = False
+
+    if "tausrc" in h.lower():
+        kwargs["opts"]   = {"xmax": +12, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "DeltaR" in h or "DeltaY" in h or "DR" in h:
         kwargs["ylabel"] = "Events / %.2f "
@@ -354,11 +359,13 @@ def GetHistoKwargs(histoName, opts):
             kwargs["divideByBinWidth"] = True
 
 
+    if "NTau" in h:
+        kwargs["opts"]   = {"xmax": 8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
     if "Njets" in h:
         kwargs["xlabel"] = "jet multiplicity"
-    if "NBjets" in h:
+    if "NBjet" in h:
         kwargs["xlabel"] = "b-jet multiplicity"
-        kwargs["opts"]   = {"xmax": 10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmax": 8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "JetPt" in h or "jetPt" in h:        
         if "BJetPt" in h or "BjetPt" in h:

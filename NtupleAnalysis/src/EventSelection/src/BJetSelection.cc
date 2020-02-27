@@ -3,6 +3,7 @@
 
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/CommonPlots_ttm.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "Framework/interface/Exception.h"
@@ -42,6 +43,51 @@ BJetSelection::BJetSelection(const ParameterSet& config, EventCounter& eventCoun
 {
   initialize(config);
 }
+
+BJetSelection::BJetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  bTriggerMatchingApply(config.getParameter<bool>("triggerMatchingApply")),
+  fTriggerMatchingCone(config.getParameter<float>("triggerMatchingCone")),
+  fJetPtCuts(config.getParameter<std::vector<float>>("jetPtCuts")),
+  fJetEtaCuts(config.getParameter<std::vector<float>>("jetEtaCuts")),
+  fNumberOfJetsCut(config, "numberOfBJetsCut"),
+  fDisriminatorValue(-1.0),
+  // Event counter for passing selection
+  cPassedBJetSelection(fEventCounter.addCounter("passed b-jet selection ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "All events")),
+  cSubPassedEta(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedPt(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedDiscriminator(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed discriminator")),
+  cSubPassedTrgMatching(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed trigger matching")),
+  cSubPassedNBjets(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed Nbjets")),
+  fBTagSFCalculator(config)
+{
+  initialize(config);
+}
+
+BJetSelection::BJetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, nullptr, postfix),
+  bTriggerMatchingApply(config.getParameter<bool>("triggerMatchingApply")),
+  fTriggerMatchingCone(config.getParameter<float>("triggerMatchingCone")),
+  fJetPtCuts(config.getParameter<std::vector<float>>("jetPtCuts")),
+  fJetEtaCuts(config.getParameter<std::vector<float>>("jetEtaCuts")),
+  fNumberOfJetsCut(config, "numberOfBJetsCut"),
+  fDisriminatorValue(-1.0),
+  // Event counter for passing selection
+  cPassedBJetSelection(fEventCounter.addCounter("passed b-jet selection ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "All events")),
+  cSubPassedEta(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedPt(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedDiscriminator(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed discriminator")),
+  cSubPassedTrgMatching(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed trigger matching")),
+  cSubPassedNBjets(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed Nbjets")),
+  fBTagSFCalculator(config)
+{
+  initialize(config);
+}
+
 
 BJetSelection::BJetSelection(const ParameterSet& config)
 : BaseSelection(),
@@ -201,6 +247,8 @@ BJetSelection::Data BJetSelection::analyze(const Event& event, const JetSelectio
   // Send data to CommonPlots
   if (fCommonPlots != nullptr)
     fCommonPlots->fillControlPlotsAtBtagging(event, data);
+  if (fCommonPlots_ttm != nullptr)
+    fCommonPlots_ttm->fillControlPlotsAtBtagging(event, data);
   // Return data
   return data;
 }

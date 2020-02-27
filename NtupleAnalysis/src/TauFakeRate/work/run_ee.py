@@ -56,10 +56,10 @@ import ROOT
 #================================================================================================
 # Options
 #================================================================================================
-prefix      = "Hplus2hwAnalysisWithTop"
+prefix      = "TauFakeRate_ee"
 postfix     = ""
 dataEras    = ["2016"]
-searchModes = ["80to1000"]
+searchModes = ["350to3000"] # ["80to1000"]
 
 ROOT.gErrorIgnoreLevel = 0 
 
@@ -124,70 +124,64 @@ def main():
         Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=opts.excludeTasks)
     else:
-        myBlackList = [#"DYJetsToLL_M_50_ext1",
-                       #"DYJetsToLL_M_50_ext2",
-                       #"WJetsToLNu",
-                       # "WJetsToLNu_ext2",
-                       # "QCD_Pt_15to30",
-                       # "QCD_Pt_30to50",
-                       # "QCD_Pt_50to80",
-                       # "QCD_Pt_80to120",
-                       # "QCD_Pt_80to120_ext2",
-                       # "QCD_Pt_120to170",
-                       # "QCD_Pt_120to170_ext1",
-                       # "QCD_Pt_170to300",
-                       # "QCD_Pt_170to300_ext1",
-                       # "QCD_Pt_300to470",
-                       # "QCD_Pt_300to470_ext1",
-                       # "QCD_Pt_470to600",
-                       # "QCD_Pt_600to800",
-                       # "QCD_Pt_600to800_ext1",
-                       # "QCD_Pt_800to1000",
-                       # "QCD_Pt_800to1000_ext1",
-                       # "QCD_Pt_1000to1400_ext1",
-                       # "QCD_Pt_1400to1800",
-                       # "QCD_Pt_1400to1800_ext1",
-                       # "QCD_Pt_1800to2400",
-                       # "QCD_Pt_1800to2400_ext1",
-                       # "QCD_Pt_2400to3200",
-                       # "QCD_Pt_2400to3200_ext1",
-                       # "QCD_Pt_15to20_MuEnrichedPt5",
-                       # "QCD_Pt_20to30_MuEnrichedPt5",
-                       # "QCD_Pt_30to50_MuEnrichedPt5",
-                       # "QCD_Pt_50to80_MuEnrichedPt5",
-                       # "QCD_Pt_80to120_MuEnrichedPt5",
-                       # "QCD_Pt_80to120_MuEnrichedPt5_ext1",
-                       # "QCD_Pt_120to170_MuEnrichedPt5",
-                       # "QCD_Pt_170to300_MuEnrichedPt5",
-                       # "QCD_Pt_170to300_MuEnrichedPt5_ext1",
-                       # "QCD_Pt_300to470_MuEnrichedPt5",
-                       # "QCD_Pt_300to470_MuEnrichedPt5_ext1",
-                       # "QCD_Pt_300to470_MuEnrichedPt5_ext2",
-                       # "QCD_Pt_470to600_MuEnrichedPt5",
-                       # "QCD_Pt_470to600_MuEnrichedPt5_ext1",
-                       # "QCD_Pt_470to600_MuEnrichedPt5_ext2",
-                       # "QCD_Pt_600to800_MuEnrichedPt5",
-                       # "QCD_Pt_600to800_MuEnrichedPt5_ext1",
-                       # "QCD_Pt_800to1000_MuEnrichedPt5",
-                       # "QCD_Pt_800to1000_MuEnrichedPt5_ext1",
-                       # "QCD_Pt_800to1000_MuEnrichedPt5_ext2",
-                       # "QCD_Pt_1000toInf_MuEnrichedPt5",
-                       # "QCD_bEnriched_HT200to300",
-                       # "QCD_bEnriched_HT300to500",
-                       # "QCD_bEnriched_HT500to700",
-                       # "QCD_bEnriched_HT700to1000",
-                       # "QCD_bEnriched_HT1000to1500",
-                       # "QCD_bEnriched_HT1500to2000",
-                       # "QCD_bEnriched_HT2000toInf",
-                       # "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
-                       # "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
+        myBlackList = ["QCD_Pt_15to20_MuEnrichedPt5",
+                       "QCD_Pt_20to30_MuEnrichedPt5",
+                       "QCD_Pt_30to50_MuEnrichedPt5",
+                       "QCD_Pt_50to80_MuEnrichedPt5",
+                       "QCD_Pt_80to120_MuEnrichedPt5",
+                       "QCD_Pt_80to120_MuEnrichedPt5_ext1",
+                       "QCD_Pt_120to170_MuEnrichedPt5",
+                       "QCD_Pt_170to300_MuEnrichedPt5",
+                       "QCD_Pt_170to300_MuEnrichedPt5_ext1",
+                       "QCD_Pt_300to470_MuEnrichedPt5",
+                       "QCD_Pt_300to470_MuEnrichedPt5_ext1",
+                       "QCD_Pt_300to470_MuEnrichedPt5_ext2",
+                       "QCD_Pt_470to600_MuEnrichedPt5",
+                       "QCD_Pt_470to600_MuEnrichedPt5_ext1",
+                       "QCD_Pt_470to600_MuEnrichedPt5_ext2",
+                       "QCD_Pt_600to800_MuEnrichedPt5",
+                       "QCD_Pt_600to800_MuEnrichedPt5_ext1",
+                       "QCD_Pt_800to1000_MuEnrichedPt5",
+                       "QCD_Pt_800to1000_MuEnrichedPt5_ext1",
+                       "QCD_Pt_800to1000_MuEnrichedPt5_ext2",
+                       "QCD_Pt_1000toInf_MuEnrichedPt5",
+                       "QCD_bEnriched_HT200to300",
+                       "QCD_bEnriched_HT300to500",
+                       "QCD_bEnriched_HT500to700",
+                       "QCD_bEnriched_HT700to1000",
+                       "QCD_bEnriched_HT1000to1500",
+                       "QCD_bEnriched_HT1500to2000",
+                       "QCD_bEnriched_HT2000toInf",
+                       "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
+                       "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
+                       "WWTo4Q",
+                       "SingleMuon_Run2016F_03Feb2017_v1_277932_278800",                                                                                                                             
+                       "SingleMuon_Run2016E_03Feb2017_v1_276831_277420",                                                                                                                             
+                       "SingleMuon_Run2016D_03Feb2017_v1_276315_276811",                                                                                                                             
+                       "SingleMuon_Run2016C_03Feb2017_v1_275656_276283",                                                                                                                             
+                       "SingleMuon_Run2016B_03Feb2017_ver2_v2_273150_275376",                                                                                                                        
+                       "SingleMuon_Run2016G_03Feb2017_v1_278820_280385",                                                                                                                             
+                       "SingleMuon_Run2016F_03Feb2017_v1_278801_278808",                                                                                                                             
+                       "SingleMuon_Run2016H_03Feb2017_ver3_v1_284036_284044",                                                                                                                        
+                       "SingleMuon_Run2016H_03Feb2017_ver2_v1_281613_284035",     
+                       "DYJetsToLL_M_50_HT_70to100",
+                       "DYJetsToLL_M_50_HT_100to200",
+                       "DYJetsToLL_M_50_HT_100to200_ext1",
+                       "DYJetsToLL_M_50_HT_200to400",
+                       "DYJetsToLL_M_50_HT_200to400_ext1",
+                       "DYJetsToLL_M_50_HT_400to600",
+                       "DYJetsToLL_M_50_HT_400to600_ext1",
+                       "DYJetsToLL_M_50_HT_600to800",
+                       "DYJetsToLL_M_50_HT_800to1200",
+                       "DYJetsToLL_M_50_HT_1200to2500",
+                       "DYJetsToLL_M_50_HT_2500toInf",
                        ]
 
         #if opts.doSystematics:
         #    myBlackList.append("QCD")
 
-        Verbose("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
-        Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
+        Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
+        Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         regex =  "|".join(myBlackList)
         if len(myBlackList)>0:
             process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=regex)
@@ -202,16 +196,30 @@ def main():
     from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysisWithTop import allSelections
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
-    # allSelections.BjetSelection.triggerMatchingApply = True
-    # allSelections.TopSelection.ChiSqrCutValue = 100.0
-    # allSelections.BJetSelection.numberOfBJetsCutValue = 0
-    # allSelections.BJetSelection.numberOfBJetsCutDirection = "=="
     
-    #allSelections.TopSelectionMVA.MVACutValue           = 0.90 # [default: 0.4]
-    #allSelections.FakeBTopSelectionMVA.MVACutValue      = 0.00 # [default: -1.0]
-    #allSelections.FakeBMeasurement.LdgTopMVACutValue    = allSelections.TopSelectionMVA.MVACutValue
-    #allSelections.FakeBMeasurement.SubldgTopMVACutValue = allSelections.TopSelectionMVA.MVACutValue
+    # Trigger
+    allSelections.Trigger.triggerOR = ["HLT_Ele27_WPTight_Gsf"]
 
+    # Electrons
+    allSelections.ElectronSelection.applyTriggerMatching = True
+    allSelections.ElectronSelection.electronPtCut        = 28.0
+    allSelections.ElectronSelection.electronEtaCut       = 2.5
+    allSelections.ElectronSelection.electronIDType       = "MVA"
+    allSelections.ElectronSelection.electronID           = "cutBasedElectronID_Spring15_25ns_V1_standalone_tight"
+    allSelections.ElectronSelection.electronMVA          = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
+    allSelections.ElectronSelection.electronMVACut       = "Loose"
+    allSelections.ElectronSelection.electronIsolation    = "tight"
+    allSelections.ElectronSelection.electronIsolType     = "default"
+
+    # Muons
+    allSelections.MuonSelection.applyTriggerMatching = False
+    allSelections.MuonSelection.triggerMatchingCone  = 0.1
+    allSelections.MuonSelection.muonPtCut            = 10.0
+    allSelections.MuonSelection.muonEtaCut           = 2.5
+    allSelections.MuonSelection.muonID               = "muIDLoose"
+    allSelections.MuonSelection.muonIsolation        = "veto"
+    allSelections.MuonSelection.muonIsolType         = "default"
+    
     # ================================================================================================
     # Add Analysis Variations
     # ================================================================================================
@@ -236,11 +244,9 @@ def main():
                               usePUreweighting       = opts.usePUreweighting,
                               useTopPtReweighting    = opts.useTopPtReweighting,
                               doSystematicVariations = opts.doSystematics,
-                              # analysisType="HToHW_withTop",#iro
-                              analysisType="HToTB",
+                              analysisType="HToHW_withTop",
                               verbose=opts.verbose)
 
-    print "=== run.py: TESTing!"
     # Add variations (e.g. for optimisation)
     # builder.addVariation("METSelection.METCutValue", [100,120,140])
     # builder.addVariation("AngularCutsBackToBack.workingPoint", ["Loose","Medium","Tight"])
@@ -267,6 +273,7 @@ def main():
     # Pick events
     # ================================================================================================
     #process.addOptions(EventSaver = PSet(enabled = True,pickEvents = True))
+
     # ================================================================================================
     # Run the analysis
     # ================================================================================================

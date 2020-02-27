@@ -12,6 +12,7 @@
 
 class ParameterSet;
 class CommonPlots;
+class CommonPlots_ttm;
 class Event;
 class EventCounter;
 class HistoWrapper;
@@ -39,10 +40,18 @@ public:
     const float getHighestSelectedMuonEta() const { return fHighestSelectedMuonEta; }
     const float getHighestSelectedMuonPhi() const { return fHighestSelectedMuonPhi; }
     const float getHighestSelectedMuonPtBeforePtCut() const { return fHighestSelectedMuonPtBeforePtCut; }
+    const float getMuonTriggerSF() const { return fMuonTriggerSF; }
+    const float getMuonIDSF() const { return fMuonIDSF; }
+    const int getHLTMuonCharge() const { return fHLTMuonCharge; }
     // FIXME: Add MC information if deemed necessary
 //     const bool eventContainsMuonFromCJet() const { return fHasMuonFromCjetStatus; }
 //     const bool eventContainsMuonFromBJet() const { return fHasMuonFromBjetStatus; }
 //     const bool eventContainsMuonFromCorBJet() const { return eventContainsMuonFromCJet() || eventContainsMuonFromBJet(); }
+
+    // Getters for anti-isolated muons (i.e. passed other cuts but not isolation)
+    const bool isAntiIsolated() const { return !hasIdentifiedMuons(); }
+    const bool hasAntiIsolatedMuons() const { return (fAntiIsolatedMuons.size() > 0); }
+    const std::vector<Muon>& getAntiIsolatedMuons() const { return fAntiIsolatedMuons; }
 
     friend class MuonSelection;
 
@@ -52,16 +61,24 @@ public:
     float fHighestSelectedMuonEta;
     float fHighestSelectedMuonPhi;
     float fHighestSelectedMuonPtBeforePtCut;
+    /// Cache muon identification scale factor
+    float fMuonIDSF;
+    /// Cache for muon trigger SF
+    float fMuonTriggerSF;
+    int fHLTMuonCharge;
     /// MC info about non-isolated muons
     //bool fHasMuonFromCjetStatus;
     //bool fHasMuonFromBjetStatus;
     /// Muon collection after all selections
     std::vector<Muon> fSelectedMuons;
+    std::vector<Muon> fAntiIsolatedMuons;
   };
   
   // Main class
   /// Constructor with histogramming
   explicit MuonSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix);
+  explicit MuonSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix);
+  explicit MuonSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix);
   /// Constructor without histogramming
   explicit MuonSelection(const ParameterSet& config, const std::string& postfix);
   virtual ~MuonSelection();
@@ -72,12 +89,13 @@ public:
   Data silentAnalyze(const Event& event);
   /// analyze does fill histograms and incrementes counters
   Data analyze(const Event& event);
-
+  Data analyzeLoose(const Event& event);
 private:
   /// Initialisation called from constructor
   void initialize(const ParameterSet& config, const std::string& postfix);
   /// The actual selection
   Data privateAnalyze(const Event& iEvent);
+  Data privateAnalyzeLoose(const Event& iEvent);
   bool passTrgMatching(const Muon& muon, std::vector<math::LorentzVectorT<double>>& trgMuons) const;
 
   // Input parameters
@@ -90,6 +108,11 @@ private:
   bool fVetoMode;
   bool fMiniIsol;
   
+  // muon identification SF
+  GenericScaleFactor fMuonIDSFReader;
+  // muon trigger SF
+  GenericScaleFactor fMuonTriggerSFReader;
+
   // Event counter for passing selection
   Count cPassedMuonSelection;
   // Sub counters

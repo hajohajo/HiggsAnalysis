@@ -3,6 +3,7 @@
 
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/CommonPlots_ttm.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "Framework/interface/Exception.h"
@@ -25,6 +26,32 @@ const math::XYVectorD& METSelection::Data::getMET() const {
 
 METSelection::METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  fMETCut(config, "METCut"),
+  fMETSignificanceCut(config, "METSignificanceCut"),
+  bApplyPhiCorrections(config.getParameter<bool>("applyPhiCorrections")),
+  // MET trigger SF
+  fMETTriggerSFReader(config.getParameterOptional<ParameterSet>("metTriggerSF")),
+  // Event counter for passing selection
+  cPassedMETSelection(fEventCounter.addCounter("passed MET selection ("+postfix+")"))
+{
+  initialize(config);
+}
+
+METSelection::METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  fMETCut(config, "METCut"),
+  fMETSignificanceCut(config, "METSignificanceCut"),
+  bApplyPhiCorrections(config.getParameter<bool>("applyPhiCorrections")),
+  // MET trigger SF
+  fMETTriggerSFReader(config.getParameterOptional<ParameterSet>("metTriggerSF")),
+  // Event counter for passing selection
+  cPassedMETSelection(fEventCounter.addCounter("passed MET selection ("+postfix+")"))
+{
+  initialize(config);
+}
+
+METSelection::METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, nullptr, postfix),
   fMETCut(config, "METCut"),
   fMETSignificanceCut(config, "METSignificanceCut"),
   bApplyPhiCorrections(config.getParameter<bool>("applyPhiCorrections")),
@@ -95,6 +122,8 @@ METSelection::Data METSelection::analyze(const Event& event, int nVertices) {
   // Send data to CommonPlots
   if (fCommonPlots != nullptr)
     fCommonPlots->fillControlPlotsAtMETSelection(event, data);
+  if (fCommonPlots_ttm != nullptr)
+    fCommonPlots_ttm->fillControlPlotsAtMETSelection(event, data);
   // Return data
   return data;
 }

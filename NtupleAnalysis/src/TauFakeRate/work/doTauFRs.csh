@@ -19,32 +19,33 @@ set INITIAL = `echo $USER | cut -c1-1`
 set MYDIR   = ${1} # pseudomulticrab directory name
 #set FORMATS = "png"
 set FORMATS = "png,pdf,C"
-set DSETS   = "QCD|WJets"
+#set eDSETS   = "QCD|WJets"
+set iDSETS   = "SingleMuon|DYJetsToLL_M_50_ext|ST_|TT|WJetsToLNu_HT|WWTo2L2Nu|WZ|ZZ|ttH"
 set DATAERA = "Run2016"
 set ANAME   = "TauFakeRate"
 set SMODE   = "350to3000"
 #set GRID    = "--gridX --gridY"
 set GRID    = ""
 #set ANAME   = "Hplus2hwAnalysis_fake"
-#set SMODE   = "350to3000"
 
 #================================================================================================
 # Data/MC plots
 #================================================================================================
-./plotDataMC.py --folder "" -e ${DSETS} -s {$FORMATS} -m ${MYDIR} --ratio --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE}
+#./plotDataMC.py --folder "" -e ${eDSETS} -s {$FORMATS} -m ${MYDIR} --ratio --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE}
+./plotDataMC.py --folder "" -i ${iDSETS} -s {$FORMATS} -m ${MYDIR} --ratio --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE}
 
 
 #================================================================================================
 # Fake Rate plots
 #================================================================================================
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_1pr_barrel" --denHisto "tauPt_den_1pr_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_2pr_barrel" --denHisto "tauPt_den_2pr_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_3pr_barrel" --denHisto "tauPt_den_3pr_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm0_barrel" --denHisto "tauPt_den_dm0_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm1_barrel" --denHisto "tauPt_den_dm1_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm10_barrel" --denHisto "tauPt_den_dm10_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
 
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_1pr_endcap" --denHisto "tauPt_den_1pr_endcap" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_2pr_endcap" --denHisto "tauPt_den_2pr_endcap" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_3pr_endcap" --denHisto "tauPt_den_3pr_endcap" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm0_endcap" --denHisto "tauPt_den_dm0_endcap" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm1_endcap" --denHisto "tauPt_den_dm1_endcap" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm10_endcap" --denHisto "tauPt_den_dm10_endcap" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
 
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_2pr" --denHisto "tauPt_den_2pr" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
-./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_3pr" --denHisto "tauPt_den_3pr" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -e ${DSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm0" --denHisto "tauPt_den_dm0" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm1" --denHisto "tauPt_den_dm1" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
+./plotTauFakeRates.py -m ${MYDIR} --numHisto "tauPt_num_dm10" --denHisto "tauPt_den_dm10" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC

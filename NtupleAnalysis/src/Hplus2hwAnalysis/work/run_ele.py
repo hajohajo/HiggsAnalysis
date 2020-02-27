@@ -73,8 +73,8 @@ def main():
 			      ### OPRIONS ###
                               usePUreweighting       = True,
                               useTopPtReweighting    = False,
-                              doSystematicVariations = False,
-			      analysisType 	     = "HToHW")
+                              doSystematicVariations = True,
+			      analysisType 	     = "HToHW_ele")
 
 
 

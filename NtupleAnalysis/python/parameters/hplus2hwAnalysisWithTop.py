@@ -14,6 +14,9 @@ histogramAmbientLevel = "Debug"  # ("Systematics", "Vital", "Informative", "Debu
 # Trigger [scanned in range _v1--_v100 (=>remove the '_v' suffix)]
 #================================================================================================
 trigger = PSet(
+    # No need to specify version numbers, they are automatically scanned in range 1--100 (remove the '_v' suffix)
+    eleTrgEffJson  = "ElePOGEff.json",
+    muonTrgEffJson = "muonPAGEff.json",
     triggerOR = [
         # SingleMuon Primary Dataset (PD)
         "HLT_IsoMu24",
@@ -63,7 +66,7 @@ electronSelection = PSet(
     applyTriggerMatching = False,
     triggerMatchingCone  = 0.1,   # DeltaR for matching offline tau with trigger tau
     electronPtCut        = 10.0,    # [default: 10.0]
-    electronEtaCut       = 2.4,     # [default: 2.4]
+    electronEtaCut       = 2.5,     # [default: 2.4]
     electronIDType       = "MVA",   # [default: "MVA] ("default", "MVA")
     electronID           = "cutBasedElectronID_Spring15_25ns_V1_standalone_veto",
     electronMVA          = "ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values",
@@ -79,7 +82,7 @@ muonSelection = PSet(
     applyTriggerMatching = True ,       # HLTMuon_Pt Missing from tree!
     triggerMatchingCone  = 0.1,         # DeltaR for matching offline tau with trigger tau
     muonPtCut            = 26.0,        # [default: 10.0]
-    muonEtaCut           = 2.4,         # [default: 2.4]
+    muonEtaCut           = 2.5,         # [default: 2.4]
     muonID               = "muIDTight", # [default: "muIDTight"] ("muIDLoose", "muIDMedium", "muIDTight")
     muonIsolation        = "tight",     # [default: "tight"]
     muonIsolType         = "default",   # [default: "default"]
@@ -122,29 +125,6 @@ looseTauSelection = PSet(
   againstMuonDiscr     = tauSelection.againstMuonDiscr,
   isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
   )
-
-# tau identification scale factors
-scaleFactors.assignTauIdentificationSF(tauSelection)
-scaleFactors.assignTauIdentificationSF(looseTauSelection)
-
-# tau misidentification scale factor
-scaleFactors.assignTauMisidentificationSF(tauSelection, "eToTau", "nominal")
-scaleFactors.assignTauMisidentificationSF(tauSelection, "muToTau", "nominal")
-scaleFactors.assignTauMisidentificationSF(tauSelection, "jetToTau",  "nominal")
-
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "eToTau", "nominal")
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "muToTau", "nominal")
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau",  "nominal")
-'''
-newer version still unsuported in this branch
-scaleFactors.assignTauMisidentificationSF(tauSelection, "eToTau", "full", "nominal")
-scaleFactors.assignTauMisidentificationSF(tauSelection, "muToTau", "full", "nominal")
-scaleFactors.assignTauMisidentificationSF(tauSelection, "jetToTau", "full", "nominal")
-
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "eToTau", "full", "nominal")
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "muToTau", "full", "nominal")
-scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau", "full", "nominal")
-'''
 
 #================================================================================================
 # Jet selection
@@ -207,6 +187,7 @@ bjetSelection = PSet(
 #=================================================================================================
 # Fat jet selection
 #=================================================================================================
+'''
 fatjetVeto = PSet(
     fatjetType                  = "FatJets", # [default: "FatJets"]  
     fatjetPtCuts                = [450.0],   # [default: [450.0] ]
@@ -218,6 +199,7 @@ fatjetVeto = PSet(
     numberOfFatJetsCutValue     = 0,         # [default: 0]
     numberOfFatJetsCutDirection = ">=",      # [default: "=="] (TO DISABLE: >=0)
 )
+'''
 
 #================================================================================================
 # MET selection
@@ -251,46 +233,71 @@ topSelectionMVA = PSet(
     TopMVAalgo               = "BDTG" # [default: BDTG] (options: "BDTG", "NN") 
 )
 
-
-#================================================================================================
-# FakeB Measurement Options
-#================================================================================================
-fakeBBjetSelection = PSet(
-    triggerMatchingApply      = bjetSelection.triggerMatchingApply,
-    triggerMatchingCone       = bjetSelection.triggerMatchingCone,
-    jetPtCuts                 = bjetSelection.jetPtCuts,
-    jetEtaCuts                = bjetSelection.jetEtaCuts,
-    bjetDiscr                 = bjetSelection.bjetDiscr,    
-    bjetDiscrWorkingPoint     = "Loose", # NOTE: Defines VR and CR2
-    numberOfBJetsCutValue     = bjetSelection.numberOfBJetsCutValue,
-    numberOfBJetsCutDirection = bjetSelection.numberOfBJetsCutDirection,
-    )
-scaleFactors.setupBtagSFInformation(btagPset               = fakeBBjetSelection, 
-                                    btagPayloadFilename    = "CSVv2.csv",
-                                    btagEfficiencyFilename = "btageff_HToTB.json",
-                                    direction              = "nominal")
-
-fakeBMeasurement = PSet(
-    # b-jets
-    baselineBJetsCutValue          = 2,    # [default: 2]
-    baselineBJetsCutDirection      = "==", # [default: ==]
-    baselineBJetsDiscr             = bjetSelection.bjetDiscr,
-    baselineBJetsDiscrWP           = bjetSelection.bjetDiscrWorkingPoint,
-    # Tops
-    LdgTopMVACutValue              = topSelectionMVA.TopMVACutValue,
-    LdgTopMVACutDirection          = topSelectionMVA.TopMVACutDirection, 
-    SubldgTopMVACutValue           = topSelectionMVA.TopMVACutValue,
-    SubldgTopMVACutDirection       = "<", # [default: "<"]
-    )
+# #================================================================================================
+# # FakeB Measurement Options
+# #================================================================================================
+# fakeBBjetSelection = PSet(
+#     triggerMatchingApply      = bjetSelection.triggerMatchingApply,
+#     triggerMatchingCone       = bjetSelection.triggerMatchingCone,
+#     jetPtCuts                 = bjetSelection.jetPtCuts,
+#     jetEtaCuts                = bjetSelection.jetEtaCuts,
+#     bjetDiscr                 = bjetSelection.bjetDiscr,    
+#     bjetDiscrWorkingPoint     = "Loose", # NOTE: Defines VR and CR2
+#     numberOfBJetsCutValue     = bjetSelection.numberOfBJetsCutValue,
+#     numberOfBJetsCutDirection = bjetSelection.numberOfBJetsCutDirection,
+#     )
+# 
+# fakeBMeasurement = PSet(
+#     # b-jets
+#     baselineBJetsCutValue          = 2,    # [default: 2]
+#     baselineBJetsCutDirection      = "==", # [default: ==]
+#     baselineBJetsDiscr             = bjetSelection.bjetDiscr,
+#     baselineBJetsDiscrWP           = bjetSelection.bjetDiscrWorkingPoint,
+#     # Tops
+#     LdgTopMVACutValue              = topSelectionMVA.TopMVACutValue,
+#     LdgTopMVACutDirection          = topSelectionMVA.TopMVACutDirection, 
+#     SubldgTopMVACutValue           = topSelectionMVA.TopMVACutValue,
+#     SubldgTopMVACutDirection       = "<", # [default: "<"]
+#     )
 
 #================================================================================================
 # Scale Factors (SFs)
 #================================================================================================
+# Electron id & trigger SF
+scaleFactors.assignElectronIdentificationSF(electronSelection, "nominal", "Data")
+scaleFactors.assignElectronTriggerSF(electronSelection, "nominal", trigger.eleTrgEffJson, "Data")
+
+# Muon id & trigger SF
+scaleFactors.assignMuonIdentificationSF(muonSelection, "nominal", "Data")
+scaleFactors.assignMuonTriggerSF(muonSelection, "nominal", trigger.muonTrgEffJson, "Data")
+
+# Tau id & trigger SF
+scaleFactors.assignTauIdentificationSF(tauSelection)
+scaleFactors.assignTauMisidentificationSF(tauSelection, "eToTau", "nominal")
+scaleFactors.assignTauMisidentificationSF(tauSelection, "muToTau", "nominal")
+scaleFactors.assignTauMisidentificationSF(tauSelection, "jetToTau",  "nominal")
+
+scaleFactors.assignTauIdentificationSF(looseTauSelection)
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "eToTau", "nominal")
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "muToTau", "nominal")
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau",  "nominal")
+
+'''
+newer version still unsuported in this branch
+scaleFactors.assignTauMisidentificationSF(tauSelection, "eToTau", "full", "nominal")
+scaleFactors.assignTauMisidentificationSF(tauSelection, "muToTau", "full", "nominal")
+scaleFactors.assignTauMisidentificationSF(tauSelection, "jetToTau", "full", "nominal")
+
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "eToTau", "full", "nominal")
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "muToTau", "full", "nominal")
+scaleFactors.assignTauMisidentificationSF(looseTauSelection, "jetToTau", "full", "nominal")
+'''
+
+# B-tagging
 if bjetSelection.bjetDiscr == "pfCombinedInclusiveSecondaryVertexV2BJetTags":
     scaleFactors.setupBtagSFInformation(btagPset               = bjetSelection, 
                                         btagPayloadFilename    = "CSVv2.csv",
-                                        #btagEfficiencyFilename = "btageff_hybrid_HToTB.json",
-                                        btagEfficiencyFilename = "btageff_HToTB.json",
+                                        btagEfficiencyFilename = "btageff_HToTB.json", #btageff_hybrid_HToTB.json
                                         direction              = "nominal")
 elif bjetSelection.bjetDiscr == "pfCombinedMVAV2BJetTags":
     scaleFactors.setupBtagSFInformation(btagPset               = bjetSelection, 
@@ -300,7 +307,7 @@ elif bjetSelection.bjetDiscr == "pfCombinedMVAV2BJetTags":
 else:
     raise Exception("This should never be reached!")
 
-# top-tagging (json files available for: defaut, fatJet, ldgJet)
+# top-tagging (json files available for: default, fatJet, ldgJet)
 MVAstring = "%.2f" % topSelectionMVA.TopMVACutValue
 # Determine which top JSON files to use depending on the MVA trainigh weightfile used
 if "noDeltaRqq_noTopPtRew" in topSelectionMVA.WeightFile:
@@ -329,6 +336,7 @@ scaleFactors.setupToptagSFInformation(topTagPset                     = topSelect
                                       topTagEffUncertaintiesFilename = topTagEffUnc,
                                       direction                      = "nominal",
                                       variationInfo                  = None)
+
 
 #================================================================================================
 # Common plots options
@@ -368,7 +376,7 @@ allSelections = PSet(
     ElectronSelection     = electronSelection,
     MuonSelection         = muonSelection,
     TauSelection          = tauSelection,
-    LooseTauSelection      = looseTauSelection,
+    LooseTauSelection     = looseTauSelection,
     JetSelection          = jetSelection,
     AngularCutsCollinear  = angularCutsCollinear,
     BJetSelection         = bjetSelection,
@@ -376,8 +384,6 @@ allSelections = PSet(
     AngularCutsBackToBack = angularCutsBackToBack,
     TopSelectionMVA       = topSelectionMVA,
     # FatJetSelection       = fatjetVeto,
-    #FakeBMeasurement      = fakeBMeasurement,
-    #FakeBBjetSelection    = fakeBBjetSelection,
     CommonPlots           = commonPlotsOptions,
     HistogramAmbientLevel = histogramAmbientLevel,
 )

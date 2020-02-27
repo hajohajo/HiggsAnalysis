@@ -94,10 +94,6 @@ crab getoutput <dir> --command=LCG --checksum=no
 To retrieve a range of jobs for a given task:
 crab getoutput -d <task_dir> --jobids <comma-separated-list-of-jobs-and/or-job-ranges>
 
-To check whether you have write persmissions on a T2 centre use the command
-crab checkwrite --site 
-For example:
-crab checkwrite --site T2_CH_CERN
 '''
 
 #================================================================================================
@@ -109,6 +105,7 @@ import sys
 import time
 import datetime
 import subprocess
+import shlex
 import tarfile
 from optparse import OptionParser
 from collections import OrderedDict
@@ -999,7 +996,12 @@ def PrintTaskSummary(reportDict):
         if (report.allJobs == report.eosOut):
             outOK = True
 
-        if (not logOK or not outOK):
+        #if (not logOK or not outOK):
+            #status = "%s%s" % (colors.BLINK, status)
+        #if status == "COMPLETED":
+        #    status = "%s" % (status)
+        # Remember that "status" already contains a style (extra characters)
+        if "COMPLETED" not in status:
             status = "%s%s" % (colors.BLINK, status)
 
         idle          = '{0: >3}'.format(report.idle)
@@ -1219,9 +1221,9 @@ def GetReportTable(taskDir, nJobs, running, transferring, finished, unknown, fai
     nLogsEOS  = ''.join( str(eosLog).split() ) 
     nOutEOS   = ''.join( str(eosOut).split() )
     nOutEOSM  = eosOutMerged 
-    txtAlign  = "{:<25} {:>4} {:<1} {:<4}"
+    txtAlign  = "{:<31} {:>4} {:<1} {:<4}"
     dataset   = taskDir.split("/")[-1]
-    length    = 45 #len(dataset)
+    length    = 60 #len(dataset)
     hLine     = "="*length
     status    = GetTaskStatus(taskDir).replace("\t", "")
     txtAlignB = "{:<%s}" % (length)
@@ -1989,6 +1991,30 @@ def ConvertCommandToEOS(cmd, opts):
 
     return cmdMap[cmd]
 
+def CheckStorageSitePermissions(opts):
+    '''
+    To check whether you have write persmissions on a T2 centre use the command
+    crab checkwrite --site 
+
+    For example:
+    crab checkwrite --site T2_CH_CERN
+    '''
+    # Provide an array of arguments (not a string of arguments) to subprocess
+    cmd  = "crab checkwrite --site %s" % (opts.storageSite)
+    cmds = shlex.split(cmd)
+    p    = subprocess.Popen(cmds, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, err = p.communicate()
+    if len(err) > 0:
+        raise Exception(es + err + ns)
+    else:
+        if "success" in output.lower():
+            msg = "%sSuccess%s: Able to write in /store/user/%s on site %s" % (ss, ns, getUsernameFromSiteDB(), hs + opts.storageSite + ns)
+            Print(msg, True)
+        else:
+            msg = output
+            raise Exception(es + msg + ns, True)
+    return
+
 
 def CreateJob(opts, args):
     '''
@@ -2002,6 +2028,9 @@ def CreateJob(opts, args):
     datasets     = DatasetGroup(analysis).GetDatasets()
     taskDirName  = GetTaskDirName(analysis, version, datasets)
     opts.dirName = taskDirName
+
+    # Check that user has write permission to chosen storage site
+    CheckStorageSitePermissions(opts)
 
     # Give user last chance to abort
     PrintInfo(opts.dirName, analysis, opts)
@@ -2018,8 +2047,7 @@ def CreateJob(opts, args):
     for i, d in enumerate(newDatasets, 1):
         Print("%d) %s" % (i, cys + GetRequestName(d) + ns), False)
 
-    if opts.ask:
-        Abort(keystroke="y")
+    Abort(keystroke="y")
 
     # For-loop: All datasets
     for dataset in newDatasets:
@@ -2062,7 +2090,7 @@ if __name__ == "__main__":
     PSET    = "miniAOD2TTree_SignalAnalysisSkim_cfg.py"
     SITE    = "T2_FI_HIP"
     DIRNAME = ""
-    ASK     = True
+    ASK     = False
     NOSUBMIT= False
 
     parser = OptionParser(usage="Usage: %prog [options]")

@@ -12,6 +12,7 @@
 
 class ParameterSet;
 class CommonPlots;
+class CommonPlots_ttm;
 class Event;
 class EventCounter;
 class HistoWrapper;
@@ -97,6 +98,7 @@ public:
   // Main class
   /// Constructor with histogramming
   explicit TauSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix = "");
+  explicit TauSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix = "");
   /// Constructor without histogramming
   explicit TauSelection(const ParameterSet& config, const std::string& postfix = "");
   virtual ~TauSelection();
@@ -107,14 +109,14 @@ public:
   Data silentAnalyze(const Event& event);
   /// analyze does fill histograms and incrementes counters
   Data analyze(const Event& event);
-  Data analyzeTight(const Event& event);
+  Data analyzeLoose(const Event& event);
 
 private:
   /// Initialisation called from constructor
   void initialize(const ParameterSet& config, const std::string& postfix);
   /// The actual selection
   Data privateAnalyze(const Event& iEvent);
-  Data privateAnalyzeTight(const Event& iEvent);
+  Data privateAnalyzeLoose(const Event& iEvent);
   bool passTrgMatching(const Tau& tau, std::vector<math::LorentzVectorT<double>>& trgTaus) const;
   // !!!!!!!!!!!!!!!!!!!!!!!!!! bool passDecayModeFinding(const Tau& tau) const { return tau.decayModeFinding(); }
   bool passDecayModeFinding(const Tau& tau) const { return tau.decayModeFindingNewDMs(); }

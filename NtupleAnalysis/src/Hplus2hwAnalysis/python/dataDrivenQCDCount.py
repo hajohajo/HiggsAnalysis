@@ -59,7 +59,8 @@ class DataDrivenQCDShape:
             raise Exception(ShellStyles.ErrorLabel()+"DataDrivenQCDShape::getDataDrivenQCDForSplittedBin: requested bin index %d out of range (0-%d)!"%(binIndex,len(self._dataList)))
         h = aux.Clone(self._dataList[binIndex])
         h.SetName(h.GetName()+"dataDriven")
-#        h.Add(self._ewkList[binIndex], -1.0)
+#        h.Add(self._ewkList[binIndex])
+#        h.Add(self._dataList[binIndex])
         return h
 
     ## Return the data in a given phase space split bin
@@ -82,10 +83,10 @@ class DataDrivenQCDShape:
     def getIntegratedDataDrivenQCDHisto(self):
         h = aux.Clone(self._dataList[0])
         h.SetName(h.GetName()+"Integrated")
-        h.Add(self._ewkList[0],-1.0)
+#        h.Add(self._dataList[0])
         for i in range(1, len(self._dataList)):
             h.Add(self._dataList[i])
-#            h.Add(self._ewkList[i],-1.0)
+#            h.Add(self._ewkList[i])
         return h
 
     ## Return the sum of data integrated over the phase space splitted bins

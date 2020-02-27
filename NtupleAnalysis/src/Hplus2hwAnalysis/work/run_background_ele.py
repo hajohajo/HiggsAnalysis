@@ -89,7 +89,7 @@ def main():
                               usePUreweighting       = True,
                               useTopPtReweighting    = False,
                               doSystematicVariations = True,
-			      analysisType           = "HToHW_background")
+			      analysisType           = "HToHW_background_ele")
 
 
 

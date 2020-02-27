@@ -3,6 +3,7 @@
 
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/CommonPlots_ttm.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "DataFormat/interface/Muon.h"
@@ -15,7 +16,11 @@
 MuonSelection::Data::Data() 
 : fHighestSelectedMuonPt(0.0),
   fHighestSelectedMuonEta(0.0),
-  fHighestSelectedMuonPhi(0.0) { }
+  fHighestSelectedMuonPhi(0.0),
+  fMuonIDSF(1.0),
+  fMuonTriggerSF(1.0),
+  fHLTMuonCharge(1)
+ { }
 
 MuonSelection::Data::~Data() { }
 
@@ -27,6 +32,60 @@ MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCoun
   fMiniIsoCut(-1.0),
   fVetoMode(false),
   fMiniIsol(false),
+  fMuonIDSFReader(config.getParameterOptional<ParameterSet>("muonIDSF")),
+  fMuonTriggerSFReader(config.getParameterOptional<ParameterSet>("muonTriggerSF")),
+  // Event counter for passing selection
+  cPassedMuonSelection(fEventCounter.addCounter("passed mu selection ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("mu selection ("+postfix+")", "All events")),
+  cSubPassedIsPresent(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed is present")),
+  cSubPassedTriggerMatching(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed trigger matching")),
+  cSubPassedPt(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedEta(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedID(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed ID")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed isolation")),
+  cSubPassedSelection(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed selection")),
+  cSubPassedVeto(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed veto"))
+{
+  initialize(config, postfix);
+}
+
+MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  cfg_MuonPtCut(config.getParameter<float>("muonPtCut")),
+  cfg_MuonEtaCut(config.getParameter<float>("muonEtaCut")),
+  fRelIsoCut(-1.0),
+  fMiniIsoCut(-1.0),
+  fVetoMode(false),
+  fMiniIsol(false),
+  fMuonIDSFReader(config.getParameterOptional<ParameterSet>("muonIDSF")),
+  fMuonTriggerSFReader(config.getParameterOptional<ParameterSet>("muonTriggerSF")),
+  // Event counter for passing selection
+  cPassedMuonSelection(fEventCounter.addCounter("passed mu selection ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("mu selection ("+postfix+")", "All events")),
+  cSubPassedIsPresent(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed is present")),
+  cSubPassedTriggerMatching(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed trigger matching")),
+  cSubPassedPt(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedEta(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedID(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed ID")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed isolation")),
+  cSubPassedSelection(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed selection")),
+  cSubPassedVeto(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed veto"))
+{
+  initialize(config, postfix);
+}
+
+MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, nullptr, postfix),
+  cfg_MuonPtCut(config.getParameter<float>("muonPtCut")),
+  cfg_MuonEtaCut(config.getParameter<float>("muonEtaCut")),
+  fRelIsoCut(-1.0),
+  fMiniIsoCut(-1.0),
+  fVetoMode(false),
+  fMiniIsol(false),
+  fMuonIDSFReader(config.getParameterOptional<ParameterSet>("muonIDSF")),
+  fMuonTriggerSFReader(config.getParameterOptional<ParameterSet>("muonTriggerSF")),
   // Event counter for passing selection
   cPassedMuonSelection(fEventCounter.addCounter("passed mu selection ("+postfix+")")),
   // Sub counters
@@ -51,6 +110,8 @@ MuonSelection::MuonSelection(const ParameterSet& config, const std::string& post
   fMiniIsoCut(-1.0),
   fVetoMode(false),
   fMiniIsol(false),
+  fMuonIDSFReader(config.getParameterOptional<ParameterSet>("muonIDSF")),
+  fMuonTriggerSFReader(config.getParameterOptional<ParameterSet>("muonTriggerSF")),
   // Event counter for passing selection
   cPassedMuonSelection(fEventCounter.addCounter("passed mu selection ("+postfix+")")),
   // Sub counters
@@ -189,7 +250,24 @@ MuonSelection::Data MuonSelection::analyze(const Event& event) {
     {
     fCommonPlots->fillControlPlotsAtMuonSelection(event, data);
     }
+  if (fCommonPlotsIsEnabled_ttm()) 
+    {
+    fCommonPlots_ttm->fillControlPlotsAtMuonSelection(event, data);
+    }
 
+  return data;
+}
+
+MuonSelection::Data MuonSelection::analyzeLoose(const Event& event) {
+  ensureAnalyzeAllowed(event.eventID());
+
+  MuonSelection::Data data = privateAnalyzeLoose(event);
+
+  // Send data to CommonPlots
+//  if (fCommonPlots != nullptr)
+//    fCommonPlots->fillControlPlotsAtTauSelection(event, data);
+//    fCommonPlots->fillControlPlotsAfterTauSelection(event, data);
+  // Return data
   return data;
 }
 
@@ -216,6 +294,16 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
       }
     }
 
+  // For-loop: All muons to find trg match
+  if (cfg_ApplyTriggerMatching) {
+    for(Muon muon: event.muons()) {
+      // Apply trigger matching
+      if (this->passTrgMatching(muon, myTriggerMuonMomenta)) {
+        passedTrgMatch = true;
+        output.fHLTMuonCharge = muon.charge();
+      }
+    }
+  }
 
   // For-loop: All muons
   for(Muon muon: event.muons()) 
@@ -223,12 +311,15 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
       passedIsPresent = true;
 
       // Apply trigger matching
-      if (cfg_ApplyTriggerMatching) 
-	{
-	  if (!this->passTrgMatching(muon, myTriggerMuonMomenta))
-	    continue;
-	}
-    passedTrgMatch = true;
+//      if (cfg_ApplyTriggerMatching) 
+//	{
+//	  if (!this->passTrgMatching(muon, myTriggerMuonMomenta)) passedTrgMatch = true;
+//	    continue;
+//	}
+//    output.fHLTMuonCharge = muon.charge();
+    if (cfg_ApplyTriggerMatching) {
+      if(!passedTrgMatch) continue;
+    }
 
     // Fill histograms before any cuts
     hMuonPtAll->Fill(muon.pt());
@@ -245,9 +336,12 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
     passedEta = true;
     
     //=== Apply cut on muon ID
-    if (!muon.muonIDDiscriminator()) continue;
-    passedID = true;
-    
+    if (!muon.muonIDDiscriminator()) { //continue;
+      passedID = false;
+    } else {
+      passedID = true;
+    }
+
     // Fill histograms before isolation cut
     hIsolPtBefore->Fill(muon.pt());
     hIsolEtaBefore->Fill(muon.eta());
@@ -266,9 +360,238 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
     else passedIsolCut = passedRelIso;
 
     //=== Apply cut on muon isolation
-    if (!passedIsolCut) continue;
-    passedIsol = true;
+//    if (!passedIsolCut) continue;
+//    passedIsol = true;
+    //=== Apply cut on muon isolation
+    if (!passedIsolCut) {
+//      std::cout << "DEGUG: anti iso muon" << "\n";
+//      output.fAntiIsolatedMuons.push_back(muon);
+      passedIsol = false;
+    } else {
+      passedIsol = true;
+//      output.fSelectedMuons.push_back(muon);
+    }
+    if (!passedID || !passedIsol) {
+//      std::cout << "muons entering anti-iso vector" << "\n";
+      output.fAntiIsolatedMuons.push_back(muon);
+    }
+
+    if (passedID && passedIsol) {
+      output.fSelectedMuons.push_back(muon);
+    }
+
+    if (passedIsol) {
+    // Fill histograms after isolation cut
+      hIsolPtAfter->Fill(muon.pt());
+      hIsolEtaAfter->Fill(muon.eta());
+      hIsolRelIsoAfter->Fill(muon.relIsoDeltaBeta04());
+      hIsolMiniIsoAfter->Fill(muon.effAreaMiniIso());
+      if (fCommonPlotsIsEnabled())
+        {
+	  hIsolVtxAfter->Fill(fCommonPlots->nVertices());
+        }
     
+    // Fill histograms after all cuts
+      hMuonPtPassed->Fill(muon.pt());
+      hMuonEtaPassed->Fill(muon.eta());
+      hMuonRelIsoPassed->Fill(muon.relIsoDeltaBeta04());
+      hMuonMiniIsoPassed->Fill(muon.effAreaMiniIso());
+    
+    // Save the highest pt muon
+      if (muon.pt() > output.fHighestSelectedMuonPt) {
+        output.fHighestSelectedMuonPt = muon.pt();
+        output.fHighestSelectedMuonEta = muon.eta();
+        output.fHighestSelectedMuonPhi = muon.phi();
+      }
+    
+    // Save all muons surviving the cuts
+//    output.fSelectedMuons.push_back(muon);
+//    output.fSelectedAntiIsolatedMuons.push_back(muon)
+
+    // Fill resolution histograms
+      if (event.isMC()) 
+        {
+	  hPtResolution->Fill((muon.pt() - muon.MCmuon()->pt()) / muon.pt());
+	  hEtaResolution->Fill((muon.eta() - muon.MCmuon()->eta()) / muon.eta());
+  	  hPhiResolution->Fill((muon.phi() - muon.MCmuon()->phi()) / muon.phi());
+        }
+    }
+  } //for-loop: muons
+  
+  //sort muons, needed comparisons defined in Muon.h
+  std::sort(output.fSelectedMuons.begin(), output.fSelectedMuons.end());
+  std::sort(output.fAntiIsolatedMuons.begin(), output.fAntiIsolatedMuons.end());
+  // Assign booleans
+  passedSelection = (output.fSelectedMuons.size() > 0);
+  passedVeto      = (output.fSelectedMuons.size() == 0);
+
+  // Set muon ID SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedMuons()) {
+      output.fMuonIDSF = fMuonIDSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt());
+    }
+  }
+
+  // Set muon trigger SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedMuons()) {
+      output.fMuonTriggerSF = fMuonTriggerSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt());
+    }
+  }
+
+  // Fill histos
+  hMuonNAll->Fill(event.muons().size());
+  hMuonNPassed->Fill(output.fSelectedMuons.size());
+
+  // Fill sub-counters
+  if (passedIsPresent) cSubPassedIsPresent.increment();   
+  if (passedTrgMatch) cSubPassedTriggerMatching.increment();
+  if (passedPt) cSubPassedPt.increment();
+  if (passedEta) cSubPassedEta.increment();
+  if (passedID) cSubPassedID.increment();
+  if (passedIsol) cSubPassedIsolation.increment();
+  if (passedSelection) cSubPassedSelection.increment();
+  if (passedVeto) cSubPassedVeto.increment();
+  if (fVetoMode) 
+    {
+      if (passedVeto) cPassedMuonSelection.increment();
+    }
+  else 
+    {
+      if (passedSelection) cPassedMuonSelection.increment();
+    }
+  
+  // Return data object
+  return output;
+}
+
+MuonSelection::Data MuonSelection::privateAnalyzeLoose(const Event& event) {
+  Data output;
+  cSubAll.increment();
+  bool passedIsPresent = false;
+  bool passedTrgMatch  = false;
+  bool passedPt        = false;
+  bool passedEta       = false;
+  bool passedID        = false;
+  bool passedIsol      = false;
+  bool passedSelection = false;
+  bool passedVeto      = false;
+
+  // Cache vector of trigger mu 4-momenta
+//  std::vector<math::LorentzVectorT<double>> myTriggerMuonMomenta;
+//  if (cfg_ApplyTriggerMatching) 
+//    {
+//    // For-loop: All trigger muons 
+//    for (HLTMuon p: event.triggerMuons()) 
+//      {
+//	myTriggerMuonMomenta.push_back(p.p4());
+//      }
+//    }
+
+
+  // For-loop: All muons
+//  for(Muon muon: event.looseMuons()) 
+//    {
+//      passedIsPresent = true;
+
+      // Apply trigger matching
+//      if (cfg_ApplyTriggerMatching) 
+//	{
+//	  if (!this->passTrgMatching(muon, myTriggerMuonMomenta))
+//	    continue;
+//	}
+//    output.fHLTMuonCharge = muon.charge();
+//    passedTrgMatch = true;
+
+     // Cache vector of trigger mu 4-momenta
+  std::vector<math::LorentzVectorT<double>> myTriggerMuonMomenta;
+  if (cfg_ApplyTriggerMatching) 
+    {
+    // For-loop: All trigger muons 
+    for (HLTMuon p: event.triggerMuons()) 
+      {
+        myTriggerMuonMomenta.push_back(p.p4());
+      }
+    }
+
+  // For-loop: All muons to find trg match
+  if (cfg_ApplyTriggerMatching) {
+    for(Muon muon: event.muons()) {
+      // Apply trigger matching
+      if (this->passTrgMatching(muon, myTriggerMuonMomenta)) {
+        passedTrgMatch = true;
+        output.fHLTMuonCharge = muon.charge();
+      }
+    }
+  }
+
+  // For-loop: All muons
+  for(Muon muon: event.muons()) 
+    {
+      passedIsPresent = true;
+
+      // Apply trigger matching
+//      if (cfg_ApplyTriggerMatching) 
+//      {
+//        if (!this->passTrgMatching(muon, myTriggerMuonMomenta)) passedTrgMatch = true;
+//          continue;
+//      }
+//    output.fHLTMuonCharge = muon.charge();
+    if (cfg_ApplyTriggerMatching) {
+      if(!passedTrgMatch) continue;
+    }
+
+    // Fill histograms before any cuts
+    hMuonPtAll->Fill(muon.pt());
+    hMuonEtaAll->Fill(muon.eta());
+    hMuonRelIsoAll->Fill(muon.relIsoDeltaBeta04());
+    hMuonMiniIsoAll->Fill(muon.effAreaMiniIso());
+    
+    //=== Apply cut on pt
+    if (muon.pt() < cfg_MuonPtCut) continue;
+    passedPt = true;
+
+    //=== Apply cut on eta
+    if (std::fabs(muon.eta()) > cfg_MuonEtaCut) continue;
+    passedEta = true;
+    
+    //=== Apply cut on muon ID
+//    if (!muon.muonIDDiscriminator()) continue;
+    passedID = true;
+    
+    // Fill histograms before isolation cut
+    hIsolPtBefore->Fill(muon.pt());
+    hIsolEtaBefore->Fill(muon.eta());
+    hIsolRelIsoBefore->Fill(muon.relIsoDeltaBeta04());
+    hIsolMiniIsoBefore->Fill(muon.effAreaMiniIso());
+    if (fCommonPlotsIsEnabled())
+      {
+	hIsolVtxBefore->Fill(fCommonPlots->nVertices());
+      }
+    
+    // Determine Relative and Mini Isolation booleans
+    bool passedRelIso    = (muon.relIsoDeltaBeta04() < fRelIsoCut);
+    bool passedMiniIso   = (muon.effAreaMiniIso() < fMiniIsoCut);
+    bool passedIsolCut   = false;
+//    if (fMiniIsol) passedIsolCut = passedMiniIso;
+//    else passedIsolCut = passedRelIso;
+
+    passedIsolCut = true;
+
+    //=== Apply cut on muon isolation
+//    if (!passedIsolCut) {
+//      output.fAntiIsolatedMuons.push_back(muon);
+//      passedIsol = ;
+//    } else {
+//      passedIsol = true;
+//      output.fSelectedMuons.push_back(muon);
+//    }
+
+//    std::cout << "loose muons entering vector" << "\n";
+
+    output.fSelectedMuons.push_back(muon);
+
+    if (passedIsol) {
     // Fill histograms after isolation cut
     hIsolPtAfter->Fill(muon.pt());
     hIsolEtaAfter->Fill(muon.eta());
@@ -293,7 +616,7 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
     }
     
     // Save all electrons surviving the cuts
-    output.fSelectedMuons.push_back(muon);
+//    output.fSelectedMuons.push_back(muon);
 
     // Fill resolution histograms
     if (event.isMC()) 
@@ -302,14 +625,30 @@ MuonSelection::Data MuonSelection::privateAnalyze(const Event& event) {
 	hEtaResolution->Fill((muon.eta() - muon.MCmuon()->eta()) / muon.eta());
 	hPhiResolution->Fill((muon.phi() - muon.MCmuon()->phi()) / muon.phi());
       }
+    }
   } //for-loop: muons
   
   //sort muons, needed comparisons defined in Muon.h
   std::sort(output.fSelectedMuons.begin(), output.fSelectedMuons.end());
+  std::sort(output.fAntiIsolatedMuons.begin(), output.fAntiIsolatedMuons.end());
 
   // Assign booleans
   passedSelection = (output.fSelectedMuons.size() > 0);
   passedVeto      = (output.fSelectedMuons.size() == 0);
+
+  // Set muon ID SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedMuons()) {
+      output.fMuonIDSF = fMuonIDSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt());
+    }
+  }
+
+  // Set muon trigger SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedMuons()) {
+      output.fMuonTriggerSF = fMuonTriggerSFReader.getScaleFactorValue(output.getSelectedMuons()[0].pt());
+    }
+  }
 
   // Fill histos
   hMuonNAll->Fill(event.muons().size());

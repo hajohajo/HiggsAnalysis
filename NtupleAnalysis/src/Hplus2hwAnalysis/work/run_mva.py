@@ -2,7 +2,7 @@ import sys
 
 from HiggsAnalysis.NtupleAnalysis.main import Process, PSet, Analyzer
 from HiggsAnalysis.NtupleAnalysis.AnalysisBuilder import AnalysisBuilder
-from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysis import allSelections
+from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysis_muon import allSelections
 
 import ROOT
 

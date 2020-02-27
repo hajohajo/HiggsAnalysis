@@ -197,26 +197,36 @@ void Hplus2hwAnalysis_ele::process(Long64_t entry) {
   if(eData.getSelectedElectrons().size() != 1)
     return;
 
+  ////////////
+  // Electron ID and Trigger SF
+  ////////////
 
+  if (fEvent.isMC()) {
+    fEventWeight.multiplyWeight(eData.getElectronIDSF());
+  }
+
+  if (fEvent.isMC()) {
+    fEventWeight.multiplyWeight(eData.getElectronTriggerSF());
+  }
 
   ////////////
   // Dummy Trigger SF for first check
   ////////////
 
-  if (fEvent.isMC()) {
-    if (26 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 30) fEventWeight.multiplyWeight(0.9664);
-    if (30 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 40) fEventWeight.multiplyWeight(0.9781);
-    if (40 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 50) fEventWeight.multiplyWeight(0.9819);
-    if (50 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 60) fEventWeight.multiplyWeight(0.9822);
-    if (60 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 80) fEventWeight.multiplyWeight(0.9804);
-    if (80 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 120) fEventWeight.multiplyWeight(0.9780);
-    if (120 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 200) fEventWeight.multiplyWeight(0.9752);
-    if (200 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 500) fEventWeight.multiplyWeight(0.9704);
+//  if (fEvent.isMC()) {
+//    if (26 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 30) fEventWeight.multiplyWeight(0.9664);
+//    if (30 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 40) fEventWeight.multiplyWeight(0.9781);
+//    if (40 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 50) fEventWeight.multiplyWeight(0.9819);
+//    if (50 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 60) fEventWeight.multiplyWeight(0.9822);
+//    if (60 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 80) fEventWeight.multiplyWeight(0.9804);
+//    if (80 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 120) fEventWeight.multiplyWeight(0.9780);
+//    if (120 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 200) fEventWeight.multiplyWeight(0.9752);
+//    if (200 <= eData.getSelectedElectrons()[0].pt() && eData.getSelectedElectrons()[0].pt() < 500) fEventWeight.multiplyWeight(0.9704);
 
-  }
+//  }
 
-  hMuonPt_afterMuonSelection->Fill(eData.getSelectedElectrons()[0].pt());
-  hMuonEta_afterMuonSelection->Fill(eData.getSelectedElectrons()[0].eta());
+//  hMuonPt_afterMuonSelection->Fill(eData.getSelectedElectrons()[0].pt());
+//  hMuonEta_afterMuonSelection->Fill(eData.getSelectedElectrons()[0].eta());
 
   ////////////
   // Tau
@@ -287,12 +297,21 @@ void Hplus2hwAnalysis_ele::process(Long64_t entry) {
     return;
   }
 
+  ////////////
+  // Muon veto
+  ////////////
+
+  const MuonSelection::Data muData = fMuonSelection.analyze(fEvent);
+  if(muData.hasIdentifiedMuons())
+    return;
+
 
   ////////////
   // Jet selection
   ////////////
 
-  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
+//  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
+  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTaus()[0], tauData.getSelectedTaus()[1]);
   if (!jetData.passedSelection())
     return;
 
@@ -313,14 +332,6 @@ void Hplus2hwAnalysis_ele::process(Long64_t entry) {
   if (fEvent.isMC()) {
     fEventWeight.multiplyWeight(bjetData.getBTaggingScaleFactorEventWeight());
   }
-
-  ////////////
-  // Muon veto
-  ////////////
-
-  const MuonSelection::Data muData = fMuonSelection.analyze(fEvent);
-  if(muData.hasIdentifiedMuons())
-    return;
 
 
   ////////////
@@ -353,7 +364,6 @@ void Hplus2hwAnalysis_ele::process(Long64_t entry) {
 //  hNJet->Fill(jetData.getNumberOfSelectedJets());
 
   double myTransverseMass = TransverseMass::reconstruct(tauData.getSelectedTaus()[0],tauData.getSelectedTaus()[1],eData.getSelectedElectrons()[0], METData.getMET());
-//  double myTransverseMass = TransverseMass::reconstruct(muData.getSelectedMuons()[0],muData.getSelectedMuons()[1],muData.getSelectedMuons()[2],muData.getSelectedMuons()[3],muData.getSelectedMuons()[4], METData.getMET());
   hTransverseMass->Fill(myTransverseMass);
 
 
