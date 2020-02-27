@@ -9,10 +9,10 @@
 
 #include "TDirectory.h"
 
-class TauFakeRate: public BaseSelector {
+class TauFakeRate_mm: public BaseSelector {
 public:
-  explicit TauFakeRate(const ParameterSet& config, const TH1* skimCounters);
-  virtual ~TauFakeRate() {}
+  explicit TauFakeRate_mm(const ParameterSet& config, const TH1* skimCounters);
+  virtual ~TauFakeRate_mm() {}
 
   /// Books histograms
   virtual void book(TDirectory *dir) override;
@@ -143,9 +143,9 @@ private:
 };
 
 #include "Framework/interface/SelectorFactory.h"
-REGISTER_SELECTOR(TauFakeRate);
+REGISTER_SELECTOR(TauFakeRate_mm);
 
-TauFakeRate::TauFakeRate(const ParameterSet& config, const TH1* skimCounters)
+TauFakeRate_mm::TauFakeRate_mm(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
     fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2hwAnalysisWithTop, fHistoWrapper),
     cAllEvents(fEventCounter.addCounter("all events")),
@@ -172,9 +172,9 @@ TauFakeRate::TauFakeRate(const ParameterSet& config, const TH1* skimCounters)
 { }
 
 
-void TauFakeRate::book(TDirectory *dir) {
+void TauFakeRate_mm::book(TDirectory *dir) {
 
-  if (0) std::cout << "=== TauFakeRate::book()" << std::endl;
+  if (0) std::cout << "=== TauFakeRate_mm::book()" << std::endl;
   // Book common plots histograms
   fCommonPlots.book(dir, isData());
 
@@ -304,13 +304,13 @@ void TauFakeRate::book(TDirectory *dir) {
 }
 
 
-void TauFakeRate::setupBranches(BranchManager& branchManager) {
+void TauFakeRate_mm::setupBranches(BranchManager& branchManager) {
   fEvent.setupBranches(branchManager);
   return;
 }
 
 
-void TauFakeRate::process(Long64_t entry) {
+void TauFakeRate_mm::process(Long64_t entry) {
 
   //====== Initialize
   fCommonPlots.initialize();
@@ -601,7 +601,7 @@ void TauFakeRate::process(Long64_t entry) {
 }
 
 
-void TauFakeRate::doLooseTaus(const Event& event, const TauSelection::Data& tauData) {
+void TauFakeRate_mm::doLooseTaus(const Event& event, const TauSelection::Data& tauData) {
 
 
   // For-loop: All Selected taus
@@ -713,7 +713,7 @@ void TauFakeRate::doLooseTaus(const Event& event, const TauSelection::Data& tauD
 }
 
 
-void TauFakeRate::doTightTaus(const Event& event, const TauSelection::Data& tightTauData) {
+void TauFakeRate_mm::doTightTaus(const Event& event, const TauSelection::Data& tightTauData) {
 
   // For-loop: All selected taus
   for(unsigned int i=0; i<tightTauData.getSelectedTaus().size(); i++)
