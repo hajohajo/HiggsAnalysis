@@ -157,7 +157,7 @@ TauFakeRate_ee::TauFakeRate_ee(const ParameterSet& config, const TH1* skimCounte
     fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cLeptonOSCounter(fEventCounter.addCounter("#mu OS")),
-    cLeptonMassCounter(fEventCounter.addCounter("m_{#mu#mu} window")),
+    cLeptonMassCounter(fEventCounter.addCounter("m_{ee} window")),
     fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fTauSelection(config.getParameter<ParameterSet>("TauSelection")), // Fixes "An object with name tauSelection_ exists already"
     fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
