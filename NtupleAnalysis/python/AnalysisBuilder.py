@@ -1,6 +1,5 @@
 '''
-Package: AnalysisConfig
-
+DESCRIPTION:
 Analysis configuration, with ability to create the main analyzer 
 and the analyzers for the N systematic uncertainty variations 
 and other variations based on the config.
@@ -17,10 +16,13 @@ import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 #================================================================================================
 # Global Definitions
 #================================================================================================
-sh_Error   = ShellStyles.ErrorStyle()
-sh_Success = ShellStyles.SuccessStyle()
-sh_Note    = ShellStyles.HighlightAltStyle()
-sh_Normal  = ShellStyles.NormalStyle()
+ss = ShellStyles.SuccessStyle()
+ns = ShellStyles.NormalStyle()
+ts = ShellStyles.NoteStyle()
+hs = ShellStyles.HighlightAltStyle()
+ls = ShellStyles.HighlightStyle()
+es = ShellStyles.ErrorStyle()
+cs = ShellStyles.CaptionStyle()
 
 #================================================================================================
 # Class Definition
@@ -264,7 +266,7 @@ class AnalysisBuilder:
             msg = "Unsupported analysis \"%s\". Please select one of the following: %s" % (analysis, ", ".join(myAnalyses))
             raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle() )
         else:
-            self.Print("Analysis type set to %s" % (sh_Note + analysis + sh_Normal), True)
+            self.Print("Analysis type set to %s" % (ls + analysis + ns), True)
             return analysis
 
     def getListOfSystematics(self):
@@ -288,7 +290,7 @@ class AnalysisBuilder:
         if len(systList) < 1:
             self.Print("Disabled systematics", False)
         else:
-            self.Print("Enabled %d systematics (%s)" % (len(systList), sh_Note + ", ".join(systList) + sh_Normal), False)
+            self.Print("Enabled %d systematics (%s)" % (len(systList), hs + ", ".join(systList) + ns), False)
         return systList
 
     def getSystematicsForHToTauNu(self):
@@ -476,7 +478,7 @@ class AnalysisBuilder:
                 modStr = "%s_%s_Run%s"%(self._name, searchMode, dataEra)
                 # Create nominal module without any variation
                 configs.append(AnalysisConfig(self._name, modStr, config, self._verbose))
-                self.Print("Created nominal module %s" % (sh_Note + modStr + sh_Normal) )
+                self.Print("Created nominal module %s" % (ls + modStr + ns), False)
                 # Create modules for optimization and systematics variations
                 configs.extend(self._buildVariation(config, modStr))
 
@@ -527,5 +529,5 @@ class AnalysisBuilder:
 		kwargs[keys[level]]=item
                 configs.append(AnalysisConfig(self._name, modStr, config, self._verbose, **kwargs))
                 del kwargs[keys[level]]
-                self.Print("Created variation module %s" % (sh_Note + modStr + sh_Normal), i==0)
+                self.Print("Created variation module %s" % (hs + modStr + ns), i==0)
         return configs
