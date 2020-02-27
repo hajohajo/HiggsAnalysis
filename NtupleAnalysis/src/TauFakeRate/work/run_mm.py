@@ -56,7 +56,7 @@ import ROOT
 #================================================================================================
 # Options
 #================================================================================================
-prefix      = "TauFakeRate"
+prefix      = "TauFakeRate_mm"
 postfix     = ""
 dataEras    = ["2016"]
 searchModes = ["350to3000"] # ["80to1000"]
@@ -154,32 +154,6 @@ def main():
                        "QCD_bEnriched_HT2000toInf",
                        "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
                        "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
-                       #"ttHJetToGG_M125",
-                       #"ttHJetToNonbb_M125_ext1",
-                       #"ttHJetToTT_M125_ext4",
-                       #"ttHJetTobb_M125_ext3",
-                       #"TTTT",
-                       #"TTWJetsToLNu_ext1",
-                       #"TTWJetsToLNu_ext2",
-                       #"TTZToLLNuNu_M_10_ext3",
-                       #"TTZToQQ",
-                       #"WJetsToLNu_HT_100To200",
-                       #"WJetsToLNu_HT_100To200_ext1",
-                       #"WJetsToLNu_HT_100To200_ext2",
-                       #"WJetsToLNu_HT_1200To2500",
-                       #"WJetsToLNu_HT_1200To2500_ext1",
-                       #"WJetsToLNu_HT_200To400",
-                       #"WJetsToLNu_HT_200To400_ext1",
-                       #"WJetsToLNu_HT_200To400_ext2",
-                       #"WJetsToLNu_HT_2500ToInf",
-                       #"WJetsToLNu_HT_2500ToInf_ext1",
-                       #"WJetsToLNu_HT_400To600",
-                       #"WJetsToLNu_HT_400To600_ext1",
-                       #"WJetsToLNu_HT_600To800",
-                       #"WJetsToLNu_HT_600To800_ext1",
-                       #"WJetsToLNu_HT_70To100",
-                       #"WJetsToLNu_HT_800To1200",
-                       #"WJetsToLNu_HT_800To1200_ext1",
                        "WWTo4Q",
                        "SingleElectron_Run2016G_03Feb2017_v1_278820_280385",
                        "SingleElectron_Run2016F_03Feb2017_v1_277932_278800",
@@ -201,12 +175,7 @@ def main():
                        "DYJetsToLL_M_50_HT_800to1200",
                        "DYJetsToLL_M_50_HT_1200to2500",
                        "DYJetsToLL_M_50_HT_2500toInf",
-                       #"DYJetsToLL_M_50_ext1",
-                       #"DYJetsToLL_M_50_ext2",
                        ]
-
-        #if opts.doSystematics:
-        #    myBlackList.append("QCD")
 
         Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
         Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
@@ -225,17 +194,6 @@ def main():
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
     allSelections.MuonSelection.applyTriggerMatching = False # cannot use it for 2 muons and single-muon trigger
-    #allSelections.MuonSelection.muonPtCut = 40.0 # cannot use it for 2 muons and single-muon trigger
-    #allSelections.JetSelection.numberOfJetsCutValue = 1 # [default; 0]
-
-    # allSelections.BjetSelection.triggerMatchingApply = True
-    # allSelections.BJetSelection.numberOfBJetsCutValue = 0
-    # allSelections.BJetSelection.numberOfBJetsCutDirection = "=="
-    
-    #allSelections.TopSelectionMVA.MVACutValue           = 0.90 # [default: 0.4]
-    #allSelections.FakeBTopSelectionMVA.MVACutValue      = 0.00 # [default: -1.0]
-    #allSelections.FakeBMeasurement.LdgTopMVACutValue    = allSelections.TopSelectionMVA.MVACutValue
-    #allSelections.FakeBMeasurement.SubldgTopMVACutValue = allSelections.TopSelectionMVA.MVACutValue
 
     # ================================================================================================
     # Add Analysis Variations
@@ -290,6 +248,8 @@ def main():
     # Pick events
     # ================================================================================================
     #process.addOptions(EventSaver = PSet(enabled = True,pickEvents = True))
+
+
     # ================================================================================================
     # Run the analysis
     # ================================================================================================

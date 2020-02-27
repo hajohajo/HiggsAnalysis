@@ -17,8 +17,8 @@ endif
 #================================================================================================
 set INITIAL = `echo $USER | cut -c1-1`
 set MYDIR   = ${1} # pseudomulticrab directory name
-set FORMATS = "png"
-#set FORMATS = "png,pdf,C"
+#set FORMATS = "png"
+set FORMATS = "png,pdf,C"
 set DSETS   = "QCD|WJets"
 set DATAERA = "Run2016"
 set ANAME   = "TauFakeRate"
@@ -26,7 +26,6 @@ set SMODE   = "350to3000"
 #set GRID    = "--gridX --gridY"
 set GRID    = ""
 #set ANAME   = "Hplus2hwAnalysis_fake"
-#set SMODE   = "350to3000"
 
 #================================================================================================
 # Data/MC plots
