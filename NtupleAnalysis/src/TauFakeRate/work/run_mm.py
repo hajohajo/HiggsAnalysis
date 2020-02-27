@@ -176,9 +176,9 @@ def main():
                        "DYJetsToLL_M_50_HT_1200to2500",
                        "DYJetsToLL_M_50_HT_2500toInf",
                        ]
-
-        Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
-        Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
+        
+        Verbose("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
+        Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         regex =  "|".join(myBlackList)
         if len(myBlackList)>0:
             process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=regex)

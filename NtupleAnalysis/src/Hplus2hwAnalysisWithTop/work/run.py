@@ -179,17 +179,15 @@ def main():
                        # "QCD_bEnriched_HT1000to1500",
                        # "QCD_bEnriched_HT1500to2000",
                        # "QCD_bEnriched_HT2000toInf",
-                      "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
-                      "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
+                       # "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
+                       # "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
                        ]
-
-        Print("WARNING! Signal samples temporarily BLACKLISTED!", True)
 
         #if opts.doSystematics:
         #    myBlackList.append("QCD")
 
-        Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
-        Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
+        Verbose("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
+        Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         regex =  "|".join(myBlackList)
         if len(myBlackList)>0:
             process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=regex)
