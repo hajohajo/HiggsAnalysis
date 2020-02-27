@@ -532,7 +532,7 @@ void TauFakeRate_mm::process(Long64_t entry) {
   cSelected.increment();
   
   // Fill histos
-  fCommonPlots.fillControlPlotsAfterAllSelections(fEvent);
+  fCommonPlots.fillControlPlotsAfterAllSelections(fEvent); // not needed really
   
   if (fEvent.isMC() )
     {
