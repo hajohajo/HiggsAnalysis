@@ -118,23 +118,21 @@ private:
   WrappedTH1 *hDileptonEta_AfterLeptonSelection;
   WrappedTH1 *hDileptonMass_AfterLeptonSelection;
   
-  WrappedTH1 *hTauSrc_AfterTauSelection;
   WrappedTH1 *hNTau_AfterTauSelection;
   WrappedTH1 *hNTau_AfterJetSelection;
   WrappedTH1 *hNTau_AfterBJetSelection;
   WrappedTH1 *hNTau_AfterMetSelection;
-
-  WrappedTH1 *hNTau;
-  WrappedTH1 *hTauPt;
-  WrappedTH1 *hTauEta;
 
   WrappedTH1 *hDileptonMass_AfterTauSelection;
   WrappedTH1 *hDileptonMass_AfterJetSelection;
   WrappedTH1 *hDileptonMass_AfterBJetSelection;
   WrappedTH1 *hDileptonMass_AfterMetSelection;
 
-  WrappedTH1 *hTauSrc_AfterAllSelections;
   WrappedTH1 *hNTau_AfterAllSelections;
+  WrappedTH1 *hTauSrc_AfterAllSelections;
+  WrappedTH1 *hTauSrcDM0_AfterAllSelections;
+  WrappedTH1 *hTauSrcDM1_AfterAllSelections;
+  WrappedTH1 *hTauSrcDM10_AfterAllSelections;
   WrappedTH1 *hNJet_AfterAllSelections;
   WrappedTH1 *hNBjet_AfterAllSelections;
   WrappedTH1 *hMet_AfterAllSelections;
@@ -284,13 +282,16 @@ void TauFakeRate::book(TDirectory *dir) {
   hDileptonMass_AfterBJetSelection   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterBJetSelection" , ";m_{ll} (GeV)", mN, mMin, mMax);
   hDileptonMass_AfterMetSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterMetSelection"  , ";m_{ll} (GeV)", mN, mMin, mMax);
 
-  hTauSrc_AfterTauSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrc_AfterTauSelection", ";#tau source", nN, nMin, nMax  );
   hNTau_AfterTauSelection   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_AfterTauSelection"  , ";loose #tau-jet multiplicity" , nN  , nMin  , nMax  );
   hNTau_AfterJetSelection   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_AfterJetSelection"  , ";loose #tau-jet multiplicity" , nN  , nMin  , nMax  );
   hNTau_AfterBJetSelection  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_AfterBJetSelection" , ";loose #tau-jet multiplicity" , nN  , nMin  , nMax  );
   hNTau_AfterMetSelection   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_AfterMetSelection"  , ";loose #tau-jet multiplicity" , nN  , nMin  , nMax  );
 
-  hTauSrc_AfterAllSelections       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrc_AfterAllSelections"      , ";#tau source", nN, nMin, nMax  );
+  hTauSrc_AfterAllSelections       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrc_AfterAllSelections"    , ";#tau source", 80, 0.0, 80.0);
+  hTauSrcDM0_AfterAllSelections    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM0_AfterAllSelections" , ";#tau source", 80, 0.0, 80.0);
+  hTauSrcDM1_AfterAllSelections    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM1_AfterAllSelections" , ";#tau source", 80, 0.0, 80.0);
+  hTauSrcDM10_AfterAllSelections   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM10_AfterAllSelections", ";#tau source", 80, 0.0, 80.0);
+
   hNTau_AfterAllSelections         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_AfterAllSelections"        , ";loose #tau-jet multiplicity", nN  , nMin  , nMax  );
   hNJet_AfterAllSelections         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NJet_AfterAllSelections"        , ";jet multiplicity"  , nN  , nMin  , nMax  );
   hNBjet_AfterAllSelections        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NBjet_AfterAllSelections"       , ";b-jet multiplicity", nN  , nMin  , nMax  );
@@ -440,33 +441,35 @@ void TauFakeRate::process(Long64_t entry) {
   // Determine if genuine or fake tau. If more than one tau present use the first one in the list (pt-sorted)
   bool bEleToTau     = false; // ele  -> tau fakes only
   bool bMuonToTau    = false; // muon -> tau fakes only
-  bool bJetToTau     = false; // jet  -> tau fakes only
+  // bool bJetToTau     = false; // jet  -> tau fakes only
   bool bLightQToTau  = false; // light quark-> tau fakes only (u,d,s)
   bool bHeavyQToTau  = false; // heavy quark-> tau fakes only (c,b)
   bool bGluonToTau   = false; // jet  -> tau fakes only
   bool bUnknownToTau = false; // unknown -> tau fakes only
   bool bGenuineTau   = false;
+  unsigned int tau_dm = looseTauData.getSelectedTau().decayMode();
   if ( fEvent.isMC() )
     {
       bEleToTau     = looseTauData.getSelectedTau().isElectronToTau();
       bMuonToTau    = looseTauData.getSelectedTau().isMuonToTau();
-      bJetToTau     = looseTauData.getSelectedTau().isJetToTau();
+      // bJetToTau     = looseTauData.getSelectedTau().isJetToTau();
       bLightQToTau  = looseTauData.getSelectedTau().isQuarkToTau(1) || looseTauData.getSelectedTau().isQuarkToTau(2) || looseTauData.getSelectedTau().isQuarkToTau(3);
       bHeavyQToTau  = looseTauData.getSelectedTau().isQuarkToTau(4) || looseTauData.getSelectedTau().isQuarkToTau(5);
       bGluonToTau   = looseTauData.getSelectedTau().isGluonToTau();
       bUnknownToTau = looseTauData.getSelectedTau().isUnknownTauDecay();
       bGenuineTau   = looseTauData.getSelectedTau().isGenuineTau();
     }
-  int tauSrcBit =  1*bEleToTau + 2*bMuonToTau + 3*bJetToTau + 4*bLightQToTau + 5*bHeavyQToTau + 6*bGluonToTau + 7*bUnknownToTau;// => genuineTau = 0
-  // int tauSrcBit =  pow(2,0)*bEleToTau + pow(2,1)*bMuonToTau + pow(2,2)*bJetToTau + pow(2,3)*bQuarkToTau + pow(2,4)*bGluonToTau + pow(2,5)*bUnknownToTau;// => genuineTau = 0
+
+  // Define a bit to store the source of fake. Note that more than one source might be true (rare but happens)
+  // int tauSrcBit =  1*bEleToTau + 2*bMuonToTau + 3*bLightQToTau + 4*bHeavyQToTau + 5*bGluonToTau + 6*bUnknownToTau;// => genuineTau = 0
+  int tauSrcBit =  pow(2,0)*bEleToTau + pow(2,1)*bMuonToTau + pow(2,2)*bLightQToTau + pow(2,3)*bHeavyQToTau + pow(2,4)*bGluonToTau + pow(2,5)*bUnknownToTau;// => genuineTau = 0
 
   // Fake tau in our analysis is "not genuine tau and not e->tau and not mu->tau"
   bool bFakeTau = ( fEvent.isMC() && !bGenuineTau && !(bEleToTau || bMuonToTau) );
   
   // Fill histos ( also sets value for boolean bIsGenuineTau
   hDileptonMass_AfterTauSelection->Fill(dilepton_invMass);
-  hNTau_AfterTauSelection->Fill( looseTauData.getSelectedTaus().size() );
-  if (fEvent.isMC()) hTauSrc_AfterTauSelection->Fill(tauSrcBit);
+  hNTau_AfterTauSelection->Fill( looseTauData.getSelectedTaus().size() );  
   fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, looseTauData); // uses: bIsGenuineTau = data.getSelectedTaus()[0].isGenuineTau();
 
   // Redefine what the "bGenuineTau" boolean is. N.B: Affects the genuineTau plots filled by control plots!
@@ -527,11 +530,17 @@ void TauFakeRate::process(Long64_t entry) {
   //================================================================================================
   if (0) std::cout << "=== All Selections" << std::endl;
   cSelected.increment();
-
+  
   // Fill histos
   fCommonPlots.fillControlPlotsAfterAllSelections(fEvent);
-
-  if (fEvent.isMC()) hTauSrc_AfterAllSelections->Fill(tauSrcBit);
+  
+  if (fEvent.isMC() )
+    {
+      hTauSrc_AfterAllSelections->Fill(tauSrcBit);
+      if (tau_dm == 0)  hTauSrcDM0_AfterAllSelections->Fill(tauSrcBit);
+      if (tau_dm == 1)  hTauSrcDM1_AfterAllSelections->Fill(tauSrcBit);
+      if (tau_dm == 10) hTauSrcDM10_AfterAllSelections->Fill(tauSrcBit);
+    }
   hNTau_AfterAllSelections->Fill( looseTauData.getSelectedTaus().size() );
   hNJet_AfterAllSelections ->Fill( jetData.getSelectedJets().size() );
   hNBjet_AfterAllSelections->Fill( bjetData.getSelectedBJets().size() );
@@ -621,7 +630,7 @@ void TauFakeRate::doLooseTaus(const Event& event, const TauSelection::Data& tauD
 
       // Only if MC  and selected tau is genuine (not fake)
       // if (event.isMC() && tauData.getSelectedTaus()[i].isGenuineTau()) 
-      if (!bFakeTau)
+      if (bIsMC && !bFakeTau)
 	{
 	  if (tau_dm == 0)  
 	    {
@@ -727,12 +736,12 @@ void TauFakeRate::doTightTaus(const Event& event, const TauSelection::Data& tigh
 	  bGenuineTau = tightTauData.getSelectedTaus()[i].isGenuineTau();
 	  bEleToTau   = tightTauData.getSelectedTaus()[i].isElectronToTau();
 	  bMuonToTau  = tightTauData.getSelectedTaus()[i].isMuonToTau();
-	  bFakeTau    = (bIsMC && !bGenuineTau && !(bEleToTau || bMuonToTau) );
+	  bFakeTau    = (!bGenuineTau && !(bEleToTau || bMuonToTau) );
 	}
 
       // Only if MC  and selected tau is genuine. (if not genuine tau, reject the events)
       //if (event.isMC() && tightTauData.getSelectedTaus()[i].isGenuineTau()) 
-      if (!bFakeTau)
+      if (bIsMC && !bFakeTau)
 	{
 	  if (tau_dm==0) 
 	    {
@@ -808,6 +817,6 @@ void TauFakeRate::doTightTaus(const Event& event, const TauSelection::Data& tigh
 	    }
 	}
     }
-  
+
   return;
 }
