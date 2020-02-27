@@ -151,7 +151,6 @@ def main(opts):
 
         # Set signal cross-section
         newOrder = ["Data", "DYJetsToLL", "TT", "Diboson", "SingleTop", "ttX"]
-        # newOrder = ["Data", "DYJetsToLLHT", "TT", "Diboson", "SingleTop", "ttX", "WJetsHT"] #"WJets"
 
         # For-loop: All dataset objects
         for d in datasetsMgr.getAllDatasets():

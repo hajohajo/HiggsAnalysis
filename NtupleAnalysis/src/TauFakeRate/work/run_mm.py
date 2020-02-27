@@ -8,15 +8,15 @@ used as input to plotting scripts to get the desired results.
 
 
 USAGE:
-./run.py -m <multicrab_directory> -n 10 -e "Keyword1|Keyword2|Keyword3"
+./run_mm.py -m <multicrab_directory> -n 10 -e "Keyword1|Keyword2|Keyword3"
 
 
 EXAMPLE:
-./run.py -m <multicrab_directory> -n 10 -e "QCD_bEnriched_HT300|2016|ST_"
+./run_mm.py -m <multicrab_directory> -n 10 -e "QCD_bEnriched_HT300|2016|ST_"
 
 
 LAST USED:
-./run.py -m  /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2hwAnalysis_v8030_20190628T1421
+./run_mm.py -m  /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2hwAnalysis_v8030_20190628T1421
 
 ROOT:
 The available ROOT options for the Error-Ignore-Level are (const Int_t):
@@ -72,7 +72,7 @@ def Verbose(msg, printHeader=False):
         return
 
     if printHeader:
-        print "=== run.py:"
+        print "=== run_mm.py:"
 
     if msg !="":
         print "\t", msg
@@ -81,7 +81,7 @@ def Verbose(msg, printHeader=False):
 
 def Print(msg, printHeader=True):
     if printHeader:
-        print "=== run.py:"
+        print "=== run_mm.py:"
 
     if msg !="":
         print "\t", msg
