@@ -154,9 +154,9 @@ TauFakeRate_ee::TauFakeRate_ee(const ParameterSet& config, const TH1* skimCounte
     cTrigger(fEventCounter.addCounter("passed trigger")),
     fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cVertexSelection(fEventCounter.addCounter("passed PV")),
-    fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
-    fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    cLeptonOSCounter(fEventCounter.addCounter("#mu OS")),
+    fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
+    cLeptonOSCounter(fEventCounter.addCounter("e OS")),
     cLeptonMassCounter(fEventCounter.addCounter("m_{ee} window")),
     fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     // fTauSelection(config.getParameter<ParameterSet>("TauSelection")), // Fixes "An object with name tauSelection_ exists already"
@@ -176,7 +176,7 @@ TauFakeRate_ee::TauFakeRate_ee(const ParameterSet& config, const TH1* skimCounte
 
 void TauFakeRate_ee::book(TDirectory *dir) {
 
-  if (1) std::cout << "=== TauFakeRate_ee::book()" << std::endl;
+  if (0) std::cout << "=== TauFakeRate_ee::book()" << std::endl;
   // Book common plots histograms
   fCommonPlots.book(dir, isData());
 
@@ -640,7 +640,7 @@ void TauFakeRate_ee::doLooseTaus(const Event& event, const TauSelection::Data& t
 
       // Only if MC  and selected tau is genuine (not fake)
       // if (event.isMC() && tauData.getSelectedTaus()[i].isGenuineTau()) 
-      if (!bFakeTau)
+      if (bIsMC && !bFakeTau)
 	{
 	  if (tau_dm == 0)  
 	    {
@@ -662,7 +662,7 @@ void TauFakeRate_ee::doLooseTaus(const Event& event, const TauSelection::Data& t
 	      if (tau_inBarrel) hTauPt_den_g_dm10_barrel->Fill( tau_pt );
 	      else hTauPt_den_g_dm10_endcap->Fill( tau_pt );
 	    }
-	}// (!bFakeTau)
+	}// (bIsMC && !bFakeTau)
     
       // 1-prong decays; decay mode (DM) = 0
       if (tau_dm==0) 
@@ -751,7 +751,7 @@ void TauFakeRate_ee::doTightTaus(const Event& event, const TauSelection::Data& t
 
       // Only if MC  and selected tau is genuine. (if not genuine tau, reject the events)
       //if (event.isMC() && tightTauData.getSelectedTaus()[i].isGenuineTau()) 
-      if (!bFakeTau)
+      if (bIsMC && !bFakeTau)
 	{
 	  if (tau_dm==0) 
 	    {
