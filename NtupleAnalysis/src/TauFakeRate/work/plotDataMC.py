@@ -305,9 +305,11 @@ def GetHistoKwargs(histoName, opts):
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["moveLegend"] = _legRM #_legNE
         kwargs["divideByBinWidth"] = False
+        if "dilepton" in h.lower():
+            kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}            
 
     if "tausrc" in h.lower():
-        kwargs["opts"]   = {"xmax": +12, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmax": +65, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "DeltaR" in h or "DeltaY" in h or "DR" in h:
         kwargs["ylabel"] = "Events / %.2f "
