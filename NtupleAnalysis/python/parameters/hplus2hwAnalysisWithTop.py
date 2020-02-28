@@ -351,10 +351,9 @@ commonPlotsOptions = PSet(
     etaBins           = PSet(nBins =  50, axisMin = -5.0, axisMax =    5.0),
     phiBins           = PSet(nBins =  64, axisMin = -3.2, axisMax =    3.2),
     deltaEtaBins      = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
-    #deltaPhiBins      = PSet(nBins =  32, axisMin =  0.0, axisMax =    3.2),
     deltaPhiBins      = PSet(nBins =  36, axisMin =  0.0, axisMax =  180.0), # 5 degress
     deltaRBins        = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
-    rtauBins          = PSet(nBins =  55, axisMin =  0.0, axisMax =    1.1), # HToTauNu
+    rtauBins          = PSet(nBins =  55, axisMin =  0.0, axisMax =    1.1),
     njetsBins         = PSet(nBins =  18, axisMin =  0.0, axisMax =   18.0),
     metBins           = PSet(nBins = 160, axisMin =  0.0, axisMax =  800.0), # 5 GeV bin width
     htBins            = PSet(nBins = 400, axisMin =  0.0, axisMax = 2000.0), # 5 GeV bin width 
@@ -362,8 +361,8 @@ commonPlotsOptions = PSet(
     angularCuts1DBins = PSet(nBins =  52, axisMin =  0.0, axisMax =  260.0), 
     topMassBins       = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width 
     wMassBins         = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width 
-    mtBins            = PSet(nBins = 200, axisMin =  0.0, axisMax = 2000.0), # 10 GeV bin width
-    invMassBins       = PSet(nBins = 600, axisMin =  0.0, axisMax = 3000.0), #  5 GeV bin width
+    mtBins            = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width
+    invMassBins       = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width
 )
 
 #================================================================================================
