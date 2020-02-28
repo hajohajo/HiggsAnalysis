@@ -35,7 +35,7 @@ QGLInputStash::QGLInputStash() {}
 // Destructor
 QGLInputStash::~QGLInputStash() {
   
-  std::vector<std::vector<QGLInputItem*>> collections = { fLight, fGluon};
+  std::vector<std::vector<QGLInputItem*>> collections = { fUDS, fG};
   for (auto& container: collections) {
     for (size_t i = 0; i < container.size(); ++i) {
       delete container[i];
@@ -62,10 +62,10 @@ const float QGLInputStash::getInputValue(std::string jetType, float QGL, float p
 
 // Get vector of input items (according to jetType)
 std::vector<QGLInputItem*>& QGLInputStash::getCollection(std::string jetType) {
-  if (jetType == "Light")
-    return fLight;
-  else if (jetType == "Gluon")
-    return fGluon;
+  if (jetType == "UDS")
+    return fUDS;
+  else if (jetType == "G")
+    return fG;
   throw hplus::Exception("Logic") << "Unknown jet type requested! " << jetType;
 }
 
@@ -112,8 +112,8 @@ QuarkGluonLikelihoodRatio::QuarkGluonLikelihoodRatio(const ParameterSet& config)
 
 QuarkGluonLikelihoodRatio::~QuarkGluonLikelihoodRatio() {
   delete hAllJetsNonBJetsQGL;
-  delete hGluonJetQGL;
-  delete hLightJetQGL;
+  delete hGJetQGL;
+  delete hUDSJetQGL;
 
   delete hQGLR;
   delete hQGLR_vs_HT;
@@ -121,8 +121,8 @@ QuarkGluonLikelihoodRatio::~QuarkGluonLikelihoodRatio() {
 }
 
 void QuarkGluonLikelihoodRatio::initialize(const ParameterSet& config) {
-  handleQGLInput(config, "Light"); 
-  handleQGLInput(config, "Gluon");
+  handleQGLInput(config, "UDS"); 
+  handleQGLInput(config, "G");
   
   return;
 }
@@ -130,8 +130,8 @@ void QuarkGluonLikelihoodRatio::initialize(const ParameterSet& config) {
 void QuarkGluonLikelihoodRatio::handleQGLInput(const ParameterSet& config, std::string jetType) { 
   
   boost::optional<std::vector<ParameterSet>> psets;
-  if (jetType == "Light") psets = config.getParameterOptional<std::vector<ParameterSet>>("LightJetsQGL");
-  if (jetType == "Gluon") psets = config.getParameterOptional<std::vector<ParameterSet>>("GluonJetsQGL");
+  if (jetType == "UDS") psets = config.getParameterOptional<std::vector<ParameterSet>>("UDSJetsQGL");
+  if (jetType == "G") psets = config.getParameterOptional<std::vector<ParameterSet>>("GJetsQGL");
   
   if (!psets) return;
   
@@ -162,9 +162,9 @@ void QuarkGluonLikelihoodRatio::bookHistograms(TDirectory* dir) {
   float fQGLMin     = 0.0;
   float fQGLMax     = 1.0;
     
-  hAllJetsNonBJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllJetsNonBJetsQGL", "Quark-Gluon discriminant for all jets bot identified as b-jets", nQGLBins, fQGLMin, fQGLMax);
-  hGluonJetQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "GluonJetQGL", "Quark-Gluon discriminant for Gluon Jets", nQGLBins, fQGLMin, fQGLMax);
-  hLightJetQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "LightJetQGL", "Quark-Gluon discriminant for Light Jets", nQGLBins, fQGLMin, fQGLMax);
+  hAllJetsNonBJetsQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "AllJetsNonBJetsQGL", "Quark-Gluon discriminant for all jets not identified as b-jets", nQGLBins, fQGLMin, fQGLMax);
+  hGJetQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "GJetQGL", "Quark-Gluon discriminant for Gluon Jets", nQGLBins, fQGLMin, fQGLMax);
+  hUDSJetQGL = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "UDSJetQGL", "Quark-Gluon discriminant for UDS Jets", nQGLBins, fQGLMin, fQGLMax);
   
   hQGLR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "QGLR", "Quark-Gluon likelihood ratio", nQGLBins, fQGLMin, fQGLMax);
   hQGLR_vs_HT = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, subdir, "QGLR_vs_HT", "QGLR Vs H_{T} (GeVc^{-1})", 50, 0.0, 4000.0, nQGLBins, fQGLMin, fQGLMax);
@@ -229,17 +229,17 @@ QuarkGluonLikelihoodRatio::Data QuarkGluonLikelihoodRatio::privateAnalyze(const 
 	// Jets to keep
 	output.fJetsForQGLR.push_back(jet);
 	
-	// Gluon Jets
+	// G Jets
 	if (jetPartonFlavour == 21)
 	  {
-	    output.fGluonJets.push_back(jet);
-	    hGluonJetQGL->Fill(jet.QGTaggerAK4PFCHSqgLikelihood());
+	    output.fGJets.push_back(jet);
+	    hGJetQGL->Fill(jet.QGTaggerAK4PFCHSqgLikelihood());
 	  }
-	// Light Jets
+	// UDS Jets
 	if (jetPartonFlavour == 1 || jetPartonFlavour == 2 || jetPartonFlavour == 3)
 	  {
-	    output.fLightJets.push_back(jet);
-	    hLightJetQGL->Fill(jet.QGTaggerAK4PFCHSqgLikelihood());
+	    output.fUDSJets.push_back(jet);
+	    hUDSJetQGL->Fill(jet.QGTaggerAK4PFCHSqgLikelihood());
 	  }
       } 
     else 
@@ -332,9 +332,9 @@ double QuarkGluonLikelihoodRatio::calculateL(const Event& iEvent, const std::vec
 	  double QGL   = QuarkJet.QGTaggerAK4PFCHSqgLikelihood();
 	  double pt    = QuarkJet.pt();
 	  
-	  productQuark *= fProb.getInputValue("Light", QGL, pt);
+	  productQuark *= fProb.getInputValue("UDS", QGL, pt);
 	  
-	  if (0) std::cout<<"Light Jet |  q="<<q<<"  with index="<<index<<"   pt ="<<pt<<"  QGL="<<QGL<<"  Probability="<<fProb.getInputValue("Light", QGL, pt)<<std::endl;
+	  if (0) std::cout<<"UDS Jet |  q="<<q<<"  with index="<<index<<"   pt ="<<pt<<"  QGL="<<QGL<<"  Probability="<<fProb.getInputValue("UDS", QGL, pt)<<std::endl;
 	}
       
       for (unsigned int g=Nq; g<v.size(); g++)
@@ -344,9 +344,9 @@ double QuarkGluonLikelihoodRatio::calculateL(const Event& iEvent, const std::vec
 	  double QGL   = GluonJet.QGTaggerAK4PFCHSqgLikelihood();
 	  double pt    = GluonJet.pt();
 	  
-	  productGluon *= fProb.getInputValue("Gluon", QGL, pt);
+	  productGluon *= fProb.getInputValue("G", QGL, pt);
 	  
-	  if (0) std::cout<<"Gluon Jet |  g="<<g<<"  with index="<<index<<"   pt ="<<pt<<"  QGL="<<QGL<<"  Probability="<<fProb.getInputValue("Gluon", QGL, pt)<<std::endl;
+	  if (0) std::cout<<"Gluon Jet |  g="<<g<<"  with index="<<index<<"   pt ="<<pt<<"  QGL="<<QGL<<"  Probability="<<fProb.getInputValue("G", QGL, pt)<<std::endl;
 	}
       sum+= productQuark * productGluon;
     }
