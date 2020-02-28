@@ -144,7 +144,7 @@ def main(opts):
         datasetsMgr.loadLuminosities() # from lumi.json
 
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
-        if 0:
+        if 1:
             datasetsMgr.PrintInfo()
         plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
         datasetsMgr.PrintInfo()
