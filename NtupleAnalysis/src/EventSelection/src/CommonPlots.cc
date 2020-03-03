@@ -294,9 +294,9 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
     
   // Create histograms
   const bool hplus2tb     = ( (fAnalysisType == kFakeBMeasurement) || (fAnalysisType == kHplus2tbAnalysis) );
-  const bool hplus2hw     = ( (fAnalysisType == kHplus2hwAnalysis) || (fAnalysisType == kHplus2hwAnalysisWithTop) );
+  const bool hplus2hw     = ( (fAnalysisType == kHplus2hwAnalysis) || (fAnalysisType == kHplus2hwAnalysisWithTop) || (fAnalysisType == kQCDMeasurement_mmt) || (fAnalysisType == kHplus2hwAnalysis_mmt));
   const bool hplus2hw_top = ( (fAnalysisType == kHplus2hwAnalysisWithTop) );
-  const bool hplus2hw_ele = ( (fAnalysisType == kHplus2hw_ele_Analysis) );
+  const bool hplus2hw_ele = ( (fAnalysisType == kHplus2hw_ele_Analysis) || (fAnalysisType == kQCDMeasurement_eet) || (fAnalysisType == kHplus2hwAnalysis_eet));
 
   // vertex
 
@@ -836,7 +836,7 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
 						       100, 0, 0.2);
     }// if (!hplus2tb)   
   
-    if (hplus2hw)
+    if (hplus2hw || fAnalysisType == kQCDMeasurement_muon)
     {
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlSelectedMuonPtAfterAllSelections, 
                                                        "SelectedMu_pT_AfterAllSelections", ";#mu p_{T}, GeV/c;N_{events}",
@@ -853,7 +853,7 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
     }// if (hplushw_muon)
 
 
-    if (hplus2hw_ele)
+    if (hplus2hw_ele || fAnalysisType == kQCDMeasurement_ele)
     {
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlSelectedElectronPtAfterAllSelections, 
                                                        "SelectedEle_pT_AfterAllSelections", ";e p_{T}, GeV/c;N_{events}",
@@ -1283,7 +1283,7 @@ void CommonPlots::fillControlPlotsAfterTauSelection(const Event& event, const Ta
       if (data.getAntiIsolatedTaus().size()==1) {
 //        bIsGenuineTau = data.getAntiIsolatedTauIsGenuineTau();
 	bIsGenuineTau = data.getAntiIsolatedTaus()[0].isGenuineTau();
-      } else if (data.getAntiIsolatedTaus()[0].isGenuineTau() || data.getAntiIsolatedTaus()[1].isGenuineTau()) {
+      } else if (data.getAntiIsolatedTaus().size() >= 2 && (data.getAntiIsolatedTaus()[0].isGenuineTau() || data.getAntiIsolatedTaus()[1].isGenuineTau())) {
 	bIsGenuineTau = true;
       } else {
 	bIsGenuineTau = false;
@@ -1331,7 +1331,9 @@ void CommonPlots::fillControlPlotsAfterBtagSF(const Event& event, const JetSelec
 }
 
 void CommonPlots::fillControlPlotsAfterAntiIsolatedTauSelection(const Event& event, const TauSelection::Data& data) {
+
   for (auto& p: fBaseObjects) {
+//    std::cout << p->isNull() << "\n";
     p->fillControlPlotsAfterAntiIsolatedTauSelection(event, data);
   }
 }
@@ -1643,19 +1645,19 @@ void CommonPlots::fillControlPlotsAfterTopologicalSelections(const Event& event,
   return;
 }
 
-void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau) {
+void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau, int first, int second) {
   fHistoSplitter.fillShapeHistogramTriplet(hCtrlNVerticesAfterAllSelections, bIsGenuineTau, iVertices);
 
   if (withoutTau == false)
     {
       if (usesAntiIsolatedTaus()) {
-        if (fTauData.getAntiIsolatedTaus().size() > 1 ) {
-          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[0].pt());
-          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[0].eta());
-          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[0].phi());
-          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[1].pt());
-          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[1].eta());
-          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[1].phi());
+        if (fTauData.getAntiIsolatedTaus().size() >= 2 && fTauData.getSelectedTaus().size() == 0) {
+          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[first].pt());
+          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[first].eta());
+          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[first].phi());
+          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[second].pt());
+          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[second].eta());
+          fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[second].phi());
 
           fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().pt());
           fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().eta());
@@ -1673,33 +1675,37 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
         }
 	else
 	  {
-	    if (fTauData.getAntiIsolatedTaus().size() > 0)
+	    if (fTauData.getAntiIsolatedTaus().size() >= 1 && fTauData.getSelectedTaus().size() == 1)
 	      {
-		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[0].pt());
-		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[0].eta());
-		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[0].phi());
-	      }
-	    if (fTauData.getSelectedTaus().size() > 0)
-	      {
+		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[first].pt());
+		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[first].eta());
+		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTaus()[first].phi());
 		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[0].pt());
 		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[0].eta());
 		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[0].phi());
 	      }
-	    
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().pt());
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().eta());
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().phi());
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauEtaPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().eta(), fTauData.getAntiIsolatedTau().phi());
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauLdgTrkPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().lChTrkPt());
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauDecayModeAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().decayMode());
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauNProngsAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().nProngs());
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauRtauAfterAllSelections, bIsGenuineTau, fTauData.getRtauOfAntiIsolatedTau());
-
-	    for (auto& p: fHelper.getTauSourceData(!event.isMC(), fTauData.getAntiIsolatedTau())) 
-	      {
-		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauSourceAfterAllSelections, bIsGenuineTau, p);
-	      }
-	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauIPxyAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().IPxy());
+	    else if (fTauData.getAntiIsolatedTaus().size() == 0 && fTauData.getSelectedTaus().size() == 1)
+              {
+                fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[0].pt());
+                fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[0].eta());
+                fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[0].phi());
+              }
+            else if (fTauData.getAntiIsolatedTaus().size() >= 1 && fTauData.getSelectedTaus().size() == 0)
+              {
+	        fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().pt());
+	        fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauEtaAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().eta());
+	        fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().phi());
+	        fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauEtaPhiAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().eta(), fTauData.getAntiIsolatedTau().phi());
+	        fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauLdgTrkPtAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().lChTrkPt());
+	        fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauDecayModeAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().decayMode());
+	        fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauNProngsAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().nProngs());
+	        fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauRtauAfterAllSelections, bIsGenuineTau, fTauData.getRtauOfAntiIsolatedTau());
+              }
+//	    for (auto& p: fHelper.getTauSourceData(!event.isMC(), fTauData.getAntiIsolatedTau())) 
+//	      {
+//		fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauSourceAfterAllSelections, bIsGenuineTau, p);
+//	      }
+//	    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTauIPxyAfterAllSelections, bIsGenuineTau, fTauData.getAntiIsolatedTau().IPxy());
 	  }
       } // antiIsolatedTaus
       else
@@ -1708,7 +1714,7 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[0].eta());
 	  fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPhiAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[0].phi());
 	  
-	  if(fTauData.getSelectedTaus().size() > 1)
+	  if(fTauData.getSelectedTaus().size() >= 2)
 	    {
 	      fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausPtAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[1].pt());
 	      fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedTausEtaAfterAllSelections, bIsGenuineTau, fTauData.getSelectedTaus()[1].eta());
@@ -1743,9 +1749,16 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
   
   // Muons
   if(fMuonData.hasIdentifiedMuons()){
-    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonPtAfterAllSelections, bIsGenuineTau, fMuonData.getHighestSelectedMuonPt());
-    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonEtaAfterAllSelections, bIsGenuineTau, fMuonData.getHighestSelectedMuonEta());
-    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonPhiAfterAllSelections, bIsGenuineTau, fMuonData.getHighestSelectedMuonPhi());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonPtAfterAllSelections, bIsGenuineTau, fMuonData.getSelectedMuons()[0].pt());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonEtaAfterAllSelections, bIsGenuineTau, fMuonData.getSelectedMuons()[0].eta());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedMuonPhiAfterAllSelections, bIsGenuineTau, fMuonData.getSelectedMuons()[0].phi());
+  }
+
+  // Electrons
+  if(fElectronData.hasIdentifiedElectrons()){
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedElectronPtAfterAllSelections, bIsGenuineTau, fElectronData.getSelectedElectrons()[0].pt());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedElectronEtaAfterAllSelections, bIsGenuineTau, fElectronData.getSelectedElectrons()[0].eta());
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlSelectedElectronPhiAfterAllSelections, bIsGenuineTau, fElectronData.getSelectedElectrons()[0].phi());
   }
 
   fHistoSplitter.fillShapeHistogramTriplet(hCtrlNJetsAfterAllSelections, bIsGenuineTau, fJetData.getNumberOfSelectedJets());
@@ -1785,15 +1798,24 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
     {
       if (usesAntiIsolatedTaus()) {
         if (fTauData.getAntiIsolatedTaus().size()>0) {
-	  if (fAnalysisType == kQCDMeasurement || fAnalysisType == kQCDNormalizationSystematicsControlRegion) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTau(), fMETData.getMET());
+	  if (fAnalysisType == kQCDMeasurement ) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTau(), fMETData.getMET());
         }
-        if (fTauData.getAntiIsolatedTaus().size()>=2) {
-          if (fAnalysisType == kHplus2hwAnalysis || fAnalysisType == kQCDMeasurement_muon) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[0],fTauData.getAntiIsolatedTaus()[1],fMuonData.getSelectedMuons()[0], fMETData.getMET());
-          if (fAnalysisType == kHplus2hw_ele_Analysis || fAnalysisType == kQCDMeasurement_ele) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[0],fTauData.getAntiIsolatedTaus()[1],fElectronData.getSelectedElectrons()[0], fMETData.getMET());
+        if (fTauData.getAntiIsolatedTaus().size()>=2 && fTauData.getSelectedTaus().size() == 0) {
+          if (fAnalysisType == kHplus2hwAnalysis || fAnalysisType == kQCDMeasurement_muon) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[first],fTauData.getAntiIsolatedTaus()[second],fMuonData.getSelectedMuons()[0], fMETData.getMET());
+          if (fAnalysisType == kHplus2hw_ele_Analysis || fAnalysisType == kQCDMeasurement_ele) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[first],fTauData.getAntiIsolatedTaus()[second],fElectronData.getSelectedElectrons()[0], fMETData.getMET());
         }
-        if (fTauData.getAntiIsolatedTaus().size()==1) {
-          if (fAnalysisType == kHplus2hwAnalysis || fAnalysisType == kQCDMeasurement_muon) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getAntiIsolatedTaus()[0],fMuonData.getSelectedMuons()[0], fMETData.getMET());
-          if (fAnalysisType == kHplus2hw_ele_Analysis || fAnalysisType == kQCDMeasurement_ele) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getAntiIsolatedTaus()[0],fElectronData.getSelectedElectrons()[0], fMETData.getMET());
+        if (fTauData.getAntiIsolatedTaus().size()>=1 && fTauData.getSelectedTaus().size() == 1) {
+          if (fAnalysisType == kHplus2hwAnalysis || fAnalysisType == kQCDMeasurement_muon) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getAntiIsolatedTaus()[first],fMuonData.getSelectedMuons()[0], fMETData.getMET());
+          if (fAnalysisType == kHplus2hw_ele_Analysis || fAnalysisType == kQCDMeasurement_ele) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getAntiIsolatedTaus()[first],fElectronData.getSelectedElectrons()[0], fMETData.getMET());
+        }
+        if (fTauData.getSelectedTaus().size() == 0 && fTauData.getAntiIsolatedTaus().size() >= 1 && fMuonData.getSelectedMuons().size() == 1 && fMuonData.getAntiIsolatedMuons().size() >= 1) {
+          if (fAnalysisType == kQCDMeasurement_mmt) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[first],fMuonData.getSelectedMuons()[0],fMuonData.getAntiIsolatedMuons()[0], fMETData.getMET());
+        }
+        if (fTauData.getAntiIsolatedTaus().size() >= 1 && fMuonData.getSelectedMuons().size() == 2) {
+          if (fAnalysisType == kQCDMeasurement_mmt) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[first],fMuonData.getSelectedMuons()[0],fMuonData.getSelectedMuons()[1], fMETData.getMET());
+        }
+        if (fTauData.getAntiIsolatedTaus().size() >= 1) {
+          if (fAnalysisType == kQCDMeasurement_eet) myTransverseMass = TransverseMass::reconstruct(fTauData.getAntiIsolatedTaus()[first],fElectronData.getSelectedElectrons()[0],fElectronData.getSelectedElectrons()[1], fMETData.getMET());
         }
 
 //        myTransverseMass = TransverseMass::reconstruct(fLooseTauData.getSelectedTaus()[0],fLooseTauData.getSelectedTaus()[0],fMuonData.getSelectedMuons()[0], fMETData.getMET());
@@ -1806,6 +1828,8 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
 	   else myTransverseMass = -1.0;
 	 }
        if (fAnalysisType == kHplus2hw_ele_Analysis) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fTauData.getSelectedTaus()[1],fElectronData.getSelectedElectrons()[0], fMETData.getMET());
+       if (fAnalysisType == kHplus2hwAnalysis_mmt) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fMuonData.getSelectedMuons()[0],fMuonData.getSelectedMuons()[1], fMETData.getMET());
+       if (fAnalysisType == kHplus2hwAnalysis_eet) myTransverseMass = TransverseMass::reconstruct(fTauData.getSelectedTaus()[0],fElectronData.getSelectedElectrons()[0],fElectronData.getSelectedElectrons()[1],fMETData.getMET());
       }
 
       // Create the up and down variation for tau ID shape
@@ -1815,6 +1839,7 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
       }else if(tauIDdown && fTauData.hasIdentifiedTaus() && fTauData.getSelectedTau().pt()>=200){
 	fHistoSplitter.fillShapeHistogramTriplet(hShapeTransverseMass, bIsGenuineTau, myTransverseMass, (hShapeTransverseMass[0]->UnprotectedGetWeight()*(1.0-0.35*fTauData.getSelectedTau().pt()/1000.0)));
       }else{
+//	fHistoSplitter.fillShapeHistogramTriplet(hShapeTransverseMass, bIsGenuineTau, myTransverseMass);
 	fHistoSplitter.fillShapeHistogramTriplet(hShapeTransverseMass, bIsGenuineTau, myTransverseMass);
       }
     }// if (withoutTau == false)
@@ -1823,7 +1848,7 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
     hNSelectedVsRunNumber->Fill(event.eventID().run());
   }
   for (auto& p: fBaseObjects) {
-    p->fillControlPlotsAfterAllSelections(event);
+    p->fillControlPlotsAfterAllSelections(event,withoutTau,first,second);
   }
 
   // TopSelection histograms

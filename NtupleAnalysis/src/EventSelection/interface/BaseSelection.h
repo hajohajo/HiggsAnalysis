@@ -7,6 +7,7 @@ class EventCounter;
 class HistoWrapper;
 class EventID;
 class CommonPlots;
+class CommonPlots_ttm;
 class EventWeight;
 
 #include <string>
@@ -15,6 +16,8 @@ class BaseSelection {
   public:
     /// Constructor for event selection with histogramming
     BaseSelection(EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots = 0, const std::string& postfix = "");
+    BaseSelection(EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots = 0, const std::string& postfix = "");
+    BaseSelection(EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix = "");
     /// Constructor for filtering without histogramming
     BaseSelection();
     virtual ~BaseSelection();
@@ -41,6 +44,7 @@ class BaseSelection {
     EventCounter* getEventCounterPointer() const { return &fEventCounter; }
     HistoWrapper* getHistoWrapperPointer() const { return &fHistoWrapper; }
     bool fCommonPlotsIsEnabled() const { return (fCommonPlots != 0); }
+    bool fCommonPlotsIsEnabled_ttm() const { return (fCommonPlots_ttm != 0); }
 
   private:
     EventWeight* fLocalDummyEventWeight; // Used only for constructor without histogramming (owner)
@@ -51,6 +55,7 @@ class BaseSelection {
     EventCounter& fEventCounter;
     HistoWrapper& fHistoWrapper;
     CommonPlots* fCommonPlots;
+    CommonPlots_ttm* fCommonPlots_ttm;
     const std::string sPostfix;
   
   private:

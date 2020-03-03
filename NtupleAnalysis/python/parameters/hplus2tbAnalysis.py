@@ -174,6 +174,19 @@ hplusSelection = PSet(
     FreeBjetsCutDirection    =  ">=" # [default: ">="]
     )
 
+#================================================================================================ 
+# QGLR
+#================================================================================================
+qglSelection = PSet(
+    QGLRCutValue             = 0.0,
+    QGLRCutDirection         = ">=",
+    numberOfJetsCutValue     = 10,
+    numberOfJetsCutDirection = "<=",
+)
+jsonReader.setupQGLInformation(QGLRPset       = qglSelection,
+                               jsonname_UDS = "QGLdiscriminator_QCD_UDSJets_Run2016.json",
+                               jsonname_G   = "QGLdiscriminator_QCD_GJets_Run2016.json")
+
 #================================================================================================
 # FakeB Measurement Options
 #================================================================================================
@@ -305,6 +318,7 @@ allSelections = PSet(
     # FatJetSelection       = fatjetVeto,
     #FakeBMeasurement      = fakeBMeasurement,
     #FakeBBjetSelection    = fakeBBjetSelection,
+    QGLRSelection         = qglSelection,
     CommonPlots           = commonPlotsOptions,
     HistogramAmbientLevel = histogramAmbientLevel,
 )

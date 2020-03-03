@@ -8,15 +8,15 @@ used as input to plotting scripts to get the desired results.
 
 
 USAGE:
-./run.py -m <multicrab_directory> -n 10 -e "Keyword1|Keyword2|Keyword3"
+./run_mm.py -m <multicrab_directory> -n 10 -e "Keyword1|Keyword2|Keyword3"
 
 
 EXAMPLE:
-./run.py -m <multicrab_directory> -n 10 -e "QCD_bEnriched_HT300|2016|ST_"
+./run_mm.py -m <multicrab_directory> -n 10 -e "QCD_bEnriched_HT300|2016|ST_"
 
 
 LAST USED:
-./run.py -m  /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2hwAnalysis_v8030_20190628T1421
+./run_mm.py -m  /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2hwAnalysis_v8030_20190628T1421
 
 ROOT:
 The available ROOT options for the Error-Ignore-Level are (const Int_t):
@@ -56,7 +56,7 @@ import ROOT
 #================================================================================================
 # Options
 #================================================================================================
-prefix      = "TauFakeRate"
+prefix      = "TauFakeRate_mm"
 postfix     = ""
 dataEras    = ["2016"]
 searchModes = ["350to3000"] # ["80to1000"]
@@ -72,7 +72,7 @@ def Verbose(msg, printHeader=False):
         return
 
     if printHeader:
-        print "=== run.py:"
+        print "=== run_mm.py:"
 
     if msg !="":
         print "\t", msg
@@ -81,7 +81,7 @@ def Verbose(msg, printHeader=False):
 
 def Print(msg, printHeader=True):
     if printHeader:
-        print "=== run.py:"
+        print "=== run_mm.py:"
 
     if msg !="":
         print "\t", msg
@@ -154,32 +154,6 @@ def main():
                        "QCD_bEnriched_HT2000toInf",
                        "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
                        "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
-                       #"ttHJetToGG_M125",
-                       #"ttHJetToNonbb_M125_ext1",
-                       #"ttHJetToTT_M125_ext4",
-                       #"ttHJetTobb_M125_ext3",
-                       #"TTTT",
-                       #"TTWJetsToLNu_ext1",
-                       #"TTWJetsToLNu_ext2",
-                       #"TTZToLLNuNu_M_10_ext3",
-                       #"TTZToQQ",
-                       #"WJetsToLNu_HT_100To200",
-                       #"WJetsToLNu_HT_100To200_ext1",
-                       #"WJetsToLNu_HT_100To200_ext2",
-                       #"WJetsToLNu_HT_1200To2500",
-                       #"WJetsToLNu_HT_1200To2500_ext1",
-                       #"WJetsToLNu_HT_200To400",
-                       #"WJetsToLNu_HT_200To400_ext1",
-                       #"WJetsToLNu_HT_200To400_ext2",
-                       #"WJetsToLNu_HT_2500ToInf",
-                       #"WJetsToLNu_HT_2500ToInf_ext1",
-                       #"WJetsToLNu_HT_400To600",
-                       #"WJetsToLNu_HT_400To600_ext1",
-                       #"WJetsToLNu_HT_600To800",
-                       #"WJetsToLNu_HT_600To800_ext1",
-                       #"WJetsToLNu_HT_70To100",
-                       #"WJetsToLNu_HT_800To1200",
-                       #"WJetsToLNu_HT_800To1200_ext1",
                        "WWTo4Q",
                        "SingleElectron_Run2016G_03Feb2017_v1_278820_280385",
                        "SingleElectron_Run2016F_03Feb2017_v1_277932_278800",
@@ -190,13 +164,21 @@ def main():
                        "SingleElectron_Run2016H_03Feb2017_ver2_v1_281613_284035",
                        "SingleElectron_Run2016F_03Feb2017_v1_278801_278808",
                        "SingleElectron_Run2016C_03Feb2017_v1_275656_276283",
+                       "DYJetsToLL_M_50_HT_70to100",
+                       "DYJetsToLL_M_50_HT_100to200",
+                       "DYJetsToLL_M_50_HT_100to200_ext1",
+                       "DYJetsToLL_M_50_HT_200to400",
+                       "DYJetsToLL_M_50_HT_200to400_ext1",
+                       "DYJetsToLL_M_50_HT_400to600",
+                       "DYJetsToLL_M_50_HT_400to600_ext1",
+                       "DYJetsToLL_M_50_HT_600to800",
+                       "DYJetsToLL_M_50_HT_800to1200",
+                       "DYJetsToLL_M_50_HT_1200to2500",
+                       "DYJetsToLL_M_50_HT_2500toInf",
                        ]
-
-        #if opts.doSystematics:
-        #    myBlackList.append("QCD")
-
-        Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
-        Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
+        
+        Verbose("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
+        Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         regex =  "|".join(myBlackList)
         if len(myBlackList)>0:
             process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=regex)
@@ -212,17 +194,6 @@ def main():
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
     allSelections.MuonSelection.applyTriggerMatching = False # cannot use it for 2 muons and single-muon trigger
-    #allSelections.MuonSelection.muonPtCut = 40.0 # cannot use it for 2 muons and single-muon trigger
-    allSelections.JetSelection.numberOfJetsCutValue = 1 # [default; 0]
-
-    # allSelections.BjetSelection.triggerMatchingApply = True
-    # allSelections.BJetSelection.numberOfBJetsCutValue = 0
-    # allSelections.BJetSelection.numberOfBJetsCutDirection = "=="
-    
-    #allSelections.TopSelectionMVA.MVACutValue           = 0.90 # [default: 0.4]
-    #allSelections.FakeBTopSelectionMVA.MVACutValue      = 0.00 # [default: -1.0]
-    #allSelections.FakeBMeasurement.LdgTopMVACutValue    = allSelections.TopSelectionMVA.MVACutValue
-    #allSelections.FakeBMeasurement.SubldgTopMVACutValue = allSelections.TopSelectionMVA.MVACutValue
 
     # ================================================================================================
     # Add Analysis Variations
@@ -277,6 +248,8 @@ def main():
     # Pick events
     # ================================================================================================
     #process.addOptions(EventSaver = PSet(enabled = True,pickEvents = True))
+
+
     # ================================================================================================
     # Run the analysis
     # ================================================================================================

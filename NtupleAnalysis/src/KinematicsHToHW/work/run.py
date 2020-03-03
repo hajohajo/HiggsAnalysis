@@ -150,7 +150,7 @@ def main():
     # ================================================================================================
     # Overwrite Default Settings  
     # ================================================================================================
-    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysisWithTop.py import allSelections
+    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysisWithTop import allSelections
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
 
@@ -197,7 +197,7 @@ def main():
                               usePUreweighting       = opts.usePUreweighting,
                               useTopPtReweighting    = opts.useTopPtReweighting,
                               doSystematicVariations = opts.doSystematics,
-                              analysisType="HToTB",
+                              analysisType="HToHW",
                               verbose=opts.verbose)
 
     # Add variations (e.g. for optimisation)

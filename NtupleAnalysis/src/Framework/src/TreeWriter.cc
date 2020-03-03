@@ -2,7 +2,7 @@
 #include "Framework/interface/Exception.h"
 
 #include "EventSelection/interface/TransverseMass.h"
-
+#include "Math/VectorUtil.h"
 #include <iomanip>
 #include <sstream>
 
@@ -46,6 +46,12 @@ void TreeWriter::book(TDirectory *dir) {
   Float_t sub_leading_tau_eta;
   Float_t sub_leading_tau_phi;
 
+  Float_t deltaPhiTauTau;
+
+  Float_t ldgTrkPtFrac;
+  Float_t deltaPhiTauMET;
+  Float_t deltaPhiTauBjet;
+
   //muons
 
   Float_t leading_muon_pt;
@@ -60,9 +66,8 @@ void TreeWriter::book(TDirectory *dir) {
 //  Float_t leading_tau_phi;
 
   // b-jets
-//  Float_t leading_tau_pt;
-//  Float_t leading_tau_eta;
-//  Float_t leading_tau_phi;
+  Float_t bjet_pt;
+  Float_t deltaPhiBjetMET;
 
   // MET
   Float_t MET_pt;
@@ -82,9 +87,17 @@ void TreeWriter::book(TDirectory *dir) {
   t->Branch("sub_leading_tau_eta",&sub_leading_tau_eta,"sub_leading_tau_eta/F");
   t->Branch("sub_leading_tau_phi",&sub_leading_tau_phi,"sub_leading_tau_phi/F");
 
+  t->Branch("deltaPhiTauTau",&deltaPhiTauTau,"deltaPhiTauTau/F");
+  t->Branch("ldgTrkPtFrac",&ldgTrkPtFrac,"ldgTrkPtFrac/F");
+  t->Branch("deltaPhiTauMET",&deltaPhiTauMET,"deltaPhiTauMET/F");
+  t->Branch("deltaPhiTauBjet",&deltaPhiTauBjet,"deltaPhiTauBjet/F");
+
   t->Branch("leading_muon_pt",&leading_muon_pt,"leading_muon_pt/F");
   t->Branch("leading_muon_eta",&leading_muon_eta,"leading_muon_eta/F");
   t->Branch("leading_muon_phi",&leading_muon_phi,"leading_muon_phi/F");
+
+  t->Branch("bjet_pt",&bjet_pt,"bjet_pt/F");
+  t->Branch("deltaPhiBjetMET",&deltaPhiBjetMET,"deltaPhiBjetMET/F");
 
   t->Branch("MET_pt",&MET_pt,"MET_pt/F");
   t->Branch("MET_phi",&MET_phi,"MET_phi/F");
@@ -120,6 +133,8 @@ void TreeWriter::write(const Event& event,
 
   // write information to the root file
 
+  //taus
+
   Float_t leading_tau_pt;
   Float_t leading_tau_eta;
   Float_t leading_tau_phi;
@@ -128,15 +143,28 @@ void TreeWriter::write(const Event& event,
   Float_t sub_leading_tau_eta;
   Float_t sub_leading_tau_phi;
 
+  Float_t deltaPhiTauTau;
+  Float_t ldgTrkPtFrac;
+  Float_t deltaPhiTauMET;
+  Float_t deltaPhiTauBjet;
+
+  //muons
+
   Float_t leading_muon_pt;
   Float_t leading_muon_eta;
   Float_t leading_muon_phi;
 
+  // b-jets
+  Float_t bjet_pt;
+  Float_t deltaPhiBjetMET;
+
+  // MET
   Float_t MET_pt;
   Float_t MET_phi;
 
-  Float_t transverse_mass;
 
+  //Transverse mass
+  Float_t transverse_mass;
 
   t = (TTree*)f->Get(b);
 
@@ -153,6 +181,14 @@ void TreeWriter::write(const Event& event,
   t->SetBranchAddress("leading_muon_eta",&leading_muon_eta);
   t->SetBranchAddress("leading_muon_phi",&leading_muon_phi);
 
+  t->SetBranchAddress("deltaPhiTauTau",&deltaPhiTauTau);
+  t->SetBranchAddress("ldgTrkPtFrac",&ldgTrkPtFrac);
+  t->SetBranchAddress("deltaPhiTauMET",&deltaPhiTauMET);
+  t->SetBranchAddress("deltaPhiTauBjet",&deltaPhiTauBjet);
+
+  t->SetBranchAddress("bjet_pt",&bjet_pt);
+  t->SetBranchAddress("deltaPhiBjetMET",&deltaPhiBjetMET);
+
   t->SetBranchAddress("MET_pt",&MET_pt);
   t->SetBranchAddress("MET_phi",&MET_phi);
 
@@ -168,6 +204,14 @@ void TreeWriter::write(const Event& event,
   sub_leading_tau_pt = tauData.getSelectedTaus()[1].pt();
   sub_leading_tau_eta = tauData.getSelectedTaus()[1].eta();
   sub_leading_tau_phi = tauData.getSelectedTaus()[1].phi();
+
+  deltaPhiTauTau = ROOT::Math::VectorUtil::DeltaPhi(tauData.getSelectedTaus()[0].p4(),tauData.getSelectedTaus()[1].p4());
+  ldgTrkPtFrac = 2.0*tauData.getSelectedTaus()[0].lChTrkPt()/tauData.getSelectedTaus()[0].pt()-1.0;
+  deltaPhiTauMET = ROOT::Math::VectorUtil::DeltaPhi(tauData.getSelectedTaus()[0].p4(),METData.getMET());
+  deltaPhiTauBjet = ROOT::Math::VectorUtil::DeltaPhi(tauData.getSelectedTaus()[0].p4(),bJetData.getSelectedBJets()[0].p4());
+
+  bjet_pt = bJetData.getSelectedBJets()[0].pt();
+  deltaPhiBjetMET = ROOT::Math::VectorUtil::DeltaPhi(bJetData.getSelectedBJets()[0].p4(),METData.getMET());
 
   leading_muon_pt = muonData.getSelectedMuons()[0].pt();
   leading_muon_eta = muonData.getSelectedMuons()[0].eta();

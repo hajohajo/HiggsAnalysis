@@ -1,6 +1,5 @@
 '''
-Package: AnalysisConfig
-
+DESCRIPTION:
 Analysis configuration, with ability to create the main analyzer 
 and the analyzers for the N systematic uncertainty variations 
 and other variations based on the config.
@@ -17,10 +16,13 @@ import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 #================================================================================================
 # Global Definitions
 #================================================================================================
-sh_Error   = ShellStyles.ErrorStyle()
-sh_Success = ShellStyles.SuccessStyle()
-sh_Note    = ShellStyles.HighlightAltStyle()
-sh_Normal  = ShellStyles.NormalStyle()
+ss = ShellStyles.SuccessStyle()
+ns = ShellStyles.NormalStyle()
+ts = ShellStyles.NoteStyle()
+hs = ShellStyles.HighlightAltStyle()
+ls = ShellStyles.HighlightStyle()
+es = ShellStyles.ErrorStyle()
+cs = ShellStyles.CaptionStyle()
 
 #================================================================================================
 # Class Definition
@@ -76,7 +78,10 @@ class AnalysisConfig:
                     scaleFactors.assignMETTriggerSF(self._config.METSelection, self._config.BJetSelection.bjetDiscrWorkingPoint, self._getDirectionString(value), self._config.Trigger.METtriggerEfficiencyJsonName, variationType)
                 elif value.startswith("MuonTrgEff"):
                     variationType = value.replace("MuonTrgEff","").replace("Minus","").replace("Plus","")
-                    scaleFactors.assignMuonTriggerSF(self._config.MuonSelection, self._getDirectionString(value), self._config.Trigger.MuontriggerEfficiencyJsonName, variationType)
+                    scaleFactors.assignMuonTriggerSF(self._config.MuonSelection, self._getDirectionString(value), self._config.Trigger.MuontriggerEfficiencyJsonName, variationType="Data")
+		elif value.startswith("ElectronTrgEff"):
+                    variationType = value.replace("ElectronTrgEff","").replace("Minus","").replace("Plus","")
+                    scaleFactors.assignElectronTriggerSF(self._config.ElectronSelection, self._getDirectionString(value), self._config.Trigger.ElectrontriggerEfficiencyJsonName, variationType="Data")
 
                 # tau ID syst
                 elif value.startswith("TauIDSyst"):
@@ -85,6 +90,14 @@ class AnalysisConfig:
 		# muon ID syst
                 elif value.startswith("MuonIDSyst"):
                     self._config.systematicVariation = "_"+value.replace("Plus","down").replace("Minus","up")
+                    variationType = value.replace("MuonIDSyst","").replace("Minus","").replace("Plus","")
+                    scaleFactors.assignMuonIdentificationSF(self._config.MuonSelection, self._getDirectionString(value), variationType="Data")
+
+		# electron ID syst
+                elif value.startswith("ElectronIDSyst"):
+                    self._config.systematicVariation = "_"+value.replace("Plus","down").replace("Minus","up")
+                    variationType = value.replace("ElectronIDSyst","").replace("Minus","").replace("Plus","")
+                    scaleFactors.assignElectronIdentificationSF(self._config.ElectronSelection, self._getDirectionString(value), variationType="Data")
 
 		# b tag SF
 		elif value.startswith("BTagSF") or value.startswith("BMistagSF"):
@@ -248,12 +261,12 @@ class AnalysisBuilder:
         return
 
     def _getAnalysisType(self, analysis):
-        myAnalyses = ["HToTauNu", "HToTB","HToHW", "HToHW_background", "HToHW_withTop"]
+        myAnalyses = ["HToTauNu", "HToTB","HToHW", "HToHW_ele", "HToHW_background", "HToHW_background_ele", "HToHW_withTop"]
         if analysis not in myAnalyses:
             msg = "Unsupported analysis \"%s\". Please select one of the following: %s" % (analysis, ", ".join(myAnalyses))
             raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle() )
         else:
-            self.Print("Analysis type set to %s" % (sh_Note + analysis + sh_Normal), True)
+            self.Print("Analysis type set to %s" % (ls + analysis + ns), True)
             return analysis
 
     def getListOfSystematics(self):
@@ -264,16 +277,20 @@ class AnalysisBuilder:
             systList = self.getSystematicsForHToTB()
 	elif  self._analysisType == "HToHW":
             systList = self.getSystematicsForHToHW()
+	elif  self._analysisType == "HToHW_ele":
+            systList = self.getSystematicsForHToHW_ele()
 	elif  self._analysisType == "HToHW_withTop":
             systList = self.getSystematicsForHToHW_withTop()
 	elif  self._analysisType == "HToHW_background":
             systList = self.getSystematicsForHToHW_background()
+	elif  self._analysisType == "HToHW_background_ele":
+            systList = self.getSystematicsForHToHW_background_ele()
         else:
             raise Exception(ShellStyles.ErrorStyle() + "This should never be reached" + ShellStyles.NormalStyle() )
         if len(systList) < 1:
             self.Print("Disabled systematics", False)
         else:
-            self.Print("Enabled %d systematics (%s)" % (len(systList), sh_Note + ", ".join(systList) + sh_Normal), False)
+            self.Print("Enabled %d systematics (%s)" % (len(systList), hs + ", ".join(systList) + ns), False)
         return systList
 
     def getSystematicsForHToTauNu(self):
@@ -353,6 +370,33 @@ class AnalysisBuilder:
 
         return items
 
+    def getSystematicsForHToHW_ele(self):
+        items = []
+
+        # Trigger systematics
+        items.extend(["ElectronTrgEffData"])
+
+        # Tau ID variation systematics
+        items.extend(["FakeTauElectron", "FakeTauMuon", "FakeTauJet", "TauIDSyst"])
+
+        # Electron ID variation systematics
+        items.extend(["ElectronIDSyst"])
+
+        # Energy scales and JER systematics
+        items.extend(["TauES", "JES", "JER", "UES"])
+
+        # b quark systematics
+        items.extend(["BTagSF", "BMistagSF"])
+
+        # top quark systematics
+        if self._useTopPtReweighting:
+            items.append("TopPt")
+
+        # PU weight systematics
+        items.extend(["PUWeight"])
+
+        return items
+
     def getSystematicsForHToHW_withTop(self):
         items = []
 
@@ -385,6 +429,14 @@ class AnalysisBuilder:
 
         # Trigger systematics
         items.extend(["MuonTrgEffData"])
+
+        return items
+
+    def getSystematicsForHToHW_background_ele(self):
+        items = []
+
+        # Trigger systematics
+        items.extend(["ElectronTrgEffData"])
 
         return items
 
@@ -426,7 +478,7 @@ class AnalysisBuilder:
                 modStr = "%s_%s_Run%s"%(self._name, searchMode, dataEra)
                 # Create nominal module without any variation
                 configs.append(AnalysisConfig(self._name, modStr, config, self._verbose))
-                self.Print("Created nominal module %s" % (sh_Note + modStr + sh_Normal) )
+                self.Print("Created nominal module %s" % (ls + modStr + ns), False)
                 # Create modules for optimization and systematics variations
                 configs.extend(self._buildVariation(config, modStr))
 
@@ -477,5 +529,5 @@ class AnalysisBuilder:
 		kwargs[keys[level]]=item
                 configs.append(AnalysisConfig(self._name, modStr, config, self._verbose, **kwargs))
                 del kwargs[keys[level]]
-                self.Print("Created variation module %s" % (sh_Note + modStr + sh_Normal), i==0)
+                self.Print("Created variation module %s" % (hs + modStr + ns), i==0)
         return configs

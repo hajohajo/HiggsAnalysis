@@ -14,10 +14,11 @@ EXAMPLES:
 ./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" -s png --cutLineX 45.0 --cutLineY 0.4
 ./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" -s png --gridX --gridY --yMin 0.0 --yMax 0.6
 ./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" -s png --gridX --gridY --yMin 0.0 --yMax 0.6 -e "WJets" --individualMC
+./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" --gridX --gridY --yMin 0.0 --yMax 1.0 -e "WJets" --individualMC
 
 
 LAST USED (HToHW_withTop):
-./plotTauFakeRates.py -m TauFakeRate_Attempt4_MuonPt40_AtLeast2Jets_08Feb2020 --numHisto "tauPt_num_1pr" --denHisto "tauPt_den_1pr" --gridX --gridY --yMin 0.0 --yMax 1.0 -e "WJets" --individualMC
+./plotTauFakeRates.py -a TauFakeRate_ee --numHisto "tauPt_num_dm0" --denHisto "tauPt_den_dm0" --gridX --gridY --yMin 0.0 --yMax 1.0 -m
 
 
 LAST USED (HToHW):
@@ -195,7 +196,7 @@ def main(opts):
 
         # Merge all MC datasets into a a MC-soup dataset called "Simulation"  ?
         if 0:
-            datasetsMgr.merge(mcName, mcList) #iro
+            datasetsMgr.merge(mcName, mcList)
 
         if not foundData:
             raise Exception("Data samples are required for this script! (foundData = %s)" % (foundData) )
@@ -307,7 +308,7 @@ def PlotHistoGraphs(hGraphList, kwargs):
 
     # For-loop: All efficiencie TGraphs    
     for g in hGraphList:
-        # g.getRootHisto().GetXaxis().SetTitle(_kwargs["xlabel"]) #iro
+        # g.getRootHisto().GetXaxis().SetTitle(_kwargs["xlabel"])
         g.getRootHisto().GetYaxis().SetTitle(_kwargs["ylabel"])
         if opts.yMin != None:
             g.getRootHisto().SetMinimum(_kwargs["opts"]["ymin"])
@@ -393,7 +394,8 @@ def GetHistoKwargs(opts):
         "addCmsText"       : True,
         "cmsExtraText"     : "Very Preliminary",
         "opts"             : {"ymaxfactor": 10.0},
-        "opts2"            : {"ymin": 0.0, "ymax": 2.0},
+        #"opts2"            : {"ymin": 0.0, "ymax": 2.0},
+        "opts2"            : {"ymin": 0.65, "ymax": 1.35},
         "divideByBinWidth" : False,
         "log"              : True,
         "moveLegend"       : _legNE, 
@@ -749,7 +751,7 @@ if __name__ == "__main__":
     parser.add_option("-b", "--batchMode", dest="batchMode", action="store_false", default=BATCHMODE, 
                       help="Enables batch mode (canvas creation does NOT generate a window) [default: %s]" % BATCHMODE)
 
-    parser.add_option("--analysisName", dest="analysisName", type="string", default=ANALYSISNAME,
+    parser.add_option("-a", "--analysisName", dest="analysisName", type="string", default=ANALYSISNAME,
                       help="Override default analysisName [default: %s]" % ANALYSISNAME)
 
     parser.add_option("--intLumi", dest="intLumi", type=float, default=INTLUMI,
@@ -845,7 +847,8 @@ if __name__ == "__main__":
         raise Exception(es + msg + ns)
 
     # Set name for saving
-    opts.saveName = "TauFR_%s" % (opts.denHisto.split("_")[-1])
+    opts.saveName = opts.denHisto.replace("tauPt", "TauFR").replace("num_", "").replace("den_", "")
+    #opts.saveName = "TauFR_%s" % (opts.denHisto.split("_")[-1])
 
     # Create save formats
     if "," in opts.saveFormats:

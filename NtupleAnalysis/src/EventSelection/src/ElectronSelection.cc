@@ -3,6 +3,7 @@
 
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/CommonPlots_ttm.h"
 #include "DataFormat/interface/Electron.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
@@ -11,7 +12,11 @@
 
 ElectronSelection::Data::Data()
 : fHighestSelectedElectronPt(0.0),
-  fHighestSelectedElectronEta(0.0) { }
+  fHighestSelectedElectronEta(0.0),
+  fElectronIDSF(1.0),
+  fElectronTriggerSF(1.0),
+  fHLTElectronCharge(1) { }
+
 
 ElectronSelection::Data::~Data() { }
 
@@ -25,6 +30,8 @@ ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& e
   fVetoMode(false),
   fMiniIsol(false),
   fElectronMVA(false),
+  fElectronIDSFReader(config.getParameterOptional<ParameterSet>("electronIDSF")),
+  fElectronTriggerSFReader(config.getParameterOptional<ParameterSet>("electronTriggerSF")),
   // Event counter for passing selection
   cPassedElectronSelection(fEventCounter.addCounter("passed e selection ("+postfix+")")),
   // Sub counters
@@ -41,6 +48,63 @@ ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& e
   initialize(config, postfix);
 }
 
+ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  cfg_ElectronPtCut(config.getParameter<float>("electronPtCut")),
+  cfg_ElectronEtaCut(config.getParameter<float>("electronEtaCut")),
+  cfg_ElectronMVACut(config.getParameter<string>("electronMVACut")),
+  fRelIsoCut(-1.0),
+  fMiniIsoCut(-1.0),
+  fVetoMode(false),
+  fMiniIsol(false),
+  fElectronMVA(false),
+  fElectronIDSFReader(config.getParameterOptional<ParameterSet>("electronIDSF")),
+  fElectronTriggerSFReader(config.getParameterOptional<ParameterSet>("electronTriggerSF")),
+  // Event counter for passing selection
+  cPassedElectronSelection(fEventCounter.addCounter("passed e selection ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("e selection ("+postfix+")", "All events")),
+  cSubPassedIsPresent(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed is present")),
+  cSubPassedTriggerMatching(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed trigger matching")),
+  cSubPassedPt(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedEta(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedID(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed ID")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed isolation")),
+  cSubPassedSelection(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed selection")),
+  cSubPassedVeto(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed veto"))
+{
+  initialize(config, postfix);
+}
+
+ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, nullptr, postfix),
+  cfg_ElectronPtCut(config.getParameter<float>("electronPtCut")),
+  cfg_ElectronEtaCut(config.getParameter<float>("electronEtaCut")),
+  cfg_ElectronMVACut(config.getParameter<string>("electronMVACut")),
+  fRelIsoCut(-1.0),
+  fMiniIsoCut(-1.0),
+  fVetoMode(false),
+  fMiniIsol(false),
+  fElectronMVA(false),
+  fElectronIDSFReader(config.getParameterOptional<ParameterSet>("electronIDSF")),
+  fElectronTriggerSFReader(config.getParameterOptional<ParameterSet>("electronTriggerSF")),
+  // Event counter for passing selection
+  cPassedElectronSelection(fEventCounter.addCounter("passed e selection ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("e selection ("+postfix+")", "All events")),
+  cSubPassedIsPresent(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed is present")),
+  cSubPassedTriggerMatching(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed trigger matching")),
+  cSubPassedPt(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedEta(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedID(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed ID")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed isolation")),
+  cSubPassedSelection(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed selection")),
+  cSubPassedVeto(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed veto"))
+{
+  initialize(config, postfix);
+}
+
+
 ElectronSelection::ElectronSelection(const ParameterSet& config, const std::string& postfix)
 : BaseSelection(),
   cfg_ElectronPtCut(config.getParameter<float>("electronPtCut")),
@@ -51,6 +115,8 @@ ElectronSelection::ElectronSelection(const ParameterSet& config, const std::stri
   fVetoMode(false),
   fMiniIsol(false),
   fElectronMVA(false),
+  fElectronIDSFReader(config.getParameterOptional<ParameterSet>("electronIDSF")),
+  fElectronTriggerSFReader(config.getParameterOptional<ParameterSet>("electronTriggerSF")),
   // Event counter for passing selection
   cPassedElectronSelection(fEventCounter.addCounter("passed e selection ("+postfix+")")),
   // Sub counters
@@ -197,10 +263,27 @@ ElectronSelection::Data ElectronSelection::analyze(const Event& event) {
     {
       fCommonPlots->fillControlPlotsAtElectronSelection(event, data);
     }
-  
+  if (fCommonPlotsIsEnabled_ttm())
+    {
+      fCommonPlots_ttm->fillControlPlotsAtElectronSelection(event, data);
+    }
   // Return data
   return data;
 }
+
+ElectronSelection::Data ElectronSelection::analyzeLoose(const Event& event) {
+  ensureAnalyzeAllowed(event.eventID());
+  ElectronSelection::Data data = privateAnalyzeLoose(event);
+  // Send data to CommonPlots
+//  if (fCommonPlotsIsEnabled())
+//    {
+//      fCommonPlots->fillControlPlotsAtElectronSelection(event, data);
+//    }
+
+  // Return data
+  return data;
+}
+
 
 ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
   Data output;
@@ -225,6 +308,200 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
 	}
     }
   
+
+  // For-loop: All muons to find trg match
+  if (cfg_ApplyTriggerMatching) {
+    for(Electron electron: event.electrons()) {
+      // Apply trigger matching
+      if (this->passTrgMatching(electron, myTriggerElectronMomenta)) {
+        passedTrgMatch = true;
+//        output.fHLTElectronCharge = electron.charge();
+      }
+    }
+  }
+
+  // For-loop: All electrons
+  for(Electron electron: event.electrons()) 
+    {
+      passedIsPresent = true;
+      
+      // Apply trigger matching
+//      if (cfg_ApplyTriggerMatching)
+//	{
+//	  if (!this->passTrgMatching(electron, myTriggerElectronMomenta)) continue;
+//	}
+      // Designate as trigger-matched
+//      output.fHLTElectronCharge = electron.charge();
+      if (cfg_ApplyTriggerMatching) {
+        if(!passedTrgMatch) continue;
+      }
+
+//      passedTrgMatch = true;
+      
+      // Fill histograms before any cuts
+      hElectronPtAll->Fill(electron.pt());
+      hElectronEtaAll->Fill(electron.eta());
+      hElectronRelIsoAll->Fill(electron.effAreaIsoDeltaBeta()); // electron.relIsoDeltaBeta()
+      hElectronMiniIsoAll->Fill(electron.effAreaMiniIso());
+      
+      // Debug?
+//      if (0) cout << "pt = " << electron.pt() << ", eta = " << electron.eta() << ", cut-ID = " << electron.electronIDDiscriminator() << endl;
+
+      //=== Apply cut on pt    
+      if (electron.pt() < cfg_ElectronPtCut) continue;
+      passedPt = true;
+      
+      //=== Apply cut on eta
+      if (std::fabs(electron.eta()) > cfg_ElectronEtaCut) continue;
+      passedEta = true;
+      
+      // Determine if Cut-based ID passed
+      bool passedCutBasedID = electron.electronIDDiscriminator();
+      bool passedMVA        = false;
+      bool passedIDCut      = false;
+      // Determine if MVA ID passed
+      if (fElectronMVA) passedMVA   = getMVADecision(electron, cfg_ElectronMVACut); 
+      if (fElectronMVA) passedIDCut = passedMVA;
+      else passedIDCut = passedCutBasedID;
+      //=== Apply cut on ID (Cut-based or MVA)
+      if (!passedIDCut) continue;
+      passedID = true;
+      
+      // Fill histograms before isolation cut
+      hIsolPtBefore->Fill(electron.pt());
+      hIsolEtaBefore->Fill(electron.eta());
+      hIsolRelIsoBefore->Fill(electron.effAreaIsoDeltaBeta());
+      hIsolMiniIsoBefore->Fill(electron.effAreaMiniIso());
+      if (fCommonPlotsIsEnabled())
+	{
+	  hIsolVtxBefore->Fill(fCommonPlots->nVertices());
+	}
+      
+      // Determine Relative and Mini Isolation booleans
+      bool passedRelIso  = (electron.effAreaIsoDeltaBeta() < fRelIsoCut);
+      bool passedMiniIso = (electron.effAreaMiniIso() < fMiniIsoCut);
+      bool passedIsolCut = false;
+      if (fMiniIsol) passedIsolCut =  passedMiniIso;
+      else passedIsolCut =  passedRelIso;
+
+      if (!passedIsolCut) 
+	{
+	  output.fAntiIsolatedElectrons.push_back(electron);
+	  passedIsol = false;
+	} 
+      else
+	{
+	  passedIsol = true;
+	  output.fSelectedElectrons.push_back(electron);
+	}
+
+      //=== Apply cut on electron isolation
+      if (!passedIsolCut) continue;
+      
+      // Fill histograms after isolation cut
+      hIsolPtAfter->Fill(electron.pt());
+      hIsolEtaAfter->Fill(electron.eta());
+      hIsolRelIsoAfter->Fill(electron.effAreaIsoDeltaBeta());
+      hIsolMiniIsoAfter->Fill(electron.effAreaMiniIso());
+      if (fCommonPlotsIsEnabled()) 
+	{
+	  hIsolVtxAfter->Fill(fCommonPlots->nVertices());
+	}
+      
+      // Fill histograms after all cuts
+      hElectronPtPassed->Fill(electron.pt());
+      hElectronEtaPassed->Fill(electron.eta());
+      hElectronRelIsoPassed->Fill(electron.effAreaIsoDeltaBeta());
+      hElectronMiniIsoPassed->Fill(electron.effAreaMiniIso());
+      
+      // Save the highest pt electron
+      if (electron.pt() > output.fHighestSelectedElectronPt) 
+	{
+	  output.fHighestSelectedElectronPt = electron.pt();
+	  output.fHighestSelectedElectronEta = electron.eta();
+	}
+      
+      // Fill resolution histograms
+      if (event.isMC()) 
+	{
+	  hPtResolution->Fill((electron.pt() - electron.MCelectron()->pt()) / electron.pt());
+	  hEtaResolution->Fill((electron.eta() - electron.MCelectron()->eta()) / electron.eta());
+	  hPhiResolution->Fill((electron.phi() - electron.MCelectron()->phi()) / electron.phi());
+	}
+      
+    }//for-loop: electrons
+  
+  
+  // Sort electrons, needed comparisons defined in Electron.h
+  std::sort(output.fSelectedElectrons.begin(), output.fSelectedElectrons.end());
+  std::sort(output.fAntiIsolatedElectrons.begin(), output.fAntiIsolatedElectrons.end());
+
+  // Assign booleans
+  passedSelection = (output.fSelectedElectrons.size() > 0);
+  passedVeto      = (output.fSelectedElectrons.size() == 0); 
+
+  // Set electron ID SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedElectrons()) {
+      output.fElectronIDSF = fElectronIDSFReader.getScaleFactorValue(output.getSelectedElectrons()[0].eta());
+    }
+  }
+
+  // Set electron trigger SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedElectrons()) {
+      output.fElectronTriggerSF = fElectronTriggerSFReader.getScaleFactorValue(output.getSelectedElectrons()[0].pt());
+    }
+  }
+
+  // Fill histos
+  hElectronNAll->Fill(event.electrons().size());
+  hElectronNPassed->Fill(output.fSelectedElectrons.size());
+
+  // Fill sub-counters
+  if (passedIsPresent) cSubPassedIsPresent.increment();
+  if (passedTrgMatch) cSubPassedTriggerMatching.increment();
+  if (passedPt) cSubPassedPt.increment();
+  if (passedEta) cSubPassedEta.increment();
+  if (passedID) cSubPassedID.increment();
+  if (passedIsol) cSubPassedIsolation.increment();
+  if (passedSelection) cSubPassedSelection.increment();
+  if (passedVeto) cSubPassedVeto.increment();
+  if (fVetoMode) 
+    {
+      if (passedVeto) cPassedElectronSelection.increment();
+    }
+  else
+    {
+      if (passedSelection) cPassedElectronSelection.increment();
+    }
+
+  // Return data object
+  return output;
+}
+
+ElectronSelection::Data ElectronSelection::privateAnalyzeLoose(const Event& event) {
+  Data output;
+  cSubAll.increment();
+  bool passedIsPresent = false;
+  bool passedTrgMatch  = false;
+  bool passedPt        = false;
+  bool passedEta       = false;
+  bool passedID        = false;
+  bool passedIsol      = false;
+  bool passedSelection = false;
+  bool passedVeto      = false;
+
+  // Cache vector of trigger ele 4-momenta
+  std::vector<math::LorentzVectorT<double>> myTriggerElectronMomenta;
+  // if (cfg_ApplyTriggerMatching) 
+  //  {
+  // For-loop: All trigger electrons
+  // for (HLTElectron p: event.triggerElectrons())
+  //   {
+  //   myTriggerElectronMomenta.push_back(p.p4());
+  //   }
+  //  }
   
   // For-loop: All electrons
   for(Electron electron: event.electrons()) 
@@ -232,11 +509,12 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
       passedIsPresent = true;
       
       // Apply trigger matching
-      if (cfg_ApplyTriggerMatching)
-	{
-	  if (!this->passTrgMatching(electron, myTriggerElectronMomenta)) continue;
-	}
+      // if (cfg_ApplyTriggerMatching)
+      // {
+      //  if (!this->passTrgMatching(electron, myTriggerElectronMomenta)) continue;
+      // }
       // Designate as trigger-matched
+      // output.fHLTElectronCharge = electron.charge();
       passedTrgMatch = true;
       
       // Fill histograms before any cuts
@@ -281,12 +559,8 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
       // Determine Relative and Mini Isolation booleans
       bool passedRelIso  = (electron.effAreaIsoDeltaBeta() < fRelIsoCut);
       bool passedMiniIso = (electron.effAreaMiniIso() < fMiniIsoCut);
-      bool passedIsolCut = false;
-      if (fMiniIsol) passedIsolCut =  passedMiniIso;
-      else passedIsolCut =  passedRelIso;
 
-      //=== Apply cut on electron isolation
-      if (!passedIsolCut) continue;
+      // No need to look at isolation criteria for this case
       passedIsol = true;
       
       // Fill histograms after isolation cut
@@ -332,6 +606,21 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
   // Assign booleans
   passedSelection = (output.fSelectedElectrons.size() > 0);
   passedVeto      = (output.fSelectedElectrons.size() == 0); 
+
+
+  // Set electron ID SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedElectrons()) {
+      output.fElectronIDSF = fElectronIDSFReader.getScaleFactorValue(output.getSelectedElectrons()[0].eta());
+    }
+  }
+
+  // Set electron trigger SF value to data object
+  if (event.isMC()) {
+    if (output.hasIdentifiedElectrons()) {
+      output.fElectronTriggerSF = fElectronTriggerSFReader.getScaleFactorValue(output.getSelectedElectrons()[0].pt());
+    }
+  }
 
   // Fill histos
   hElectronNAll->Fill(event.electrons().size());

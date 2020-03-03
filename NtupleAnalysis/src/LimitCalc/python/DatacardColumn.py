@@ -739,10 +739,10 @@ class DatacardColumn():
                         # print ShellStyles.WarningLabel()+"Forcing heavy H+ signal sample %s to normalization of 1 pb xsect in DatacardColumn.py"%self._label
 
                         #myDatasetRootHisto.Delete()
-                        dsetMgr.getDataset(self.getDatasetMgrColumn()).setCrossSection(0.001)
+                        dsetMgr.getDataset(self.getDatasetMgrColumn()).setCrossSection(1.0)
                         myDatasetRootHisto = dsetMgr.getDataset(self.getDatasetMgrColumn()).getDatasetRootHisto(mySystematics.histogram(self.getFullShapeHistoName()))
                         if self._verbose:
-                            print "..... Assuming this is signal -> set cross section to 1 fb for limit calculation"
+                            print "..... Assuming this is signal -> set cross section to 1 pb for limit calculation"
                 # for light H+, use 13 TeV ttbar xsect from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
                 elif (not config.OptionLimitOnSigmaBr and (self._label[:2] == "HW" or self._label[:2] == "HH" or self._label[:2] == "WH")):
                      ttbarxsect = xsect.backgroundCrossSections.crossSection("TT", energy="13")

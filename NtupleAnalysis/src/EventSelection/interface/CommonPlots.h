@@ -21,6 +21,8 @@ public:
     kSignalAnalysis,
     kHplus2tbAnalysis,
     kHplus2hwAnalysis,
+    kHplus2hwAnalysis_mmt,
+    kHplus2hwAnalysis_eet,
     kHplus2hwAnalysisWithTop,
     kHplus2hw_ele_Analysis,
     kBTagEfficiencyAnalysis,
@@ -30,6 +32,8 @@ public:
     kQCDMeasurement,
     kQCDMeasurement_ele,
     kQCDMeasurement_muon,
+    kQCDMeasurement_mmt,
+    kQCDMeasurement_eet,
     kFakeBMeasurement,
     kQCDNormalizationSystematicsSignalRegion, // Needed for obtaining normalization systematics to data-driven control plots
     kQCDNormalizationSystematicsControlRegion // Needed for obtaining normalization systematics to data-driven control plots
@@ -37,6 +41,7 @@ public:
 
   CommonPlots(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper);
   CommonPlots(const ParameterSet& config, const CommonPlots::AnalysisType type, HistoWrapper& histoWrapper, bool test);
+//  CommonPlots();
   ~CommonPlots();
 
   //Tau ID syst switches
@@ -122,7 +127,7 @@ public:
 					       const METSelection::Data& METData, 
 					       const TopSelectionMVA::Data& topData);
   void fillControlPlotsAfterTopologicalSelections(const Event& event, bool withoutTau=false, bool withMu=false);
-  void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false);
+  void fillControlPlotsAfterAllSelections(const Event& event, bool withoutTau=false, int i=0, int j=1);
   void fillControlPlotsAfterAllSelections(const Event& event, int isGenuineB);  //HToTB-specific
   void fillControlPlotsAfterAllSelectionsWithProbabilisticBtag(const Event& event, const METSelection::Data& metData, double btagWeight);
   //void fillControlPlotsAfterAllSelectionsWithFullMass(const Event& event, FullHiggsMassCalculator::Data& data);
@@ -139,8 +144,7 @@ public:
 
 private:
   /// Returns true if anti-isolated taus need to be used (QCD measurement)
-  const bool usesAntiIsolatedTaus() const { return fAnalysisType == kQCDMeasurement ||
-      fAnalysisType == kQCDNormalizationSystematicsControlRegion || fAnalysisType == kQCDMeasurement_ele || fAnalysisType == kQCDMeasurement_muon; }
+  const bool usesAntiIsolatedTaus() const { return fAnalysisType == kQCDMeasurement || fAnalysisType == kQCDNormalizationSystematicsControlRegion || fAnalysisType == kQCDMeasurement_ele || fAnalysisType == kQCDMeasurement_muon || fAnalysisType == kQCDMeasurement_mmt; }
   
 private:
   ///===== Config params
