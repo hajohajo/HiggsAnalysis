@@ -73,7 +73,7 @@ private:
   METSelection fMETSelection;
   //QuarkGluonLikelihoodRatio fQGLRSelection;
   TopSelectionMVA fTopSelection;
-  FatJetSelection fFatJetSelection;
+  //FatJetSelection fFatJetSelection;
   Count cSelected;
   
   GenericScaleFactor fMisIDSFReader;
@@ -365,7 +365,7 @@ SystTopMVA::SystTopMVA(const ParameterSet& config, const TH1* skimCounters)
     fMETSelection(config.getParameter<ParameterSet>("METSelection")), // no subcounter in main counter
     //fQGLRSelection(config.getParameter<ParameterSet>("QGLRSelection")),// fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
+    //fFatJetSelection(config.getParameter<ParameterSet>("FatJetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     cSelected(fEventCounter.addCounter("Selected Events")),
     fMisIDSFReader(config.getParameterOptional<ParameterSet>("MisIDSF.MisIDSF")),
     cMisIDSFCounter(fEventCounter.addCounter("Mis-ID SF")),
@@ -389,7 +389,7 @@ void SystTopMVA::book(TDirectory *dir) {
   fMETSelection.bookHistograms(dir);
   //fQGLRSelection.bookHistograms(dir);
   fTopSelection.bookHistograms(dir);
-  fFatJetSelection.bookHistograms(dir);
+  //fFatJetSelection.bookHistograms(dir);
 
   // const int nTopMassBins  = fCommonPlots.getTopMassBinSettings().bins();
   // const float fTopMassMin = fCommonPlots.getTopMassBinSettings().min();

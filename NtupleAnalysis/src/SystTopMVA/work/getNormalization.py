@@ -754,7 +754,7 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "SystTopBDT"
+    ANALYSISNAME = "SystTopMVA"
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
     OPTMODE      = ""
@@ -770,7 +770,7 @@ if __name__ == "__main__":
     VERBOSE      = False
     HISTOLEVEL   = "Vital"
     NORMALISE    = False  
-    FOLDER       = "SystTopBDT_" 
+    FOLDER       = "SystTopMVA_" 
     SUBDIR       = "NormalizationFactors"
 
     # Define the available script options
