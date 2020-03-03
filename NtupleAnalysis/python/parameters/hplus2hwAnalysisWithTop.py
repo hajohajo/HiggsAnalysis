@@ -126,6 +126,17 @@ looseTauSelection = PSet(
   isolationDiscr       = "byVLooseIsolationMVArun2v1DBoldDMwLT",
   )
 
+
+tauFakeRateMeasurement = PSet(
+    dileptonAbsChargeCutValue     = 0,       # [default: 0] (0=OS, 2=SS)
+    dileptonAbsChargeCutDirection = "==",    # [default: "=="] (==, !=, <, <=, >, >=)
+    dileptonInvariantMass         = 91.1876, # [default: 91.1876] 
+    dileptonInvariantMassPlus     = 20.0,    # [default: 20.0] 
+    dileptonInvariantMassMinus    = 20.0,    # [default: 20.0] 
+    dileptonDeltaRCutValue        = 0,       # [default: 0] (0=OS, 2=SS)
+    dileptonDeltaRCutDirection    = ">=",    # [default: ">="] (==, !=, <, <=, >, >=)
+    )
+
 #================================================================================================
 # Jet selection
 #================================================================================================
@@ -369,20 +380,21 @@ commonPlotsOptions = PSet(
 # Build all selections group
 #================================================================================================
 allSelections = PSet(
-    Verbose               = verbose,
-    Trigger               = trigger,
-    METFilter             = metFilter,
-    ElectronSelection     = electronSelection,
-    MuonSelection         = muonSelection,
-    TauSelection          = tauSelection,
-    LooseTauSelection     = looseTauSelection,
-    JetSelection          = jetSelection,
-    AngularCutsCollinear  = angularCutsCollinear,
-    BJetSelection         = bjetSelection,
-    METSelection          = metSelection,
-    AngularCutsBackToBack = angularCutsBackToBack,
-    TopSelectionMVA       = topSelectionMVA,
-    # FatJetSelection       = fatjetVeto,
-    CommonPlots           = commonPlotsOptions,
-    HistogramAmbientLevel = histogramAmbientLevel,
+    Verbose                = verbose,
+    Trigger                = trigger,
+    METFilter              = metFilter,
+    ElectronSelection      = electronSelection,
+    MuonSelection          = muonSelection,
+    TauSelection           = tauSelection,
+    LooseTauSelection      = looseTauSelection,
+    TauFakeRateMeasurement = tauFakeRateMeasurement,
+    JetSelection           = jetSelection,
+    AngularCutsCollinear   = angularCutsCollinear,
+    BJetSelection          = bjetSelection,
+    METSelection           = metSelection,
+    AngularCutsBackToBack  = angularCutsBackToBack,
+    TopSelectionMVA        = topSelectionMVA,
+    # FatJetSelection        = fatjetVeto,
+    CommonPlots            = commonPlotsOptions,
+    HistogramAmbientLevel  = histogramAmbientLevel,
 )
