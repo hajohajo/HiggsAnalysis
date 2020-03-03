@@ -32,6 +32,8 @@ LAST USED:
 ./plot_EfficiencySystTop.py -m /uscms_data/d3/mkolosov/workspace/pseudo-multicrab/TopTaggerEfficiency/TopTaggerEfficiency_180608_194156_massCut300_All --type partonShower
 ./plot_EfficiencySystTop.py -m /uscms_data/d3/mkolosov/workspace/pseudo-multicrab/TopTaggerEfficiency/TopTaggerEfficiency_180608_194156_massCut300_All --type evtGen
 
+./plot_EfficiencySystTop.py -m TopTaggerEfficiency_200301_NNsemiLeptonic_TopTaggingSystematics --folder topMVASelection_ --type showerScales
+
 STATISTICS OPTIONS:
 https://iktp.tu-dresden.de/~nbarros/doc/root/TEfficiency.html
 statOption = ROOT.TEfficiency.kFCP       # Clopper-Pearson
@@ -195,7 +197,7 @@ def GetHistoKwargs(histoName, opts):
         units             = "GeV/c"
         kwargs["xlabel"]  = "p_{T} (%s)" % (units)
         bins              = [i for i in range(0, 1000+50, 50)]
-        if opts.folder == "topbdtSelection_":
+        if opts.folder == "topMVASelection_":
             #bins          = [i for i in range(0, 600+100, 100)] + [800]
             bins              = [0, 100, 200, 300, 400, 500, 600]
         else:
@@ -268,9 +270,9 @@ def main(opts):
         datasetsMgr.selectAndReorder(datasetOrder)
 
         
-        Numerator = ["AllTopQuarkPt_MatchedBDT",
-                     "TrijetFakePt_BDT",
-                     "AllTopQuarkPt_MatchedBDT",
+        Numerator = ["AllTopQuarkPt_MatchedMVA",
+                     "TrijetFakePt_MVA",
+                     "AllTopQuarkPt_MatchedMVA",
                      "AllTopQuarkPt_Matched",
                      ]
         Denominator = ["AllTopQuarkPt_Matched",
@@ -303,7 +305,7 @@ def main(opts):
             PlotEfficiency(datasetsMgr, numerator, denominator, eff_def[i])
 
         if 0:
-            hNumerator   = "AllTopQuarkPt_MatchedBDT"
+            hNumerator   = "AllTopQuarkPt_MatchedMVA"
             hDenominator = "AllTopQuarkPt_Matched"
             numerator    = os.path.join(opts.folder, hNumerator)
             denFolder    = opts.folder
@@ -522,7 +524,7 @@ def PlotEfficiency(datasetsMgr, numPath, denPath, eff_def):
     if eff_def == "genuineTop":
         
         uncWriter = UncertaintyWriter()
-        jsonName = "uncertainties_%s_BDT_%s.json" % (opts.type, opts.BDT)
+        jsonName = "uncertainties_%s_MVA_%s.json" % (opts.type, opts.MVA)
         analysis = opts.analysisName
         saveDir  =  os.path.join("", jsonName)
         
@@ -618,11 +620,11 @@ if __name__ == "__main__":
     PRECISION    = 3
     INTLUMI      = -1.0
     URL          = False
-    BDT          = "0.4"
+    MVA          = "0.4"
     SAVEDIR      = None
     VERBOSE      = False
     NORMALISE    = False
-    FOLDER       = "topbdtSelection_"
+    FOLDER       = "topMVASelection_"
     TYPE         = "mtop"
 
     # Define the available script options
@@ -631,8 +633,8 @@ if __name__ == "__main__":
     parser.add_option("-m", "--mcrab", dest="mcrab", action="store", 
                       help="Path to the multicrab directory for input")
     
-    parser.add_option("--bdt", dest="BDT", type="string", default=BDT,
-                      help="The BDT cut used [default: %s]" % BDT)
+    parser.add_option("--mva", dest="MVA", type="string", default=MVA,
+                      help="The MVA cut used [default: %s]" % MVA)
     
     parser.add_option("-o", "--optMode", dest="optMode", type="string", default=OPTMODE, 
                       help="The optimization mode when analysis variation is enabled  [default: %s]" % OPTMODE)
@@ -679,9 +681,9 @@ if __name__ == "__main__":
     (opts, parseArgs) = parser.parse_args()
     
     
-    opts.BDT = opts.BDT.replace('.', 'p')
-    if "-" in opts.BDT:
-        opts.BDT = opts.BDT.replace("-", "m")
+    opts.MVA = opts.MVA.replace('.', 'p')
+    if "-" in opts.MVA:
+        opts.MVA = opts.MVA.replace("-", "m")
         
     # Require at least two arguments (script-name, path to multicrab)
     if len(sys.argv) < 2:

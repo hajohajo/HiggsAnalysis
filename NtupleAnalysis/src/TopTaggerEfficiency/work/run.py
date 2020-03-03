@@ -190,14 +190,26 @@ def main():
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
 
-    allSelections.TopSelectionMVA.TopMVACutValue      = 0.40
-    allSelections.TopSelectionMVA.TopMVACutDirection  = ">="
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.270 # Semileptonic - signalEffic = 0.99 (bkgEffic = 0.10) 
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.685 # SemiLeptonic - signalEffic = 0.95 (bkgEffic = 0.05)
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.75 # SemiLeptonic - signalEffic = 0.93 (bkgEffic = 0.044)
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.82 # SemiLeptonic - signalEffic = 0.90 (bkgEffic = 0.036)
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.962 # SemiLeptonic - signalEffic = 0.62 (bkgEffic = 0.01)
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.395 # SemiLeptonic DeltaR < 0.3 - signalEffic = 0.93 (bkgEffic = 0.096)
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.85 # Hadronic - signalEffic = 0.90 (bkgEffic = 0.035)
+    #allSelections.TopSelectionMVA.TopMVACutDirection  = ">="
+    #allSelections.TopSelectionMVA.WeightFile          = "semiLeptonic.txt"
+    #allSelections.TopSelectionMVA.WeightFile          = "hadronic.txt"
+    #allSelections.TopSelectionMVA.TopMVAalgo          = "NN"
     #BDTG_DeltaR0p4_BJetPt40_25Sept2018.weights.xml
     #BDTG_DeltaR0p3_DeltaPtOverPt0p50_BJetPt40_18Sept2018.weights.xml
     #BDTG_DeltaR0p3_BJetPt40_17July2018.weights.xml
     #BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_14July2018.weight.xml
-    allSelections.DeltaR = 0.3
+    allSelections.DeltaR = 0.4
     allSelections.DeltaPtOverPt = 0.32
+
+    allSelections.TopSelectionMVA.TopMassUppCutDirection = "<=" # [default: <=]
+    allSelections.TopSelectionMVA.TopMassUppCutValue     = 400   # [default: 400.0]
     # ================================================================================================
     # Add Analysis Variations
     # ================================================================================================
@@ -325,7 +337,7 @@ if __name__ == "__main__":
     NEVTS         = -1
     HISTOLEVEL    = "Debug" #"Informative" #"Debug"
     PUREWEIGHT    = True
-    TOPPTREWEIGHT = True
+    TOPPTREWEIGHT = False
     DOSYSTEMATICS = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")

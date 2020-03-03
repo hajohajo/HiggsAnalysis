@@ -1599,7 +1599,7 @@ void TopTaggerEfficiency::process(Long64_t entry) {
   //============================================================
   //============================================================
   //Return if less than two top candidates found in the event!!!
-  int ncleaned = topData.getAllTopsBJet().size();
+  int ncleaned = hplusData.getAllCleanedTopsSize();
   if (ncleaned < 2) return;
   //============================================================
   //============================================================
