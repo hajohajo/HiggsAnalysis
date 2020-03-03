@@ -47,6 +47,7 @@ public:
 
   //returns the last copy of a gen particle
   genParticle findLastCopy(int index);
+  bool HasMother(const Event& event, const genParticle &p, const int mom_pdgId);
   //is Bjet
   bool isBJet(const Jet& jet, const std::vector<Jet>& bjets);
   bool isMatchedJet(const Jet& jet, const std::vector<Jet>& jets);
@@ -295,6 +296,8 @@ private:
   WrappedTH1        *hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt160To180GeV;
   WrappedTH1        *hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt180To200GeV;
   WrappedTH1        *hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt200ToInfGeV;
+
+  WrappedTH1        *hLeptonJet_MotherID;
 
   //Correlations
   WrappedTH2 *hQuarkJetMinDr03_DeltaPtOverPt_vs_QuarkPt;
@@ -885,6 +888,8 @@ void TopRecoTree::book(TDirectory *dir) {
   hQuarkJetMinDr03_DeltaPtOverPt_QuarkPt200ToInfGeV=fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital,myInclusiveDir,
 									       "QuarkJetMinDr03_DeltaPtOverPt_2000ToInfGeV","#;Delta P_{T}(jet-quark)/P_{T,q}",500,-2.5,2.5);
   
+  hLeptonJet_MotherID = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital,myInclusiveDir, "LeptonJet_MotherID", "LeptonJet_MotherID", 30, 0, 30);
+
   //Correlation plots
   hQuarkJetMinDr03_DeltaPtOverPt_vs_QuarkPt = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, myInclusiveDir_2d,
 									 "QuarkJetMinDr03_DeltaPtOverPt_vs_QuarkPt", ";#Delta P_{T}/P_{T};P_{T} (GeV/c)", 
@@ -1179,7 +1184,7 @@ void TopRecoTree::getTopDecayProducts(const Event& fEvent, genParticle top, vect
 	int Wdau_index = W.daughters().at(idau);
 	genParticle Wdau = fEvent.genparticles().getGenParticles()[Wdau_index];	
 	//std::cout<<"pdgId: "<<Wdau.pdgId()<<std::endl;
-	// Consider only quarks as decaying products                                                                    
+	// Consider only quarks as decaying products
 	if (std::abs(Wdau.pdgId()) > 5) continue;
 	quarks.push_back(Wdau);
       }//for (size_t idau=0; idau<W.daughters().size(); idau++)
@@ -1230,6 +1235,26 @@ genParticle TopRecoTree::findLastCopy(int index){
     if (gen_pdgId == genDau_pdgId) return findLastCopy(genDau_index);
   }
   return gen_particle;
+}
+
+bool TopRecoTree::HasMother(const Event& event, const genParticle &p, const int mom_pdgId){
+  //  Description:
+  //  Returns true if the particle has a mother with pdgId equal to mom_pdgId.
+  // Ensure the particle has a mother!
+  if (p.mothers().size() < 1) return false;
+  // For-loop: All mothers
+  for (size_t iMom = 0; iMom < p.mothers().size(); iMom++)
+    {
+      int mom_index =  p.mothers().at(iMom);
+      const genParticle m = event.genparticles().getGenParticles()[mom_index];
+      int motherID = m.pdgId();
+      int particleID = p.pdgId();
+      //std::cout<<"motherID "<<motherID<<std::endl;
+      if (std::abs(motherID) == mom_pdgId) return true;
+      if (std::abs(motherID) == std::abs(particleID)) return HasMother(event, m, mom_pdgId);      
+    }
+
+  return false;
 }
 
 bool TopRecoTree::isWsubjet(const Jet& jet , const std::vector<Jet>& jets1 , const std::vector<Jet>& jets2){
@@ -1754,7 +1779,10 @@ void TopRecoTree::process(Long64_t entry) {
     }
     
     if (quarks.size() == 2){
-      // Fill vectors for b-quarks, leading and subleading quarks coming from tops                                                                                                   
+      // If top is from the decay of the H+ continue
+      if (HasMother(fEvent, top, 37)) continue;
+
+      // Fill vectors for b-quarks, leading and subleading quarks coming from tops
       GenTops_Quarks.push_back(bquarks.at(0));
       GenTops_Quarks.push_back(quarks.at(0));
       GenTops_Quarks.push_back(quarks.at(1));
@@ -1918,10 +1946,10 @@ void TopRecoTree::process(Long64_t entry) {
   //  	double dRmin = min(min(dR12, dR1b), dR2b);
   //  	if (dRmin < 0.8) return;
   //   }
-
   //================================================================================================//                      
   //                                    Top Candidates                                              //
   //================================================================================================//
+
   bool applyBjetPtCut = true;
   float BjetPtCut = cfg_BjetsPtCut.at(cfg_BjetsPtCut.size()-1);
   int jmatched = 0;
@@ -2547,6 +2575,8 @@ void TopRecoTree::process(Long64_t entry) {
   //========================================================================================================
   // Sanity check
   //========================================================================================================
+  vector<genParticle> GenEle = GetGenParticles(fEvent.genparticles().getGenParticles(), 11); //Last copy
+  vector<genParticle> GenMu = GetGenParticles(fEvent.genparticles().getGenParticles(), 13); //Last copy
     
   for (auto& jet: jetData.getSelectedJets()){
     hAllJetCvsL         -> Fill(jet.pfCombinedCvsLJetTags());
@@ -2555,6 +2585,36 @@ void TopRecoTree::process(Long64_t entry) {
     hAllJetMult         -> Fill(jet.QGTaggerAK4PFCHSmult());
     hAllJetBdisc        -> Fill(jet.bjetDiscriminator());
     hAllJetQGLikelihood -> Fill(jet.QGTaggerAK4PFCHSqgLikelihood());
+
+    double dRmin = 999.99;
+    genParticle genLep_matched;
+
+    if (!isLepton(jet, selectedElectrons, selectedMuons)) continue;
+    if (passElectron){
+      Electron ele = selectedElectrons.at(0);
+      for (auto& genEle: GenEle){
+	double dR  = ROOT::Math::VectorUtil::DeltaR( ele.p4(), genEle.p4());
+	if (dRmin < dR) continue;
+	dRmin = dR;
+	genLep_matched = genEle;
+      }
+    }
+    else if (passMuon){
+      Muon mu = selectedMuons.at(0);
+      for (auto& genMu: GenMu){
+	double dR  = ROOT::Math::VectorUtil::DeltaR( mu.p4(), genMu.p4());
+	if (dRmin < dR) continue;
+	dRmin = dR;
+	genLep_matched = genMu;
+      }
+    }  
+    if (dRmin > 0.3) continue;
+    //std::cout<<"I found a lepton jet :)"<<std::endl;
+    if (HasMother(fEvent, genLep_matched, 6)) hLeptonJet_MotherID -> Fill(6);
+    if (HasMother(fEvent, genLep_matched, 15)) hLeptonJet_MotherID -> Fill(15);
+    else if (HasMother(fEvent, genLep_matched, 24)) hLeptonJet_MotherID -> Fill(24);
+    else if (HasMother(fEvent, genLep_matched, 25)) hLeptonJet_MotherID -> Fill(25);
+    else hLeptonJet_MotherID -> Fill(0);
   }
   
   vector<genParticle> GenCharm = GetGenParticles(fEvent.genparticles().getGenParticles(), 4);
