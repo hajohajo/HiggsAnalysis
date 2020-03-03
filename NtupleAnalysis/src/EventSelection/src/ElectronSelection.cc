@@ -384,18 +384,20 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
       if (fMiniIsol) passedIsolCut =  passedMiniIso;
       else passedIsolCut =  passedRelIso;
 
-      //=== Apply cut on electron isolation
-//      if (!passedIsolCut) continue;
-//      passedIsol = true;
-      if (!passedIsolCut) {
-//      std::cout << "DEGUG: anti iso muon" << "\n";
-        output.fAntiIsolatedElectrons.push_back(electron);
-        passedIsol = false;
-      } else {
-        passedIsol = true;
-        output.fSelectedElectrons.push_back(electron);
-      }
+      if (!passedIsolCut) 
+	{
+	  output.fAntiIsolatedElectrons.push_back(electron);
+	  passedIsol = false;
+	} 
+      else
+	{
+	  passedIsol = true;
+	  output.fSelectedElectrons.push_back(electron);
+	}
 
+      //=== Apply cut on electron isolation
+      if (!passedIsolCut) continue;
+      
       // Fill histograms after isolation cut
       hIsolPtAfter->Fill(electron.pt());
       hIsolEtaAfter->Fill(electron.eta());
@@ -409,7 +411,7 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
       // Fill histograms after all cuts
       hElectronPtPassed->Fill(electron.pt());
       hElectronEtaPassed->Fill(electron.eta());
-      hElectronRelIsoPassed->Fill(electron.effAreaIsoDeltaBeta()); // electron.relIsoDeltaBeta()
+      hElectronRelIsoPassed->Fill(electron.effAreaIsoDeltaBeta());
       hElectronMiniIsoPassed->Fill(electron.effAreaMiniIso());
       
       // Save the highest pt electron
@@ -418,9 +420,6 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
 	  output.fHighestSelectedElectronPt = electron.pt();
 	  output.fHighestSelectedElectronEta = electron.eta();
 	}
-      
-      // Save all electrons surviving the cuts
-//      output.fSelectedElectrons.push_back(electron);
       
       // Fill resolution histograms
       if (event.isMC()) 
@@ -433,14 +432,13 @@ ElectronSelection::Data ElectronSelection::privateAnalyze(const Event& event) {
     }//for-loop: electrons
   
   
-  //sort electrons, needed comparisons defined in Electron.h
+  // Sort electrons, needed comparisons defined in Electron.h
   std::sort(output.fSelectedElectrons.begin(), output.fSelectedElectrons.end());
   std::sort(output.fAntiIsolatedElectrons.begin(), output.fAntiIsolatedElectrons.end());
 
   // Assign booleans
   passedSelection = (output.fSelectedElectrons.size() > 0);
   passedVeto      = (output.fSelectedElectrons.size() == 0); 
-
 
   // Set electron ID SF value to data object
   if (event.isMC()) {
@@ -496,15 +494,14 @@ ElectronSelection::Data ElectronSelection::privateAnalyzeLoose(const Event& even
 
   // Cache vector of trigger ele 4-momenta
   std::vector<math::LorentzVectorT<double>> myTriggerElectronMomenta;
-//  if (cfg_ApplyTriggerMatching) 
-//    {
-      // For-loop: All trigger electrons
-//      for (HLTElectron p: event.triggerElectrons())
-//	{
-//	  myTriggerElectronMomenta.push_back(p.p4());
-//	}
-//    }
-  
+  // if (cfg_ApplyTriggerMatching) 
+  //  {
+  // For-loop: All trigger electrons
+  // for (HLTElectron p: event.triggerElectrons())
+  //   {
+  //   myTriggerElectronMomenta.push_back(p.p4());
+  //   }
+  //  }
   
   // For-loop: All electrons
   for(Electron electron: event.electrons()) 
@@ -512,12 +509,12 @@ ElectronSelection::Data ElectronSelection::privateAnalyzeLoose(const Event& even
       passedIsPresent = true;
       
       // Apply trigger matching
-//      if (cfg_ApplyTriggerMatching)
-//	{
-//	  if (!this->passTrgMatching(electron, myTriggerElectronMomenta)) continue;
-//	}
+      // if (cfg_ApplyTriggerMatching)
+      // {
+      //  if (!this->passTrgMatching(electron, myTriggerElectronMomenta)) continue;
+      // }
       // Designate as trigger-matched
-//      output.fHLTElectronCharge = electron.charge();
+      // output.fHLTElectronCharge = electron.charge();
       passedTrgMatch = true;
       
       // Fill histograms before any cuts
@@ -527,7 +524,7 @@ ElectronSelection::Data ElectronSelection::privateAnalyzeLoose(const Event& even
       hElectronMiniIsoAll->Fill(electron.effAreaMiniIso());
       
       // Debug?
-//      if (0) cout << "pt = " << electron.pt() << ", eta = " << electron.eta() << ", cut-ID = " << electron.electronIDDiscriminator() << endl;
+      if (0) cout << "pt = " << electron.pt() << ", eta = " << electron.eta() << ", cut-ID = " << electron.electronIDDiscriminator() << endl;
 
       //=== Apply cut on pt    
       if (electron.pt() < cfg_ElectronPtCut) continue;
@@ -562,12 +559,8 @@ ElectronSelection::Data ElectronSelection::privateAnalyzeLoose(const Event& even
       // Determine Relative and Mini Isolation booleans
       bool passedRelIso  = (electron.effAreaIsoDeltaBeta() < fRelIsoCut);
       bool passedMiniIso = (electron.effAreaMiniIso() < fMiniIsoCut);
-      bool passedIsolCut = false;
-      if (fMiniIsol) passedIsolCut =  passedMiniIso;
-      else passedIsolCut =  passedRelIso;
 
-      //=== Apply cut on electron isolation
-//      if (!passedIsolCut) continue;
+      // No need to look at isolation criteria for this case
       passedIsol = true;
       
       // Fill histograms after isolation cut
