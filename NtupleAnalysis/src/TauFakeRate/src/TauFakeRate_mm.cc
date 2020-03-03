@@ -314,7 +314,7 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hDileptonEta_AfterLeptonSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonEta_AfterLeptonSelection"   , ";#eta"       , etaN, etaMin, etaMax);
   hDileptonMass_AfterLeptonSelection   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterLeptonSelection"  , ";m_{ll} (GeV)", mN , mMin  , mMax  );
   hDileptonCharge_AfterLeptonSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonCharge_AfterLeptonSelection", ";Q_{ll} (GeV)", 6, -3, +3);
-  hDileptonDeltaR_AfterLeptonSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonCharge_AfterLeptonSelection", ";#DeltaR_{ll}", dRN, dRMin , dRMax );
+  hDileptonDeltaR_AfterLeptonSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonDeltaR_AfterLeptonSelection", ";#DeltaR_{ll}", dRN, dRMin , dRMax );
 
   hDileptonMass_AfterTauSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterTauSelection"  , ";m_{ll} (GeV)", mN, mMin, mMax);
   hDileptonMass_AfterJetSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterJetSelection"  , ";m_{ll} (GeV)", mN, mMin, mMax);
@@ -336,7 +336,7 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hDileptonMassOnZ_Preselections  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMassOnZ_Preselections" , ";m_{ll} (GeV)", mN  , mMin  , mMax);
   hDileptonMassOffZ_Preselections = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMassOffZ_Preselections", ";m_{ll} (GeV)", mN  , mMin  , mMax);
   hDileptonCharge_Preselections   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonCharge_Preselections"  , ";Q_{ll} (GeV)", 6, -3, +3);
-  hDileptonDeltaR_Preselections   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonCharge_Preselections"  , ";#DeltaR_{ll}", dRN , dRMin , dRMax );
+  hDileptonDeltaR_Preselections   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonDeltaR_Preselections"  , ";#DeltaR_{ll}", dRN , dRMin , dRMax );
 
   hTauSrc_LooseTau         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrc_LooseTau"        , ";#tau source", 80, 0.0, 80.0);
   hTauSrcDM0_LooseTau      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM0_LooseTau"     , ";#tau source", 80, 0.0, 80.0);
@@ -441,7 +441,7 @@ void TauFakeRate_mm::process(Long64_t entry) {
   double dilepton_pt      = ( muData.getSelectedMuons()[0].p4() + muData.getSelectedMuons()[1].p4() ).pt();
   double dilepton_eta     = ( muData.getSelectedMuons()[0].p4() + muData.getSelectedMuons()[1].p4() ).eta();
   double dilepton_invMass = ( muData.getSelectedMuons()[0].p4() + muData.getSelectedMuons()[1].p4() ).M();
-  double dilepton_dR      = ROOT::Math::VectorUtil::DeltaR(muData.getSelectedMuons()[0].p4(),muData.getSelectedMuons()[1].p4()); //iro
+  double dilepton_dR      = ROOT::Math::VectorUtil::DeltaR(muData.getSelectedMuons()[0].p4(),muData.getSelectedMuons()[1].p4());
   int dilepton_charge     = muData.getSelectedMuons()[0].charge() + muData.getSelectedMuons()[1].charge();
   bool bPassAbsCharge     = false;
   bool bOnZMass           = false; 
