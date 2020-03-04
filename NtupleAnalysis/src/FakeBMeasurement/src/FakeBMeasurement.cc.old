@@ -53,6 +53,7 @@ private:
   BJetSelection fBaselineBJetSelection;
   METSelection fBaselineMETSelection;
   TopSelectionMVA fBaselineTopSelection;
+  HplusSelection fBaselineHplusSelection;
   Count cBaselineAnyTwoTopsAndFreeBCounter;
   Count cBaselineTwoCleanTopsCounter;
   Count cBaselineTopTaggingSFCounter;
@@ -64,6 +65,7 @@ private:
   BJetSelection fInvertedBJetSelection;
   METSelection fInvertedMETSelection;
   TopSelectionMVA fInvertedTopSelection;
+  HplusSelection fInvertedHplusSelection;
   Count cInvertedAnyTwoTopsAndFreeBCounter;
   Count cInvertedTwoCleanTopsCounter;
   Count cInvertedTopTaggingSFCounter;
@@ -429,6 +431,7 @@ FakeBMeasurement::FakeBMeasurement(const ParameterSet& config, const TH1* skimCo
     fBaselineBJetSelection(config.getParameter<ParameterSet>("BJetSelection")),// fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBaselineMETSelection(config.getParameter<ParameterSet>("METSelection")),
     fBaselineTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, "Baseline"),
+    fBaselineHplusSelection(config.getParameter<ParameterSet>("HplusSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cBaselineAnyTwoTopsAndFreeBCounter(fEventCounter.addCounter("any 2 tops & free b")),
     cBaselineTwoCleanTopsCounter(fEventCounter.addCounter("2 clean tops")),
     cBaselineTopTaggingSFCounter(fEventCounter.addCounter("top SF")),
@@ -439,6 +442,7 @@ FakeBMeasurement::FakeBMeasurement(const ParameterSet& config, const TH1* skimCo
     fInvertedBJetSelection(config.getParameter<ParameterSet>("FakeBBjetSelection")),//, fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fInvertedMETSelection(config.getParameter<ParameterSet>("METSelection")),
     fInvertedTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"), fEventCounter, fHistoWrapper, &fCommonPlots, "Inverted"),
+    fInvertedHplusSelection(config.getParameter<ParameterSet>("HplusSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cInvertedAnyTwoTopsAndFreeBCounter(fEventCounter.addCounter("any 2 tops & free b")),
     cInvertedTwoCleanTopsCounter(fEventCounter.addCounter("2 clean tops")),
     cInvertedTopTaggingSFCounter(fEventCounter.addCounter("top SF")),
@@ -817,11 +821,13 @@ void FakeBMeasurement::book(TDirectory *dir) {
   fBaselineBJetSelection.bookHistograms(dir);
   fBaselineMETSelection.bookHistograms(dir);
   fBaselineTopSelection.bookHistograms(dir);
+  fBaselineHplusSelection.bookHistograms(dir);
   // Inverted selection
   fInvertedBJetSelection.bookHistograms(dir);
   fInvertedMETSelection.bookHistograms(dir);
   fInvertedTopSelection.bookHistograms(dir);
-  
+  fInvertedHplusSelection.bookHistograms(dir);
+
   // ====== Histogram settings
   HistoSplitter histoSplitter = fCommonPlots.getHistoSplitter();
 
@@ -1851,25 +1857,42 @@ void FakeBMeasurement::DoBaselineAnalysis(Long64_t entry,
   // const TopSelectionMVA::Data topData = fBaselineTopSelection.analyze(fEvent, jetData, bjetData); 
   const TopSelectionMVA::Data topData = fBaselineTopSelection.silentAnalyze(fEvent, jetData, bjetData);  // disable counters & histograms (misleading)
 
+  if (0) std::cout << "=== Hplus2tb selection" << std::endl;
+  const HplusSelection::Data hplusData = fBaselineHplusSelection.analyze(fEvent, jetData, bjetData, topData);
+  
+  //if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
+  //if (topData.getAllCleanedTopsSize() != 2) return; 
+
+  // Apply top-tag SF
+
+  if (fEvent.isMC()) 
+    {
+      if (topData.getTopTaggingScaleFactorEventWeight() != hplusData.getTopTaggingScaleFactorEventWeight())
+   	{
+   	  fEventWeight.multiplyWeight(1./topData.getTopTaggingScaleFactorEventWeight());
+   	  fEventWeight.multiplyWeight(hplusData.getTopTaggingScaleFactorEventWeight());
+   	}
+    }
+
   // Ensure 2 tops with MVA > -1.0 and free b-jet are present
-  if (!topData.passedAnyTwoTopsAndFreeB()) return;
+  if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
   cBaselineAnyTwoTopsAndFreeBCounter.increment();
 
   // Require exactly 2 clean tops (no MVA cut yet)
-  if (topData.getAllCleanedTopsSize() != 2) return;
+  if (hplusData.getAllCleanedTopsSize() != 2) return;
   cBaselineTwoCleanTopsCounter.increment();
 
   if (0) std::cout << "\n=== Baseline: Top-tag SF" << std::endl;
   // Apply top-tag SF 
   if (fEvent.isMC()) 
     {
-      fEventWeight.multiplyWeight(topData.getTopTaggingScaleFactorEventWeight());
+      fEventWeight.multiplyWeight(hplusData.getTopTaggingScaleFactorEventWeight());
     }
   cBaselineTopTaggingSFCounter.increment();
 
   // Define variables
-  float ldgMVA            = topData.getMVAmax1(); // topData.getMVALdgInPt();
-  float subldgMVA         = topData.getMVAmax2(); // topData.getMVASubldgInPt()
+  float ldgMVA            = hplusData.getMVAmax1(); // hplusData.getMVALdgInPt();
+  float subldgMVA         = hplusData.getMVAmax2(); // hplusData.getMVASubldgInPt()
   bool bPass_LdgTopMVA    = cfg_LdgTopMVACut.passedCut(ldgMVA);
   bool bPass_SubldgTopMVA = cfg_LdgTopMVACut.passedCut(subldgMVA);
   bool bPass_BothMVA      = bPass_LdgTopMVA * bPass_SubldgTopMVA;
@@ -1877,8 +1900,8 @@ void FakeBMeasurement::DoBaselineAnalysis(Long64_t entry,
   
   // Defining the splitting of phase-space as the eta of the Tetrajet b-jet
   std::vector<float> myFactorisationInfo;
-  myFactorisationInfo.push_back(topData.getTetrajetBJet().pt() );
-  myFactorisationInfo.push_back(topData.getTetrajetBJet().eta() );
+  myFactorisationInfo.push_back(hplusData.getTetrajetBJet().pt() );
+  myFactorisationInfo.push_back(hplusData.getTetrajetBJet().eta() );
   fCommonPlots.setFactorisationBinForEvent(myFactorisationInfo);
   
   if (!bPass_BothMVA) 
@@ -1888,14 +1911,14 @@ void FakeBMeasurement::DoBaselineAnalysis(Long64_t entry,
 	{
 
 	  // Splitted Histos
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_CRfour, isGenuineB, topData.getLdgTrijet().pt() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_CRfour, isGenuineB, topData.getLdgTrijet().M() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_CRfour, isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_CRfour, isGenuineB, topData.getTetrajetBJet().pt() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_CRfour, isGenuineB, topData.getTetrajetBJet().eta() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_CRfour, isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_CRfour, isGenuineB, topData.getLdgTetrajet().pt() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_CRfour, isGenuineB, topData.getLdgTetrajet().M());
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_CRfour, isGenuineB, hplusData.getLdgTrijet().pt() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_CRfour, isGenuineB, hplusData.getLdgTrijet().M() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_CRfour, isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_CRfour, isGenuineB, hplusData.getTetrajetBJet().pt() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_CRfour, isGenuineB, hplusData.getTetrajetBJet().eta() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_CRfour, isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_CRfour, isGenuineB, hplusData.getLdgTetrajet().pt() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_CRfour, isGenuineB, hplusData.getLdgTetrajet().M());
 	}
 
       // If top fails determine if event falls into  Control Region 1 (CR1)
@@ -2020,47 +2043,47 @@ void FakeBMeasurement::DoBaselineAnalysis(Long64_t entry,
 	    }
 	}// jets
       
-      double dEta = std::abs( topData.getTetrajetBJet().p4().eta() - topData.getLdgTrijetBJet().p4().eta() );
-      double dPhi = std::abs( ROOT::Math::VectorUtil::DeltaPhi( topData.getTetrajetBJet().p4(), topData.getLdgTrijetBJet().p4() ) );
-      double dR = ROOT::Math::VectorUtil::DeltaR( topData.getTetrajetBJet().p4(), topData.getLdgTrijetBJet().p4()) ;
+      double dEta = std::abs( hplusData.getTetrajetBJet().p4().eta() - hplusData.getLdgTrijetBJet().p4().eta() );
+      double dPhi = std::abs( ROOT::Math::VectorUtil::DeltaPhi( hplusData.getTetrajetBJet().p4(), hplusData.getLdgTrijetBJet().p4() ) );
+      double dR = ROOT::Math::VectorUtil::DeltaR( hplusData.getTetrajetBJet().p4(), hplusData.getLdgTrijetBJet().p4()) ;
 
       // Fill histos
       hBaseline_MET_AfterCRSelections ->Fill(isGenuineB, METData.getMET().R());
       hBaseline_HT_AfterCRSelections ->Fill(isGenuineB, jetData.HT());
-      hBaseline_MVAmax1_AfterCRSelections ->Fill(isGenuineB, topData.getMVAmax1());
-      hBaseline_MVAmax2_AfterCRSelections ->Fill(isGenuineB, topData.getMVAmax2());
-      hBaseline_LdgTetrajetPt_AfterCRSelections->Fill(isGenuineB, topData.getLdgTetrajet().pt() );
-      hBaseline_LdgTetrajetM_AfterCRSelections->Fill(isGenuineB, topData.getLdgTetrajet().M() );
-      hBaseline_TetrajetBJetPt_AfterCRSelections->Fill(isGenuineB, topData.getTetrajetBJet().pt() );
-      hBaseline_TetrajetBJetEta_AfterCRSelections->Fill(isGenuineB, topData.getTetrajetBJet().eta() );
-      hBaseline_TetrajetBJetBdisc_AfterCRSelections->Fill(isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
+      hBaseline_MVAmax1_AfterCRSelections ->Fill(isGenuineB, hplusData.getMVAmax1());
+      hBaseline_MVAmax2_AfterCRSelections ->Fill(isGenuineB, hplusData.getMVAmax2());
+      hBaseline_LdgTetrajetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getLdgTetrajet().pt() );
+      hBaseline_LdgTetrajetM_AfterCRSelections->Fill(isGenuineB, hplusData.getLdgTetrajet().M() );
+      hBaseline_TetrajetBJetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().pt() );
+      hBaseline_TetrajetBJetEta_AfterCRSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().eta() );
+      hBaseline_TetrajetBJetBdisc_AfterCRSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
       hBaseline_DeltaEtaLdgTrijetBJetTetrajetBJet_AfterCRSelections->Fill(isGenuineB, dEta);
       hBaseline_DeltaPhiLdgTrijetBJetTetrajetBJet_AfterCRSelections->Fill(isGenuineB, dPhi);
       hBaseline_DeltaRLdgTrijetBJetTetrajetBJet_AfterCRSelections->Fill(isGenuineB, dR);
-      hBaseline_LdgTrijetPt_AfterCRSelections->Fill(isGenuineB, topData.getLdgTrijet().pt() );
-      hBaseline_LdgTrijetMass_AfterCRSelections ->Fill(isGenuineB, topData.getLdgTrijet().M() );
-      hBaseline_LdgTrijetJet1Bdisc_AfterCRSelections ->Fill(isGenuineB, topData.getLdgTrijetJet1().bjetDiscriminator() );
-      hBaseline_LdgTrijetJet2Bdisc_AfterCRSelections ->Fill(isGenuineB, topData.getLdgTrijetJet2().bjetDiscriminator() );
-      hBaseline_LdgTrijetBJetBdisc_AfterCRSelections ->Fill(isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-      hBaseline_SubLdgTrijetPt_AfterCRSelections->Fill(isGenuineB, topData.getSubldgTrijet().pt() );
-      hBaseline_SubLdgTrijetMass_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgTrijet().M() );
-      hBaseline_SubLdgTrijetJet1Bdisc_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgTrijetJet1().bjetDiscriminator() );
-      hBaseline_SubLdgTrijetJet2Bdisc_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgTrijetJet2().bjetDiscriminator() );
-      hBaseline_SubLdgTrijetBJetBdisc_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgTrijetBJet().bjetDiscriminator() );
-      hBaseline_LdgDijetPt_AfterCRSelections->Fill(isGenuineB, topData.getLdgDijet().pt() );
-      hBaseline_LdgDijetM_AfterCRSelections ->Fill(isGenuineB, topData.getLdgDijet().M() );
-      hBaseline_SubLdgDijetPt_AfterCRSelections->Fill(isGenuineB, topData.getSubldgDijet().pt() );
-      hBaseline_SubLdgDijetM_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgDijet().M() );
+      hBaseline_LdgTrijetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getLdgTrijet().pt() );
+      hBaseline_LdgTrijetMass_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgTrijet().M() );
+      hBaseline_LdgTrijetJet1Bdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgTrijetJet1().bjetDiscriminator() );
+      hBaseline_LdgTrijetJet2Bdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgTrijetJet2().bjetDiscriminator() );
+      hBaseline_LdgTrijetBJetBdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+      hBaseline_SubLdgTrijetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getSubldgTrijet().pt() );
+      hBaseline_SubLdgTrijetMass_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgTrijet().M() );
+      hBaseline_SubLdgTrijetJet1Bdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetJet1().bjetDiscriminator() );
+      hBaseline_SubLdgTrijetJet2Bdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetJet2().bjetDiscriminator() );
+      hBaseline_SubLdgTrijetBJetBdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetBJet().bjetDiscriminator() );
+      //hBaseline_LdgDijetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getLdgDijet().pt() );
+      //hBaseline_LdgDijetM_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgDijet().M() );
+      //hBaseline_SubLdgDijetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getSubldgDijet().pt() );
+      //hBaseline_SubLdgDijetM_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgDijet().M() );
       
       // Splitted histos
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_CRone, isGenuineB, topData.getLdgTrijet().pt() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_CRone, isGenuineB, topData.getLdgTrijet().M() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_CRone, isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_CRone, isGenuineB, topData.getTetrajetBJet().pt() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_CRone, isGenuineB, topData.getTetrajetBJet().eta() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_CRone, isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_CRone, isGenuineB, topData.getLdgTetrajet().pt() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_CRone, isGenuineB, topData.getLdgTetrajet().M());
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_CRone, isGenuineB, hplusData.getLdgTrijet().pt() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_CRone, isGenuineB, hplusData.getLdgTrijet().M() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_CRone, isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_CRone, isGenuineB, hplusData.getTetrajetBJet().pt() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_CRone, isGenuineB, hplusData.getTetrajetBJet().eta() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_CRone, isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_CRone, isGenuineB, hplusData.getLdgTetrajet().pt() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_CRone, isGenuineB, hplusData.getLdgTetrajet().M());
       
       return;
 
@@ -2070,7 +2093,7 @@ void FakeBMeasurement::DoBaselineAnalysis(Long64_t entry,
   //================================================================================================
   // Signal Region (SR)
   //================================================================================================
-  if (!topData.passedSelection()) return;
+  if (!hplusData.passedSelection()) return;
   if (0) std::cout << "=== Baseline: Signal Region (SR)" << std::endl;
   ccSR.increment();
 
@@ -2192,47 +2215,47 @@ void FakeBMeasurement::DoBaselineAnalysis(Long64_t entry,
 	}
     }
 
-  double dEta = std::abs( topData.getTetrajetBJet().p4().eta() - topData.getLdgTrijetBJet().p4().eta() );
-  double dPhi = std::abs( ROOT::Math::VectorUtil::DeltaPhi( topData.getTetrajetBJet().p4(), topData.getLdgTrijetBJet().p4() ) );
-  double dR = ROOT::Math::VectorUtil::DeltaR( topData.getTetrajetBJet().p4(), topData.getLdgTrijetBJet().p4()) ;
+  double dEta = std::abs( hplusData.getTetrajetBJet().p4().eta() - hplusData.getLdgTrijetBJet().p4().eta() );
+  double dPhi = std::abs( ROOT::Math::VectorUtil::DeltaPhi( hplusData.getTetrajetBJet().p4(), hplusData.getLdgTrijetBJet().p4() ) );
+  double dR = ROOT::Math::VectorUtil::DeltaR( hplusData.getTetrajetBJet().p4(), hplusData.getLdgTrijetBJet().p4()) ;
 
   // Fill histos
   hBaseline_MET_AfterAllSelections ->Fill(isGenuineB, METData.getMET().R());
   hBaseline_HT_AfterAllSelections ->Fill(isGenuineB, jetData.HT());
-  hBaseline_MVAmax1_AfterAllSelections ->Fill(isGenuineB, topData.getMVAmax1());
-  hBaseline_MVAmax2_AfterAllSelections ->Fill(isGenuineB, topData.getMVAmax2());
-  hBaseline_LdgTetrajetPt_AfterAllSelections->Fill(isGenuineB, topData.getLdgTetrajet().pt() );
-  hBaseline_LdgTetrajetM_AfterAllSelections->Fill(isGenuineB, topData.getLdgTetrajet().M() );
-  hBaseline_TetrajetBJetPt_AfterAllSelections->Fill(isGenuineB, topData.getTetrajetBJet().pt() );
-  hBaseline_TetrajetBJetEta_AfterAllSelections->Fill(isGenuineB, topData.getTetrajetBJet().eta() );
-  hBaseline_TetrajetBJetBdisc_AfterAllSelections->Fill(isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
+  hBaseline_MVAmax1_AfterAllSelections ->Fill(isGenuineB, hplusData.getMVAmax1());
+  hBaseline_MVAmax2_AfterAllSelections ->Fill(isGenuineB, hplusData.getMVAmax2());
+  hBaseline_LdgTetrajetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getLdgTetrajet().pt() );
+  hBaseline_LdgTetrajetM_AfterAllSelections->Fill(isGenuineB, hplusData.getLdgTetrajet().M() );
+  hBaseline_TetrajetBJetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().pt() );
+  hBaseline_TetrajetBJetEta_AfterAllSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().eta() );
+  hBaseline_TetrajetBJetBdisc_AfterAllSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
   hBaseline_DeltaEtaLdgTrijetBJetTetrajetBJet_AfterAllSelections->Fill(isGenuineB, dEta);
   hBaseline_DeltaPhiLdgTrijetBJetTetrajetBJet_AfterAllSelections->Fill(isGenuineB, dPhi);
   hBaseline_DeltaRLdgTrijetBJetTetrajetBJet_AfterAllSelections->Fill(isGenuineB, dR);
-  hBaseline_LdgTrijetPt_AfterAllSelections->Fill(isGenuineB, topData.getLdgTrijet().pt() );
-  hBaseline_LdgTrijetMass_AfterAllSelections ->Fill(isGenuineB, topData.getLdgTrijet().M() );
-  hBaseline_LdgTrijetJet1Bdisc_AfterAllSelections ->Fill(isGenuineB, topData.getLdgTrijetJet1().bjetDiscriminator() );
-  hBaseline_LdgTrijetJet2Bdisc_AfterAllSelections ->Fill(isGenuineB, topData.getLdgTrijetJet2().bjetDiscriminator() );
-  hBaseline_LdgTrijetBJetBdisc_AfterAllSelections ->Fill(isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-  hBaseline_SubLdgTrijetPt_AfterAllSelections->Fill(isGenuineB, topData.getSubldgTrijet().pt() );
-  hBaseline_SubLdgTrijetMass_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgTrijet().M() );
-  hBaseline_SubLdgTrijetJet1Bdisc_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgTrijetJet1().bjetDiscriminator() );
-  hBaseline_SubLdgTrijetJet2Bdisc_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgTrijetJet2().bjetDiscriminator() );
-  hBaseline_SubLdgTrijetBJetBdisc_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgTrijetBJet().bjetDiscriminator() );
-  hBaseline_LdgDijetPt_AfterAllSelections->Fill(isGenuineB, topData.getLdgDijet().pt() );
-  hBaseline_LdgDijetM_AfterAllSelections ->Fill(isGenuineB, topData.getLdgDijet().M() );
-  hBaseline_SubLdgDijetPt_AfterAllSelections->Fill(isGenuineB, topData.getSubldgDijet().pt() );
-  hBaseline_SubLdgDijetM_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgDijet().M() );
+  hBaseline_LdgTrijetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getLdgTrijet().pt() );
+  hBaseline_LdgTrijetMass_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgTrijet().M() );
+  hBaseline_LdgTrijetJet1Bdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgTrijetJet1().bjetDiscriminator() );
+  hBaseline_LdgTrijetJet2Bdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgTrijetJet2().bjetDiscriminator() );
+  hBaseline_LdgTrijetBJetBdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+  hBaseline_SubLdgTrijetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getSubldgTrijet().pt() );
+  hBaseline_SubLdgTrijetMass_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgTrijet().M() );
+  hBaseline_SubLdgTrijetJet1Bdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetJet1().bjetDiscriminator() );
+  hBaseline_SubLdgTrijetJet2Bdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetJet2().bjetDiscriminator() );
+  hBaseline_SubLdgTrijetBJetBdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetBJet().bjetDiscriminator() );
+  // hBaseline_LdgDijetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getLdgDijet().pt() );
+  // hBaseline_LdgDijetM_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgDijet().M() );
+  // hBaseline_SubLdgDijetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getSubldgDijet().pt() );
+  // hBaseline_SubLdgDijetM_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgDijet().M() );
 
   // Splitted Histos
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_SR, isGenuineB, topData.getLdgTrijet().pt() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_SR, isGenuineB, topData.getLdgTrijet().M() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_SR, isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_SR, isGenuineB, topData.getTetrajetBJet().pt() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_SR, isGenuineB, topData.getTetrajetBJet().eta() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_SR, isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_SR, isGenuineB, topData.getLdgTetrajet().pt() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_SR, isGenuineB, topData.getLdgTetrajet().M());
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_SR, isGenuineB, hplusData.getLdgTrijet().pt() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_SR, isGenuineB, hplusData.getLdgTrijet().M() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_SR, isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_SR, isGenuineB, hplusData.getTetrajetBJet().pt() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_SR, isGenuineB, hplusData.getTetrajetBJet().eta() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_SR, isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_SR, isGenuineB, hplusData.getLdgTetrajet().pt() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_SR, isGenuineB, hplusData.getLdgTetrajet().M());
 
   // Save selected event ID for pick events
   fEventSaver.save();
@@ -2297,25 +2320,42 @@ void FakeBMeasurement::DoInvertedAnalysis(Long64_t entry,
   // const TopSelectionMVA::Data topData = fInvertedTopSelection.analyze(fEvent, jetData, invBjetData);
   const TopSelectionMVA::Data topData = fInvertedTopSelection.silentAnalyze(fEvent, jetData, invBjetData); // disable counters & histograms (misleading)
 
+  if (0) std::cout << "=== Hplus2tb selection" << std::endl;
+  const HplusSelection::Data hplusData = fInvertedHplusSelection.analyze(fEvent, jetData, invBjetData, topData);
+  
+  //if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
+  //if (topData.getAllCleanedTopsSize() != 2) return; 
+
+  // Apply top-tag SF
+
+  if (fEvent.isMC()) 
+    {
+      if (topData.getTopTaggingScaleFactorEventWeight() != hplusData.getTopTaggingScaleFactorEventWeight())
+   	{
+   	  fEventWeight.multiplyWeight(1./topData.getTopTaggingScaleFactorEventWeight());
+   	  fEventWeight.multiplyWeight(hplusData.getTopTaggingScaleFactorEventWeight());
+   	}
+    }
+
   // Ensure 2 tops with MVA > -1.0 and free b-jet are present
-  if (!topData.passedAnyTwoTopsAndFreeB()) return;
+  if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
   cInvertedAnyTwoTopsAndFreeBCounter.increment();
 
   // Require exactly 2 clean tops (no MVA cut yet)
-  if (topData.getAllCleanedTopsSize() != 2) return;
+  if (hplusData.getAllCleanedTopsSize() != 2) return;
   cInvertedTwoCleanTopsCounter.increment();
 
   if (0) std::cout << "=== Inverted BJet: Top-tag SF" << std::endl;
   // Apply top-tag SF
   if (fEvent.isMC()) 
     {
-      fEventWeight.multiplyWeight(topData.getTopTaggingScaleFactorEventWeight());
+      fEventWeight.multiplyWeight(hplusData.getTopTaggingScaleFactorEventWeight());
     }
   cInvertedTopTaggingSFCounter.increment();
 
   // Define variables
-  float ldgMVA            = topData.getMVAmax1(); // topData.getMVALdgInPt();
-  float subldgMVA         = topData.getMVAmax2(); // topData.getMVASubldgInPt();
+  float ldgMVA            = hplusData.getMVAmax1(); // hplusData.getMVALdgInPt();
+  float subldgMVA         = hplusData.getMVAmax2(); // hplusData.getMVASubldgInPt();
   bool bPass_LdgTopMVA    = cfg_LdgTopMVACut.passedCut(ldgMVA);
   bool bPass_SubldgTopMVA = cfg_LdgTopMVACut.passedCut(subldgMVA);
   bool bPass_BothMVA      = bPass_LdgTopMVA * bPass_SubldgTopMVA;
@@ -2323,10 +2363,10 @@ void FakeBMeasurement::DoInvertedAnalysis(Long64_t entry,
 
   // Fill histos after StandardSelections: Require any two tops with MVA > -1.0 and presence of free b-jet (not taken up by any of the two best (in MVA) tops) 
   std::vector<float> myFactorisationInfo;
-  myFactorisationInfo.push_back(topData.getTetrajetBJet().pt() );
-  myFactorisationInfo.push_back(topData.getTetrajetBJet().eta() );
+  myFactorisationInfo.push_back(hplusData.getTetrajetBJet().pt() );
+  myFactorisationInfo.push_back(hplusData.getTetrajetBJet().eta() );
   fCommonPlots.setFactorisationBinForEvent(myFactorisationInfo);
-  fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, invBjetData, METData, QuarkGluonLikelihoodRatio::Data(), topData, isGenuineB);
+  fCommonPlots.fillControlPlotsAfterStandardSelections(fEvent, jetData, invBjetData, METData, QuarkGluonLikelihoodRatio::Data(), hplusData, isGenuineB);
   
   if (!bPass_BothMVA) 
     {
@@ -2334,19 +2374,19 @@ void FakeBMeasurement::DoInvertedAnalysis(Long64_t entry,
       if (bPass_LdgTopMVA && cfg_SubldgTopMVAMinCut.passedCut(subldgMVA) && cfg_SubldgTopMVAMaxCut.passedCut(subldgMVA) )
 	{
 	  // Splitted Histos
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_CRthree, isGenuineB, topData.getLdgTrijet().pt() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_CRthree, isGenuineB, topData.getLdgTrijet().M() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_CRthree, isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_CRthree, isGenuineB, topData.getTetrajetBJet().pt() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_CRthree, isGenuineB, topData.getTetrajetBJet().eta() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_CRthree, isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_CRthree, isGenuineB, topData.getLdgTetrajet().pt() );
-	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_CRthree, isGenuineB, topData.getLdgTetrajet().M());
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_CRthree, isGenuineB, hplusData.getLdgTrijet().pt() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_CRthree, isGenuineB, hplusData.getLdgTrijet().M() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_CRthree, isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_CRthree, isGenuineB, hplusData.getTetrajetBJet().pt() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_CRthree, isGenuineB, hplusData.getTetrajetBJet().eta() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_CRthree, isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_CRthree, isGenuineB, hplusData.getLdgTetrajet().pt() );
+	  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_CRthree, isGenuineB, hplusData.getLdgTetrajet().M());
 	}
 
       // If top fails determine if event falls into  Control Region 2 (CR2)
       if (!bPass_InvertedTop) return;
-      if (topData.getLdgTrijetBJet().bjetDiscriminator() < 0.8484) return; // fixme - test - iro
+      if (hplusData.getLdgTrijetBJet().bjetDiscriminator() < 0.8484) return; // fixme - test - iro
 
       if (0) std::cout << "=== Inverted BJet: Control Region 2 (CR2)" << std::endl;
       cCRtwo.increment();
@@ -2470,47 +2510,47 @@ void FakeBMeasurement::DoInvertedAnalysis(Long64_t entry,
 	    }
 	}
       
-      double dEta = std::abs( topData.getTetrajetBJet().p4().eta() - topData.getLdgTrijetBJet().p4().eta() );
-      double dPhi = std::abs( ROOT::Math::VectorUtil::DeltaPhi( topData.getTetrajetBJet().p4(), topData.getLdgTrijetBJet().p4() ) );
-      double dR = ROOT::Math::VectorUtil::DeltaR( topData.getTetrajetBJet().p4(), topData.getLdgTrijetBJet().p4()) ;
+      double dEta = std::abs( hplusData.getTetrajetBJet().p4().eta() - hplusData.getLdgTrijetBJet().p4().eta() );
+      double dPhi = std::abs( ROOT::Math::VectorUtil::DeltaPhi( hplusData.getTetrajetBJet().p4(), hplusData.getLdgTrijetBJet().p4() ) );
+      double dR = ROOT::Math::VectorUtil::DeltaR( hplusData.getTetrajetBJet().p4(), hplusData.getLdgTrijetBJet().p4()) ;
 
       // Fill histos
       hInverted_MET_AfterCRSelections ->Fill(isGenuineB, METData.getMET().R());
       hInverted_HT_AfterCRSelections ->Fill(isGenuineB, jetData.HT());
-      hInverted_MVAmax1_AfterCRSelections ->Fill(isGenuineB, topData.getMVAmax1());
-      hInverted_MVAmax2_AfterCRSelections ->Fill(isGenuineB, topData.getMVAmax2());
-      hInverted_LdgTetrajetPt_AfterCRSelections->Fill(isGenuineB, topData.getLdgTetrajet().pt() );
-      hInverted_LdgTetrajetM_AfterCRSelections->Fill(isGenuineB, topData.getLdgTetrajet().M() );
-      hInverted_TetrajetBJetPt_AfterCRSelections->Fill(isGenuineB, topData.getTetrajetBJet().pt() );
-      hInverted_TetrajetBJetEta_AfterCRSelections->Fill(isGenuineB, topData.getTetrajetBJet().eta() );
-      hInverted_TetrajetBJetBdisc_AfterCRSelections->Fill(isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
+      hInverted_MVAmax1_AfterCRSelections ->Fill(isGenuineB, hplusData.getMVAmax1());
+      hInverted_MVAmax2_AfterCRSelections ->Fill(isGenuineB, hplusData.getMVAmax2());
+      hInverted_LdgTetrajetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getLdgTetrajet().pt() );
+      hInverted_LdgTetrajetM_AfterCRSelections->Fill(isGenuineB, hplusData.getLdgTetrajet().M() );
+      hInverted_TetrajetBJetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().pt() );
+      hInverted_TetrajetBJetEta_AfterCRSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().eta() );
+      hInverted_TetrajetBJetBdisc_AfterCRSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
       hInverted_DeltaEtaLdgTrijetBJetTetrajetBJet_AfterCRSelections->Fill(isGenuineB, dEta);
       hInverted_DeltaPhiLdgTrijetBJetTetrajetBJet_AfterCRSelections->Fill(isGenuineB, dPhi);
       hInverted_DeltaRLdgTrijetBJetTetrajetBJet_AfterCRSelections->Fill(isGenuineB, dR);
-      hInverted_LdgTrijetPt_AfterCRSelections->Fill(isGenuineB, topData.getLdgTrijet().pt() );
-      hInverted_LdgTrijetMass_AfterCRSelections ->Fill(isGenuineB, topData.getLdgTrijet().M() );
-      hInverted_LdgTrijetJet1Bdisc_AfterCRSelections ->Fill(isGenuineB, topData.getLdgTrijetJet1().bjetDiscriminator() );
-      hInverted_LdgTrijetJet2Bdisc_AfterCRSelections ->Fill(isGenuineB, topData.getLdgTrijetJet2().bjetDiscriminator() );
-      hInverted_LdgTrijetBJetBdisc_AfterCRSelections ->Fill(isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-      hInverted_SubLdgTrijetPt_AfterCRSelections->Fill(isGenuineB, topData.getSubldgTrijet().pt() );
-      hInverted_SubLdgTrijetMass_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgTrijet().M() );
-      hInverted_SubLdgTrijetJet1Bdisc_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgTrijetJet1().bjetDiscriminator() );
-      hInverted_SubLdgTrijetJet2Bdisc_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgTrijetJet2().bjetDiscriminator() );
-      hInverted_SubLdgTrijetBJetBdisc_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgTrijetBJet().bjetDiscriminator() );
-      hInverted_LdgDijetPt_AfterCRSelections->Fill(isGenuineB, topData.getLdgDijet().pt() );
-      hInverted_LdgDijetM_AfterCRSelections ->Fill(isGenuineB, topData.getLdgDijet().M() );
-      hInverted_SubLdgDijetPt_AfterCRSelections->Fill(isGenuineB, topData.getSubldgDijet().pt() );
-      hInverted_SubLdgDijetM_AfterCRSelections ->Fill(isGenuineB, topData.getSubldgDijet().M() );
+      hInverted_LdgTrijetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getLdgTrijet().pt() );
+      hInverted_LdgTrijetMass_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgTrijet().M() );
+      hInverted_LdgTrijetJet1Bdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgTrijetJet1().bjetDiscriminator() );
+      hInverted_LdgTrijetJet2Bdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgTrijetJet2().bjetDiscriminator() );
+      hInverted_LdgTrijetBJetBdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+      hInverted_SubLdgTrijetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getSubldgTrijet().pt() );
+      hInverted_SubLdgTrijetMass_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgTrijet().M() );
+      hInverted_SubLdgTrijetJet1Bdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetJet1().bjetDiscriminator() );
+      hInverted_SubLdgTrijetJet2Bdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetJet2().bjetDiscriminator() );
+      hInverted_SubLdgTrijetBJetBdisc_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetBJet().bjetDiscriminator() );
+      // hInverted_LdgDijetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getLdgDijet().pt() );
+      // hInverted_LdgDijetM_AfterCRSelections ->Fill(isGenuineB, hplusData.getLdgDijet().M() );
+      // hInverted_SubLdgDijetPt_AfterCRSelections->Fill(isGenuineB, hplusData.getSubldgDijet().pt() );
+      // hInverted_SubLdgDijetM_AfterCRSelections ->Fill(isGenuineB, hplusData.getSubldgDijet().M() );
       
       // Splitted Histos
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_CRtwo, isGenuineB, topData.getLdgTrijet().pt() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_CRtwo, isGenuineB, topData.getLdgTrijet().M() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_CRtwo, isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_CRtwo, isGenuineB, topData.getTetrajetBJet().pt() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_CRtwo, isGenuineB, topData.getTetrajetBJet().eta() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_CRtwo, isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_CRtwo, isGenuineB, topData.getLdgTetrajet().pt() );
-      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_CRtwo, isGenuineB, topData.getLdgTetrajet().M());
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_CRtwo, isGenuineB, hplusData.getLdgTrijet().pt() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_CRtwo, isGenuineB, hplusData.getLdgTrijet().M() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_CRtwo, isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_CRtwo, isGenuineB, hplusData.getTetrajetBJet().pt() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_CRtwo, isGenuineB, hplusData.getTetrajetBJet().eta() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_CRtwo, isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_CRtwo, isGenuineB, hplusData.getLdgTetrajet().pt() );
+      fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_CRtwo, isGenuineB, hplusData.getLdgTetrajet().M());
       
       return;
     }
@@ -2518,8 +2558,8 @@ void FakeBMeasurement::DoInvertedAnalysis(Long64_t entry,
   //================================================================================================
   // Verification Region (VR)
   //================================================================================================
-  if (!topData.passedSelection()) return;
-  if (topData.getLdgTrijetBJet().bjetDiscriminator() < 0.8484) return; // fixme - test - iro
+  if (!hplusData.passedSelection()) return;
+  if (hplusData.getLdgTrijetBJet().bjetDiscriminator() < 0.8484) return; // fixme - test - iro
 
   if (0) std::cout << "=== Inverted BJet: Verification Region (VR)" << std::endl;
   cVR.increment();
@@ -2643,47 +2683,47 @@ void FakeBMeasurement::DoInvertedAnalysis(Long64_t entry,
 	}
     }
 
-  double dEta = std::abs( topData.getTetrajetBJet().p4().eta() - topData.getLdgTrijetBJet().p4().eta() );
-  double dPhi = std::abs( ROOT::Math::VectorUtil::DeltaPhi( topData.getTetrajetBJet().p4(), topData.getLdgTrijetBJet().p4() ) );
-  double dR = ROOT::Math::VectorUtil::DeltaR( topData.getTetrajetBJet().p4(), topData.getLdgTrijetBJet().p4()) ;
+  double dEta = std::abs( hplusData.getTetrajetBJet().p4().eta() - hplusData.getLdgTrijetBJet().p4().eta() );
+  double dPhi = std::abs( ROOT::Math::VectorUtil::DeltaPhi( hplusData.getTetrajetBJet().p4(), hplusData.getLdgTrijetBJet().p4() ) );
+  double dR = ROOT::Math::VectorUtil::DeltaR( hplusData.getTetrajetBJet().p4(), hplusData.getLdgTrijetBJet().p4()) ;
   
   // Fill histos
   hInverted_MET_AfterAllSelections ->Fill(isGenuineB, METData.getMET().R());
   hInverted_HT_AfterAllSelections ->Fill(isGenuineB, jetData.HT());
-  hInverted_MVAmax1_AfterAllSelections ->Fill(isGenuineB, topData.getMVAmax1());
-  hInverted_MVAmax2_AfterAllSelections ->Fill(isGenuineB, topData.getMVAmax2());
-  hInverted_LdgTetrajetPt_AfterAllSelections->Fill(isGenuineB, topData.getLdgTetrajet().pt() );
-  hInverted_LdgTetrajetM_AfterAllSelections->Fill(isGenuineB, topData.getLdgTetrajet().M() );
-  hInverted_TetrajetBJetPt_AfterAllSelections->Fill(isGenuineB, topData.getTetrajetBJet().pt() );
-  hInverted_TetrajetBJetEta_AfterAllSelections->Fill(isGenuineB, topData.getTetrajetBJet().eta() );
-  hInverted_TetrajetBJetBdisc_AfterAllSelections->Fill(isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
+  hInverted_MVAmax1_AfterAllSelections ->Fill(isGenuineB, hplusData.getMVAmax1());
+  hInverted_MVAmax2_AfterAllSelections ->Fill(isGenuineB, hplusData.getMVAmax2());
+  hInverted_LdgTetrajetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getLdgTetrajet().pt() );
+  hInverted_LdgTetrajetM_AfterAllSelections->Fill(isGenuineB, hplusData.getLdgTetrajet().M() );
+  hInverted_TetrajetBJetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().pt() );
+  hInverted_TetrajetBJetEta_AfterAllSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().eta() );
+  hInverted_TetrajetBJetBdisc_AfterAllSelections->Fill(isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
   hInverted_DeltaEtaLdgTrijetBJetTetrajetBJet_AfterAllSelections->Fill(isGenuineB, dEta);
   hInverted_DeltaPhiLdgTrijetBJetTetrajetBJet_AfterAllSelections->Fill(isGenuineB, dPhi);
   hInverted_DeltaRLdgTrijetBJetTetrajetBJet_AfterAllSelections->Fill(isGenuineB, dR);
-  hInverted_LdgTrijetPt_AfterAllSelections->Fill(isGenuineB, topData.getLdgTrijet().pt() );
-  hInverted_LdgTrijetMass_AfterAllSelections ->Fill(isGenuineB, topData.getLdgTrijet().M() );
-  hInverted_LdgTrijetJet1Bdisc_AfterAllSelections ->Fill(isGenuineB, topData.getLdgTrijetJet1().bjetDiscriminator() );
-  hInverted_LdgTrijetJet2Bdisc_AfterAllSelections ->Fill(isGenuineB, topData.getLdgTrijetJet2().bjetDiscriminator() );
-  hInverted_LdgTrijetBJetBdisc_AfterAllSelections ->Fill(isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-  hInverted_SubLdgTrijetPt_AfterAllSelections->Fill(isGenuineB, topData.getSubldgTrijet().pt() );
-  hInverted_SubLdgTrijetMass_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgTrijet().M() );
-  hInverted_SubLdgTrijetJet1Bdisc_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgTrijetJet1().bjetDiscriminator() );
-  hInverted_SubLdgTrijetJet2Bdisc_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgTrijetJet2().bjetDiscriminator() );
-  hInverted_SubLdgTrijetBJetBdisc_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgTrijetBJet().bjetDiscriminator() );
-  hInverted_LdgDijetPt_AfterAllSelections->Fill(isGenuineB, topData.getLdgDijet().pt() );
-  hInverted_LdgDijetM_AfterAllSelections ->Fill(isGenuineB, topData.getLdgDijet().M() );
-  hInverted_SubLdgDijetPt_AfterAllSelections->Fill(isGenuineB, topData.getSubldgDijet().pt() );
-  hInverted_SubLdgDijetM_AfterAllSelections ->Fill(isGenuineB, topData.getSubldgDijet().M() );
+  hInverted_LdgTrijetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getLdgTrijet().pt() );
+  hInverted_LdgTrijetMass_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgTrijet().M() );
+  hInverted_LdgTrijetJet1Bdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgTrijetJet1().bjetDiscriminator() );
+  hInverted_LdgTrijetJet2Bdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgTrijetJet2().bjetDiscriminator() );
+  hInverted_LdgTrijetBJetBdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+  hInverted_SubLdgTrijetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getSubldgTrijet().pt() );
+  hInverted_SubLdgTrijetMass_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgTrijet().M() );
+  hInverted_SubLdgTrijetJet1Bdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetJet1().bjetDiscriminator() );
+  hInverted_SubLdgTrijetJet2Bdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetJet2().bjetDiscriminator() );
+  hInverted_SubLdgTrijetBJetBdisc_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgTrijetBJet().bjetDiscriminator() );
+  // hInverted_LdgDijetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getLdgDijet().pt() );
+  // hInverted_LdgDijetM_AfterAllSelections ->Fill(isGenuineB, hplusData.getLdgDijet().M() );
+  // hInverted_SubLdgDijetPt_AfterAllSelections->Fill(isGenuineB, hplusData.getSubldgDijet().pt() );
+  // hInverted_SubLdgDijetM_AfterAllSelections ->Fill(isGenuineB, hplusData.getSubldgDijet().M() );
 
   // Splitted histos
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_VR, isGenuineB, topData.getLdgTrijet().pt() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_VR, isGenuineB, topData.getLdgTrijet().M() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_VR, isGenuineB, topData.getLdgTrijetBJet().bjetDiscriminator() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_VR, isGenuineB, topData.getTetrajetBJet().pt() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_VR, isGenuineB, topData.getTetrajetBJet().eta() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_VR, isGenuineB, topData.getTetrajetBJet().bjetDiscriminator() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_VR, isGenuineB, topData.getLdgTetrajet().pt() );
-  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_VR, isGenuineB, topData.getLdgTetrajet().M());
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetPt_VR, isGenuineB, hplusData.getLdgTrijet().pt() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetMass_VR, isGenuineB, hplusData.getLdgTrijet().M() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTrijetBJetBdisc_VR, isGenuineB, hplusData.getLdgTrijetBJet().bjetDiscriminator() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetPt_VR, isGenuineB, hplusData.getTetrajetBJet().pt() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetEta_VR, isGenuineB, hplusData.getTetrajetBJet().eta() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hTetrajetBJetBdisc_VR, isGenuineB, hplusData.getTetrajetBJet().bjetDiscriminator() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetPt_VR, isGenuineB, hplusData.getLdgTetrajet().pt() );
+  fCommonPlots.getHistoSplitter().fillShapeHistogramTriplet(hLdgTetrajetMass_VR, isGenuineB, hplusData.getLdgTetrajet().M());
 
   // Save selected event ID for pick events
   fEventSaver.save();
