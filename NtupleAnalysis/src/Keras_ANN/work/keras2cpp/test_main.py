@@ -23,7 +23,7 @@ import json
 import sys
 import os
 import uproot
-from sklearn.preprocessing import StandardScaler
+from sklearn.externals import joblib
 # Regression predictions
 from keras.models import load_model
 from optparse import OptionParser
@@ -47,7 +47,7 @@ def Print(msg, printHeader=False):
     return
 
 def main():
-    ROOT.gStyle.SetOptStat(0)
+    #ROOT.gStyle.SetOptStat(0)
 
     # Definitions
     filename = opts.filename
@@ -99,18 +99,6 @@ def main():
     
     # Concatinate signal + background datasets
     df_all  = pandas.concat( [df_signal, df_background] )
-    
-    # Standardization of datasets? 
-    if opts.standardise != None:
-        msg  = "Standardising dataset features with the %sScaler%s" % (ls + opts.standardise, ns)
-        #Print(msg, True)    
-        '''
-        if not df_signal.empty: 
-            scaler_sig, df_signal = func.GetStandardisedDataFrame(df_signal, opts.inputList, scalerType=opts.standardise)
-        if not df_background.empty: 
-            scaler_bkg, df_background = func.GetStandardisedDataFrame(df_background, opts.inputList, scalerType=opts.standardise)
-        scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList, scalerType=opts.standardise)
-        '''
 
     # Get a Numpy representation of the DataFrames for signal and background datasets
     dset_signal     = df_signal.values
@@ -119,7 +107,19 @@ def main():
     
     X_bkg      = dset_background[:opts.entries, 0:nInputs]
     X_sig      = dset_signal[:opts.entries, 0:nInputs]
-    
+        
+    # Standardization of datasets? 
+    if opts.standardise != "None":
+        msg  = "Standardising dataset features with the %sScaler" % (opts.standardise)
+        Print(msg, True)
+        scalerName = os.path.join(opts.dir, 'scaler.save')
+        # Load the scaler files
+        scaler = joblib.load(scalerName)
+        
+        #Transform inputs
+        X_bkg = scaler.transform(X_bkg)
+        X_sig = scaler.transform(X_sig)
+        
     # Load & compile the model
     modelFile = os.path.join(opts.dir, 'model_trained.h5')
     Print("Loading model %s" % (modelFile), True)
@@ -131,12 +131,24 @@ def main():
     Y_bkg = loaded_model.predict(X_bkg, verbose=0) 
     Y_sig = loaded_model.predict(X_sig, verbose=0) 
     
-    Print("predicted signal: ", False)
-    for i in range(Nevts):
-        Print(Y_sig[i], False)
-    Print("predicted background: ", False)
-    for i in range(Nevts):
-        Print(Y_bkg[i], False)
+    # Create histograms
+    h_sig = ROOT.TH1F("sig", '', 50, 0, 1)    
+    h_bkg = ROOT.TH1F("bkg", '', 50, 0, 1)    
+
+    #Print("predicted signal: ", False)
+    for i in range(opts.entries):
+        h_sig.Fill(Y_sig[i])
+        #Print(Y_sig[i], False)
+    #Print("predicted background: ", False)
+    for i in range(opts.entries):
+        h_bkg.Fill(Y_bkg[i])
+        #Print(Y_bkg[i], False)
+
+    outfile    = ROOT.TFile.Open("keras_py.root","RECREATE")
+    outfile.cd()
+    h_sig.Write()
+    h_bkg.Write()
+    outfile.Close()
 
 #================================================================================================
 # Main
@@ -164,7 +176,7 @@ if __name__ == "__main__":
     DIR         = None
     SAVEDIR     = ""
     SAVEFORMATS = "pdf" #"png" does not work
-    STANDARDISE = None
+    STANDARDISE = "None"
     SAVENAME    = None
     LOGY        = False
     ENTRIES     = None
