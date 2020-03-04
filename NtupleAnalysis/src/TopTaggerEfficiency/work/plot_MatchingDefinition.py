@@ -145,7 +145,7 @@ def GetHistoKwargs(histoName, opts):
         units             = "GeV/c"
         kwargs["xlabel"]  = "p_{T} (%s)" % (units)
         bins              = [i for i in range(0, 1000+50, 50)]
-        if opts.folder == "topbdtSelection_":
+        if opts.folder == "topMVASelection_":
             #bins          = [i for i in range(0, 600+100, 100)] + [800]
             bins              = [0, 100, 200, 300, 400, 500, 600]
         else:
@@ -198,9 +198,9 @@ def main(opts):
         datasetsMgr_default.PrintInfo()
         datasetsMgr_second.PrintInfo()
         
-        Numerator = ["AllTopQuarkPt_MatchedBDT",
-                     "TrijetFakePt_BDT",
-                     "AllTopQuarkPt_MatchedBDT",
+        Numerator = ["AllTopQuarkPt_MatchedMVA",
+                     "TrijetFakePt_MVA",
+                     "AllTopQuarkPt_MatchedMVA",
                      "AllTopQuarkPt_Matched",
                      ]
         Denominator = ["AllTopQuarkPt_Matched",
@@ -331,7 +331,7 @@ def PlotEfficiency(datasetMgr1, datasetMgr2, numPath, denPath, eff_def):
     # Write the JSON file 
     if eff_def == "genuineTop":
         uncWriter = UncertaintyWriter()
-        jsonName = "uncertainties_matching_BDT_%s.json" % (opts.BDT)
+        jsonName = "uncertainties_matching_MVA_%s.json" % (opts.MVA)
         analysis = opts.analysisName
         saveDir  =  os.path.join("", jsonName)
         uncWriter.addParameters("matching", analysis, saveDir, gEff1, gEff2)
@@ -449,8 +449,8 @@ if __name__ == "__main__":
     SAVEDIR      = None
     VERBOSE      = False
     NORMALISE    = False
-    FOLDER       = "topbdtSelection_"
-    BDT          = "0.4"
+    FOLDER       = "topMVASelection_"
+    MVA          = "0.4"
     
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -461,7 +461,7 @@ if __name__ == "__main__":
     parser.add_option("-s", "--mcrab2", dest="mcrab2", action="store", 
                       help="Path to the second multicrab directory for input")
     
-    parser.add_option("--bdt", dest="BDT", action="store", default=BDT, help="BDT cut [default: %s]" % BDT)
+    parser.add_option("--mva", dest="MVA", action="store", default=MVA, help="MVA cut [default: %s]" % MVA)
 
     parser.add_option("-o", "--optMode", dest="optMode", type="string", default=OPTMODE, 
                       help="The optimization mode when analysis variation is enabled  [default: %s]" % OPTMODE)
@@ -515,9 +515,9 @@ if __name__ == "__main__":
         #print __doc__
         sys.exit(1)
 
-    opts.BDT = opts.BDT.replace('.', 'p')
-    if "-" in opts.BDT:
-        opts.BDT = opts.BDT.replace("-", "m")
+    opts.MVA = opts.MVA.replace('.', 'p')
+    if "-" in opts.MVA:
+        opts.MVA = opts.MVA.replace("-", "m")
         
     # Append folder to save directory path
     if opts.saveDir == None:
