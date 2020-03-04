@@ -48,6 +48,7 @@ public:
   //returns the last copy of a gen particle
   genParticle findLastCopy(int index);
   bool HasMother(const Event& event, const genParticle &p, const int mom_pdgId);
+  bool OriginatesFrom(const Event& event, const genParticle &p, const int mom_pdgId);
   //is Bjet
   bool isBJet(const Jet& jet, const std::vector<Jet>& bjets);
   bool isMatchedJet(const Jet& jet, const std::vector<Jet>& jets);
@@ -1241,6 +1242,7 @@ bool TopRecoTree::HasMother(const Event& event, const genParticle &p, const int 
   //  Description:
   //  Returns true if the particle has a mother with pdgId equal to mom_pdgId.
   // Ensure the particle has a mother!
+
   if (p.mothers().size() < 1) return false;
   // For-loop: All mothers
   for (size_t iMom = 0; iMom < p.mothers().size(); iMom++)
@@ -1249,9 +1251,26 @@ bool TopRecoTree::HasMother(const Event& event, const genParticle &p, const int 
       const genParticle m = event.genparticles().getGenParticles()[mom_index];
       int motherID = m.pdgId();
       int particleID = p.pdgId();
-      //std::cout<<"motherID "<<motherID<<std::endl;
       if (std::abs(motherID) == mom_pdgId) return true;
       if (std::abs(motherID) == std::abs(particleID)) return HasMother(event, m, mom_pdgId);      
+    }
+
+  return false;
+}
+
+bool TopRecoTree::OriginatesFrom(const Event& event, const genParticle &p, const int mom_pdgId){
+  //  Description:
+  //  Returns true if the particle has a mother with pdgId equal to mom_pdgId.
+  if (p.mothers().size() < 1) return false;
+  // For-loop: All mothers
+  for (size_t iMom = 0; iMom < p.mothers().size(); iMom++)
+    {
+      int mom_index =  p.mothers().at(iMom);
+      const genParticle m = event.genparticles().getGenParticles()[mom_index];
+      int motherID = m.pdgId();
+      //std::cout<<motherID<<std::endl;
+      if (std::abs(motherID) == mom_pdgId) return true;
+      return OriginatesFrom(event, m, mom_pdgId);      
     }
 
   return false;
@@ -2609,11 +2628,11 @@ void TopRecoTree::process(Long64_t entry) {
       }
     }  
     if (dRmin > 0.3) continue;
-    //std::cout<<"I found a lepton jet :)"<<std::endl;
-    if (HasMother(fEvent, genLep_matched, 6)) hLeptonJet_MotherID -> Fill(6);
-    if (HasMother(fEvent, genLep_matched, 15)) hLeptonJet_MotherID -> Fill(15);
-    else if (HasMother(fEvent, genLep_matched, 24)) hLeptonJet_MotherID -> Fill(24);
-    else if (HasMother(fEvent, genLep_matched, 25)) hLeptonJet_MotherID -> Fill(25);
+
+    if (OriginatesFrom(fEvent, genLep_matched, 6)) hLeptonJet_MotherID -> Fill(6);
+    else if (OriginatesFrom(fEvent, genLep_matched, 15)) hLeptonJet_MotherID -> Fill(15);
+    else if (OriginatesFrom(fEvent, genLep_matched, 24)) hLeptonJet_MotherID -> Fill(24);
+    else if (OriginatesFrom(fEvent, genLep_matched, 25)) hLeptonJet_MotherID -> Fill(25);
     else hLeptonJet_MotherID -> Fill(0);
   }
   

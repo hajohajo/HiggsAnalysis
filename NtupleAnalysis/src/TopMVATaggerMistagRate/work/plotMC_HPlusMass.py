@@ -455,7 +455,7 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "TopBDTTaggerMistagRate"
+    ANALYSISNAME = "TopMVATaggerMistagRate"
     MVACUT       = "MVA"
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
