@@ -43,6 +43,21 @@ def GetGraph(x, y, xerrl, xerrh, yerrl, yerrh):
                                    array.array("d",yerrl), array.array("d",yerrh))
     return graph
 
+
+# from https://github.com/cms-analysis/CombineHarvester/blob/master/CombineTools/python/plotting.py
+def TwoPadSplit(split_point, gap_low, gap_high):
+    upper = ROOT.TPad('upper', 'upper', 0., 0., 1., 1.)
+    upper.SetBottomMargin(split_point + gap_high)
+    upper.SetFillStyle(4000)
+    upper.Draw()
+    lower = ROOT.TPad('lower', 'lower', 0., 0., 1., 1.)
+    lower.SetTopMargin(1 - split_point + gap_low)
+    lower.SetFillStyle(4000)
+    lower.Draw()
+    upper.cd()
+    result = [upper, lower]
+    return result
+
 def GetRatioStyle(h_ratio, ytitle, xtitle, ymax=2, ymin=0):
     h_ratio.SetMaximum(ymax)
     h_ratio.SetMinimum(ymin)
