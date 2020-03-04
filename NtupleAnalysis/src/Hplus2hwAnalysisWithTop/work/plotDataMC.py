@@ -144,6 +144,7 @@ def main(opts):
         datasetsMgr.loadLuminosities() # from lumi.json
 
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
+        datasetsMgr.PrintInfo() #iro
         plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
 
         # Set signal cross-section
@@ -195,12 +196,15 @@ def main(opts):
             "tauSelection_",
             "metSelection_",
             "topSelectionBDT_",
+            "topSelectionMVA_",
             "config",
             "NSelectedVsRunNumber",
             ]
 
         # For-loop: All histograms
         for h in histoPaths:
+            if "MET_AfterAll" not in h:
+                continue
             myHistos.append(h)
 
         # For-loop: All histos
@@ -688,7 +692,7 @@ def GetHistoKwargs(h, opts):
             kwargs["opts"] = {"xmin": xMin, "xmax": xMax, "ymin": _yMin, "ymax": 5e9}
             #kwargs["opts"] = {"ymin": _yMin, "ymax": 5e9}
             kwargs["moveLegend"] = _legNE
-            kwargs["blindingRangeString"] = "0 to 100"
+            #kwargs["blindingRangeString"] = "0 to 100"
         elif "jet selection" in h:
             kwargs["opts"] = {"xmin": 0.0, "xmax": 7.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         elif "tau selection" in h:
@@ -780,7 +784,8 @@ def GetHistoKwargs(h, opts):
     if "_AfterAllSelections" in h or "_AfterTopSelection" in h or "_AfterMetSelection" in h:
         if "blindingRangeString" not in kwargs:
             if "eta" not in h.lower():
-                kwargs["blindingRangeString"] = "0 to %s" % (5000)
+                #kwargs["blindingRangeString"] = "0 to %s" % (5000)
+                pass
 
         #kwargs["ratio"] = False
 

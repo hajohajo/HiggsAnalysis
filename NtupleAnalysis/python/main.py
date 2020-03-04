@@ -26,10 +26,13 @@ import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 _debugMode = False
 _debugPUreweighting = False
 _debugMemoryConsumption = False
-sh_Error   = ShellStyles.ErrorStyle()
-sh_Success = ShellStyles.SuccessStyle()
-sh_Note    = ShellStyles.HighlightAltStyle()
-sh_Normal  = ShellStyles.NormalStyle()
+ss = ShellStyles.SuccessStyle()
+ns = ShellStyles.NormalStyle()
+ts = ShellStyles.NoteStyle()
+hs = ShellStyles.HighlightAltStyle()
+ls = ShellStyles.HighlightStyle()
+es = ShellStyles.ErrorStyle()
+cs = ShellStyles.CaptionStyle()
 
 #================================================================================================
 # Function Definition
@@ -379,7 +382,7 @@ class Process:
                 if d.isData():
                     self.datasetsData.append(d)
             dsetMgrCreator_tmp.close()
-        self.Print("Pileup reweighting will be done according to the sum of:\n\t%s" % (sh_Note + "\n\t".join([d.getName() for d in self.datasetsData]) + sh_Normal), True)
+        self.Print("Pileup reweighting will be done according to the sum of:\n\t%s" % (hs + "\n\t".join([d.getName() for d in self.datasetsData]) + ns), True)
 
 
         if len(whitelist) > 0:
@@ -391,7 +394,7 @@ class Process:
                     if match or ( item.endswith('*') and dset.getName().startswith(item[:-1]) ):
                         isOnWhiteList = True
                 if not isOnWhiteList:
-                    blacklist.append(dset.getName())
+                    blacklist.append("^"+dset.getName()+"$")
 
         for dset in dsets:
             isOnBlackList = False
@@ -490,7 +493,7 @@ class Process:
         config = None
         # Create output directory
         os.mkdir(outputDir)
-        self.Print("Created output directory %s" % (sh_Note + outputDir + sh_Normal), True)
+        self.Print("Created output directory %s" % (ls + outputDir + ns), True)
 
         multicrabCfg = os.path.join(outputDir, "multicrab.cfg")
         f = open(multicrabCfg, "w")
@@ -512,7 +515,7 @@ class Process:
                 if k in lumidata:
                     msg  = "Luminosity JSON file %s has a dataset (%s) for which the luminosity has already been loaded. " % (fname, k) 
                     msg += "Please check the luminosity JSON files:\n%s" % ("\n".join(lumifiles))
-                    raise Exception(sh_Error + msg + sh_Normal)
+                    raise Exception(es + msg + ns)
             lumidata.update(data)
         if len(lumidata) > 0:
             # Add run range in a json file, if runMin and runMax in pset
@@ -535,7 +538,7 @@ class Process:
             # Create the luminosity JSON file
             f = open(os.path.join(outputDir, "lumi.json"), "w")
             json.dump(lumidata, f, sort_keys=True, indent=2)
-            self.Verbose("Created luminosity json file %s" % (sh_Note + f.name + sh_Normal), True)
+            self.Verbose("Created luminosity json file %s" % (hs + f.name + ns), True)
             f.close()
 
         # Setup proof if asked
@@ -554,9 +557,9 @@ class Process:
         callsTotal = 0
 
         # Print the datasets that will be run on!
-        self.Print("Will process %d datasets in total:" % (len(self._datasets) ), True)
+        self.Print("Will process %d datasets in total:" % (len(self._datasets) ), False)
         for i, d in enumerate(self._datasets, 1):
-            self.Print("%d) %s" % (i, sh_Note + d.getName() + sh_Normal), i==0)
+            self.Print("%d) %s" % (i, hs + d.getName() + ns), False) #i==0)
 
         # Process over datasets
         ndset = 0
@@ -810,7 +813,7 @@ class Process:
         self.PrintStatsTotal(readMbytes, cpuTimeTotal, realTimeTotal, readMbytesTotal)
 
         # Inform user of location of results
-        self.Print("Results are in %s" % (sh_Success + outputDir + sh_Normal), True)
+        self.Print("Results are in %s" % (ss + outputDir + ns), True)
         config.write(os.path.join(outputDir,"parameters.json"))
         return outputDir
     
@@ -827,8 +830,7 @@ class Process:
         total["Read size"]    = "%.1f" % (readMbytesTotal) + " MB"
         total["Read speed"]   = "%.1f" % (readMbytes/realTimeTotal) + " MB/s"
         dt = str(datetime.timedelta(seconds=round(realTimeTotal))) + " (h:mm:ss)"
-        total["Real time"] = "%s"   % (sh_Note + dt + sh_Normal)
-        # total["Real time"]    = "%.1f" % realTimeTotal + " s"
+        total["Real time"] = "%s"  % (dt) #(hs + dt + ns)
         for key in total:
             self.Print(align.format(key, ":", total[key]), False)
         return
@@ -845,7 +847,7 @@ class Process:
         info["Read Size"]    = "%.1f" % (readMbytes) + " MB"
         info["Read Speed"]   = "%.1f" % (readMbytes/realTime) + " MB/s"
         dt = str(datetime.timedelta(seconds=round(realTime))) + " (h:mm:ss)"
-        info["Real time"] = "%s"   % (sh_Note + dt + sh_Normal)
+        info["Real time"] = "%s"   % (dt) #hs + dt + ns)
         # info["Real time"]    = "%.1f" % realTime + " s"
         for key in info:
             self.Print(align.format(key, ":", info[key]), False)

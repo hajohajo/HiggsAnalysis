@@ -150,50 +150,28 @@ def main():
     # ================================================================================================
     # Overwrite Default Settings  
     # ================================================================================================
-    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2tbAnalysis import allSelections
+    from HiggsAnalysis.NtupleAnalysis.parameters.hplus2hwAnalysisWithTop import allSelections
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
 
-    allSelections.ElectronSelection.electronPtCut  = 10.0
-    allSelections.ElectronSelection.electronEtaCut = 2.1
+    #allSelections.ElectronSelection.electronPtCut  = 10.0
+    #allSelections.ElectronSelection.electronEtaCut = 2.1
 
-    allSelections.MuonSelection.muonPtCut  = 25.0
-    allSelections.MuonSelection.muonEtaCut = 2.4
+    #allSelections.MuonSelection.muonPtCut  = 25.0
+    #allSelections.MuonSelection.muonEtaCut = 2.4
     
-    allSelections.TauSelection.triggerMatchingApply = False
-    allSelections.TauSelection.triggerMatchingCone  =  0.1
-    allSelections.TauSelection.tauPtCut             = 30.0
-    allSelections.TauSelection.tauEtaCut            =  2.1
-    allSelections.TauSelection.tauLdgTrkPtCut       =  0.0
-    allSelections.TauSelection.prongs               = -1
-    allSelections.TauSelection.rtau                 =  0.0
-    allSelections.TauSelection.againstElectronDiscr = "againstElectronTightMVA6"
-    allSelections.TauSelection.againstMuonDiscr     = "againstMuonLoose3"
-    allSelections.TauSelection.isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits"
+    #allSelections.TauSelection.tauPtCut             = 30.0
+    #allSelections.TauSelection.tauEtaCut            =  2.1
+    #allSelections.TauSelection.againstElectronDiscr = "againstElectronTightMVA6"
+    #allSelections.TauSelection.againstMuonDiscr     = "againstMuonLoose3"
+    #allSelections.TauSelection.isolationDiscr       = "byLooseCombinedIsolationDeltaBetaCorr3Hits"
 
-    allSelections.JetSelection.jetType                  = "Jets"
-    allSelections.JetSelection.jetPtCuts                = [30.0]
-    allSelections.JetSelection.jetEtaCuts               = [2.4]
-    allSelections.JetSelection.numberOfJetsCutValue     = 3
-    allSelections.JetSelection.numberOfJetsCutDirection = ">="
-    allSelections.JetSelection.HTCutValue               = 0.0
-    allSelections.JetSelection.HTCutDirection           = ">="
-
-    allSelections.BJetSelection.triggerMatchingApply      = False
-    allSelections.BJetSelection.triggerMatchingCone       = 0.1
-    allSelections.BJetSelection.jetPtCuts                 = [20.0]
-    allSelections.BJetSelection.jetEtaCuts                = [2.4]
-    allSelections.BJetSelection.bjetDiscr                 = "pfCombinedInclusiveSecondaryVertexV2BJetTags"
-    allSelections.BJetSelection.bjetDiscrWorkingPoint     = "Medium"
-    allSelections.BJetSelection.numberOfBJetsCutValue     = 1
-    allSelections.BJetSelection.numberOfBJetsCutDirection = ">="
-
-    allSelections.METSelection.METCutValue                 = 0 # default: 40.0
-    allSelections.METSelection.METCutDirection             = ">="
-    allSelections.METSelection.METSignificanceCutValue     = -1000.0
-    allSelections.METSelection.METSignificanceCutDirection = ">"
-    allSelections.METSelection.METType                     = "MET_Type1"
-    allSelections.METSelection.applyPhiCorrections          = False
+    #allSelections.BJetSelection.jetPtCuts                 = [20.0]
+    #allSelections.BJetSelection.jetEtaCuts                = [2.4]
+    #allSelections.BJetSelection.bjetDiscr                 = "pfCombinedInclusiveSecondaryVertexV2BJetTags"
+    #allSelections.BJetSelection.bjetDiscrWorkingPoint     = "Medium"
+    #allSelections.BJetSelection.numberOfBJetsCutValue     = 1
+    #allSelections.BJetSelection.numberOfBJetsCutDirection = ">="
 
     # ================================================================================================
     # Add Analysis Variations
@@ -219,7 +197,7 @@ def main():
                               usePUreweighting       = opts.usePUreweighting,
                               useTopPtReweighting    = opts.useTopPtReweighting,
                               doSystematicVariations = opts.doSystematics,
-                              analysisType="HToTB",
+                              analysisType="HToHW",
                               verbose=opts.verbose)
 
     # Add variations (e.g. for optimisation)

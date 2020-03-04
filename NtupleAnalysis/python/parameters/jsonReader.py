@@ -5,11 +5,11 @@ import os
 
 # This file contains all the QGL values and their uncertainties used in the analysis
 
-def setupQGLInformation(QGLRPset, jsonname_Light, jsonname_Gluon):
+def setupQGLInformation(QGLRPset, jsonname_UDS, jsonname_G):
     
     # Process the json produced with QGLR and add the relevant information to the PSet 
-    QGLRPset.LightJetsQGL = _setupQGL(jsonname_Light)
-    QGLRPset.GluonJetsQGL = _setupQGL(jsonname_Gluon)
+    QGLRPset.UDSJetsQGL = _setupQGL(jsonname_UDS)
+    QGLRPset.GJetsQGL = _setupQGL(jsonname_G)
 
 def _setupQGL(jsonname):
         # Read json

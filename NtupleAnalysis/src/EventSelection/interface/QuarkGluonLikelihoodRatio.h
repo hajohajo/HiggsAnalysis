@@ -69,8 +69,8 @@ private:
   
   std::vector<QGLInputItem*>& getCollection(std::string JetType);
   
-  std::vector<QGLInputItem*> fLight;
-  std::vector<QGLInputItem*> fGluon;
+  std::vector<QGLInputItem*> fUDS;
+  std::vector<QGLInputItem*> fG;
 };
 // -------------------------------------------------------------------------------
 
@@ -95,15 +95,15 @@ public:
     /// Obtain number of light and gluon jets
     int getNumberOfJetsForQGLR() const { return fJetsForQGLR.size(); }
     /// Obtain number of light jets
-    int getNumberOfLightJets() const { return fLightJets.size(); }
+    int getNumberOfUDSJets() const { return fUDSJets.size(); }
     /// Obtain number of gluon jets
-    int getNumberOfGluonJets() const { return fGluonJets.size(); }
+    int getNumberOfGluonJets() const { return fGJets.size(); }
     /// Obtain collection of light and gluon jets
-    const std::vector<Jet>& getLightAndGluonJetCands() const { return fJetsForQGLR; }
+    const std::vector<Jet>& getUDSAndGluonJetCands() const { return fJetsForQGLR; }
     /// Obtain collection of light jet candidates
-    const std::vector<Jet>& getLightJetCands() const { return fLightJets; }
+    const std::vector<Jet>& getUDSJetCands() const { return fUDSJets; }
     /// Obtain collection of gluon jet candidates
-    const std::vector<Jet>& getGluonJetCands() const { return fGluonJets; }
+    const std::vector<Jet>& getGluonJetCands() const { return fGJets; }
     /// Obtain QGLR
     double getQGLR() const { return fQGLR; }
     
@@ -115,9 +115,9 @@ public:
     // Jets to consider in QGLR calculation
     std::vector<Jet> fJetsForQGLR;
     // Light Jets
-    std::vector<Jet> fLightJets;
+    std::vector<Jet> fUDSJets;
     // Gluon Jets
-    std::vector<Jet> fGluonJets;
+    std::vector<Jet> fGJets;
     // Quark-Gluon Likelihood Ratio
     double fQGLR;
   };
@@ -176,8 +176,8 @@ private:
   
   // Histograms
   WrappedTH1* hAllJetsNonBJetsQGL;
-  WrappedTH1* hGluonJetQGL;
-  WrappedTH1* hLightJetQGL;
+  WrappedTH1* hGJetQGL;
+  WrappedTH1* hUDSJetQGL;
   
   WrappedTH1* hQGLR;
   WrappedTH2* hQGLR_vs_HT;

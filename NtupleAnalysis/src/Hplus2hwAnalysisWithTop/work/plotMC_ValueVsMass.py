@@ -164,7 +164,7 @@ def main(opts):
             datasetsMgr.PrintInfo()
                
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
-        plots.mergeRenameReorderForDataMC(datasetsMgr) 
+        plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
 
         if opts.intLumi < 0:
             if "Data" in datasetsMgr.getAllDatasetNames():

@@ -229,6 +229,37 @@ void Hplus2hwAnalysis_mva::process(Long64_t entry) {
     return;
   }
 
+  if(tauData.getSelectedTaus().size() < 2) {
+    return;
+  }
+
+  if(tauData.getSelectedTaus()[0].charge() == tauData.getSelectedTaus()[1].charge()) {
+    return;
+  }
+
+  ////////////
+  // 6) Tau ID SF
+  ////////////
+
+  if (fEvent.isMC()) {
+    fEventWeight.multiplyWeight(tauData.getTauIDSF());
+//    fEventWeight.multiplyWeight(tauData.getTauIDSF());
+    cTauIDSFCounter.increment();
+  }
+
+  ////////////
+  // 6) Tau misID SF
+  ////////////
+
+  if (fEvent.isMC()) {
+    fEventWeight.multiplyWeight(tauData.getTauMisIDSF());
+    cFakeTauSFCounter.increment();
+  }
+
+
+  cOverTwoTausCounter.increment();
+
+  fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, tauData);
 
 //  if(fEvent.isMC())  fTreeWriter.write(fEvent,tauData);
 
@@ -273,38 +304,6 @@ void Hplus2hwAnalysis_mva::process(Long64_t entry) {
   }
 
 //  cMETSelection.increment();
-
-  if(tauData.getSelectedTaus().size() < 2) {
-    return;
-  }
-
-  if(tauData.getSelectedTaus()[0].charge() == tauData.getSelectedTaus()[1].charge()) {
-    return;
-  }
-
-  cOverTwoTausCounter.increment();
-
-  fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, tauData);
-
-
-  ////////////
-  // 6) Tau ID SF
-  ////////////
-
-  if (fEvent.isMC()) {
-    fEventWeight.multiplyWeight(tauData.getTauIDSF());
-//    fEventWeight.multiplyWeight(tauData.getTauIDSF());
-    cTauIDSFCounter.increment();
-  }
-
-  ////////////
-  // 6) Tau misID SF
-  ////////////
-
-  if (fEvent.isMC()) {
-    fEventWeight.multiplyWeight(tauData.getTauMisIDSF());
-    cFakeTauSFCounter.increment();
-  }
 
 
   ////////////

@@ -210,6 +210,7 @@ class StyleError(StyleBase):
         
 
 dataStyle = StyleCompound([Style(ROOT.kFullCircle, ROOT.kBlack)])
+simStyle  = StyleCompound([Style(ROOT.kOpenCircle, ROOT.kPink)])
 dataMcStyle = dataStyle.clone()
 errorStyle = StyleCompound([StyleError(ROOT.kBlack, 3345, styleSyst=3354)])
 errorStyle2 = StyleCompound([StyleError(ROOT.kGray+2, 3354)])
@@ -333,8 +334,8 @@ ttHTobbStyle      = Style(ROOT.kFullSquare, ROOT.kSpring-5)
 ttHToNonbbStyle   = Style(ROOT.kFullSquare, ROOT.kSpring-7)
 ttwStyle          = Style(ROOT.kOpenSquare, ROOT.kSpring+9)
 ttzStyle          = Style(ROOT.kFullDiamond, ROOT.kAzure-4)
-wStyle            = Style(ROOT.kFullTriangleDown, ROOT.kOrange+9)
-wjetsStyle        = Style(ROOT.kStar, ROOT.kOrange+9)
+wStyle            = Style(ROOT.kFullTriangleDown, ROOT.kRed+1) #ROOT.kOrange+9)
+wjetsStyle        = Style(ROOT.kStar, ROOT.kRed+1) #ROOT.kOrange+9)
 wwStyle           = Style(ROOT.kMultiply, ROOT.kPink-9)
 wzStyle           = Style(ROOT.kMultiply, ROOT.kPink-7)
 zjetsStyle        = Style(ROOT.kFullCross, ROOT.kRed-7)

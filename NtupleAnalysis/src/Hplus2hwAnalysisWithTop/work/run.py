@@ -124,33 +124,33 @@ def main():
         Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=opts.excludeTasks)
     else:
-        myBlackList = ["DYJetsToLL_M_50_ext1",
-                       "DYJetsToLL_M_50_ext2",
+        myBlackList = [#"DYJetsToLL_M_50_ext1",
+                       #"DYJetsToLL_M_50_ext2",
                        #"WJetsToLNu",
-                       "WJetsToLNu_ext2",
-                       "QCD_Pt_15to30",
-                       "QCD_Pt_30to50",
-                       "QCD_Pt_50to80",
-                       "QCD_Pt_80to120",
-                       "QCD_Pt_80to120_ext2",
-                       "QCD_Pt_120to170",
-                       "QCD_Pt_120to170_ext1",
-                       "QCD_Pt_170to300",
-                       "QCD_Pt_170to300_ext1",
-                       "QCD_Pt_300to470",
-                       "QCD_Pt_300to470_ext1",
-                       "QCD_Pt_470to600",
-                       "QCD_Pt_600to800",
-                       "QCD_Pt_600to800_ext1",
-                       "QCD_Pt_800to1000",
-                       "QCD_Pt_800to1000_ext1",
-                       "QCD_Pt_1000to1400_ext1",
-                       "QCD_Pt_1400to1800",
-                       "QCD_Pt_1400to1800_ext1",
-                       "QCD_Pt_1800to2400",
-                       "QCD_Pt_1800to2400_ext1",
-                       "QCD_Pt_2400to3200",
-                       "QCD_Pt_2400to3200_ext1",
+                       # "WJetsToLNu_ext2",
+                       # "QCD_Pt_15to30",
+                       # "QCD_Pt_30to50",
+                       # "QCD_Pt_50to80",
+                       # "QCD_Pt_80to120",
+                       # "QCD_Pt_80to120_ext2",
+                       # "QCD_Pt_120to170",
+                       # "QCD_Pt_120to170_ext1",
+                       # "QCD_Pt_170to300",
+                       # "QCD_Pt_170to300_ext1",
+                       # "QCD_Pt_300to470",
+                       # "QCD_Pt_300to470_ext1",
+                       # "QCD_Pt_470to600",
+                       # "QCD_Pt_600to800",
+                       # "QCD_Pt_600to800_ext1",
+                       # "QCD_Pt_800to1000",
+                       # "QCD_Pt_800to1000_ext1",
+                       # "QCD_Pt_1000to1400_ext1",
+                       # "QCD_Pt_1400to1800",
+                       # "QCD_Pt_1400to1800_ext1",
+                       # "QCD_Pt_1800to2400",
+                       # "QCD_Pt_1800to2400_ext1",
+                       # "QCD_Pt_2400to3200",
+                       # "QCD_Pt_2400to3200_ext1",
                        # "QCD_Pt_15to20_MuEnrichedPt5",
                        # "QCD_Pt_20to30_MuEnrichedPt5",
                        # "QCD_Pt_30to50_MuEnrichedPt5",
@@ -179,13 +179,15 @@ def main():
                        # "QCD_bEnriched_HT1000to1500",
                        # "QCD_bEnriched_HT1500to2000",
                        # "QCD_bEnriched_HT2000toInf",
+                       # "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
+                       # "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
                        ]
 
         #if opts.doSystematics:
         #    myBlackList.append("QCD")
 
-        Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
-        Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
+        Verbose("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
+        Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
         regex =  "|".join(myBlackList)
         if len(myBlackList)>0:
             process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=regex)

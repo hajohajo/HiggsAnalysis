@@ -3,6 +3,7 @@
 
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/CommonPlots_ttm.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "Framework/interface/Exception.h"
@@ -54,6 +55,59 @@ JetSelection::JetSelection(const ParameterSet& config, EventCounter& eventCounte
 { 
   initialize(config);
 }
+
+JetSelection::JetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  fJetPtCuts(config.getParameter<std::vector<float>>("jetPtCuts")),
+  fJetEtaCuts(config.getParameter<std::vector<float>>("jetEtaCuts")),
+  fTauMatchingDeltaR(config.getParameter<float>("tauMatchingDeltaR")),
+  fNumberOfJetsCut(config, "numberOfJetsCut"),
+  fHTCut(config, "HTCut"),
+  fJTCut(config, "JTCut"),
+  fMHTCut(config, "MHTCut"),
+  // Event counter for passing selection
+  cPassedJetSelection(fEventCounter.addCounter("passed jet selection ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("jet selection ("+postfix+")", "All events")),
+  cSubPassedJetID(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed jet ID")),
+  cSubPassedJetPUID(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed PU ID")),
+  cSubPassedDeltaRMatchWithTau(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed tau matching")),
+  cSubPassedEta(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedPt(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedJetCount(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed jet number cut")),
+  cSubPassedHT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed HT cut")),
+  cSubPassedJT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed JT cut")),
+  cSubPassedMHT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed MHT cut"))
+{ 
+  initialize(config);
+}
+
+JetSelection::JetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, nullptr, postfix),
+  fJetPtCuts(config.getParameter<std::vector<float>>("jetPtCuts")),
+  fJetEtaCuts(config.getParameter<std::vector<float>>("jetEtaCuts")),
+  fTauMatchingDeltaR(config.getParameter<float>("tauMatchingDeltaR")),
+  fNumberOfJetsCut(config, "numberOfJetsCut"),
+  fHTCut(config, "HTCut"),
+  fJTCut(config, "JTCut"),
+  fMHTCut(config, "MHTCut"),
+  // Event counter for passing selection
+  cPassedJetSelection(fEventCounter.addCounter("passed jet selection ("+postfix+")")),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("jet selection ("+postfix+")", "All events")),
+  cSubPassedJetID(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed jet ID")),
+  cSubPassedJetPUID(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed PU ID")),
+  cSubPassedDeltaRMatchWithTau(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed tau matching")),
+  cSubPassedEta(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed eta cut")),
+  cSubPassedPt(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed pt cut")),
+  cSubPassedJetCount(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed jet number cut")),
+  cSubPassedHT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed HT cut")),
+  cSubPassedJT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed JT cut")),
+  cSubPassedMHT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed MHT cut"))
+{ 
+  initialize(config);
+}
+
 
 JetSelection::JetSelection(const ParameterSet& config)
 : BaseSelection(),
@@ -187,6 +241,18 @@ JetSelection::Data JetSelection::silentAnalyzeWithoutTau(const Event& event) {
 JetSelection::Data JetSelection::analyze(const Event& event, const Tau& tau) {
   ensureAnalyzeAllowed(event.eventID());
   JetSelection::Data data = privateAnalyze(event, tau.p4(), tau.pt());
+  // Send data to CommonPlots
+  if (fCommonPlots != nullptr)
+    fCommonPlots->fillControlPlotsAtJetSelection(event, data);
+  if (fCommonPlots_ttm != nullptr)
+    fCommonPlots_ttm->fillControlPlotsAtJetSelection(event, data);
+  // Return data
+  return data;
+}
+
+JetSelection::Data JetSelection::analyze(const Event& event, const Tau& tau1, const Tau& tau2) {
+  ensureAnalyzeAllowed(event.eventID());
+  JetSelection::Data data = privateAnalyze(event, tau1.p4(), tau1.pt(), tau2.p4(), tau2.pt());
   // Send data to CommonPlots
   if (fCommonPlots != nullptr)
     fCommonPlots->fillControlPlotsAtJetSelection(event, data);
@@ -336,6 +402,156 @@ JetSelection::Data JetSelection::privateAnalyze(const Event& event, const math::
     findJetMatchingToTau(output.fJetMatchedToTau, event, tauP);
     if (output.jetMatchedToTauFound()) {
       hJetMatchingToTauPtRatio->Fill(tauPt / output.getJetMatchedToTau().pt());
+    }
+  }
+
+  // Fill pt and eta of jets
+  size_t i = 0;
+  for (Jet jet: output.fSelectedJets) {
+    if (i < 6) {
+      hSelectedJetPt[i]->Fill(jet.pt());
+      hSelectedJetEta[i]->Fill(jet.eta());
+    }
+    ++i;
+  }  
+
+
+  // Return data object
+  return output;
+}
+
+JetSelection::Data JetSelection::privateAnalyze(const Event& event, const math::LorentzVectorT<double>& tauP1, const double tauPt1, const math::LorentzVectorT<double>& tauP2, const double tauPt2) {
+  Data output;
+  cSubAll.increment();
+  bool passedJetID = false;
+  bool passedJetPUID = false;
+  bool passedDeltaRMatchWithTau = false;
+  bool passedEta = false;
+  bool passedPt  = false;
+  unsigned int jet_index    = -1;
+  unsigned int ptCut_index  = 0;
+  unsigned int etaCut_index = 0;
+
+  // For-loop: All jets (pT-sorted)
+  for(Jet jet: event.jets()) {
+    
+    // Jet index (for pT and eta cuts)
+    jet_index++;
+
+    //=== Apply cut on jet ID
+    if (!jet.jetIDDiscriminator())
+      continue;
+    passedJetID = true;
+
+    //=== Apply cut on jet PU ID
+    if (!jet.jetPUIDDiscriminator())
+      continue;
+    passedJetPUID = true;
+    output.fAllJets.push_back(jet);   
+    hJetPtAll->Fill(jet.pt());
+    hJetEtaAll->Fill(jet.eta());
+
+    //=== Apply cut on tau radius
+    if (tauPt1 > 0.0) {
+      double myDeltaR = ROOT::Math::VectorUtil::DeltaR(tauP1, jet.p4());
+      hJetMatchingToTauDeltaR->Fill(myDeltaR);
+      if (myDeltaR < fTauMatchingDeltaR)
+        continue;
+      passedDeltaRMatchWithTau = true;
+    }
+    if (tauPt2 > 0.0) {
+      double myDeltaR = ROOT::Math::VectorUtil::DeltaR(tauP2, jet.p4());
+      hJetMatchingToTauDeltaR->Fill(myDeltaR);
+      if (myDeltaR < fTauMatchingDeltaR)
+        continue;
+      passedDeltaRMatchWithTau = true;
+    }
+
+    //=== Apply cut on eta
+    const float jetEtaCut = fJetEtaCuts.at(etaCut_index);
+    // std::cout << jet_index << ") abs(eta)["<< etaCut_index << "] > " << jetEtaCut << " ( " << jet.eta() << ")" << std::endl;
+    if (std::fabs(jet.eta()) > jetEtaCut)
+      continue;
+    passedEta = true;
+
+
+    //=== Apply cut on pt   
+    const float jetPtCut = fJetPtCuts.at(ptCut_index);
+    // std::cout << jet_index << ") pT["<< ptCut_index << "] > " << jetPtCut << " GeV/c ( " << jet.pt() << ")" << std::endl;
+    if (jet.pt() < jetPtCut)
+      continue;
+    passedPt = true;
+
+    // Jet passed all cuts   
+    output.fSelectedJets.push_back(jet);
+    hJetPtPassed->Fill(jet.pt());
+    hJetEtaPassed->Fill(jet.eta());
+    // Increment cut index only. Cannot be bigger than the size of the cut list provided
+    if (ptCut_index  < fJetPtCuts.size()-1  ) ptCut_index++;
+    if (etaCut_index < fJetEtaCuts.size()-1 ) etaCut_index++;
+    // std::cout << jet_index+1 << ") pT = " << jet.pt() << std::endl;
+    // std::cout << jet_index+1 << ") |eta| = " << jet.eta() << std::endl;
+  }
+
+  // Fill counters so far
+  if (passedJetID)
+    cSubPassedJetID.increment();
+  if (passedJetPUID)
+    cSubPassedJetPUID.increment();
+  if (passedDeltaRMatchWithTau)
+    cSubPassedDeltaRMatchWithTau.increment();
+  if (passedEta)
+    cSubPassedEta.increment();
+  if (passedPt)
+    cSubPassedPt.increment();
+  
+  //=== Apply cut on number of jets
+  if (!fNumberOfJetsCut.passedCut(output.fSelectedJets.size()))
+    return output;
+  cSubPassedJetCount.increment();
+
+  // Sort jets by pT (descending order)
+  std::sort(output.fSelectedJets.begin(), output.fSelectedJets.end());
+
+  // Calculate HT
+  output.fHT = 0.0;
+  for(Jet jet: output.getSelectedJets()) 
+    {
+      // std::cout << "pT = " << jet.pt() << ", eta = " << jet.eta() << std::endl;
+      output.fHT += jet.pt();
+  }
+  if (tauPt1 > 0.0) output.fHT += tauPt1;
+  hHTAll->Fill(output.fHT);
+  // Calculate JT
+  output.fJT = output.fHT - output.fSelectedJets.at(0).pt();
+  hJTAll->Fill(output.fJT);
+  //=== Apply cut on HT
+  if (!fHTCut.passedCut(output.fHT)) return output;
+  cSubPassedHT.increment();
+  hHTPassed->Fill(output.fHT);
+  //=== Apply cut on JT
+  if (!fJTCut.passedCut(output.fJT)) return output;
+  cSubPassedJT.increment();
+  hJTPassed->Fill(output.fJT);
+
+  // Calculate MHT
+  calculateMHTInformation(output, tauP1, tauPt1);
+  hMHTAll->Fill(output.fMHTvalue);
+  //=== Apply cut on MHT
+  if (!fMHTCut.passedCut(output.fMHTvalue)) return output;
+  cSubPassedMHT.increment();
+  hMHTPassed->Fill(output.fMHTvalue);
+  
+  //=== Passed all jet selections
+  output.bPassedSelection = true;
+  cPassedJetSelection.increment();
+
+
+  // Find jet matched to tau
+  if (tauPt1 > 0.0) {
+    findJetMatchingToTau(output.fJetMatchedToTau, event, tauP1);
+    if (output.jetMatchedToTauFound()) {
+      hJetMatchingToTauPtRatio->Fill(tauPt1 / output.getJetMatchedToTau().pt());
     }
   }
 

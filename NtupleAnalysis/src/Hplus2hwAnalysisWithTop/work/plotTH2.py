@@ -152,7 +152,7 @@ def main(opts):
             datasetsMgr.PrintInfo()
 
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
-        plots.mergeRenameReorderForDataMC(datasetsMgr) 
+        plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
         
         # Print merged datasets and MC samples
         if 0:
@@ -202,8 +202,8 @@ def main(opts):
 
         # For-loop: All histograms
         for i,h in enumerate(histoPaths, 1):
-            #if "_Vs_" not in h:
-            #    continue
+            if "_Vs_" not in h:
+                continue
             Print(h, i==1)
             Plot2dHistograms(datasetsMgr, h)
 
