@@ -4,6 +4,7 @@
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
 #include "EventSelection/interface/CommonPlots_ttm.h"
+#include "EventSelection/interface/CommonPlots_lt.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "Framework/interface/Exception.h"
@@ -78,6 +79,32 @@ JetSelection::JetSelection(const ParameterSet& config, EventCounter& eventCounte
   cSubPassedHT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed HT cut")),
   cSubPassedJT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed JT cut")),
   cSubPassedMHT(fEventCounter.addSubCounter("jet selection ("+postfix+")", "Passed MHT cut"))
+{ 
+  initialize(config);
+}
+
+JetSelection::JetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  fJetPtCuts(config.getParameter<std::vector<float>>("jetPtCuts")),
+  fJetEtaCuts(config.getParameter<std::vector<float>>("jetEtaCuts")),
+  fTauMatchingDeltaR(config.getParameter<float>("tauMatchingDeltaR")),
+  fNumberOfJetsCut(config, "numberOfJetsCut"),
+  fHTCut(config, "HTCut"),
+  fJTCut(config, "JTCut"),
+  fMHTCut(config, "MHTCut"),
+  // Event counter for passing selection
+  cPassedJetSelection(fEventCounter.addCounter("jets " + postfix)),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("jet selection " + postfix, "All")),
+  cSubPassedJetID(fEventCounter.addSubCounter("jet selection " + postfix, "Jet ID")),
+  cSubPassedJetPUID(fEventCounter.addSubCounter("jet selection " + postfix, "PU ID")),
+  cSubPassedDeltaRMatchWithTau(fEventCounter.addSubCounter("jet selection " + postfix, "#tau_{h} Match")),
+  cSubPassedEta(fEventCounter.addSubCounter("jet selection " + postfix, "#eta")),
+  cSubPassedPt(fEventCounter.addSubCounter("jet selection " + postfix, "p_{T}")),
+  cSubPassedJetCount(fEventCounter.addSubCounter("jet selection " + postfix, "multiplicity")),
+  cSubPassedHT(fEventCounter.addSubCounter("jet selection " + postfix, "H_{T}")),
+  cSubPassedJT(fEventCounter.addSubCounter("jet selection " + postfix, "J_{T}")),
+  cSubPassedMHT(fEventCounter.addSubCounter("jet selection " + postfix, "MHT"))
 { 
   initialize(config);
 }
@@ -241,12 +268,23 @@ JetSelection::Data JetSelection::silentAnalyzeWithoutTau(const Event& event) {
 JetSelection::Data JetSelection::analyze(const Event& event, const Tau& tau) {
   ensureAnalyzeAllowed(event.eventID());
   JetSelection::Data data = privateAnalyze(event, tau.p4(), tau.pt());
+
   // Send data to CommonPlots
   if (fCommonPlots != nullptr)
-    fCommonPlots->fillControlPlotsAtJetSelection(event, data);
+    {
+      fCommonPlots->fillControlPlotsAtJetSelection(event, data);
+    }
+
   if (fCommonPlots_ttm != nullptr)
-    fCommonPlots_ttm->fillControlPlotsAtJetSelection(event, data);
-  // Return data
+    {
+      fCommonPlots_ttm->fillControlPlotsAtJetSelection(event, data);
+    }
+
+  if (fCommonPlots_lt != nullptr)
+    {
+      fCommonPlots_lt->fillControlPlotsAtJetSelection(event, data);
+    }
+
   return data;
 }
 

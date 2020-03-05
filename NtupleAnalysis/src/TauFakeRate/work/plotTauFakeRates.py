@@ -357,6 +357,7 @@ def GetGraphKwargs(kwargs):
 
     _kwargs["ratio"] = True
     _kwargs["ratioYlabel"] = "Ratio "
+    #_kwargs["ratioYlabel"] = "Data/MC "
     _kwargs["stackMCHistograms"] = False
     _kwargs["addMCUncertainty" ] = False
     _kwargs["moveLegend"] =  {"dx": -0.15, "dy": -0.01, "dh": -0.18 + (opts.nDatasets*0.025)}

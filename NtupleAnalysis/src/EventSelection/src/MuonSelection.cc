@@ -4,6 +4,7 @@
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
 #include "EventSelection/interface/CommonPlots_ttm.h"
+#include "EventSelection/interface/CommonPlots_lt.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "DataFormat/interface/Muon.h"
@@ -23,6 +24,14 @@ MuonSelection::Data::Data()
  { }
 
 MuonSelection::Data::~Data() { }
+
+const Muon& MuonSelection::Data::getSelectedMuon() const { 
+  if (!hasIdentifiedMuons())
+    throw hplus::Exception("Assert") << "You forgot to check if muons exist (hasIdentifiedMuons()), this message occurs when none exist!";
+  return fSelectedMuons[0];
+}
+
+
 
 MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
@@ -72,6 +81,32 @@ MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCoun
   cSubPassedIsolation(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed isolation")),
   cSubPassedSelection(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed selection")),
   cSubPassedVeto(fEventCounter.addSubCounter("mu selection ("+postfix+")", "Passed veto"))
+{
+  initialize(config, postfix);
+}
+
+MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  cfg_MuonPtCut(config.getParameter<float>("muonPtCut")),
+  cfg_MuonEtaCut(config.getParameter<float>("muonEtaCut")),
+  fRelIsoCut(-1.0),
+  fMiniIsoCut(-1.0),
+  fVetoMode(false),
+  fMiniIsol(false),
+  fMuonIDSFReader(config.getParameterOptional<ParameterSet>("muonIDSF")),
+  fMuonTriggerSFReader(config.getParameterOptional<ParameterSet>("muonTriggerSF")),
+  // Event counter for passing selection
+  cPassedMuonSelection(fEventCounter.addCounter("muons " + postfix)),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("mu selection" + postfix, "All")),
+  cSubPassedIsPresent(fEventCounter.addSubCounter("mu selection" + postfix, "Present")),
+  cSubPassedTriggerMatching(fEventCounter.addSubCounter("mu selection" + postfix, "Trg. Match")),
+  cSubPassedPt(fEventCounter.addSubCounter("mu selection" + postfix, "p_{T}")),
+  cSubPassedEta(fEventCounter.addSubCounter("mu selection" + postfix, "#eta")),
+  cSubPassedID(fEventCounter.addSubCounter("mu selection" + postfix, "#mu-ID")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("mu selection" + postfix, "Isolation")),
+  cSubPassedSelection(fEventCounter.addSubCounter("mu selection" + postfix, "Selection")),
+  cSubPassedVeto(fEventCounter.addSubCounter("mu selection" + postfix, "Veto"))
 {
   initialize(config, postfix);
 }
@@ -248,13 +283,19 @@ MuonSelection::Data MuonSelection::analyze(const Event& event) {
   // Send data to CommonPlots
   if (fCommonPlotsIsEnabled()) 
     {
-    fCommonPlots->fillControlPlotsAtMuonSelection(event, data);
+      fCommonPlots->fillControlPlotsAtMuonSelection(event, data);
     }
+  
   if (fCommonPlotsIsEnabled_ttm()) 
     {
-    fCommonPlots_ttm->fillControlPlotsAtMuonSelection(event, data);
+      fCommonPlots_ttm->fillControlPlotsAtMuonSelection(event, data);
     }
 
+  if (fCommonPlotsIsEnabled_lt()) 
+    {
+      fCommonPlots_lt->fillControlPlotsAtMuonSelection(event, data);
+    }
+  
   return data;
 }
 
@@ -556,7 +597,7 @@ MuonSelection::Data MuonSelection::privateAnalyzeLoose(const Event& event) {
     passedEta = true;
     
     //=== Apply cut on muon ID
-//    if (!muon.muonIDDiscriminator()) continue;
+    // if (!muon.muonIDDiscriminator()) continue;
     passedID = true;
     
     // Fill histograms before isolation cut
@@ -569,26 +610,6 @@ MuonSelection::Data MuonSelection::privateAnalyzeLoose(const Event& event) {
 	hIsolVtxBefore->Fill(fCommonPlots->nVertices());
       }
     
-    // Determine Relative and Mini Isolation booleans
-    bool passedRelIso    = (muon.relIsoDeltaBeta04() < fRelIsoCut);
-    bool passedMiniIso   = (muon.effAreaMiniIso() < fMiniIsoCut);
-    bool passedIsolCut   = false;
-//    if (fMiniIsol) passedIsolCut = passedMiniIso;
-//    else passedIsolCut = passedRelIso;
-
-    passedIsolCut = true;
-
-    //=== Apply cut on muon isolation
-//    if (!passedIsolCut) {
-//      output.fAntiIsolatedMuons.push_back(muon);
-//      passedIsol = ;
-//    } else {
-//      passedIsol = true;
-//      output.fSelectedMuons.push_back(muon);
-//    }
-
-//    std::cout << "loose muons entering vector" << "\n";
-
     output.fSelectedMuons.push_back(muon);
 
     if (passedIsol) {
