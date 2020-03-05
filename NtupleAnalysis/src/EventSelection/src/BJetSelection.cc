@@ -4,6 +4,7 @@
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
 #include "EventSelection/interface/CommonPlots_ttm.h"
+#include "EventSelection/interface/CommonPlots_lt.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "Framework/interface/Exception.h"
@@ -61,6 +62,28 @@ BJetSelection::BJetSelection(const ParameterSet& config, EventCounter& eventCoun
   cSubPassedDiscriminator(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed discriminator")),
   cSubPassedTrgMatching(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed trigger matching")),
   cSubPassedNBjets(fEventCounter.addSubCounter("bjet selection ("+postfix+")", "Passed Nbjets")),
+  fBTagSFCalculator(config)
+{
+  initialize(config);
+}
+
+BJetSelection::BJetSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  bTriggerMatchingApply(config.getParameter<bool>("triggerMatchingApply")),
+  fTriggerMatchingCone(config.getParameter<float>("triggerMatchingCone")),
+  fJetPtCuts(config.getParameter<std::vector<float>>("jetPtCuts")),
+  fJetEtaCuts(config.getParameter<std::vector<float>>("jetEtaCuts")),
+  fNumberOfJetsCut(config, "numberOfBJetsCut"),
+  fDisriminatorValue(-1.0),
+  // Event counter for passing selection
+  cPassedBJetSelection(fEventCounter.addCounter("b-jets " + postfix)),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("bjet selection " + postfix, "All")),
+  cSubPassedEta(fEventCounter.addSubCounter("bjet selection " + postfix, "#eta")),
+  cSubPassedPt(fEventCounter.addSubCounter("bjet selection " + postfix, "p_{T}")),
+  cSubPassedDiscriminator(fEventCounter.addSubCounter("bjet selection " + postfix, "b-discr.")),
+  cSubPassedTrgMatching(fEventCounter.addSubCounter("bjet selection " + postfix, "Trg. Match")),
+  cSubPassedNBjets(fEventCounter.addSubCounter("bjet selection " + postfix, "multiplicity")),
   fBTagSFCalculator(config)
 {
   initialize(config);
@@ -246,10 +269,20 @@ BJetSelection::Data BJetSelection::analyze(const Event& event, const JetSelectio
   BJetSelection::Data data = privateAnalyze(event, jetData);
   // Send data to CommonPlots
   if (fCommonPlots != nullptr)
-    fCommonPlots->fillControlPlotsAtBtagging(event, data);
+    {
+      fCommonPlots->fillControlPlotsAtBtagging(event, data);
+    }
+
   if (fCommonPlots_ttm != nullptr)
-    fCommonPlots_ttm->fillControlPlotsAtBtagging(event, data);
-  // Return data
+    {
+      fCommonPlots_ttm->fillControlPlotsAtBtagging(event, data);
+    }
+
+  if (fCommonPlots_lt != nullptr)
+    {
+      fCommonPlots_lt->fillControlPlotsAtBtagging(event, data);
+    }
+
   return data;
 }
 

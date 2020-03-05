@@ -13,6 +13,7 @@
 class ParameterSet;
 class CommonPlots;
 class CommonPlots_ttm;
+class CommonPlots_lt;
 class Event;
 class EventCounter;
 class HistoWrapper;
@@ -99,6 +100,7 @@ public:
   /// Constructor with histogramming
   explicit TauSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix = "");
   explicit TauSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix = "");
+  explicit TauSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix = "");
   /// Constructor without histogramming
   explicit TauSelection(const ParameterSet& config, const std::string& postfix = "");
   virtual ~TauSelection();

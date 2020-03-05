@@ -190,6 +190,8 @@ def main(opts):
             "ForDataDrivenCtrlPlotsEWKGenuineB",
             "ForDataDrivenCtrlPlotsEWKFakeTaus",
             "ForDataDrivenCtrlPlotsEWKGenuineTaus",
+            "ForDataDrivenCtrlPlotsFakeTau",
+            "ForDataDrivenCtrlPlotsGenuineTau",
             "AngularCuts_Collinear",
             "AngularCuts_BackToBack",
             "PUDependency",
@@ -312,10 +314,6 @@ def GetHistoKwargs(histoName, opts):
         kwargs["opts"]   = {"xmax": +20, "ymin": _yMin, "ymaxfactor": _yMaxF}
         #kwargs["opts"]   = {"xmax": +65, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
-    if "DeltaR" in h or "DeltaY" in h or "DR" in h:
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["opts"]   = {"xmax": +8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-
     if "miniiso" in h.lower():
         kwargs["units"]  = ""
         kwargs["ylabel"] = "Events / %.2f "
@@ -434,10 +432,10 @@ def GetHistoKwargs(histoName, opts):
 
     if "deltar" in h.lower():
         kwargs["units"]  = ""
-        kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaR"]
+        kwargs["rebinX"] = 1 #systematics.DataMCBinningHToHW["DeltaR"]
         kwargs["xlabel"] = "#DeltaR"
         kwargs["ylabel"] = "Events / %.2f "
-        kwargs["opts"]   = {"xmin": 0.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         
     if "DecayMode" in h:
         kwargs["moveLegend"] = _legRM

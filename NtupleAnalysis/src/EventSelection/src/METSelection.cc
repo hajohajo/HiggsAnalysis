@@ -4,6 +4,7 @@
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
 #include "EventSelection/interface/CommonPlots_ttm.h"
+#include "EventSelection/interface/CommonPlots_lt.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "Framework/interface/Exception.h"
@@ -38,6 +39,19 @@ METSelection::METSelection(const ParameterSet& config, EventCounter& eventCounte
 }
 
 METSelection::METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  fMETCut(config, "METCut"),
+  fMETSignificanceCut(config, "METSignificanceCut"),
+  bApplyPhiCorrections(config.getParameter<bool>("applyPhiCorrections")),
+  // MET trigger SF
+  fMETTriggerSFReader(config.getParameterOptional<ParameterSet>("metTriggerSF")),
+  // Event counter for passing selection
+  cPassedMETSelection(fEventCounter.addCounter("passed MET selection ("+postfix+")"))
+{
+  initialize(config);
+}
+
+METSelection::METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
   fMETCut(config, "METCut"),
   fMETSignificanceCut(config, "METSignificanceCut"),
@@ -119,12 +133,23 @@ METSelection::Data METSelection::silentAnalyze(const Event& event, int nVertices
 METSelection::Data METSelection::analyze(const Event& event, int nVertices) {
   ensureAnalyzeAllowed(event.eventID());
   METSelection::Data data = privateAnalyze(event, nVertices);
+
   // Send data to CommonPlots
   if (fCommonPlots != nullptr)
+    {
     fCommonPlots->fillControlPlotsAtMETSelection(event, data);
+    }
+
   if (fCommonPlots_ttm != nullptr)
+    {
     fCommonPlots_ttm->fillControlPlotsAtMETSelection(event, data);
-  // Return data
+    }
+
+  if (fCommonPlots_lt != nullptr)
+    {
+    fCommonPlots_lt->fillControlPlotsAtMETSelection(event, data);
+    }
+
   return data;
 }
 

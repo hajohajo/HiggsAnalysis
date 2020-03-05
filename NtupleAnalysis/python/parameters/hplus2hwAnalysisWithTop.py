@@ -356,24 +356,36 @@ commonPlotsOptions = PSet(
     histogramSplitting         = [],    # Splitting of histograms as function of one or more parameters
     enableGenuineBHistograms   = False,
     enablePUDependencyPlots    = True,  # Enable/Disable some debug-level plots
-    # Bin settings (final bin setting done in datacardGenerator, there also variable bin width is supported)
-    nVerticesBins     = PSet(nBins = 100, axisMin =  0.0, axisMax =  200.0),
+    nVerticesBins     = PSet(nBins = 100, axisMin =  0.0, axisMax =  100.0),
     ptBins            = PSet(nBins =  50, axisMin =  0.0, axisMax =  500.0),
     etaBins           = PSet(nBins =  50, axisMin = -5.0, axisMax =    5.0),
     phiBins           = PSet(nBins =  64, axisMin = -3.2, axisMax =    3.2),
     deltaEtaBins      = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
-    deltaPhiBins      = PSet(nBins =  36, axisMin =  0.0, axisMax =  180.0), # 5 degress
-    deltaRBins        = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
-    rtauBins          = PSet(nBins =  55, axisMin =  0.0, axisMax =    1.1),
+    deltaPhiBins      = PSet(nBins =  32, axisMin =  0.0, axisMax =    3.2),
+    deltaRBins        = PSet(nBins =  50, axisMin =  0.0, axisMax =   10.0),
+    rtauBins          = PSet(nBins =  55, axisMin =  0.0, axisMax =    1.1), # needed?
     njetsBins         = PSet(nBins =  18, axisMin =  0.0, axisMax =   18.0),
-    metBins           = PSet(nBins = 160, axisMin =  0.0, axisMax =  800.0), # 5 GeV bin width
-    htBins            = PSet(nBins = 400, axisMin =  0.0, axisMax = 2000.0), # 5 GeV bin width 
+    metBins           = PSet(nBins = 100, axisMin =  0.0, axisMax =  500.0), 
+    htBins            = PSet(nBins = 100, axisMin =  0.0, axisMax = 1000.0), 
     bjetDiscrBins     = PSet(nBins = 120, axisMin =  0.0, axisMax =    1.2),
-    angularCuts1DBins = PSet(nBins =  52, axisMin =  0.0, axisMax =  260.0), 
-    topMassBins       = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width 
-    wMassBins         = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width 
-    mtBins            = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width
-    invMassBins       = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width
+    angularCuts1DBins = PSet(nBins =  52, axisMin =  0.0, axisMax =  260.0), # needed?
+    topMassBins       = PSet(nBins = 300, axisMin =  0.0, axisMax = 1500.0), 
+    wMassBins         = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), 
+    mtBins            = PSet(nBins = 800, axisMin =  0.0, axisMax = 1000.0), 
+    invMassBins       = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), 
+#     nVerticesBins              = PSet(nBins = 100, axisMin =  0.0, axisMax =  200.0),
+#     ptBins                     = PSet(nBins =  50, axisMin =  0.0, axisMax =  500.0),
+#     etaBins                    = PSet(nBins =  50, axisMin = -5.0, axisMax =    5.0),
+#     phiBins                    = PSet(nBins =  64, axisMin = -3.2, axisMax =    3.2),
+#     deltaEtaBins               = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
+#     deltaPhiBins               = PSet(nBins =  36, axisMin =  0.0, axisMax =  180.0), # 5 degress
+#     deltaRBins                 = PSet(nBins = 100, axisMin =  0.0, axisMax =   10.0),
+#     njetsBins                  = PSet(nBins =  18, axisMin =  0.0, axisMax =   18.0),
+#     metBins                    = PSet(nBins = 160, axisMin =  0.0, axisMax =  800.0), # 5 GeV bin width
+#     htBins                     = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), # 5 GeV bin width 
+#     bjetDiscrBins              = PSet(nBins = 120, axisMin =  0.0, axisMax =    1.2),
+#     mtBins                     = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width
+#     invMassBins                = PSet(nBins = 200, axisMin =  0.0, axisMax = 1000.0), #  5 GeV bin width
 )
 
 #================================================================================================

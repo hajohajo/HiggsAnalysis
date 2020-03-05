@@ -4,6 +4,7 @@
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
 #include "EventSelection/interface/CommonPlots_ttm.h"
+#include "EventSelection/interface/CommonPlots_lt.h"
 #include "DataFormat/interface/Electron.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
@@ -72,6 +73,34 @@ ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& e
   cSubPassedIsolation(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed isolation")),
   cSubPassedSelection(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed selection")),
   cSubPassedVeto(fEventCounter.addSubCounter("e selection ("+postfix+")", "Passed veto"))
+{
+  initialize(config, postfix);
+}
+
+ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix)
+: BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+  cfg_ElectronPtCut(config.getParameter<float>("electronPtCut")),
+  cfg_ElectronEtaCut(config.getParameter<float>("electronEtaCut")),
+  cfg_ElectronMVACut(config.getParameter<string>("electronMVACut")),
+  fRelIsoCut(-1.0),
+  fMiniIsoCut(-1.0),
+  fVetoMode(false),
+  fMiniIsol(false),
+  fElectronMVA(false),
+  fElectronIDSFReader(config.getParameterOptional<ParameterSet>("electronIDSF")),
+  fElectronTriggerSFReader(config.getParameterOptional<ParameterSet>("electronTriggerSF")),
+  // Event counter for passing selection
+  cPassedElectronSelection(fEventCounter.addCounter("electrons " + postfix) ),
+  // Sub counters
+  cSubAll(fEventCounter.addSubCounter("e selection " + postfix, "All")),
+  cSubPassedIsPresent(fEventCounter.addSubCounter("e selection "+  postfix, "Present")),
+  cSubPassedTriggerMatching(fEventCounter.addSubCounter("e selection" + postfix, "Trg. Match")),
+  cSubPassedPt(fEventCounter.addSubCounter("e selection" + postfix, "p_{T}")),
+  cSubPassedEta(fEventCounter.addSubCounter("e selection" + postfix, "#eta")),
+  cSubPassedID(fEventCounter.addSubCounter("e selection" + postfix, "e-ID")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("e selection" + postfix, "Isolation")),
+  cSubPassedSelection(fEventCounter.addSubCounter("e selection" + postfix, "Selection")),
+  cSubPassedVeto(fEventCounter.addSubCounter("e selection" + postfix, "Veto"))
 {
   initialize(config, postfix);
 }
@@ -258,16 +287,23 @@ ElectronSelection::Data ElectronSelection::silentAnalyze(const Event& event) {
 ElectronSelection::Data ElectronSelection::analyze(const Event& event) {
   ensureAnalyzeAllowed(event.eventID());
   ElectronSelection::Data data = privateAnalyze(event);
+
   // Send data to CommonPlots
   if (fCommonPlotsIsEnabled())
     {
       fCommonPlots->fillControlPlotsAtElectronSelection(event, data);
     }
+
   if (fCommonPlotsIsEnabled_ttm())
     {
       fCommonPlots_ttm->fillControlPlotsAtElectronSelection(event, data);
     }
-  // Return data
+
+  if (fCommonPlotsIsEnabled_lt())
+    {
+      fCommonPlots_lt->fillControlPlotsAtElectronSelection(event, data);
+    }
+
   return data;
 }
 
@@ -556,9 +592,9 @@ ElectronSelection::Data ElectronSelection::privateAnalyzeLoose(const Event& even
 	  hIsolVtxBefore->Fill(fCommonPlots->nVertices());
 	}
       
-      // Determine Relative and Mini Isolation booleans
-      bool passedRelIso  = (electron.effAreaIsoDeltaBeta() < fRelIsoCut);
-      bool passedMiniIso = (electron.effAreaMiniIso() < fMiniIsoCut);
+      // Determine Relative and Mini Isolation booleans (unused here)
+      // bool passedRelIso  = (electron.effAreaIsoDeltaBeta() < fRelIsoCut);
+      // bool passedMiniIso = (electron.effAreaMiniIso() < fMiniIsoCut);
 
       // No need to look at isolation criteria for this case
       passedIsol = true;

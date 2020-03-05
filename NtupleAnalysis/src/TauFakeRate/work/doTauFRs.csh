@@ -17,7 +17,8 @@ endif
 #================================================================================================
 set INITIAL = `echo $USER | cut -c1-1`
 set MYDIR   = ${1} # pseudomulticrab directory name
-set FORMATS = "png,pdf,C"
+#set FORMATS = "png,pdf,C"
+set FORMATS = "png"
 set eDSETS   = "QCD|WJets"
 set iDSETS   = "SingleE|SingleMuon|DYJetsToLL_M_50_ext|ST_|TT|WJetsToLNu_HT|WWTo2L2Nu|WZ|ZZ|ttH"
 set DATAERA = "Run2016"
