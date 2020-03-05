@@ -8,6 +8,7 @@ import array
 import json
 import pandas
 import numpy 
+import contextlib
 
 from sklearn.utils.class_weight import compute_sample_weight
 from sklearn.preprocessing import StandardScaler
@@ -15,7 +16,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
-
+from scipy import sparse
 #================================================================================================   
 # Function definition
 #================================================================================================   
@@ -142,6 +143,65 @@ def doSampleReweighing(df_sig, df_bkg, varName, _verbose=False, **kwargs):
         Verbose(hLine, False, _verbose)
 
     return weights
+
+
+def PrintArray(array):
+    '''
+    Fixes missing leading whitespace (fixme!)
+    https://stackoverflow.com/questions/23870301/extra-spaces-in-the-representation-of-numpy-arrays-of-floats
+    '''
+    _str = str(array)
+    
+    if ("[ " not in _str):
+        _str = _str.replace("[","[ ")
+    if (" ]" not in _str):
+        _str = _str.replace("]"," ]")
+    return _str
+
+def GetScalerAttributes(df, nInputs, scaler, scalerType):    
+    '''
+    Get scaler attributes (only the ones that are needed for the features transformation!)
+    Standard Scaler: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
+    MinMax Scaler: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html
+    Robust Scaler: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html
+    Preprocessing: https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/preprocessing/_data.py
+    '''
+    attr = ""
+
+    # is sparse?
+    isSparse = sparse.issparse(df.values)
+
+    if scalerType.lower() == "standard":
+        # X' = (X - mean_)/scale_
+        mean = numpy.zeros(nInputs)
+        scale = numpy.ones(nInputs)
+        if scaler.with_mean:
+            mean = scaler.mean_
+        if scaler.with_std:
+            scale = scaler.scale_
+        attr += "mean\n%s\n" % PrintArray(mean)
+        attr += "scale\n%s\n" % PrintArray(scale)
+        attr += "isSparse %.0f\n" % isSparse # this should return false!
+
+    elif scalerType.lower() == "minmax":
+        # X' = X*scale_ + min_
+        attr += "min\n%s\n" % PrintArray(scaler.min_)
+        attr += "scale\n%s\n" % PrintArray(scaler.scale_)
+        attr += "isSparse %.0f\n" % isSparse # not used
+
+    elif scalerType.lower() == "robust":
+        # X' = (X-center_)/scale_
+        center = numpy.zeros(nInputs)
+        scale = numpy.ones(nInputs)
+        if scaler.with_centering:
+            center = scaler.center_
+        if scaler.with_scaling:
+            scale = scaler.scale_
+        attr += "center\n%s\n" % PrintArray(center)
+        attr += "scale\n%s\n" % PrintArray(scale)
+        attr += "isSparse %.0f\n" % isSparse # this should return false!
+        
+    return attr
 
 def GetOriginalDataFrame(scaler, df, inputList):
     '''
@@ -1063,17 +1123,20 @@ def PlotOvertrainingTest(Y_train_S, Y_test_S, Y_train_B, Y_test_B, saveDir, save
     return htrain_s1, htest_s1, htrain_b1, htest_b1
 
 
-def WriteModel(model, model_json, inputList, output, verbose=False):
+def WriteModel(model, model_json, inputList, scaler_attributes, output, verbose=False):
     '''
     Write model weights and architecture in txt file
     '''
     arch = json.loads(model_json)
     with open(output, 'w') as fout:
-        #Store input variable names
+        # Store input variable names
         fout.write('inputs ' + str(len(inputList)) + '\n')
         for var in inputList:
             fout.write(var + '\n')
-                   
+            
+        # Store scaler type and attributes (needed for variable transformation)
+        fout.write(scaler_attributes)
+
         # Store number of layers
         fout.write( 'layers ' + str(len(model.layers)) + '\n')
         layers = []
@@ -1114,10 +1177,10 @@ def WriteModel(model, model_json, inputList, output, verbose=False):
                 
                 for w in W:
                     # Store weights
-                    fout.write(str(w) + '\n')
+                    fout.write(PrintArray(w) + '\n')
                 # Store bias values (shifts the activation function : output[i] = (Sum(weights[i,j]*inputs[j]) + bias[i]))
                 biases = model.layers[index].get_weights()[1]
-                fout.write(str(biases) + '\n')
+                fout.write(PrintArray(biases) + '\n')
 
         if verbose:
             Print('Writing model in file %s' % (output), True)

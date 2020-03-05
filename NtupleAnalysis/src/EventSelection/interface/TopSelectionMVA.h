@@ -205,7 +205,8 @@ public:
 
   // MVA output
   float MVAoutput;
-
+  
+  //Old Names
   Float_t TrijetPtDR;
   Float_t TrijetDijetPtDR;
   Float_t TrijetBjetMass;
@@ -227,6 +228,29 @@ public:
   Float_t TrijetSubldgJetMult;
   Float_t TrijetLdgJetQGLikelihood;
   Float_t TrijetSubldgJetQGLikelihood;
+
+  //New Names
+  Float_t trijetPtDR;
+  Float_t dijetPtDR;
+  Float_t bjetMass;
+  Float_t LdgJetBdisc;
+  Float_t SubldgJetBdisc;
+  Float_t bjetLdgJetMass;
+  Float_t bjetSubldgJetMass;
+  Float_t trijetMass;
+  Float_t dijetMass;
+  Float_t bjetBdisc;
+  Float_t SoftDrop_n2;
+  Float_t LdgJetCombinedCvsL;    
+  Float_t SubldgJetCombinedCvsL;
+  Float_t LdgJetPtD;
+  Float_t SubldgJetPtD;
+  Float_t LdgJetAxis2;
+  Float_t SubldgJetAxis2;
+  Float_t LdgJetMult;
+  Float_t SubldgJetMult;
+  Float_t LdgJetQGLikelihood;
+  Float_t SubldgJetQGLikelihood;
 
 private:
   /// Initialisation called from constructor

@@ -8,23 +8,10 @@ USAGE:
 
 
 EXAMPLES:
-./plot_MistagRate.py -m TopBDTTaggerMistagRate_180603_JetPt100_40_40_40_1bjet_HT500/ --folder TopBDTTagger_QCDMistagRate
+./plot_MistagRate.py -m TopMVATaggerMistagRate_180603_JetPt100_40_40_40_1bjet_HT500/ --folder TopMVATagger_QCDMistagRate
 
 LAST USED:
- BDT -0.50: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_070749_BDTm0p50_TopMassCut400_BDTtrainingBjetsPt40 --folder TopBDTTagger_QCDMistagRate
- BDT -0.40: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_071727_BDTm0p40_TopMassCut400_BDTtrainingBjetsPt40 --folder TopBDTTagger_QCDMistagRate
- BDT -0.30: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_072442_BDTm0p30_TopMassCut400_BDTtrainingBjetsPt40 --folder TopBDTTagger_QCDMistagRate
- BDT -0.20: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_073443_BDTm0p20_TopMassCut400_BDTtrainingBjetsPt40 --folder TopBDTTagger_QCDMistagRate
- BDT -0.10: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_074228_BDTm0p10_TopMassCut400_BDTtrainingBjetsPt40 --folder TopBDTTagger_QCDMistagRate
- BDT  0.00: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_074701_BDT0p00_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate
- BDT  0.10: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_080922_BDT0p10_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate 
- BDT  0.20: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_083255_BDT0p20_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate
- BDT  0.30: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_085259_BDT0p30_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate
- BDT  0.40: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_085259_BDT0p40_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate
- BDT  0.50: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_091928_BDT0p50_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate
- BDT  0.60: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_093012_BDT0p60_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate
- BDT  0.70: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_093715_BDT0p70_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate
- BDT  0.80: ./plot_MistagRate.py -m TopBDTTaggerMistagRate_180717_094402_BDT0p80_TopMassCut400_BDTtrainingBjetsPt40  --folder TopBDTTagger_QCDMistagRate
+./plot_MistagRate.py -m TopMVATaggerMistagRate_200227_NNsemileptonic --folder TopMVATagger_QCDMistagRate
 
 STATISTICS OPTIONS:
 https://iktp.tu-dresden.de/~nbarros/doc/root/TEfficiency.html
@@ -208,7 +195,7 @@ def GetHistoKwargs(histoName, opts):
     elif "pt" in h:
         units   = "GeV/c"
         xlabel  = "p_{T} (%s)" % (units)
-        myBins  = [0, 100, 200, 300, 400, 500, 600]#, 800]
+        myBins  = [0, 100, 200, 300, 400, 500, 600, 700, 800, 1000]
         kwargs["xmax"] = 600
         kwargs["cutBox"] = {"cutValue": 100.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0, "xmax": 600, "ymin": 0.0, "ymax": 0.322}
@@ -407,7 +394,7 @@ def main(opts):
 
             p.setLuminosity(intLumi)
             _kwargs["ratio"] = True
-            _kwargs["opts"]   = {"xmin": 0.0, "xmax": 600.0, "ymin": 0.0, "ymax": 0.16, "ymaxfactor": 1.8}
+            _kwargs["opts"]   = {"xmin": 0.0, "xmax": 1000.0, "ymin": 0.0, "ymax": 0.16, "ymaxfactor": 1.8}
             _kwargs["cutBoxY"] = {"cutValue": 1.10, "fillColor": ROOT.kGray+1, "fillStyle": 3001, "box": False, "line": True, "greaterThan": True, "mainCanvas": False, 
                                   "ratioCanvas": True, "mirror": True}
             plots.drawPlot(p, plotName, **_kwargs)
@@ -701,7 +688,7 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "TopBDTTaggerMistagRate"
+    ANALYSISNAME = "TopMVATaggerMistagRate" # TopBDTTaggerMistagRate
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
     OPTMODE      = ""

@@ -1168,28 +1168,9 @@ void TopTaggerEfficiency::process(Long64_t entry) {
   if (0) std::cout << "=== Top (MVA) selection" << std::endl;
   const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent, jetData, bjetData);
 
-  if (0){
-    if (fEvent.isMC()) fEventWeight.multiplyWeight(topData.getTopTaggingScaleFactorEventWeight());
-  }
-
-
   if (0) std::cout << "=== Hplus2tb selection" << std::endl;
   const HplusSelection::Data hplusData = fHplusSelection.analyze(fEvent, jetData, bjetData, topData);
   
-  //if (!hplusData.passedAnyTwoTopsAndFreeB()) return;
-  //if (topData.getAllCleanedTopsSize() != 2) return; 
-
-  // Apply top-tag SF
-
-  if (fEvent.isMC()) 
-    {
-      if (topData.getTopTaggingScaleFactorEventWeight() != hplusData.getTopTaggingScaleFactorEventWeight())
-   	{
-   	  fEventWeight.multiplyWeight(1./topData.getTopTaggingScaleFactorEventWeight());
-   	  fEventWeight.multiplyWeight(hplusData.getTopTaggingScaleFactorEventWeight());
-   	}
-    }
-
   //================================================================================================                             
   // Gen Particle Selection                            
   //================================================================================================           
@@ -1599,7 +1580,7 @@ void TopTaggerEfficiency::process(Long64_t entry) {
   //============================================================
   //============================================================
   //Return if less than two top candidates found in the event!!!
-  int ncleaned = topData.getAllTopsBJet().size();
+  int ncleaned = hplusData.getAllCleanedTopsSize();
   if (ncleaned < 2) return;
   //============================================================
   //============================================================

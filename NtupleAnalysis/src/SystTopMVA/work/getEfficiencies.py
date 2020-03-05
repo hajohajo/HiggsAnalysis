@@ -73,7 +73,7 @@ import HiggsAnalysis.NtupleAnalysis.tools.plots as plots
 import HiggsAnalysis.NtupleAnalysis.tools.crosssection as xsect
 import HiggsAnalysis.NtupleAnalysis.tools.aux as aux
 import HiggsAnalysis.NtupleAnalysis.tools.multicrabConsistencyCheck as consistencyCheck
-import HiggsAnalysis.SystTopBDT.SystTopBDTNormalization as SystTopBDTNormalization
+import HiggsAnalysis.SystTopMVA.SystTopMVANormalization as SystTopMVANormalization
 
 import HiggsAnalysis.NtupleAnalysis.tools.analysisModuleSelector as analysisModuleSelector
 import HiggsAnalysis.FakeBMeasurement.FakeBResult as fakeBResult
@@ -510,10 +510,9 @@ def PlotHistos(d_noSF, d_withSF, num_histoList, den_histoList,  opts):
     # Normalization Factors (see: getNormalization.py)
     # =========================================================================================
     #f1=0.626877; f2=0.880767;
-    f1 = 0.625454; f2 = 0.836566; #noTopPtRew
-    #f1 = 0.626893; f2 = 0.880846; #noDeltaRqq
-    #f1 = 0.625454; f2 = 0.836566; #noDeltaRqq, noTopPtRew
-    
+    # f1 = 0.625454; f2 = 0.836566; #noTopPtRew #HIG-18-015
+    f1 = 0.625454; f2 = 0.836566;
+
     # =========================================================================================
     # (A) Apply Normalization Factors (see: getNormalizations.py)
     # =========================================================================================
@@ -678,7 +677,7 @@ def PlotHistos(d_noSF, d_withSF, num_histoList, den_histoList,  opts):
         name = opts.noSFcrab.split("_")[-4]
         name = name.replace(opts.analysisName, "")
         print "name = ", name
-        jsonName = "toptagEff_BDT"+name+"_InclusiveTT_TopMassCut400.json"
+        jsonName = "toptagEff_MVA"+name+"_InclusiveTT_TopMassCut400.json"
         runRange = "273150-284044"
         analysis = opts.analysisName
         label = "2016"
@@ -832,7 +831,7 @@ def PlotHistos(d_noSF, d_withSF, num_histoList, den_histoList,  opts):
     if (not opts.inclusiveEff):
         name = opts.noSFcrab.split("_")[-4]
         name = name.replace(opts.analysisName, "")
-        jsonName = "toptagEff_BDT"+name+"_GenuineTT_TopMassCut400.json"
+        jsonName = "toptagEff_MVA"+name+"_GenuineTT_TopMassCut400.json"
         runRange = "273150-284044"
         analysis = opts.analysisName
         label = "2016"
@@ -867,7 +866,7 @@ if __name__ == "__main__":
     # Save to dirs
     
     # Default Settings
-    ANALYSISNAME = "SystTopBDT"
+    ANALYSISNAME = "SystTopMVA"
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
     OPTMODE      = None
@@ -880,7 +879,7 @@ if __name__ == "__main__":
     VERBOSE      = False
     USEMC        = False
     RATIO        = True
-    FOLDER       = "SystTopBDT_"
+    FOLDER       = "SystTopMVA_"
     INCLUSIVE    = False
     INCLUSIVE_EFF = False
     # Define the available script options

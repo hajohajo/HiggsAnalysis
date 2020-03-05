@@ -1,97 +1,30 @@
 #!/usr/bin/env python
 '''
-DESCRIPTION:
-Keras is a modular, powerful and intuitive open-source Deep Learning library built on Theano and TensorFlow. 
-Thanks to its minimalist, user-friendly interface, it has become one of the most popular packages to build, 
-train, and test neural networks. This script provides an interface for conducting deep learning studies in 
-python with Keras. The step included are:
-1. Load Data.
-2. Define Keras Model.
-3. Compile Keras Model.
-4. Fit Keras Model.
-5. Evaluate Keras Model.
-6. Tie It All Together.
-7. Make Predictions
+DESCRIPTION:                                                                                                                                                                         
+This script is used to develop a mass-decorrelated top-quark tagger using a Neural Network architecture.                                                                             
+The model identifies hadronically decaying top-quarks using as input a list of discriminating variables of                                                                           
+truth-matched (signal) or unmatched (background) trijet combinations.                                                                                                                
+For the mass decorrelated tagger we develop an Adversarial Neural Network that consists of two models:                                                                               
+ 1. Classifer: The nominal model that takes as input the set of input variables and gives as output                                                                                  
+               a value from 0 to 1 that characterizes an object as signal or background.                                                                                             
+               Loss function: L_c                                                                                                                                                    
+ 2. Regressor: This model is introduced in order to prevent the classifier from learning the top-quark mass.                                                                         
+               It takes as input the output of the classifier and its output is a prediction of the top-quark mass.                                                                  
+               Loss function: L_r                                                                                                                                                    
+Combining the two models, we get a new Neural Network that minimizes a joint Loss functions: L = L_c - lambda*L_r                                                                    
+The factor lambda controls the mass independence and the performance of the classifier.                                                                                              
+During a training epoch, both classifier and regressor are trained and after each iteration, the models use                                                                          
+the updated weights.                                                                                                                                                                 
+During the training, we expect an increase of the loss value of the classifier and the regressor, and at the same                                                                    
+time the minimization of the joint loss function.                                                                                                                                    
 
-ENV SETUP:
-cd ~/scratch0/CMSSW_10_2_11/src/ && cmsenv && setenv SCRAM_ARCH slc7_amd64_gcc700 && cd /afs/cern.ch/user/a/attikis/workspace/Keras_ANN/
-
-
-OPTIMISATION:
-In two words; trial & error. 
-The number of layers and the number of nodes in Keras (aka "hyperparameters") should be tuned on a validation set 
-(split from your original data into train/validation/test). Tuning just means trying different combinations of parameters
- and keep the one with the lowest loss value or better accuracy on the validation set, depending on the problem. 
-There are two basic methods:
-1) Grid search: For each parameter, decide a range and steps into that range, like 8 to 64 neurons, in powers of two 
-(e.g. 8, 16, 32, 64), and try each combination of the parameters. 
-2) Random search: Do the same but just define a range for each parameter and try a random set of parameters, drawn from 
-an uniform distribution over each range.
-Unfortunately there is no other way to tune such parameters. Just keep in mind that a deep model provides a hierarchy of 
-layers that build up increasing levels of abstraction from the space of the input variables to the output variables.
-
-About layers having different number of neurons, that could come from the tuning process, or you can also see it as 
-dimensionality reduction, like a compressed version of the previous layer.
-
-
-ACTIVATION FUNCTIONS:
-Activation functions are really important for a Artificial Neural Network to learn and make sense of something really 
-complicated and Non-linear complex functional mappings between the inputs and response variable. They introduce non-linear
-properties to our Network.Their main purpose is to convert a input signal of a node in a A-NN to an output signal. 
-That output signal now is used as a input in the next layer in the stack. Specifically in A-NN we do the sum of products of
-inputs (x_{i}) and their corresponding Weights(w_{i}) and apply a Activation function f(x_{i}) to it to get the output of that 
-layer and feed it as an input to the next layer. The question arises that why can't we do it without activating the input signal?
-If we do not apply a Activation function then the output signal would simply be a simple linear function.A linear function is 
-just a polynomial of one degree. Now, a linear equation is easy to solve but they are limited in their complexity and have less 
-power to learn complex functional mappings from data. A Neural Network without Activation function would simply be a Linear 
-regression Model, which has limited power and does not perform good most of the times. We want our Neural Network to not just 
-learn and compute a linear function but something more complicated than that. Also without activation function our Neural network
- would not be able to learn and model other complicated kinds of data such as images, videos , audio , speech etc. That is why
- we use Artificial Neural network techniques such as Deep learning to make sense of something complicated ,high dimensional, 
-non-linear -big datasets, where the model has lots and lots of hidden layers in between and has a very complicated architecture
- which helps us to make sense and extract knowledge form such complicated big datasets.
-
-
-USAGE:
-./sequential.py [opts]
-
-
-EXAMPLES:
-./sequential.py --activation relu,relu,sigmoid --neurons 36,19,1 --epochs 10000 --batchSize 50000 -s pdf --log
-./sequential.py --activation relu,relu,sigmoid --neurons 19,190,1 --epochs 50 --batchSize 500 -s pdf --saveDir ~/public/html/Test
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 2000 -s pdf --entrystop 600000 --inputVariables "TrijetPtDR,TrijetDijetPtDR,TrijetBjetMass,TrijetLdgJetBDisc,TrijetSubldgJetBDisc,TrijetBJetLdgJetMass,TrijetBJetSubldgJetMass,TrijetMass,TrijetDijetMass,TrijetBJetBDisc,TrijetSoftDrop_n2,TrijetLdgJetCvsL,TrijetSubldgJetCvsL,TrijetLdgJetPtD,TrijetSubldgJetPtD,TrijetLdgJetAxis2,TrijetSubldgJetAxis2,TrijetLdgJetMult,TrijetSubldgJetMult"
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 200 --batchSize 50000 -s pdf --entrystop 600000 --standardise --scaleBack
-
-
-LAST USED:
-./sequential.py --activation relu,relu,sigmoid --neurons 50,50,1 --epochs 5 --batchSize 20000 -s pdf --entrystop 20000 --standardise Robust
-
-./sequential.py --activation relu,relu,relu,sigmoid --neurons 32,32,32,1 --epochs 500 --batchSize 32 -s pdf,png --url --rootFileName histograms-TT_19var_6Jets_2BJets_14Nov2019.root --entrystop 500000 --standardise Robust --scaleBack
-
-GITHUB:
-https://github.com/skonstantinou/Keras_ANN/
-https://github.com/attikis/Keras_ANN
-
-
-URL:
-https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden-layers-and-nodes-in-a-feedforward-neural-netw <----- Really good
-https://towardsdatascience.com/activation-functions-neural-networks-1cbd9f8d91d6
-https://theffork.com/activation-functions-in-neural-networks/?source=post_page-----4dfb9c7ce9c9----------------------
-http://www.faqs.org/faqs/ai-faq/neural-nets/part2/ <----- Really good
-https://github.com/Kulbear/deep-learning-nano-foundation/wiki/ReLU-and-Softmax-Activation-Functions
-https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html
-https://gombru.github.io/2018/05/23/cross_entropy_loss/
-https://stackoverflow.com/questions/36950394/how-to-decide-the-size-of-layers-in-keras-dense-method
-https://machinelearningmastery.com/how-to-configure-the-number-of-layers-and-nodes-in-a-neural-network/
-https://machinelearningmastery.com/tutorial-first-neural-network-python-keras/
-https://keras.io/activations/
-https://keras.io/getting-started/
-https://keras.io/getting-started/faq/#what-does-sample-batch-epoch-mean
-https://indico.cern.ch/event/749214/attachments/1754601/2844298/CERN_TH_Seminar_Nov2018.pdf#search=keras%20AND%20StartDate%3E%3D2018%2D10%2D01
-https://www.indico.shef.ac.uk/event/11/contributions/338/attachments/281/319/rootTutorialWeek5_markhod_2018.pdf
-https://indico.cern.ch/event/683620/timetable/#20190512.detailed
-https://cds.cern.ch/record/2157570
-
+EXAMPLE: 
+./adversarial.py --activ_clf relu,relu,relu,sigmoid --neurons_clf 32,32,32,1 --epochs 500 --batchSize 32
+./adversarial.py --activ_clf relu,relu,relu,sigmoid --neurons_clf 32,32,32,1 --epochs 5 --batchSize 50000 --entrystop 20000
+./adversarial.py --activ_clf relu,relu,relu,sigmoid --neurons_clf 32,32,32,1 --activ_reg tanh,relu,relu,relu --neurons_reg 32,32,32,1 --epochs 2000 --entrystop 500000 -s pdf 
+./adversarial.py --activ_clf relu,relu,relu,sigmoid --neurons_clf 32,32,32,1 --activ_reg tanh,relu,relu,relu --neurons_reg 32,32,32,1 --epochs 2000 --entrystop 500000 -s pdf --standardise Robust
+LAST USED:                                                                                                                                                                           
+./adversarial.py --activ_clf relu,relu,relu,sigmoid --neurons_clf 32,32,32,1 --activ_reg tanh,relu,relu,relu --neurons_reg 32,32,32,1 --epochs 2000 --entrystop 500000 -s pdf
 '''
 #================================================================================================ 
 # Imports
@@ -112,8 +45,8 @@ import json
 import random as rn
 
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten
+from keras.models import Sequential, Model
+from keras.layers import Dense, Activation, Flatten, Input
 from sklearn.utils.class_weight import compute_sample_weight
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
@@ -147,6 +80,12 @@ cs = "\033[0;44m\033[1;37m"
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' #Disable AVX/FMA Warning
 
+#Run in single CPU: this ensures reproducible results!                                                                                                                               
+config = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
+                        allow_soft_placement=True, device_count = {'CPU': 1})
+session = tf.Session(config=config)
+backend.set_session(session)
+
 #================================================================================================ 
 # Function Definition
 #================================================================================================ 
@@ -178,27 +117,6 @@ def Verbose(msg, printHeader=True, verbose=False):
     Print(msg, printHeader)
     return
 
-def PrintXYTestTrain(x_tr, x_te, y_tr, y_te, w_tr, w_te, nEntries, verbose=False):
-    if not verbose:
-        return
-    table = []
-    align = "{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}"
-    table.append("="*110)
-    title = align.format("index", "X_train", "X_test", "Y_train", "Y_test", "W_train", "W_test")
-    table.append(title)
-    table.append("="*110)
-    # For-loop: All entries
-    for i,x in enumerate(x_tr, 0):
-        msg = align.format("%d" % i, "%.2f" %  x_tr[i], "%.2f" %  x_te[i], "%.2f" %  y_tr[i], "%.2f" %  y_te[i], "%.2f" % w_tr[i], "%.2f" % w_te[i])
-        if i < (nEntries/2):
-            table.append(ss + msg + ns)
-        else:
-            table.append(es + msg + ns)
-    table.append("="*100)
-    for i,r in enumerate(table, 0):
-        Print(r, i==0)
-    return
-
 def PrintNetworkSummary(opts):
     table    = []
     msgAlign = "{:^10} {:^10} {:>12} {:>10}"
@@ -207,16 +125,26 @@ def PrintNetworkSummary(opts):
     table.append(hLine)
     table.append(title)
     table.append(hLine)
-    for i, n in enumerate(opts.neurons, 0): 
+    table.append("=== Classifier")
+    for i, n in enumerate(opts.neurons_clf, 0): 
         layerType = "unknown"
         if i == 0:
-            #layerType = "input" # is this an input layer or hidden?
-            layerType = "hidden"
-        elif i+1 == len(opts.neurons):
+            layerType = "input"
+        elif i+1 == len(opts.neurons_clf):
             layerType = "output"
         else:
             layerType = "hidden"
-        table.append( msgAlign.format(i+1, opts.neurons[i], opts.activation[i], layerType) )
+        table.append( msgAlign.format(i+1, opts.neurons_clf[i], opts.activ_clf[i], layerType) )
+    table.append("=== Regressor")
+    for i, n in enumerate(opts.neurons_reg, 0): 
+        layerType = "unknown"
+        if i == 0:
+            layerType = "input"
+        elif i+1 == len(opts.neurons_reg):
+            layerType = "output"
+        else:
+            layerType = "hidden"
+        table.append( msgAlign.format(i+1, opts.neurons_reg[i], opts.activ_reg[i], layerType) )
     table.append("")
 
     Print("Will construct a DNN with the following architecture", True)
@@ -314,26 +242,6 @@ def GetModelConfiguration(myModel, verbose):
         Verbose( "%d) %s " % (i, c), True)
     return config
 
-def eval(myModel, x_test, y_test, opts):
-    '''
-    https://keras.io/models/model/#evaluate
-
-    NOTE: computation is done in batches
-    '''
-    metrics = myModel.evaluate(
-        x=x_test,
-        y=y_test,
-        batch_size=opts.batchSize,
-        verbose=1,
-        sample_weight=None
-    )
-    print "*"*100
-    print ('Loss: {:.3f}, Accuracy: {:.3f}'.format(metrics[0], metrics[1]))
-    print "myModel.metrics_names = ", myModel.metrics_names
-    print "len(metrics) = ", len(metrics)
-    print 
-    print "*"*100
-    return
 
 def GetKwargs(var, standardise=False):
 
@@ -419,58 +327,6 @@ def GetKwargs(var, standardise=False):
         kwargs["yMin"]   = 0.0
         kwargs["log"]    = False
 
-    if var == "TrijetPtDR":
-        kwargs["xMin"]   =  0.0
-        kwargs["xMax"]   = 800.0
-        kwargs["nBins"]  =  80
-        kwargs["xTitle"] = "p_{T}#DeltaR_{t}"
-        kwargs["yMin"]   = 1e-3        
-        #kwargs["yTitle"] = "a.u. / %0.0f"
-
-    if var == "TrijetDijetPtDR":
-        kwargs["xMin"]   =  0.0
-        kwargs["xMax"]   = 800.0
-        kwargs["nBins"]  = 160
-        kwargs["xTitle"] = "p_{T}#DeltaR_{W}"
-        kwargs["yMin"]   = 1e-3
-        #kwargs["yTitle"] = "a.u. / %0.f"
-
-    if var == "TrijetBjetMass":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   = 100.0
-        kwargs["nBins"]  = 200
-        kwargs["xTitle"] = "m_{b} [GeV]"
-        #kwargs["yTitle"] = "a.u. / %0.f GeV"
-
-    if var == "TrijetLdgJetBDisc":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   =   1.0
-        kwargs["nBins"]  = 100
-        kwargs["xTitle"] = "b-tag discr."
-        #kwargs["yTitle"] = "a.u. / %0.2f"
-
-    if var == "TrijetSubldgJetBDisc":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   =   1.0
-        kwargs["nBins"]  = 200
-        kwargs["xTitle"] = "b-tag discr."
-        #kwargs["yTitle"] = "a.u. / %0.2f"
-
-    if var == "TrijetBJetLdgJetMass":
-        kwargs["xMin"]   =  0.0
-        kwargs["xMax"]   = 600.0
-        kwargs["nBins"]  = 300
-        kwargs["xTitle"] = "m_{b,j_{1}} [GeV]"
-        kwargs["yMin"]   = 1e-3
-
-    if var == "TrijetBJetSubldgJetMass":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   = 600.0
-        kwargs["nBins"]  = 300
-        kwargs["xTitle"] = "m_{b,j_{2}} [GeV]"
-        kwargs["yMin"]   = 1e-3
-        #kwargs["yTitle"] = "a.u. / %0.0f GeV"
-
     if var == "TrijetMass":
         kwargs["xMin"]   =   0.0
         kwargs["xMax"]   = 900 #900.0
@@ -478,90 +334,6 @@ def GetKwargs(var, standardise=False):
         kwargs["xTitle"] = "m_{t} [GeV]"
         kwargs["yMin"]   = 1e-3
         kwargs["yMax"]   = 1.0
-        #kwargs["yTitle"] = "a.u. / %0.0f GeV"
-
-    if var == "TrijetDijetMass":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   = 500.0
-        kwargs["nBins"]  = 250
-        kwargs["xTitle"] = "m_{W} [GeV]"
-        kwargs["yMin"]   = 1e-3
-        #kwargs["yTitle"] = "a.u. / %0.0f GeV"
-
-    if var == "TrijetBJetBDisc":
-        kwargs["xMin"]   =  0.0
-        kwargs["xMax"]   =  1.0
-        kwargs["nBins"]  = 200
-        kwargs["xTitle"] = "b-tag discr."
-        #kwargs["yTitle"] = "a.u. / %0.2f"
-
-    if var == "TrijetSoftDrop_n2":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   =   2.0
-        kwargs["nBins"]  = 400
-        kwargs["xTitle"] = "soft-drop n_{2}"
-        kwargs["yMin"]   = 1e-3
-        #kwargs["yTitle"] = "a.u. / %0.2f"
-
-    if var == "TrijetLdgJetCvsL":
-        kwargs["xMin"]   =  -1.0
-        kwargs["xMax"]   =  +1.0
-        kwargs["nBins"]  = 400
-        kwargs["xTitle"] = "CvsL discr."
-        kwargs["yMin"]   = 1e-3
-        kwargs["yMax"]   = 1e-1
-        #kwargs["yTitle"] = "a.u. / %0.2f"
-
-    if var == "TrijetSubldgJetCvsL":
-        kwargs["xMin"]   =  -1.0
-        kwargs["xMax"]   =  +1.0
-        kwargs["nBins"]  = 400
-        kwargs["xTitle"] = "CvsL discr."
-        kwargs["yMin"]   = 1e-3
-        kwargs["yMax"]   = 1e-1
-        #kwargs["yTitle"] = "a.u. / %0.2f"
-
-    if var == "TrijetLdgJetPtD":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   =   1.0
-        kwargs["nBins"]  = 200
-        kwargs["xTitle"] = "p_{T}D"
-        #kwargs["yTitle"] = "a.u. / %0.2f"
-
-    if var == "TrijetSubldgJetPtD":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   =   1.0
-        kwargs["nBins"]  = 200
-        kwargs["xTitle"] = "p_{T}D"
-        #kwargs["yTitle"] = "a.u. / %0.2f"
-
-    if var == "TrijetLdgJetAxis2":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   =   0.16
-        kwargs["nBins"]  = 320
-        kwargs["xTitle"] = "axis2"
-        #kwargs["yTitle"] = "a.u. / %0.3f"
-
-    if var == "TrijetSubldgJetAxis2":
-        kwargs["xMin"]   =   0.0
-        kwargs["xMax"]   =   0.16
-        kwargs["nBins"]  = 320
-        kwargs["xTitle"] = "axis2"
-        #kwargs["yTitle"] = "a.u. / %0.3f"
-
-    if var == "TrijetLdgJetMult":
-        kwargs["xMin"]  =  0.0
-        kwargs["xMax"]   = 40.0
-        kwargs["nBins"]  = 80
-        kwargs["xTitle"] = "constituent multiplicity"
-        #kwargs["yTitle"] = "a.u. / %0.0f"
-
-    if var == "TrijetSubldgJetMult":
-        kwargs["xMin"]   =  0.0
-        kwargs["xMax"]   = 40.0
-        kwargs["nBins"]  = 80
-        kwargs["xTitle"] = "constituent multiplicity"
-        #kwargs["yTitle@"] = "a.u. / %0.0f"
 
     if standardise:
         kwargs["xMin"]  =  -5.0
@@ -569,18 +341,6 @@ def GetKwargs(var, standardise=False):
         kwargs["nBins"] = 500 #1000
 
     return kwargs
-
-
-def CrossEntropy(yHat, y):
-    ''' 
-    For future class implementation
-
-    https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html
-    ''' 
-    if y == 1:
-      return -log(yHat)
-    else:
-      return -log(1 - yHat)
 
 def GetTime(tStart):
     tFinish = time.time()
@@ -594,7 +354,7 @@ def GetTime(tStart):
 def SaveModelParameters(myModel, opts):
     nParams = myModel.count_params()
     total_count, trainable_count, non_trainable_count  = GetModelParams(myModel)
-    nParams, nWeights, nBias = GetModelWeightsAndBiases(opts.inputList, opts.neurons)
+    nParams, nWeights, nBias = GetModelWeightsAndBiases(opts.inputList, opts.neurons_clf)
     opts.modelParams = total_count
     opts.modelParamsTrain = trainable_count
     opts.modelParamsNonTrainable = non_trainable_count
@@ -622,42 +382,6 @@ def PrintDataset(myDset):
     Verbose("%s" % (ns), True)
     return
 
-def checkNumberOfLayers(opts):
-
-    opts.nLayers       = len(opts.neurons)+1
-    opts.nHiddenLayers = len(opts.neurons)-1
-
-    if opts.nHiddenLayers < 1:
-        msg = "The NN has %d hidden layers. It must have at least 1 hidden layer" % (opts.nHiddenLayers)
-        raise Exception(es + msg + ns)    
-    else:
-        msg = "The NN has %s%d hidden layers%s (in addition to input and output layers)." % (hs, opts.nHiddenLayers, ns)
-        Verbose(msg, True) 
-        msg = "[NOTE: One hidden layer is sufficient for the large majority of problems. In general, the optimal size of the hidden layer is usually between the size of the input and size of the output layers.]"
-        Verbose (msg, False)         
-    return
-
-def checkNeuronsPerLayer(nsignal, opts):
-    '''
-    https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden-layers-and-nodes-in-a-feedforward-neural-netw
-    '''
-    # For-loop: All neurons
-    for i, o in enumerate(opts.neurons, 1):
-        # Skip first (input layer) and last (output) layers (i.e. do only hidden layers)
-        if i==0 or i>=len(opts.neurons)-1:
-            continue
-        # Determine in/out neurons and compare to min-max range allowed
-        nN   = opts.neurons[i]
-        nIn  = opts.neurons[0]
-        nOut = opts.neurons[-1]
-        dof  = (2*nsignal) * (nIn + nOut)     # 2*nsignal = number of samples in training data set
-        nMax = (2*nsignal) / (2*(nIn + nOut))
-        nMin = (2*nsignal) / (10*(nIn + nOut))
-        if nN > nIn or nN < nOut:
-            msg = "The number of OUT neurons for layer #%d (%d neurons) is not within the recommended range(%d <= N <= %d). This may result in over-fitting" % (i, nN, nIn, nOut)
-            Print(hs + msg + ns, True)
-    return
-
 def writeCfgFile(opts):
 
     # Write to json file
@@ -665,20 +389,19 @@ def writeCfgFile(opts):
     jsonWr.addParameter("keras version", opts.keras)
     jsonWr.addParameter("host name", opts.hostname)
     jsonWr.addParameter("python version", opts.python)
-    jsonWr.addParameter("model", "sequential")
+    jsonWr.addParameter("model", "adversarial")
     jsonWr.addParameter("model parameters (total)", opts.modelParams)
     jsonWr.addParameter("model parameters (trainable)", opts.modelParamsTrain)
     jsonWr.addParameter("model parameters (non-trainable)", opts.modelParamsNonTrainable)
     jsonWr.addParameter("model weights", opts.modelWeights)
     jsonWr.addParameter("model biases", opts.modelBiases)
     jsonWr.addParameter("standardised datasets", opts.standardise)
-    jsonWr.addParameter("decorrelate",  opts.decorrelate)
     jsonWr.addParameter("rndSeed", opts.rndSeed)
-    jsonWr.addParameter("layers", len(opts.neurons))
-    jsonWr.addParameter("hidden layers", len(opts.neurons)-2)
-    jsonWr.addParameter("activation functions", [a for a in opts.activation])
-    jsonWr.addParameter("neurons", [n for n in opts.neurons])
-    jsonWr.addParameter("loss function", opts.lossFunction)
+    jsonWr.addParameter("layers", len(opts.neurons_clf))
+    jsonWr.addParameter("hidden layers", len(opts.neurons_clf)-2)
+    jsonWr.addParameter("activation functions", [a for a in opts.activ_clf])
+    jsonWr.addParameter("neurons", [n for n in opts.neurons_clf])
+    jsonWr.addParameter("loss function", opts.loss_clf)
     jsonWr.addParameter("optimizer", opts.optimizer)
     jsonWr.addParameter("epochs", opts.epochs)
     jsonWr.addParameter("batch size", opts.batchSize)
@@ -708,6 +431,163 @@ def writeGitFile(opts):
     gFile.write(opts.gitDiff)
     return
 
+def PlotLossFunction(TrainLosses, ValLosses, nepochs, saveDir):
+    '''                                                                                                                                                                              
+    Plot the loss function vs the number of the epoch                                                                                                                                
+    '''
+    def ApplyStyle(h, ymin, ymax, color, lstyle=ROOT.kSolid):
+        h.SetLineColor(color)
+        h.SetLineWidth(2)
+        h.SetLineStyle(lstyle)
+        if (lstyle != ROOT.kSolid):
+            h.SetLineWidth(3)
+        h.SetMaximum(ymax)
+        h.SetMinimum(ymin)
+        h.GetXaxis().SetTitle("# epoch")
+        h.GetYaxis().SetTitle("Loss")
+
+    ROOT.gStyle.SetOptStat(0)
+    canvas = ROOT.TCanvas()
+    canvas.cd()
+    leg=plot.CreateLegend(0.6, 0.65, 0.9, 0.88)
+
+    xarr = []
+    for i in range(1, nepochs+1):
+        xarr.append(i)
+
+    if (opts.lam > 0):
+        hLf_t  = ROOT.TGraph(len(xarr), array.array('d', xarr), array.array('d', TrainLosses["L_f"]))
+        hLr_t  = ROOT.TGraph(len(xarr), array.array('d', xarr), array.array('d', TrainLosses["L_r"]))
+        hLfr_t = ROOT.TGraph(len(xarr), array.array('d', xarr), array.array('d', TrainLosses["L_f - L_r"]))
+
+        hLf_v  = ROOT.TGraph(len(xarr), array.array('d', xarr), array.array('d', ValLosses["L_f"]))
+        hLr_v  = ROOT.TGraph(len(xarr), array.array('d', xarr), array.array('d', ValLosses["L_r"]))
+        hLfr_v = ROOT.TGraph(len(xarr), array.array('d', xarr), array.array('d', ValLosses["L_f - L_r"]))
+
+        # Find minimum and maximum
+        ymin = 999.99
+        ymax = 0
+        for h in [hLf_t, hLr_t, hLfr_t, hLf_v, hLr_v, hLfr_v]:
+            ymin = min(ymin, h.GetHistogram().GetMinimum())
+            ymax = max(ymax, h.GetHistogram().GetMaximum())
+        ymax = ymax + 1
+        ymin = ymin - 1
+        
+        ApplyStyle(hLf_t, ymin, ymax, ROOT.kRed, ROOT.kDashed)
+        ApplyStyle(hLr_t, ymin, ymax, ROOT.kBlue, ROOT.kDashed)
+        ApplyStyle(hLfr_t, ymin, ymax, ROOT.kGreen+1, ROOT.kDashed)
+        ApplyStyle(hLf_v, ymin, ymax, ROOT.kRed)
+        ApplyStyle(hLr_v, ymin, ymax, ROOT.kBlue)
+        ApplyStyle(hLfr_v, ymin, ymax, ROOT.kGreen+1)
+
+        for i, h in enumerate([hLf_t, hLr_t, hLfr_t, hLf_v, hLr_v, hLfr_v], 0):
+            if (i == 0):
+                h.Draw("la")
+            else:
+                h.Draw("l same")
+
+        leg.AddEntry(hLf_t, "L_{c} (train)","l")
+        leg.AddEntry(hLr_t,"L_{r} (train)","l")
+        leg.AddEntry(hLfr_t,"L_{c} - L_{r} (train)","l")
+        leg.AddEntry(hLf_v, "L_{c} (test)","l")
+        leg.AddEntry(hLr_v,"L_{r} (test)","l")
+        leg.AddEntry(hLfr_v,"L_{c} - L_{r} (test)","l")
+
+    else:
+        h_TrainLoss = ROOT.TGraph(len(xarr), array.array('d', xarr), array.array('d', TrainLosses["loss"]))
+        h_ValLoss   = ROOT.TGraph(len(xarr), array.array('d', xarr), array.array('d', ValLosses["val_loss"]))
+
+        ymax = max(h_TrainLoss.GetHistogram().GetMaximum(), h_ValLoss.GetHistogram().GetMaximum()) + 1
+        ymin = min(h_TrainLoss.GetHistogram().GetMinimum(), h_ValLoss.GetHistogram().GetMinimum()) - 1
+        ApplyStyle(h_TrainLoss, ymin, ymax,  ROOT.kGreen +1, ROOT.kDashed)
+        ApplyStyle(h_ValLoss, ymin, ymax,  ROOT.kGreen +1)
+                
+        h_TrainLoss.Draw("la")
+        h_ValLoss.Draw("l same")
+        leg.AddEntry(h_TrainLoss, "L_{c} (train)","l")
+        leg.AddEntry(h_ValLoss, "L_{c} (test)","l")
+
+    leg.Draw()
+    saveName = "Loss_lam%s_epochs%s" %(opts.lam, len(xarr))
+    plot.SavePlot(canvas, saveDir, saveName)
+    canvas.Close()
+    return
+
+def getClassifier(model_clf, nInputs):
+    # Add classifier layers           
+    Print("Classifier network", True)
+    for iLayer, n in enumerate(opts.neurons_clf, 0):
+        layer = "layer#%d" % (int(iLayer)+1)
+        if iLayer == len(opts.neurons_clf)-1:
+            layer += " (output Layer)" # Layers of nodes between the input and output layers. There may be one or more of these layers.
+        else:
+            layer += " (hidden layer)" # A layer of nodes that produce the output variables.
+            
+        Print("Adding %s, with %s%d neurons%s and activation function %s" % (hs + layer + ns, ls, n, ns, ls + opts.activ_clf[iLayer] + ns), False)
+
+        # First layer demands input_dim                                                                                                                                              
+        if (iLayer == 0):
+            model_clf.add(Dense(opts.neurons_clf[iLayer], input_dim =  nInputs))
+            model_clf.add(Activation(opts.activ_clf[iLayer]))
+        else:
+            model_clf.add(Dense(opts.neurons_clf[iLayer]))
+            model_clf.add(Activation(opts.activ_clf[iLayer]))
+    return model_clf
+
+def getRegressor(model_clf, model_reg):
+    # Add classifier                                                                                                                                                                 
+    model_reg.add(model_clf)
+
+    # Add regressor layers                                                                                                                                                           
+    for iLayer, n in enumerate(opts.neurons_reg, 0):
+        model_reg.add(Dense(opts.neurons_reg[iLayer]))
+        model_reg.add(Activation(opts.activ_reg[iLayer]))
+
+    return model_reg
+
+def make_trainable(model, isTrainable):
+    '''
+    Make layers trainiable / not trainable
+    For not trainable layers, the weights are not updated 
+    '''
+    model.trainable = isTrainable
+    for l in model.layers:
+        l.trainable = isTrainable
+
+def getLoss_clf(c):
+    def loss_C(y_true, y_pred):
+        return c * backend.binary_crossentropy(y_true, y_pred)
+    return loss_C
+
+def getLoss_reg(c):
+    def loss_R(z_true, z_pred):
+        if opts.loss_reg == "msle":
+            loss =  c * keras.losses.mean_squared_logarithmic_error(z_true, z_pred) #c: controls the mass dependence
+        elif opts.loss_reg == "mse":
+            loss =  c * keras.losses.mean_squared_error(z_true, z_pred) #c: controls the mass dependence
+        return loss
+    return loss_R
+
+def SaveTheModel(model_clf, last_epoch):
+    modelName = "model_trained_%sEpochs.h5" % (last_epoch)
+    model_clf.save(os.path.join(opts.saveDir,  modelName) )
+    
+    # Serialize model to JSON (contains arcitecture of model)
+    model_json = model_clf.to_json() # model_clf.to_yaml()
+    with open(opts.saveDir + "/model_architecture_%sEpochs.json" % (last_epoch), "w") as json_file:
+        json_file.write(model_json)
+    # Serialize weights to HDF5
+    model_clf.save_weights(os.path.join(opts.saveDir, 'model_weights_%sEpochs.h5' % (last_epoch)), overwrite=True)
+    model_clf.save(os.path.join(opts.saveDir, modelName))
+        
+    # Write weights and architecture in txt file
+    modelFilename = os.path.join(opts.saveDir, "model_%sEpochs.txt" % (last_epoch))
+    
+    # Store scaler attributes
+    scaler_attributes = "scalerType None\n" #fixme! adversarial.py does not support standardization
+    # write weights and architecture in txt file
+    func.WriteModel(model_clf, model_json, opts.inputList, scaler_attributes, modelFilename, verbose=False)
+
 def main(opts): 
 
     # Save start time (epoch seconds)
@@ -724,10 +604,7 @@ def main(opts):
     style.setGridX(opts.gridX)
     style.setGridY(opts.gridY)
 
-    if opts.scaleBack:
-        stdPlots = False
-    else:
-        stdPlots = opts.standardise 
+    stdPlots = opts.standardise
 
     # Open the ROOT file
     Verbose("Opening ROOT file %s" %  (opts.rootFileName), True)
@@ -737,7 +614,6 @@ def main(opts):
     numpy.random.seed(opts.rndSeed)
     # Setting the seed for python random numbers
     rn.seed(opts.rndSeed)
-
 
     # Determine the number of threads running
     p = psutil.Process(os.getpid())
@@ -762,7 +638,7 @@ def main(opts):
     df_bkg = background.pandas.df(opts.inputList, entrystop=opts.entrystop)
     # For testing:
     if 0:
-        Print("Printing the signal DaaFrame: %s" % df_sig, True)
+        Print("Printing the signal DataFrame: %s" % df_sig, True)
         print
         Print("Printing the background DataFrame: %s" % df_bkg, True)
         print
@@ -775,18 +651,11 @@ def main(opts):
     nEntries = min(nEntries_sig, nEntries_bkg)
 
     # Apply rule-of-thumb to prevent over-fitting!
-    checkNeuronsPerLayer(nEntries, opts)
-
-    # Optional numpy array of weights for the training & testing samples, used for weighting the loss function (during training only). 
-    # Can be used to decorrelate a variable before training; alternative approach to adversarial neural network (ANN) for combatting mass sculpting
-    if opts.decorrelate != None:        
-        msg = "Applying sample reweighting so that signal and background distributions of variable \"%s\" match"  % opts.decorrelate
-        Print(cs + msg + ns, True)
-        weights = func.doSampleReweighing(df_sig, df_bkg, "TrijetMass", _verbose=opts.verbose, **GetKwargs("TrijetMass"))
+    #checkNeuronsPerLayer(nEntries, opts)
 
     # Assigning new column in our DataFrames DataFrames with label "signal". It takes value of "1" for signal and "0" for background.
     # Total number of columns is now increased by 1 (19 + 1 = 20)
-    Verbose("Assigning a new column to our signal and bacbkround DataFrame labelled \"signal\" that will designate whether the entry is signal or not. Once this is done we can merge the DataFrames into a single oneOB", True)
+    Verbose("Assigning a new column to our signal and bacbkround DataFrame labelled \"signal\" that will designate whether the entry is signal or not. Once this is done we can merge the DataFrames into a single one", True)
     df_sig = df_sig.assign(signal=1)
     df_bkg = df_bkg.assign(signal=0)
     Verbose("Printing tabular data for signal:\n%s%s%s"     % (ss, df_sig,ns), True)
@@ -795,21 +664,13 @@ def main(opts):
     # Create a DataFrame list
     df_all  = pandas.concat( [df_sig, df_bkg] )
     Verbose("Printing the combined tabular data (signal first, background appended after signal):\n%s%s%s" % (ts, df_all, ns), True)
-    
     if opts.standardise:
         msg  = "Standardising dataset features with the %sScaler%s" % (ls + opts.standardise, ns)
         Print(msg, True)    
         # WARNING! Don't cheat - fit only on training https://scikit-learn.org/stable/modules/neural_networks_supervised.html)
-        # See also: https://sebastianraschka.com/Articles/2014_about_feature_scaling.html#about-min-max-scaling
         scaler_sig, df_sig = func.GetStandardisedDataFrame(df_sig, opts.inputList, scalerType=opts.standardise) # fixme - iro - should fit/transform only the TEST data
         scaler_bkg, df_bkg = func.GetStandardisedDataFrame(df_bkg, opts.inputList, scalerType=opts.standardise)
         scaler_all, df_all = func.GetStandardisedDataFrame(df_all, opts.inputList, scalerType=opts.standardise)
-        
-    # Store scaler attributes    
-    scaler_attributes = "scalerType %s\n" % opts.standardise
-    if opts.standardise:
-        scaler_attributes += func.GetScalerAttributes(df_all, nInputs, scaler_all, opts.standardise)
-        Verbose("Scaler Attributes\n%s\n" % scaler_attributes, True)
 
     # Get a Numpy representation of the DataFrames for signal and background datasets (again, and AFTER assigning signal and background)
     Verbose("Getting a numpy representation of the DataFrames for signal and background datasets", True)
@@ -818,70 +679,45 @@ def main(opts):
     # For future use
     jsonWr = JsonWriter(saveDir=opts.saveDir, verbose=opts.verbose)    
 
-    # Define keras model as a linear stack of layers. Add layers one at a time until we are happy with our network architecture.
-    Verbose("Creating the sequential Keras model", True)
-    myModel = Sequential()
+    # Define keras models
+    # Classifier (characterizes events as signal or background)                                                                                                                        
+    # Inputs: List of input variables                                                                                                                                                  
+    # Output: classifier                                                                                                                                                               
+    # Regressor: Predicts the top-quark mass from the classifiers output  
 
-    # The best network structure is found through a process of trial and error experimentation. Generally, you need a network large enough to capture the structure of the problem.
-    # The Dense function defines each layer - how many neurons and mathematical function to use.
-    # 'Dense' is a standard layer type that works for most cases. In a dense layer, all nodes in the previous layer connect to the nodes in the current layer.
-    # A layer's activation function allows models to take into account nonlinear relationships (i.e. not f(x)=x, but also f(x) = tanh(x) or f(x) = ReLU where x is the layer input)
-    for iLayer, n in enumerate(opts.neurons, 0):
-        layer = "layer#%d" % (int(iLayer)+1)
-        if iLayer == len(opts.neurons)-1:
-            layer += " (output Layer)" # Layers of nodes between the input and output layers. There may be one or more of these layers.
-        else:            
-            layer += " (hidden layer)" # A layer of nodes that produce the output variables.
-            
-        Print("Adding %s, with %s%d neurons%s and activation function %s" % (hs + layer + ns, ls, n, ns, ls + opts.activation[iLayer] + ns), iLayer==0)
-        if iLayer == 0:
-            # Only first layer demands input_dim. For the rest it is implied.
-            myModel.add( Dense(opts.neurons[iLayer], input_dim = nInputs) ) #, weights = [np.zeros([692, 50]), np.zeros(50)] OR bias_initializer='zeros',  or bias_initializer=initializers.Constant(0.1)
-            myModel.add( Activation(opts.activation[iLayer]) )
-            # myModel.add( Dense(opts.neurons[iLayer], input_dim = nInputs, activation = opts.activation[iLayer]) ) # her majerty Soti requested to break this into 2 lines
-        else:
-            if 0: #opts.neurons[iLayer] < nInputs:
-                msg = "The number of  neurons (=%d) is less than the number of input variables (=%d). Please set the number of neurons to be at least the number of inputs!" % (opts.neurons[iLayer], nInputs)
-                raise Exception(es + msg + ns)  
-            myModel.add( Dense(opts.neurons[iLayer]))
-            myModel.add( Activation(opts.activation[iLayer]) )
-            # myModel.add( Dense(opts.neurons[iLayer], activation = opts.activation[iLayer]) ) 
+    Verbose("Creating the Keras models", True)
+    model_clf = Sequential()    
+    model_clf = getClassifier(model_clf, nInputs)
+    model_reg = Sequential()
+    model_reg = getRegressor(model_clf, model_reg)
 
     # Print a summary representation of your model
     if opts.verbose:
         Print("Printing model summary:", True)
-        myModel.summary()
-    
+        Print("Classifier", False)
+        model_clf.summary()
+        Print("Regressor", False)
+        model_reg.summary()
+
     # Get the number of parameters of the model
-    SaveModelParameters(myModel, opts)
+    SaveModelParameters(model_clf, opts)
 
     # Get a dictionary containing the configuration of the model. 
-    model_cfg = GetModelConfiguration(myModel, opts.verbose)
+    model_cfg = GetModelConfiguration(model_clf, opts.verbose)
         
     # Split data into input (X) and output (Y), using an equal number for signal and background. 
     # This is by creating the dataset with double the number of rows as is available for signal. Remember
     # that the background entries were appended to those of the signal.
-    X     = dset_all[:2*nEntries, 0:nInputs]           # rows: 0 -> 2*Entries, columns: 0 -> 19 (all variables but not the "signal" column)
-    Y     = dset_all[:2*nEntries, nInputs:]            # rows: 0 -> 2*Entries, column : 20  [i.e. everything after column 19 which is only the "signal" column (0 or 1)]
-    X_sig = dset_all[0:nEntries, 0:nInputs]            # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
-    X_bkg = dset_all[nEntries:2*nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeB"
-    Y_sig = dset_all[:nEntries, nInputs:]              # contains 1's (total of "nEntries" values)   - NOT USED
-    Y_bkg = dset_all[:nEntries, nInputs:]              # contains 0's (total ODof "nEntries" values) - N0T USED
+    X      = dset_all[:2*nEntries, 0:nInputs]           # rows: 0 -> 2*Entries, columns: 0 -> 19 (all variables but not the "signal" column)
+    Y      = dset_all[:2*nEntries, nInputs:]            # rows: 0 -> 2*Entries, column : 20  [i.e. everything after column 19 which is only the "signal" column (0 or 1)]
+    Z      = dset_all[:2*nEntries, 7]                   #fixme! 7th row corresponce to top mass!
+    X_sig  = dset_all[:nEntries, 0:nInputs]             # contains all 19 variables (total of "nEntries" values per variable) - from "treeS"
+    X_bkg  = dset_all[nEntries:2*nEntries, 0:nInputs]   # contains all 19 variables (total of "nEntries" values per variable) - from "treeB"
     Print("Signal dataset has %s%d%s rows. Background dataset has %s%d%s rows" % (ss, len(X_sig), ns, es, len(X_bkg), ns), True)
 
-    # Split the datasets (X= 19 inputs, Y=output variable). test_size 0.5 means half for training half for testing. Shuffle the entry order?
-    if opts.decorrelate != None:
-        X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(X, Y, weights["all"], test_size=0.5, random_state = opts.rndSeed, shuffle=True)
-        x_tr = X_train[0:nEntries, 7].tolist()
-        x_te = X_test[0:nEntries, 7].tolist() # iro - fixme: index ambiguous! 
-        y_tr = Y_train[0:nEntries, 0].tolist()
-        y_te = Y_test[0:nEntries, 0].tolist()
-        w_tr = W_train.tolist()
-        w_te = W_test.tolist()
-        PrintXYTestTrain(x_tr, x_te, y_tr, y_te, w_tr, w_te, nEntries, opts.verbose)
-    else:
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
-
+    # Split the datasets (X= 19 inputs, Y=output variable, Z=target - trijet mass). test_size 0.5 means half for training half for testing. Shuffle the entry order?
+    X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(X, Y, Z, test_size=0.5, random_state = opts.rndSeed, shuffle=True)
+    
     # Save size of test & training samples for future reference
     opts.testSample  = len(X_test)
     opts.trainSample = len(X_train)
@@ -889,65 +725,126 @@ def main(opts):
     if opts.batchSize == None:
         opts.batchSize = len(X_train)/2
 
-
-    # Early stop? Stop training when a monitored quantity has stopped improving.
+    # Early stop. Stop training when a monitored quantity has stopped improving.
     # Show patience of "50" epochs with a change in the loss function smaller than "min_delta" before stopping procedure
     # https://stackoverflow.com/questions/43906048/keras-early-stopping
     #earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0, patience=10, verbose=1, mode='auto')
     earlystop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=50)
     callbacks = [earlystop]
 
-
     # [Loss function is used to understand how well the network is working (compare predicted label with actual label via some function)]
     # Optimizer function is related to a function used to optimise the weights
-    Print("Compiling the model with the loss function %s and optimizer %s " % (ls + opts.lossFunction + ns, ls + opts.optimizer + ns), True)
-    # Before you train, you must compile your model to configure the learning process. This allows you to specify:    # optimizer, loss function, and metrics.
-    # The loss functions: https://keras.io/losses/. The metrics: https://keras.io/metrics/
-    myModel.compile(loss=opts.lossFunction, optimizer=opts.optimizer, metrics=['accuracy'])
+    Print("Compiling the classifier with the loss function %s and optimizer %s " % (ls + opts.loss_clf + ns, ls + opts.optimizer + ns), True)
+    model_clf.compile(loss=opts.loss_clf, optimizer=opts.optimizer, metrics=['accuracy'])
     
+    # Define combined models
+    inputs   = Input(shape=(X_train.shape[1],))
+    optimizer_comb = opts.optimizer
+    optimizer_adv  = opts.optimizer
 
-    # Customise the optimiser settings?
-    if 0: #opts.optimizer == "adam":  # does not work (required more recent version of Keras?)
-        # Default parameters follow those provided in the original paper.
-        # learning_rate: float >= 0. Learning rate.
-        # beta_1: float, 0 < beta < 1. Generally close to 1.
-        # beta_2: float, 0 < beta < 1. Generally close to 1.
-        # amsgrad: boolean. Whether to apply the AMSGrad variant of this algorithm from the paper "On the Convergence of Adam and Beyond".
-        keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
+    # Customise the optimiser settings
+    if 0: #fixme! Add lr option 
+        if opts.optimizer == "adam":
+            optimizer_comb = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
+            optimizer_adv  = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
 
 
-    # Fit the model with our data
-    # (An "epoch" is an arbitrary cutoff, generally defined as "one iteration of training on the whole dataset", 
-    # used to separate training into distinct phases, which is useful for logging and periodic evaluation.)
-    sampleWeights  = None
-    validationData = (X_test, Y_test)
-    if opts.decorrelate != None:
-        # Optional array of the same length as X_train, containing weights to apply to the model's loss for each sample.
-        sampleWeights  = W_train
-        validationData = (X_test, Y_test, W_test) # sample weights for validation data
-    else:
-        pass
-    Verbose("Number of threads before fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
-    seqModel = myModel.fit(X_train,
-                           Y_train,
-                           validation_data=validationData,
-                           epochs     = opts.epochs,    # a full pass over all of your training data
-                           batch_size = opts.batchSize, # a set of N samples (https://stats.stackexchange.com/questions/153531/what-is-batch-size-in-neural-network)
-                           shuffle    = False,
-                           verbose    = 1,              # 0=silent, 1=progress, 2=mention the number of epoch
-                           callbacks  = callbacks,
-                           sample_weight=sampleWeights
-                           )
-    Verbose("Number of threads after fitting model is %s" % (ts + str(p.num_threads()) + ns), True)
-        
-    # Retrieve  the training / validation loss / accuracy at each epoch
-    Verbose("The available history objects of the model are: %s" % (", ".join(seqModel.history.keys())), True)
-    # For plotting: https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
-    trainLossList = seqModel.history['loss']
-    trainAccList  = seqModel.history['acc']
-    valLossList   = seqModel.history['val_loss']
-    valAccList    = seqModel.history['val_acc']
-    epochList     = range(opts.epochs)
+    # Combined network: updates the classifier's weights                                                                                                                             
+    # Input: list of discriminating variables                                                                                                                                        
+    # Output: Classifier's output, top-quark mass prediction                                                                                                                          
+    model_comb = Model(inputs=[inputs], outputs=[model_clf(inputs), model_reg(inputs)])
+
+    # Regression layers are not trainable !                                                                                                                                          
+    make_trainable(model_reg, False)
+    make_trainable(model_clf, True)
+    # Compile the combined model                                                                                                                                                     
+    # L_comb = L_clf - lambda*L_reg                                                                                                                                                  
+    model_comb.compile(loss=[getLoss_clf(c=1.0), getLoss_reg(c=-opts.lam)], optimizer=optimizer_comb)
+    
+    # Adversary network: predicts top-quark mass                                                                                                                                     
+    model_adv = Model(inputs=[inputs], outputs=[model_reg(inputs)])
+
+    # Classification layers are not trainable !                                                                                                                                      
+    make_trainable(model_reg, True)
+    make_trainable(model_clf, False)
+    # Compile the model                                                                                                                                                              
+    # L_adv = L_reg                                                                                                                                                                  
+    model_adv.compile(loss=[getLoss_reg(c=1.0)], optimizer=optimizer_adv)
+
+    # Pretrain the Classifier 
+    make_trainable(model_reg, False)
+    make_trainable(model_clf, True)
+
+    Print("=== Classifier: Fit", True)
+    model_clf.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=10, batch_size=opts.batchSize, verbose = opts.debug)
+    
+    # Pretrain the adversarial network
+    # Here the output is the top-quark mass (target) 
+    make_trainable(model_reg, True)
+    make_trainable(model_clf, False)
+
+    Print("=== Adversarial Network: Fit", True)
+    model_adv.fit(X_train, Z_train, validation_data=(X_test, Z_test), epochs=10, batch_size=opts.batchSize, verbose=opts.debug)
+
+    Verbose("Number of threads before fitting model is %s" % (ts + str(p.num_threads()) + ns), True)    
+    ###################################################
+    # Train the model
+    ###################################################
+    
+    # Dictionary with loss functions                                                                                                                                                 
+    TrainLosses = {"L_f": [], "L_r": [], "L_f - L_r": []}
+    ValLosses   = {"L_f": [], "L_r": [], "L_f - L_r": []}
+    
+    Print("Train the combined model")
+    if (opts.lam > 0):
+        for i in range(opts.epochs):
+            # Evaluate the loss function after each epoch                            
+            l_train = model_comb.evaluate(X_train, [Y_train, Z_train], verbose=opts.debug)                                                                                                
+            l_val  = model_comb.evaluate(X_test, [Y_test, Z_test], verbose=opts.debug)
+
+            # Store the value of the loss function after each epoch                                                                                                                  
+            # Print("Metrics names: %s" %(model_comb.metrics_names), True) 
+            # Metrics names: ['loss', 'sequential_1_loss', 'sequential_2_loss']
+            TrainLosses["L_f - L_r"].append(l_train[0][None][0])
+            TrainLosses["L_f"].append(l_train[1][None][0])
+            TrainLosses["L_r"].append(-l_train[2][None][0])
+
+            ValLosses["L_f - L_r"].append(l_val[0][None][0])
+            ValLosses["L_f"].append(l_val[1][None][0])
+            ValLosses["L_r"].append(-l_val[2][None][0])
+
+            if (opts.epochs < 10) or (i % (opts.epochs/10) == 0):
+                lf  = l_val[1][None][0]
+                lr  = -l_val[2][None][0]
+                lfr = l_val[0][None][0]
+                Print("=== Epoch: %s / %s. Losses: Lf = %.3f, Lr = %.3f, (L_f - L_r) = %.3f" % (i, opts.epochs, lf, lr, lfr), False)
+                # Save the model every "opts.epochs/10" epochs
+                if i > 0:#(opts.epochs >= 100):                    
+                    SaveTheModel(model_clf, i)
+                    PlotLossFunction(TrainLosses, ValLosses, i, opts.saveDir)
+
+            # Fit Classifier (with updated weights) to minimize joint loss function                                                                                                  
+            make_trainable(model_reg, False)
+            make_trainable(model_clf, True)
+            indices = numpy.random.permutation(len(X_train))[:opts.batchSize]
+
+            # Train and test on a batch                                                                                                                                              
+            model_comb.train_on_batch(X_train[indices], [Y_train[indices], Z_train[indices]])
+            model_comb.test_on_batch(X_test[indices], [Y_test[indices], Z_test[indices]])
+
+            # Fit Regressor (with updated weights) to minimize Lr                                                                                                                    
+            make_trainable(model_reg, True)
+            make_trainable(model_clf, False)
+            model_adv.fit(X_train, Z_train, validation_data=(X_test, Z_test), batch_size=opts.batchSize, epochs=1, callbacks=callbacks, verbose=opts.debug)
+    else: #lambda == 0
+        make_trainable(model_clf, True)
+        hist = model_clf.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=opts.batchSize, epochs=opts.epochs, callbacks=callbacks, verbose=opts.debug)
+
+    # Last epoch
+    last_epoch = earlystop.stopped_epoch
+    if (last_epoch == 0):
+        last_epoch = opts.epochs
+    epochList     = range(last_epoch)
 
     # Plot the input variables
     if opts.plotInputs:
@@ -964,48 +861,26 @@ def main(opts):
             # Make the plots
             func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg")   , opts.saveFormats, pType="sigVbkg"   , standardise=std_)
             func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest"), opts.saveFormats, pType="trainVtest", standardise=std_)
-            if opts.decorrelate != None:
-                func.PlotInputs(sigList  , bkgList , var, "%s/%s" % (opts.saveDir, "sigVbkg_weighted")   , opts.saveFormats, pType="sigVbkg"   , standardise=std_, w1=weights["sig"], w2=weights["bkg"])
-                func.PlotInputs(trainList, testList, var, "%s/%s" % (opts.saveDir, "trainVtest_weighted"), opts.saveFormats, pType="trainVtest", standardise=std_, w1=W_train, w2=W_test)
 
-    # Write the model
-    modelName = "model_trained.h5"
-    myModel.save(os.path.join(opts.saveDir,  modelName) )
-        
-    # Serialize model to JSON (contains arcitecture of model)
-    model_json = myModel.to_json() # myModel.to_yaml()
-    with open(opts.saveDir + "/model_architecture.json", "w") as json_file:
-        json_file.write(model_json)
-    # Serialize weights to HDF5
-    myModel.save_weights(os.path.join(opts.saveDir, 'model_weights.h5'), overwrite=True)
-    myModel.save(os.path.join(opts.saveDir, modelName))
-        
-    # Write weights and architecture in txt file
-    modelFilename = os.path.join(opts.saveDir, "model.txt")
-    Print("Writing the model (weights and architecture) in the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
-    func.WriteModel(myModel, model_json, opts.inputList, scaler_attributes, modelFilename, verbose=False)
-
-    # Write scaler
-    if (opts.standardise):
-        scalerFilename = os.path.join(opts.saveDir, "scaler.save")
-        joblib.dump(scaler_all, scalerFilename)
+    # Save the model
+    SaveTheModel(model_clf, last_epoch)
 
     #https://keras.io/visualization/
     #https://machinelearningmastery.com/display-deep-learning-model-training-history-in-keras/
-    molelFilename = modelFilename.replace(".txt", ".png")
-    Print("plot a graph of the model and save it to the file %s" % (hs + os.path.basename(modelFilename) + ns), True)
     if "fnal" not in opts.hostname:
         from keras.utils import plot_model
-        plot_model(myModel, to_file=modelFilename)
-
+        modelFilename = "model.png"
+        print molelFilename
+        Print("plot a graph of the model and save it to the file %s" % (hs + os.path.basename(modelFilename) + ns), True)    
+        plot_model(model_clf, to_file=modelFilename)
 
     # Produce method score (i.e. predict output value for given input dataset). Computation is done in batches.
     # https://stackoverflow.com/questions/49288199/batch-size-in-model-fit-and-model-predict
     Print("Generating output predictions (numpy arrays) for the input samples", True)
-    pred_train  = myModel.predict(X_train, batch_size=None, verbose=1, steps=None) # DNN output for training data (for both signal & bkg)
-    pred_test   = myModel.predict(X_test , batch_size=None, verbose=1, steps=None) # DNN output for test data (for both signal & bkg)
-    pred_signal = myModel.predict(X_sig  , batch_size=None, verbose=1, steps=None) # DNN output for signal only (all data)
-    pred_bkg    = myModel.predict(X_bkg  , batch_size=None, verbose=1, steps=None) # DNN output for data only (all data)
+    pred_train  = model_clf.predict(X_train, batch_size=None, verbose=1, steps=None) # DNN output for training data (for both signal & bkg)
+    pred_test   = model_clf.predict(X_test , batch_size=None, verbose=1, steps=None) # DNN output for test data (for both signal & bkg)
+    pred_signal = model_clf.predict(X_sig  , batch_size=None, verbose=1, steps=None) # DNN output for signal only (all data)
+    pred_bkg    = model_clf.predict(X_bkg  , batch_size=None, verbose=1, steps=None) # DNN output for data only (all data)
 
     # Join a sequence of arrays (X and Y) along an existing axis (1). In other words, add the ouput variable (Y) to the input variables (X)
     XY_train = numpy.concatenate((X_train, Y_train), axis=1)
@@ -1021,10 +896,10 @@ def main(opts):
     X_test_B  = XY_test[XY_test[:,nInputs] == 0];   X_test_B  = X_test_B[:,0:nInputs]
     
     # Produce method score for signal (training and test) and background (training and test)
-    pred_train_S =  myModel.predict(X_train_S, batch_size=None, verbose=1, steps=None)
-    pred_train_B =  myModel.predict(X_train_B, batch_size=None, verbose=1, steps=None)
-    pred_test_S  =  myModel.predict(X_test_S , batch_size=None, verbose=1, steps=None)
-    pred_test_B  =  myModel.predict(X_test_B , batch_size=None, verbose=1, steps=None)
+    pred_train_S =  model_clf.predict(X_train_S, batch_size=None, verbose=1, steps=None)
+    pred_train_B =  model_clf.predict(X_train_B, batch_size=None, verbose=1, steps=None)
+    pred_test_S  =  model_clf.predict(X_test_S , batch_size=None, verbose=1, steps=None)
+    pred_test_B  =  model_clf.predict(X_test_B , batch_size=None, verbose=1, steps=None)
 
     # Inform user of early stop
     stopEpoch = earlystop.stopped_epoch
@@ -1042,17 +917,8 @@ def main(opts):
     func.PlotAndWriteJSON(pred_train_S, pred_train_B, opts.saveDir, "OutputTrain"  , jsonWr, opts.saveFormats, **GetKwargs("OutputTrain")) # DNN score (training) : Sig Vs Bkg
     func.PlotAndWriteJSON(pred_test_S , pred_test_B , opts.saveDir, "OutputTest"   , jsonWr, opts.saveFormats, **GetKwargs("OutputTest" )) # DNN score (predicted): Sig Vs Bkg  
 
-    # Scale back the data to the original representation
-    if opts.scaleBack:
-        msg = "Performing inverse-transform (%s) to all variables to get their original representation" % (hs + "scaleBack" + ns)
-        Print(msg, True)
-        df_sig   = func.GetOriginalDataFrame(scaler_sig, df_sig, opts.inputList)
-        df_bkg   = func.GetOriginalDataFrame(scaler_bkg, df_bkg, opts.inputList)
-        df_all   = func.GetOriginalDataFrame(scaler_all, df_all, opts.inputList)
-        dset_all = df_all.values
-
     rocDict = {}
-    WPs     = [float(x)/float(40) for x in range(0, 40, 1)]
+    WPs     = [float(x)/float(40) for x in range(0, 40, 1)] 
 
     # For-loop: All branches to be plotted for various DNN score cuts (v. slow, especially for large number of "entrystop")
     for i, var in enumerate(opts.inputList, 0):
@@ -1140,14 +1006,24 @@ def main(opts):
     func.PlotTGraph(xVals, xErrs, sig_def, effErrs_B, opts.saveDir, "SignificanceA", jsonWr, opts.saveFormats, **GetKwargs("significance") )
     func.PlotTGraph(xVals, xErrs, sig_alt, effErrs_B, opts.saveDir, "SignificanceB", jsonWr, opts.saveFormats, **GetKwargs("significance") )
 
-    # Plot some metrics
+    # Plot Loss functions
     xErr = [0.0 for i in range(0, opts.epochs)]
     yErr = [0.0 for i in range(0, opts.epochs)]
-    func.PlotTGraph(epochList[0:opts.epochs], xErr, trainLossList[0:opts.epochs-1], yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
-    func.PlotTGraph(epochList[0:opts.epochs], xErr, trainAccList[0:opts.epochs-1] , yErr , opts.saveDir, "TrainAccuracy", jsonWr, opts.saveFormats, **GetKwargs("acc") )
-    func.PlotTGraph(epochList[0:opts.epochs], xErr, valLossList[0:opts.epochs-1]  , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
-    func.PlotTGraph(epochList[0:opts.epochs], xErr, valAccList[0:opts.epochs-1]   , yErr , opts.saveDir, "ValAccuracy"  , jsonWr, opts.saveFormats, **GetKwargs("acc") )
-        
+    
+    # === Loss function vs # epoch                                                                                                                                                   
+    if (opts.lam > 0):
+        func.PlotTGraph(epochList, xErr, TrainLosses["L_f"]      , yErr , opts.saveDir, "TrainLossClf"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        func.PlotTGraph(epochList, xErr, ValLosses["L_f"]        , yErr , opts.saveDir, "ValLossClf"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        func.PlotTGraph(epochList, xErr, TrainLosses["L_r"]      , yErr , opts.saveDir, "TrainLossReg"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        func.PlotTGraph(epochList, xErr, ValLosses["L_r"]        , yErr , opts.saveDir, "ValLossReg"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        func.PlotTGraph(epochList, xErr, TrainLosses["L_f - L_r"], yErr , opts.saveDir, "TrainLossComb"   , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        func.PlotTGraph(epochList, xErr, ValLosses["L_f - L_r"]  , yErr , opts.saveDir, "ValLossComb"     , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        PlotLossFunction(TrainLosses, ValLosses, last_epoch, opts.saveDir)
+    else:
+        func.PlotTGraph(epochList, xErr, hist.history['loss'][0:last_epoch]     , yErr , opts.saveDir, "TrainLoss"    , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        func.PlotTGraph(epochList, xErr, hist.history['val_loss'][0:last_epoch] , yErr , opts.saveDir, "ValLoss"      , jsonWr, opts.saveFormats, **GetKwargs("loss") )
+        PlotLossFunction(hist.history, hist.history, last_epoch, opts.saveDir)
+    
     # Plot ROC curve
     gSig  = func.GetROC(htest_s, htest_b)
     gDict = {"graph" : [gSig], "name" : [os.path.basename(opts.saveDir)]}
@@ -1186,26 +1062,29 @@ if __name__ == "__main__":
     
     # Default Settings
     #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var.root"               #  92 000
-    #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root"  # 460 000
-    ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root"  # 875 000
+    ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_6Jets_2BJets.root"  # 460 000
+    #ROOTFILENAME = "/uscms_data/d3/aattikis/workspace/pseudomulticrab/Keras/TopTagger/histograms-TT_19var_5Jets_1BJets.root"  # 875 000
     NOTBATCHMODE = False
     SAVEDIR      = None
-    SAVEFORMATS  = "png"
+    SAVEFORMATS  = "png,pdf"
     URL          = False
     STANDARDISE  = None
-    SCALEBACK    = False
-    DECORRELATE  = None
     ENTRYSTOP    = None
     VERBOSE      = False
+    DEBUG        = False
     RNDSEED      = 1234
     EPOCHS       = 100
     BATCHSIZE    = None  # See: http://stats.stackexchange.com/questions/153531/ddg#153535
-    ACTIVATION   = "relu" # "relu" or PReLU" or "LeakyReLU"
-    NEURONS      = "36,19,1"
+    LAMBDA       = 10
+    ACTIV_CLF    = 'relu,relu,relu,sigmoid'
+    ACTIV_REG    = 'tanh,relu'
+    NEURONS_CLF  = '32,32,32,1'
+    NEURONS_REG  = '16,1'
+    LOSS_REG     = 'msle'
+    LOSS_CLF     = 'binary_crossentropy'
     LOG          = False
     GRIDX        = False
     GRIDY        = False
-    LOSSFUNCTION = 'binary_crossentropy'
     OPTIMIZER    = 'adam'
     CFGJSON      = "config.json"
     RESULTSJSON  = "results.json"
@@ -1219,17 +1098,13 @@ if __name__ == "__main__":
     parser.add_option("--notBatchMode", dest="notBatchMode", action="store_true", default=NOTBATCHMODE, 
                       help="Disable batch mode (opening of X window) [default: %s]" % NOTBATCHMODE)
 
-    parser.add_option("--decorrelate", dest="decorrelate", default=DECORRELATE,
-                      help="Calculate weights to decorrelate a variable from the training. This is done by reweighting the branches so that signal and background have similar mass distributions [default: %s]" % DECORRELATE)
-
     parser.add_option("--standardise", dest="standardise", default=STANDARDISE,
                       help="Standardizing a dataset involves rescaling the distribution of INPUT values so that the mean of observed values is 0 and the standard deviation is 1 (e.g. StandardScaler) [default: %s]" % STANDARDISE)
 
-    parser.add_option("--scaleBack", dest="scaleBack", action="store_true", default=SCALEBACK,
-                      help="Scale back the data to the original representation (before the standardisation). i.e. Performing inverse-transform to all variables to get their original representation. [default: %s]" % SCALEBACK)
-
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE, 
                       help="Enable verbose mode (for debugging purposes mostly) [default: %s]" % VERBOSE)
+
+    parser.add_option("--debug", dest="debug", action="store_true", default=DEBUG, help="Enable debugging mode [default: %s]" % DEBUG)
 
     parser.add_option("--plotInputs", dest="plotInputs", action="store_true", default=PLOTINPUTS, 
                       help="Enable plotting of input variables [default: %s]" % PLOTINPUTS)
@@ -1261,20 +1136,29 @@ if __name__ == "__main__":
     parser.add_option("--batchSize", dest="batchSize", type=int, default=BATCHSIZE,
                       help="The \"batch size\" to be used (= a number of samples processed before the model is updated). Batch size impacts learning significantly; typically networks train faster with mini-batches. However, the batch size has a direct impact on the variance of gradients (the larger the batch the better the appoximation and the larger the memory usage). [default: %s]" % BATCHSIZE)
 
-    parser.add_option("--activation", dest="activation", type="string", default=ACTIVATION,
-                      help="Type of transfer function that will be used to map the output of one layer to another [default: %s]" % ACTIVATION)
+    parser.add_option("--lam",dest="lam",  default=LAMBDA,  type = int,   help="Lambda (Default: %s)" % LAMBDA)
+    
+    parser.add_option("--loss_reg", dest="loss_reg",  default=LOSS_REG,   help="Regressor loss function (Default: %s)" % LOSS_REG)
 
-    parser.add_option("--neurons", dest="neurons", type="string", default=NEURONS,
-                      help="List of neurons to use for each sequential layer (comma-separated integers)  [default: %s]" % NEURONS)
+    parser.add_option("--loss_clf", dest="loss_clf",  default=LOSS_CLF,   help="Classifier loss function (Default: %s)" % LOSS_CLF)
+
+    parser.add_option("--activ_clf",dest="activ_clf", type="string", default=ACTIV_CLF,
+                      help="List of activation functions of the classifier (comma-separated) [default: %s]" % ACTIV_CLF)
+
+    parser.add_option("--activ_reg", dest="activ_reg", type="string", default=ACTIV_REG,
+                      help="List of activation functions of the regressor (comma-separated) [default: %s]" % ACTIV_REG)
+
+    parser.add_option("--neurons_clf", dest="neurons_clf", type="string", default=NEURONS_CLF,
+                      help="List of neurons to use for each classification layer (comma-separated integers)  [default: %s]" % NEURONS_CLF)
+
+    parser.add_option("--neurons_reg", dest="neurons_reg", type="string", default=NEURONS_REG,
+                      help="List of neurons to use for each regression layer (comma-separated integers)  [default: %s]" % NEURONS_REG)
 
     parser.add_option("--inputVariables", dest="inputVariables", type="string", default=INPUTVARS,
                       help="List of input variables (TBranches) to use for the classifier (comma-separated integers)  [default: %s]" % INPUTVARS)
     
     parser.add_option("--entrystop", dest="entrystop", type="int", default=ENTRYSTOP,
                       help="Entry at which the (TBranch of TTree) reading stops. If ROOT file itoo big it may result to a \"memory error\", depending on the resources available in the machine used.  If \"None\", stop at the end of the branch. [default: %s]" % ENTRYSTOP)
-
-    parser.add_option("--lossFunction", dest="lossFunction", type="string", default=LOSSFUNCTION,
-                      help="One of the two parameters required to compile a model. The weights will take on values such that the loss function is minimized [default: %s]" % LOSSFUNCTION)
 
     parser.add_option("--optimizer", dest="optimizer", type="string", default=OPTIMIZER,
                       help="Name of optimizer function; one of the two parameters required to compile a model: [default: %s]" % OPTIMIZER)
@@ -1302,50 +1186,67 @@ if __name__ == "__main__":
         opts.saveFormats = opts.saveFormats.split(",")
     else:
         opts.saveFormats = [opts.saveFormats]
-    #opts.saveFormats = ["." + s for s in opts.saveFormats]
     opts.saveFormats = [s for s in opts.saveFormats]
     Verbose("Will save all output in %d format(s): %s" % (len(opts.saveFormats), ss + ", ".join(opts.saveFormats) + ns), True)
 
     # Create specification lists
-    if "," in opts.activation:
-        opts.activation = opts.activation.split(",")
+    print "=== Classifier"
+    if "," in opts.activ_clf:
+        opts.activ_clf = opts.activ_clf.split(",")
     else:
-        opts.activation = [opts.activation]
-    Verbose("Activation = %s" % (opts.activation), True)
-    if "," in opts.neurons:
-        opts.neurons = list(map(int, opts.neurons.split(",")) )
+        opts.activ_clf = [opts.activ_clf]
+    Print("Activation = %s" % (opts.activ_clf), False)
+    if "," in opts.neurons_clf:
+        opts.neurons_clf = list(map(int, opts.neurons_clf.split(",")) )
     else:
-        opts.neurons = list(map(int, [opts.neurons]))
-    Verbose("Neurons = %s" % (opts.neurons), True)
+        opts.neurons_clf = list(map(int, [opts.neurons_clf]))
+    Print("Neurons = %s" % (opts.neurons_clf), False)
+    
+    print 
+    print "=== Regressor"
+    if "," in opts.activ_reg:
+        opts.activ_reg = opts.activ_reg.split(",")
+    else:
+        opts.activ_reg = [opts.activ_reg]
+    Print("Activation = %s" % (opts.activ_reg), False)
+    if "," in opts.neurons_reg:
+        opts.neurons_reg = list(map(int, opts.neurons_reg.split(",")) )
+    else:
+        opts.neurons_reg = list(map(int, [opts.neurons_reg]))
+    Print("Neurons = %s" % (opts.neurons_reg), False)
+
         
     # Sanity checks (One activation function for each layer)
-    if len(opts.neurons) != len(opts.activation):
-        msg = "The list of neurons (size=%d) is not the same size as the list of activation functions (=%d)" % (len(opts.neurons), len(opts.activation))
+    if len(opts.neurons_clf) != len(opts.activ_clf):
+        msg = "== Classifier: The list of neurons (size=%d) is not the same size as the list of activation functions (=%d)" % (len(opts.neurons_clf), len(opts.activ_clf))
         raise Exception(es + msg + ns)  
+    if len(opts.neurons_reg) != len(opts.activ_reg):
+        msg = "== Regressor: The list of neurons (size=%d) is not the same size as the list of activation functions (=%d)" % (len(opts.neurons_reg), len(opts.activ_reg))
+        raise Exception(es + msg + ns)  
+
     # Sanity check (Last layer)
-    if opts.neurons[-1] != 1:
-        msg = "The number of neurons for the last layer should be equal to 1 (=%d instead)" % (opts.neurons[-1])
+    if opts.neurons_clf[-1] != 1:
+        msg = "Classification: The number of neurons for the last layer should be equal to 1 (=%d instead)" % (opts.neurons_clf[-1])
         raise Exception(es + msg + ns)   
+    if opts.neurons_reg[-1] != 1:
+        msg = "Regression: The number of neurons for the last layer should be equal to 1 (=%d instead)" % (opts.neurons_reg[-1])
+        raise Exception(es + msg + ns)   
+
         #Print(es + msg + ns, True) 
-    if opts.activation[-1] != "sigmoid":
-        msg = "The activation function for the last layer should be set to \"sigmoid\"  (=%s instead)" % (opts.activation[-1])        
-        #raise Exception(es + msg + ns)  #Print(es + msg + ns, True)
+    if opts.activ_clf[-1] != "sigmoid":
+        msg = "Classification: The activation function for the last layer should be set to \"sigmoid\"  (=%s instead)" % (opts.activ_clf[-1])        
         Print(es + msg + ns, True)  #Print(es + msg + ns, True)
 
     # Define dir/logfile names
-    specs = "%dLayers" % (len(opts.neurons))
-    for i,n in enumerate(opts.neurons, 0):
-        specs+= "_%s%s" % (opts.neurons[i], opts.activation[i])
+    specs = "%dLayers" % (len(opts.neurons_clf))
+    for i,n in enumerate(opts.neurons_clf, 0):
+        specs+= "_%s%s" % (opts.neurons_clf[i], opts.activ_clf[i])
     specs+= "_%sEpochs_%sBatchSize" % (opts.epochs, opts.batchSize)
 
     # Input list of discriminatin variables (TBranches)
     opts.inputList = opts.inputVariables.split(",")
     if opts.inputList < 1:
         raise Exception("At least one input variable needed to create the DNN. Only %d provided" % (len(opts.inputList)) )
-    if opts.decorrelate != None:
-        if opts.decorrelate not in opts.inputList:
-            msg = "Cannot apply sample reweighting. The input variable \"%s\" is not in the inputList." % (opts.decorrelate)
-            raise Exception(es + msg + ns)
 
     # Get the current date and time
     now    = datetime.now()
@@ -1355,9 +1256,9 @@ if __name__ == "__main__":
     nTime  = now.strftime("%Hh%Mm%Ss") # w/ seconds
     nDate  = "%s%s%s_%s" % (nDay, nMonth, nYear, nTime)
     if opts.entrystop != None:
-        sName  = "Keras_%s_%s" % (specs, str(opts.entrystop) + "Entrystop")
-    if opts.decorrelate != None:
-        sName += "_%sDecorrelated" % opts.decorrelate
+        sName  = "Adversarial_%s_%s" % (specs, str(opts.entrystop) + "Entrystop")
+    else:
+        sName  = "Adversarial_%s" % (specs)
     if opts.standardise != None:
         scalerTypes = ["Standard", "Robust", "MinMax"]
         if not opts.standardise in scalerTypes:
@@ -1365,11 +1266,11 @@ if __name__ == "__main__":
             raise Exception(es + msg + ns)
         #sName += "_Standardised"
         sName += "_%sScaler" % (opts.standardise)
-        if opts.scaleBack:
-            sName += "_ScaleBack"
 
     # Add the number of input variables
     sName += "_%dInputs" % (len(opts.inputList))
+    # Add the lamda value
+    sName += "_Lamda%s" % (opts.lam)
     # Add the time-stamp last
     sName += "_%s" % (nDate)
     
@@ -1407,26 +1308,35 @@ if __name__ == "__main__":
     actList = ["elu", "softmax", "selu", "softplus", "softsign", "PReLU", "LeakyReLU",
                "relu", "tanh", "sigmoid", "hard_sigmoid", "exponential", "linear"] # Loukas used "relu" for resolved top tagger
     # Sanity checks
-    for a in opts.activation:
+    for a in opts.activ_clf:
         if a not in actList:
-            msg = "Unsupported activation function %s. Please select on of the following:%s\n\t%s" % (opts.activation, ss, "\n\t".join(actList))
+            msg = "Unsupported activation function %s. Please select on of the following:%s\n\t%s" % (a, ss, "\n\t".join(actList))
             raise Exception(es + msg + ns)    
-    
+    for a in opts.activ_reg:
+        if a not in actList:
+            msg = "Unsupported activation function %s. Please select on of the following:%s\n\t%s" % (a, ss, "\n\t".join(actList))
+            raise Exception(es + msg + ns)    
+
     # See https://keras.io/losses/
     lossList = ["binary_crossentropy", "is_categorical_crossentropy",
                 "mean_squared_error", "mean_absolute_error", "mean_absolute_percentage_error", "mean_squared_logarithmic_error", "squared_hinge",
                 "hinge", "categorical_hinge", "logcosh", "huber_loss", "categorical_crossentropy", "sparse_categorical_crossentropy", 
                 "kullback_leibler_divergenc", "poisson", "cosine_proximity"]
     bLossList = ["binary_crossentropy", "is_categorical_crossentropy"]
+    rLossList = ["mse", "mae", "mape", "msle"] #"mean_squared_error", "mean_absolute_error", "mean_absolute_percentage_error", "mean_squared_logarithmic_error"
     # Sanity checks
-    if opts.lossFunction not in lossList:
-        msg = "Unsupported loss function %s. Please select on of the following:%s\n\t%s" % (opts.lossFunction, ss, "\n\t".join(lossList))
+    if opts.loss_clf not in lossList:
+        msg = "Unsupported loss function %s. Please select on of the following:%s\n\t%s" % (opts.loss_clf, ss, "\n\t".join(lossList))
         raise Exception(es + msg + ns)    
-    elif opts.lossFunction not in bLossList:
+    elif opts.loss_clf not in bLossList:
         msg = "Binary output currently only supports the following loss fucntions: %s" % ", ".join(bLossList)
         raise Exception(es + msg + ns)
     else:
         pass
+
+    if opts.loss_reg not in lossList + rLossList:
+        msg = "Unsupported loss function %s. Please select on of the following:%s\n\t%s" % (opts.loss_reg, ss, "\n\t".join(lossList))
+        raise Exception(es + msg + ns)    
 
     # See https://keras.io/optimizers/. Also https://www.dlology.com/blog/quick-notes-on-how-to-choose-optimizer-in-keras/
     optList = ["sgd", "rmsprop", "adagrad", "adadelta", "adam", "adamax", "nadam"]
@@ -1436,7 +1346,7 @@ if __name__ == "__main__":
         raise Exception(es + msg + ns)    
 
     # Determine and check the number of layers
-    checkNumberOfLayers(opts)
+    #checkNumberOfLayers(opts)
 
     # Get some basic information
     opts.keras      = keras.__version__
@@ -1452,10 +1362,6 @@ if __name__ == "__main__":
     Print("Using Keras %s" % (hs + opts.keras + ns), False)
     Print("Using Tensorflow %s" % (hs + opts.tensorflow + ns), False)
 
-    # Sanity check
-    if not opts.standardise:
-        opts.scaleBack = False
-
     main(opts)
 
     Print("Directory %s created" % (ls + opts.saveDir + ns), True)
@@ -1466,4 +1372,4 @@ if __name__ == "__main__":
         log_file.close()
 
     if opts.notBatchMode:
-        raw_input("=== sequential.py: Press any key to quit ROOT ...")
+        raw_input("=== adversarial.py: Press any key to quit ROOT ...")

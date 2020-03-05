@@ -54,7 +54,7 @@ def createLegend(xMin=0.62, yMin=0.79, xMax=0.92, yMax=0.92):
 #================================================================================================ 
 # Class Definitions
 #================================================================================================ 
-class SystTopBDTNormalizationManager:
+class SystTopMVANormalizationManager:
     '''
     Base class for QCD measurement normalization from which specialized algorithm classes inherit
     '''

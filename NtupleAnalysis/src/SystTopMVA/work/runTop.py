@@ -151,9 +151,13 @@ def main():
     allSelections.SystTopMVASelection.MVACutValue = 0.40
     allSelections.TopSelectionMVA.TopMVACutValue  = 0.40
     
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.75 #SemiLeptonic - signalEffic = 0.93
+    #allSelections.TopSelectionMVA.TopMVACutDirection  = ">="
+    #allSelections.TopSelectionMVA.WeightFile          = "semiLeptonic.txt"
+    #allSelections.TopSelectionMVA.TopMVAalgo          = "NN"
     # MVA MisID SF
     MisIDSF = PSet(
-        MisIDSFJsonName = "topMisID_BDT0p40_TopMassCut400.json",
+        MisIDSFJsonName = "topMisID_BDT0p40_TopMassCut400.json", #"topMisID_MVA0p73_TopMassCut400.json"
         ApplyMisIDSF    = False, 
         )
     
@@ -304,7 +308,7 @@ if __name__ == "__main__":
     NEVTS         = -1
     HISTOLEVEL    = "Debug" #"Informative" #"Debug"
     PUREWEIGHT    = True
-    TOPPTREWEIGHT = True
+    TOPPTREWEIGHT = False
     DOSYSTEMATICS = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")

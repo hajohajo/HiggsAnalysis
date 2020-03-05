@@ -23,6 +23,7 @@ import tensorflow as tf
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Flatten, Input
 from sklearn.preprocessing import MinMaxScaler
+from keras.models import load_model
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
 import keras.backend as K
@@ -94,7 +95,7 @@ def make_loss_R(c):
 
 #Main
 # Definitions
-filename = "histograms-TT_19var.root"
+filename = "histograms-TT_19var_6Jets_2BJets_14Nov2019.root"
 tfile    = ROOT.TFile.Open(filename)
 debug    = 0
 seed     = 1234
@@ -125,8 +126,8 @@ inputList = getInputs()
 nInputs = len(inputList)
 
 #Signal and background dataframes
-df_signal     = signal.pandas.df(inputList)
-df_background = background.pandas.df(inputList)
+df_signal     = signal.pandas.df(inputList, entrystop=600000)
+df_background = background.pandas.df(inputList, entrystop=600000)
 
 nsignal = len(df_signal.index)
 print "=== Number of signal events: ", nsignal
@@ -157,7 +158,7 @@ numpy.random.seed(seed)
 X_train, X_test, Y_train, Y_test, target_train, target_test = train_test_split(
     X, Y, target, test_size=0.5, random_state=seed, shuffle=True)
 
-
+'''
 inputs = Input(shape=(X_train.shape[1],))
 Dx = Dense(32, activation=opt.act1)(inputs)
 Dx = Dense(32, activation=opt.act2)(Dx)
@@ -172,7 +173,7 @@ D.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=10, verbose=1)
 y_predD = D.predict(X_test)
 for i in range(20):
     print("Predicted=%s (%s)"% (target_test[i], y_predD[i]))
-
+'''
 ###################################################
 #Pretraining
 ###################################################
@@ -183,10 +184,19 @@ Dx = Dense(32, activation=opt.act1)(inputs)
 Dx = Dense(32, activation=opt.act2)(Dx)
 Dx = Dense(32, activation=opt.act3)(Dx)
 Dx = Dense(1, activation='sigmoid')(Dx)
-D = Model(inputs=[inputs], outputs=[Dx])
 
+D = Model(inputs=[inputs], outputs=[Dx])
+D.compile(loss="binary_crossentropy", optimizer="adam")
+D.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=10, verbose=1)
+# D = load_model("preModel.h5")
+# D.compile(loss="binary_crossentropy", optimizer="adam")
+#D.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=10, verbose=1)
+#D.save("preModel.h5")
+y_predD = D.predict(X_test)
 inp_target = Input(shape=(y_predD.shape[1],))
-Rx = Dense(16, activation=opt.act4)(inp_target) #epochs = 10, dense = 16
+Rx = Dense(32, activation=opt.act4)(inp_target) #epochs = 10, dense = 16
+Rx = Dense(32, activation=opt.act5)(Rx) #epochs = 10, dense = 16
+Rx = Dense(32, activation=opt.act5)(Rx) #epochs = 10, dense = 16
 Rx = Dense(1, activation = opt.act5)(Rx)
 R = Model(inputs=[inp_target], outputs=[Rx])
 
