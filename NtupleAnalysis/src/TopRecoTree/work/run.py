@@ -22,8 +22,8 @@ EXAMPLE:
 ./run.py -m /uscms_data/d3/skonstan/workspace/multicrab/multicrab_TopSystBDT_v8030_20200213T0455 --noPU -i "TT|M_250|M_500|M_800"
 
 LAST USED:
-./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/ -i --noPU (hadronic selections)
-./run.py -m /uscms_data/d3/skonstan/workspace/multicrab/multicrab_TopSystBDT_v8030_20200213T0455 -i --noPU (semi leptonic selections)
+./run.py -m /uscms_data/d3/aattikis/workspace/multicrab/multicrab_Hplus2tbAnalysis_v8030_20180508T0644/ --noPU (hadronic selections)
+./run.py -m /uscms_data/d3/skonstan/workspace/multicrab/multicrab_TopSystBDT_v8030_20200213T0455 --noPU (semi leptonic selections)
 
 ROOT:
 The available ROOT options for the Error-Ignore-Level are (const Int_t):
