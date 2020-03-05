@@ -34,8 +34,8 @@ METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter&
 METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
   // Event counter for passing selection
-  cSubAll(fEventCounter.addSubCounter("METFilter selection ("+postfix+")", "All events")),
-  cPassedMETFilterSelection(fEventCounter.addCounter("passed METFilter selection ("+postfix+")"))
+  cSubAll(fEventCounter.addSubCounter("METFilter selection " + postfix, "All events")),
+  cPassedMETFilterSelection(fEventCounter.addCounter("E_{T}^{miss} Filter " + postfix))
 {
   initialize(config);
 }

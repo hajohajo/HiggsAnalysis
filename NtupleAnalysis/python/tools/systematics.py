@@ -501,6 +501,7 @@ def getBinningForTetrajetMass(binLevel=0):
 DataMCBinningHToHW = {
     "JetPt"       : [i for i in range(0, 100, 10)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 300, 25)] + [i for i in range(300, 600, 50)] + [600, 700, 800, 1000],
     "MHT"         : [i for i in range(0, 100, 20)] + [i for i in range(100, 200, 25)] + [i for i in range(200, 300, 50)] + [i for i in range(300, 600, 100)] + [600, 700, 800, 1000],
+    "LT"          : [i for i in range(0, 200, 5)] + [i for i in range(200, 300, 10)] + [i for i in range(300, 500, 20)] + [i for i in range(500, 700, 25)] + [i for i in range(700, 1000, 50)],
     "HT"          : [i for i in range(0, 600, 50)] + [i for i in range(600, 800, 50)] + [i for i in range(800, 1100, 100)] + [i for i in range(1100, 1500, 200)],
     "Vertices"    : [i for i in range(0, 40, 5)] + [i for i in range(40, 60, 10)] + [i for i in range(60, 100, 20)] + [i for i in range(100, 150, 50)],
     "Met"         : [i for i in range(0, 100, 20)] + [i for i in range(100, 200, 20)] + [i for i in range(200, 400, 40)] + [i for i in range(400, 500, 50)]  + [i for i in range(600, 800, 100)],
