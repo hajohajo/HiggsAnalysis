@@ -5,6 +5,7 @@
 #include "Framework/interface/ParameterSet.h"
 #include "EventSelection/interface/CommonPlots.h"
 #include "EventSelection/interface/CommonPlots_ttm.h"
+#include "EventSelection/interface/CommonPlots_lt.h"
 #include "DataFormat/interface/Event.h"
 #include "Framework/interface/HistoWrapper.h"
 #include "DataFormat/interface/HLTTau.h"
@@ -171,6 +172,64 @@ TauSelection::TauSelection(const ParameterSet& config, EventCounter& eventCounte
   initialize(config, postfix);
 } 
 
+TauSelection::TauSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix)
+  : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+    bApplyTriggerMatching(config.getParameter<bool>("applyTriggerMatching")),
+    fTriggerTauMatchingCone(config.getParameter<float>("triggerMatchingCone")),
+    fTauPtCut(config.getParameter<float>("tauPtCut")),
+    fTauEtaCut(config.getParameter<float>("tauEtaCut")),
+    fTauLdgTrkPtCut(config.getParameter<float>("tauLdgTrkPtCut")),
+    fTauNprongs(config.getParameter<int>("prongs")),
+    fTauRtauCut(config.getParameter<float>("rtau")),
+    fTauRtauSmallerThanCut(config.getParameter<float>("rtauSmallerThan", 999.0)),
+    fVetoMode(false),
+    // tau trigger SF
+    fTauTriggerSFReader(config.getParameterOptional<ParameterSet>("tauTriggerSF")),
+    // Event counter for passing selection
+    cPassedTauSelection(fEventCounter.addCounter("#tau_{h} " + postfix)),
+    cPassedTauSelectionGenuine(fEventCounter.addCounter("Genuine #tau_{h} " + postfix)),
+    // Sub counters
+    cSubAll(fEventCounter.addSubCounter("tau selection "+postfix, "All events")),
+    cSubPassedTriggerMatching(fEventCounter.addSubCounter("tau selection " + postfix, "Trg")),
+    cSubPassedDecayMode(fEventCounter.addSubCounter("tau selection " + postfix, "DM")),
+    cSubPassedGenericDiscriminators(fEventCounter.addSubCounter("tau selection " + postfix, "Discr")),
+    cSubPassedElectronDiscr(fEventCounter.addSubCounter("tau selection " + postfix, "e-Discr")),
+    cSubPassedMuonDiscr(fEventCounter.addSubCounter("tau selection " + postfix, "#mu-Discr")),
+    cSubPassedPt(fEventCounter.addSubCounter("tau selection " + postfix, "p_{T}")),
+    cSubPassedEta(fEventCounter.addSubCounter("tau selection " + postfix, "#eta")),
+    cSubPassedLdgTrk(fEventCounter.addSubCounter("tau selection " + postfix, "p_{T}^{ldg.trk}")),
+    cSubPassedNprongs(fEventCounter.addSubCounter("tau selection " + postfix, "N-prong")),
+    cSubPassedIsolation(fEventCounter.addSubCounter("tau selection " + postfix, "Isol.")),
+    cSubPassedRtau(fEventCounter.addSubCounter("tau selection " + postfix, "R_{#tau}")),
+    cSubPassedAntiIsolation(fEventCounter.addSubCounter("tau selection " + postfix, "Anti-isolation")),
+    cSubPassedAntiIsolationRtau(fEventCounter.addSubCounter("tau selection " + postfix, "Anti-isolated R_{#tau}")),
+    cSubPassedTauSelectionGenuine(fEventCounter.addSubCounter("tau selection " + postfix, "Genuine #tau_{h}")),
+    cSubPassedTauSelectionMultipleTaus(fEventCounter.addSubCounter("tau selection " + postfix, "Multiple #tau_{h}")),
+    cSubPassedAntiIsolatedTauSelection(fEventCounter.addSubCounter("tau selection " + postfix, "Anti-isolated #tau_{h}")),
+    cSubPassedAntiIsolatedTauSelectionMultipleTaus(fEventCounter.addSubCounter("tau selection " + postfix, "Multiple anti-isolated #tau_{h}"))
+{
+  
+  if(config.exists("tauIdentificationSF"))
+    {
+      // tau identification SF
+      fTauIDSF = config.getParameter<float>("tauIdentificationSF");
+      // tau misidentification SF
+      fEToTauMisIDSFRegion   = assignTauMisIDSFRegion(config, "E");
+      fEToTauMisIDSFValue    = assignTauMisIDSFValue(config, "E");
+      fMuToTauMisIDSFRegion  = assignTauMisIDSFRegion(config, "Mu");
+      fMuToTauMisIDSFValue   = assignTauMisIDSFValue(config, "Mu");
+      fJetToTauMisIDSFRegion = assignTauMisIDSFRegion(config, "Jet");
+      fJetToTauMisIDSFValue  = assignTauMisIDSFValue(config, "Jet");
+    }
+  
+  if(config.exists("tauTriggerSF"))
+    {
+      //  fTauTriggerSFReader = GenericScaleFactor(config.getParameterOptional<ParameterSet>("tauTriggerSF"));
+    }
+  
+  initialize(config, postfix);
+}
+
 TauSelection::TauSelection(const ParameterSet& config, const std::string& postfix)
 : BaseSelection(),
   bApplyTriggerMatching(config.getParameter<bool>("applyTriggerMatching")),
@@ -295,16 +354,23 @@ TauSelection::Data TauSelection::analyze(const Event& event) {
   TauSelection::Data data = privateAnalyze(event);
 
   // Send data to CommonPlots
-  if (fCommonPlots != nullptr) {
-    fCommonPlots->fillControlPlotsAtTauSelection(event, data);
-    fCommonPlots->fillControlPlotsAfterTauSelection(event, data);
-  }
-  // Return data
-  if (fCommonPlots_ttm != nullptr) {
-    fCommonPlots_ttm->fillControlPlotsAtTauSelection(event, data);
-    fCommonPlots_ttm->fillControlPlotsAfterTauSelection(event, data);
-  }
+  if (fCommonPlots != nullptr) 
+    {
+      fCommonPlots->fillControlPlotsAtTauSelection(event, data);
+      fCommonPlots->fillControlPlotsAfterTauSelection(event, data);
+    }
 
+  if (fCommonPlots_ttm != nullptr) 
+    {
+      fCommonPlots_ttm->fillControlPlotsAtTauSelection(event, data);
+      fCommonPlots_ttm->fillControlPlotsAfterTauSelection(event, data);
+    }
+
+  if (fCommonPlots_lt != nullptr) 
+    {
+      fCommonPlots_lt->fillControlPlotsAtTauSelection(event, data);
+      fCommonPlots_lt->fillControlPlotsAfterTauSelection(event, data);
+    }
 
   return data;
 }
@@ -439,114 +505,123 @@ TauSelection::Data TauSelection::privateAnalyze(const Event& event) {
   std::sort(output.fAntiIsolatedTaus.begin(), output.fAntiIsolatedTaus.end());
   
   // Fill data object
-  if (output.fSelectedTaus.size()) {
-    output.fRtau = output.getSelectedTau().rtau();
-    if (event.isMC()) {
-      output.fIsGenuineTau = output.getSelectedTau().isGenuineTau();
+  if (output.fSelectedTaus.size())
+    {
+      output.fRtau = output.getSelectedTau().rtau();
+      if (event.isMC()) output.fIsGenuineTau = output.getSelectedTau().isGenuineTau();
     }
-  }
-  if (output.fAntiIsolatedTaus.size()) {
-    output.fRtauAntiIsolatedTau = output.getAntiIsolatedTau().rtau();
-    if (event.isMC()) {
-      output.fIsGenuineTauAntiIsolatedTau = output.getAntiIsolatedTau().isGenuineTau();
+  
+  if (output.fAntiIsolatedTaus.size()) 
+    {
+      output.fRtauAntiIsolatedTau = output.getAntiIsolatedTau().rtau();
+      if (event.isMC()) output.fIsGenuineTauAntiIsolatedTau = output.getAntiIsolatedTau().isGenuineTau();
     }
-  }
-  if (fCommonPlots != nullptr && output.fAntiIsolatedTaus.size()) {
+
+  if (fCommonPlots != nullptr && output.fAntiIsolatedTaus.size()) 
+    {
       fCommonPlots->fillControlPlotsAfterAntiIsolatedTauSelection(event, output);
-  }
-  if (fCommonPlots_ttm != nullptr && output.fAntiIsolatedTaus.size()) {
+    }
+  
+  if (fCommonPlots_ttm != nullptr && output.fAntiIsolatedTaus.size()) 
+    {
       fCommonPlots_ttm->fillControlPlotsAfterAntiIsolatedTauSelection(event, output);
-  }
+    }
+
+  if (fCommonPlots_lt != nullptr && output.fAntiIsolatedTaus.size()) 
+    {
+      fCommonPlots_lt->fillControlPlotsAfterAntiIsolatedTauSelection(event, output);
+    }
 
   // Fill Nprongs matrix plots
-  if (event.isMC()) {
-    if (output.fSelectedTaus.size()) {
-      // Isolated genuine tau exists
-      if (output.isGenuineTau()) {
-        hNprongsMatrixForAllAfterIsolation->Fill(output.getSelectedTau().mcNProngs(), output.getSelectedTau().nProngs());
-        if (output.getSelectedTau().isFromOtherSource()) {
-          hNprongsMatrixForBmesonsAfterIsolation->Fill(output.getSelectedTau().mcNProngs(), output.getSelectedTau().nProngs());
-        }
-      }
-    } else if (output.fAntiIsolatedTaus.size()) {
-      // No isolated tau, but isolated genuine tau(s) exist
-      if (output.getAntiIsolatedTauIsGenuineTau()) {
-        hNprongsMatrixForAllAfterAntiIsolation->Fill(output.getAntiIsolatedTau().mcNProngs(), output.getAntiIsolatedTau().nProngs());
-        if (output.getAntiIsolatedTau().isFromOtherSource()) {
-          hNprongsMatrixForBmesonsAfterAntiIsolation->Fill(output.getAntiIsolatedTau().mcNProngs(), output.getAntiIsolatedTau().nProngs());
-        }
-      }
+  if (event.isMC()) 
+    {
+
+      if (output.fSelectedTaus.size()) 
+	{
+	  // Isolated genuine tau exists
+	  if (output.isGenuineTau()) 
+	    {
+	      hNprongsMatrixForAllAfterIsolation->Fill(output.getSelectedTau().mcNProngs(), output.getSelectedTau().nProngs());
+	      if (output.getSelectedTau().isFromOtherSource()) 
+		{
+		  hNprongsMatrixForBmesonsAfterIsolation->Fill(output.getSelectedTau().mcNProngs(), output.getSelectedTau().nProngs());
+		}
+	    }
+	}
+      else if (output.fAntiIsolatedTaus.size()) 
+	{
+	  // No isolated tau, but isolated genuine tau(s) exist
+	  if (output.getAntiIsolatedTauIsGenuineTau()) 
+	    {
+	      hNprongsMatrixForAllAfterAntiIsolation->Fill(output.getAntiIsolatedTau().mcNProngs(), output.getAntiIsolatedTau().nProngs());
+	      if (output.getAntiIsolatedTau().isFromOtherSource()) 
+		{
+		  hNprongsMatrixForBmesonsAfterAntiIsolation->Fill(output.getAntiIsolatedTau().mcNProngs(), output.getAntiIsolatedTau().nProngs());
+		}
+	    }
+	}
     }
-  }
+
   // Set tau identification SF value to data object
-  if (event.isMC()) {
-    setTauIDSFValue(output);
-  }
+  if (event.isMC()) setTauIDSFValue(output);
 
   // Set tau misidentification SF value to data object
-  if (event.isMC()) {
-    setTauMisIDSFValue(output);
-  }
-  // Set tau trigger SF value to data object
-  if (event.isMC()) {
-    if (output.hasIdentifiedTaus()) {
-//      cout << "trg sf" << fTauTriggerSFReader.getScaleFactorValue(output.getSelectedTau().pt()) << "\n";
-      output.fTauTriggerSF = fTauTriggerSFReader.getScaleFactorValue(output.getSelectedTau().pt());
-    }
-    if (output.hasAntiIsolatedTaus()) {
-      output.fAntiIsolatedTauTriggerSF = fTauTriggerSFReader.getScaleFactorValue(output.getAntiIsolatedTau().pt());
-    }
-  }
+  if (event.isMC()) setTauMisIDSFValue(output);
 
+  // Set tau trigger SF value to data object
+  if (event.isMC()) 
+    {
+      if (output.hasIdentifiedTaus()) 
+	{
+	  // cout << "trg sf" << fTauTriggerSFReader.getScaleFactorValue(output.getSelectedTau().pt()) << "\n";
+	  output.fTauTriggerSF = fTauTriggerSFReader.getScaleFactorValue(output.getSelectedTau().pt());
+	}
+
+      if (output.hasAntiIsolatedTaus()) 
+	{
+	  output.fAntiIsolatedTauTriggerSF = fTauTriggerSFReader.getScaleFactorValue(output.getAntiIsolatedTau().pt());
+	}
+    }
+  
   // Fill sub-counters
-  if (passedTriggerMatching)
-    cSubPassedTriggerMatching.increment();
-  if (passedDecayMode)
-    cSubPassedDecayMode.increment();
-  if (passedGenericDiscr)
-    cSubPassedGenericDiscriminators.increment();
-  if (passedEdiscr)
-    cSubPassedElectronDiscr.increment();
-  if (passedMuDiscr)
-    cSubPassedMuonDiscr.increment();
-  if (passedPt)
-    cSubPassedPt.increment();
-  if (passedEta)
-    cSubPassedEta.increment();
-  if (passedLdgTrkPt)
-    cSubPassedLdgTrk.increment();
-  if (passedNprongs)
-    cSubPassedNprongs.increment();
-  if (passedIsol)
-    cSubPassedIsolation.increment();
-  if (passedRtau)
-    cSubPassedRtau.increment();
-  if (passedAntiIsol)
-    cSubPassedAntiIsolation.increment();
-  if (passedAntiIsolRtau)
-    cSubPassedAntiIsolationRtau.increment();
+  if (passedTriggerMatching) cSubPassedTriggerMatching.increment();
+  if (passedDecayMode) cSubPassedDecayMode.increment();
+  if (passedGenericDiscr) cSubPassedGenericDiscriminators.increment();
+  if (passedEdiscr) cSubPassedElectronDiscr.increment();
+  if (passedMuDiscr) cSubPassedMuonDiscr.increment();
+  if (passedPt) cSubPassedPt.increment();
+  if (passedEta) cSubPassedEta.increment();
+  if (passedLdgTrkPt) cSubPassedLdgTrk.increment();
+  if (passedNprongs) cSubPassedNprongs.increment();
+  if (passedIsol) cSubPassedIsolation.increment();
+  if (passedRtau) cSubPassedRtau.increment();
+  if (passedAntiIsol) cSubPassedAntiIsolation.increment();
+  if (passedAntiIsolRtau) cSubPassedAntiIsolationRtau.increment();
   if (output.fSelectedTaus.size() > 0 && output.isGenuineTau() )
+    {
     cSubPassedTauSelectionGenuine.increment();
-  if (output.fSelectedTaus.size() > 1)
-    cSubPassedTauSelectionMultipleTaus.increment();
-  if (output.fAntiIsolatedTaus.size() > 0)
-    cSubPassedAntiIsolatedTauSelection.increment();
-  if (output.fAntiIsolatedTaus.size() > 1)
-    cSubPassedAntiIsolatedTauSelectionMultipleTaus.increment();
+    }
+
+  if (output.fSelectedTaus.size() > 1) cSubPassedTauSelectionMultipleTaus.increment();
+  if (output.fAntiIsolatedTaus.size() > 0) cSubPassedAntiIsolatedTauSelection.increment();
+  if (output.fAntiIsolatedTaus.size() > 1) cSubPassedAntiIsolatedTauSelectionMultipleTaus.increment();
 
   // Fill counters
-  if (fVetoMode) {
-    if (output.fSelectedTaus.size() == 0)
-      cPassedTauSelection.increment();
-  } else {
-    if (output.fSelectedTaus.size() > 0){          // if there are selected taus...
-      cPassedTauSelection.increment();
-      if (!event.isMC() or output.fIsGenuineTau) // ...and they are genuine taus (for MC) or data
-        cPassedTauSelectionGenuine.increment();
+  if (fVetoMode) 
+    {
+      if (output.fSelectedTaus.size() == 0) cPassedTauSelection.increment();
     }
-  }
+  else
+    {
+      // if there are selected taus...
+      if (output.fSelectedTaus.size() > 0)
+	{
+	  cPassedTauSelection.increment();
+	  // ...and they are genuine taus (for MC) or data
+	  if (!event.isMC() or output.fIsGenuineTau) cPassedTauSelectionGenuine.increment();
+	}
+    }
 
-  // Return data object
   return output;
 }
 

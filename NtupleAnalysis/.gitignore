@@ -12,3 +12,16 @@ QCDMeasurement_??????_??????
 external
 FrameworkDict_rdict.pcm
 libHPlusAnalysis.so
+FakeBMeasurement*
+Hplus2hwAnalysis*
+datacards_*
+Hplus2tbAnalysis_*
+multicrab_*
+Keras_3Layers*
+Keras_BDTG*
+KinematicsBkg_*
+KinematicsHToHW_*
+TopRecoTree_*
+TauFakeRate_*
+crab.log
+pico.save

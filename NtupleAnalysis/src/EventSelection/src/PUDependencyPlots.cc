@@ -29,35 +29,35 @@ void PUDependencyPlots::book(TDirectory* dir, bool isData) {
   
   TDirectory* myDir = fHistoWrapper.mkdir(level, dir, "PUDependency");
   
-  hNvtxTrg = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxTrg", ";N_{vtx};N_{events}",
+  hNvtxTrg = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxTrg", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxMETFilter = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxMETFilter", ";N_{vtx};N_{events}",
+  hNvtxMETFilter = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxMETFilter", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxVtx = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxVtx", ";N_{vtx};N_{events}",
+  hNvtxVtx = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxVtx", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxTau = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxTau", ";N_{vtx};N_{events}",
+  hNvtxTau = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxTau", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxAntiIsolatedTau = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAntiIsolatedTau", ";N_{vtx};N_{events}",
+  hNvtxAntiIsolatedTau = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAntiIsolatedTau", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxElectronVeto = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxElectronVeto", ";N_{vtx};N_{events}",
+  hNvtxElectronVeto = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxElectronVeto", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxMuonVeto = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxMuonVeto", ";N_{vtx};N_{events}",
+  hNvtxMuonVeto = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxMuonVeto", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxTauVeto = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxTauVeto", ";N_{vtx};N_{events}",
+  hNvtxTauVeto = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxTauVeto", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxJetSelection = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxJetSelection", ";N_{vtx};N_{events}",
+  hNvtxJetSelection = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxJetSelection", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxAngularCutsCollinear = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAngularCutsCollinear", ";N_{vtx};N_{events}",
+  hNvtxAngularCutsCollinear = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAngularCutsCollinear", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxMETSelection = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxMETSelection", ";N_{vtx};N_{events}",
+  hNvtxMETSelection = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxMETSelection", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxBtagging = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxBtagging", ";N_{vtx};N_{events}",
+  hNvtxBtagging = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxBtagging", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxAngularCutsBackToBack = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAngularCutsBackToBack", ";N_{vtx};N_{events}",
+  hNvtxAngularCutsBackToBack = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAngularCutsBackToBack", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxAllSelections = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAllSelections", ";N_{vtx};N_{events}",
+  hNvtxAllSelections = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAllSelections", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
-  hNvtxAllSelectionsWithProbabilisticBtag = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAllSelectionsWithProbabilisticBtag", ";N_{vtx};N_{events}",
+  hNvtxAllSelectionsWithProbabilisticBtag = fHistoWrapper.makeTH<TH1F>(level, myDir, "NvtxAllSelectionsWithProbabilisticBtag", ";vertex multiplicity;Events",
                                         fHistoSettings.bins(), fHistoSettings.min(), fHistoSettings.max());
 }
 

@@ -14,6 +14,7 @@
 class ParameterSet;
 class CommonPlots;
 class Commonplots_ttm;
+class Commonplots_lt;
 class Event;
 class EventCounter;
 class HistoWrapper;
@@ -67,6 +68,7 @@ public:
   /// Constructor with histogramming
   explicit METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix = "");
   explicit METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix = "");
+  explicit METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix = "");
   explicit METSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix = "");
   /// Constructor without histogramming
   explicit METSelection(const ParameterSet& config);
