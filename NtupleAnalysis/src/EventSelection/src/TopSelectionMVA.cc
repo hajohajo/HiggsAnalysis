@@ -1018,6 +1018,7 @@ vector<float> TopSelectionMVA::GetListOfInputs(std::vector<std::string> inputNam
   for (size_t i=0; i < inputNames.size(); i++){
     std::string var = inputNames.at(i);
     if (0) std::cout<<i<<": "<<var<<std::endl;
+    //Old Names!
     if (var == "TrijetPtDR")                   inputs.push_back(TrijetPtDR);
     else if (var == "TrijetDijetPtDR")         inputs.push_back(TrijetDijetPtDR);
     else if (var == "TrijetBjetMass")          inputs.push_back(TrijetBjetMass);
@@ -1037,10 +1038,30 @@ vector<float> TopSelectionMVA::GetListOfInputs(std::vector<std::string> inputNam
     else if (var == "TrijetSubldgJetAxis2")    inputs.push_back(TrijetSubldgJetAxis2);
     else if (var == "TrijetLdgJetMult")        inputs.push_back(TrijetLdgJetMult);
     else if (var == "TrijetSubldgJetMult")     inputs.push_back(TrijetSubldgJetMult);
-    else std::cout<<"=== TopSelectionMVA: Variable "<<var<<" is not one of the input variables!"<<std::endl;
+    // New names
+    else if (var == "trijetPtDR")            inputs.push_back(trijetPtDR);
+    else if (var == "dijetPtDR")             inputs.push_back(dijetPtDR);
+    else if (var == "bjetMass")              inputs.push_back(bjetMass);
+    else if (var == "LdgJetBdisc")           inputs.push_back(LdgJetBdisc);
+    else if (var == "SubldgJetBdisc")        inputs.push_back(SubldgJetBdisc);
+    else if (var == "bjetLdgJetMass")        inputs.push_back(bjetLdgJetMass);
+    else if (var == "bjetSubldgJetMass")     inputs.push_back(bjetSubldgJetMass);
+    else if (var == "trijetMass")            inputs.push_back(trijetMass);
+    else if (var == "dijetMass")             inputs.push_back(dijetMass);
+    else if (var == "bjetBdisc")             inputs.push_back(bjetBdisc);
+    else if (var == "SoftDrop_n2")           inputs.push_back(SoftDrop_n2);
+    else if (var == "LdgJetCombinedCvsL")    inputs.push_back(LdgJetCombinedCvsL);
+    else if (var == "SubldgJetCombinedCvsL") inputs.push_back(SubldgJetCombinedCvsL);
+    else if (var == "LdgJetPtD")             inputs.push_back(LdgJetPtD);
+    else if (var == "SubldgJetPtD")          inputs.push_back(SubldgJetPtD);
+    else if (var == "LdgJetAxis2")           inputs.push_back(LdgJetAxis2);
+    else if (var == "SubldgJetAxis2")        inputs.push_back(SubldgJetAxis2);
+    else if (var == "LdgJetMult")            inputs.push_back(LdgJetMult);
+    else if (var == "SubldgJetMult")         inputs.push_back(SubldgJetMult);
+    else std::cout<<"=== TopSelectionMVA: Input variable "<<var<<" has not been given!"<<std::endl;
   }
 
-  if (inputNames.size() > inputs.size()) std::cout<<"=== TopSelectionMVA: Top tagger takes "<<inputNames.size()<<" inputs  ("<<inputs.size()<<" have been given!)"<<std::endl;
+  if (inputNames.size() > inputs.size()) std::cout<<"=== TopSelectionMVA: Top tagger takes "<<inputNames.size()<<" inputs  ("<<inputs.size()<<"  given!)"<<std::endl;
   return inputs;
 }
 

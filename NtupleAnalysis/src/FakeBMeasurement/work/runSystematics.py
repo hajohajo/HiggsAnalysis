@@ -104,6 +104,7 @@ def main():
     # ================================================================================================
     completeList = GetDatasetCompleteList()
     whiteList    = GetDatasetWhitelist(opts)
+    #whiteList    = GetDatasetCompleteList()
     blackList    = GetDatasetBlackList(completeList, whiteList)
     maxEvents = {}
     for d in whiteList:
@@ -142,6 +143,7 @@ def main():
     # Overwrite Default Settings
     # ================================================================================================
     from HiggsAnalysis.NtupleAnalysis.parameters.hplus2tbAnalysis import allSelections
+    import HiggsAnalysis.NtupleAnalysis.parameters.scaleFactors as scaleFactors
 
     allSelections.verbose = opts.verbose
     allSelections.histogramAmbientLevel = opts.histoLevel
@@ -166,6 +168,17 @@ def main():
     # Overwrite values
     # allSelections.TopSelectionMVA.CSV_bDiscCutDirection  = ">="
     allSelections.TopSelectionMVA.CSV_bDiscCutValue = 0.54 # allow CSVv2-L for inverted top
+
+    #allSelections.TopSelectionMVA.TopMVAalgo          = "NN"
+    #allSelections.TopSelectionMVA.WeightFile = "semiLeptonic.txt"
+    #allSelections.TopSelectionMVA.TopMVACutValue      = 0.75
+
+    #scaleFactors.setupToptagSFInformation(topTagPset                     = allSelections.TopSelectionMVA,
+    #                                      topTagMisidFilename            = "topMisID_MVA0p75_TopMassCut400.json",
+    #                                      topTagEfficiencyFilename       = "toptagEff_MVA_GenuineTT_TopMassCut400.json",
+    #                                      topTagEffUncertaintiesFilename = "toptagEffUncert_GenuineTT_MVA_0p75.json",
+    #                                      direction                      = "nominal",
+    #                                      variationInfo                  = None)
 
     # ================================================================================================
     # Command Line Options
@@ -290,9 +303,9 @@ def GetDatasetCompleteList():
     myCompleteList.append("ChargedHiggs_HplusTB_HplusToTB_M_2500")
     myCompleteList.append("ChargedHiggs_HplusTB_HplusToTB_M_3000")
     #
-    myCompleteList.append("ChargedHiggs_HplusTB_HplusToTB_M_5000")
-    myCompleteList.append("ChargedHiggs_HplusTB_HplusToTB_M_7000")
-    myCompleteList.append("ChargedHiggs_HplusTB_HplusToTB_M_10000")
+    #myCompleteList.append("ChargedHiggs_HplusTB_HplusToTB_M_5000")
+    #myCompleteList.append("ChargedHiggs_HplusTB_HplusToTB_M_7000")
+    #myCompleteList.append("ChargedHiggs_HplusTB_HplusToTB_M_10000")
     #
     myCompleteList.append("ZZTo4Q")
     myCompleteList.append("ZJetsToQQ_HT600toInf")

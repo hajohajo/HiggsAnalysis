@@ -5,7 +5,7 @@
   Simple script to merge the uncertainties JSONs into one JSON file.
   
   USAGE:
-  ./mergeJSONs.py --bdt 0.40
+  ./mergeJSONs.py --mva 0.40
    
 '''
 
@@ -36,7 +36,7 @@ def Verbose(msg, printHeader=True, verbose=False):
 def main(opts):
     
 
-    jsonname = "uncertainties_GenuineTT_BDT_%s.json" % (opts.BDT)
+    jsonname = "toptagEffUncert_GenuineTT_MVA_%s.json" % (opts.MVA)
     merged = open(jsonname, "w")
     
     myList = [opts.mtop, opts.showerScales, opts.highPtRadiation, opts.partonShower, opts.evtGen, opts.matching]
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     PARTONSHOWER    = "uncertainties_partonShower.json"
     EVTGEN          = "uncertainties_evtGen.json"
     MATCHING        = "uncertainties_matching.json"
-    BDT             = "0.4"
+    MVA             = "0.4"
     
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -132,19 +132,19 @@ if __name__ == "__main__":
     parser.add_option("--partonShower", dest="partonShower", action="store", help="Path to the partonShower JSON file", default=PARTONSHOWER)
     parser.add_option("--evtGen", dest="evtGen", action="store", help="Path to the evtGen JSON file", default=EVTGEN)
     parser.add_option("--matching", dest="matching", action="store", help="Path to the matching JSON file", default=MATCHING)
-    parser.add_option("--bdt", dest="BDT", action="store", help="BDT Cut", default=BDT)
+    parser.add_option("--mva", dest="MVA", action="store", help="MVA Cut", default=MVA)
     (opts, parseArgs) = parser.parse_args()
     
-    opts.BDT = opts.BDT.replace('.', 'p')
-    if "-" in opts.BDT:
-        opts.BDT = opts.BDT.replace("-", "m")
+    opts.MVA = opts.MVA.replace('.', 'p')
+    if "-" in opts.MVA:
+        opts.MVA = opts.MVA.replace("-", "m")
     
-    opts.mtop            = "uncertainties_mTop_BDT_%s.json" % (opts.BDT)
-    opts.showerScales    = "uncertainties_showerScales_BDT_%s.json" % (opts.BDT)
-    opts.highPtRadiation = "uncertainties_highPtRadiation_BDT_%s.json" % (opts.BDT)
-    opts.partonShower    = "uncertainties_partonShower_BDT_%s.json" % (opts.BDT)
-    opts.evtGen          = "uncertainties_evtGen_BDT_%s.json" % (opts.BDT)
-    opts.matching        = "uncertainties_matching_BDT_%s.json" %(opts.BDT)
+    opts.mtop            = "uncertainties_mTop_MVA_%s.json" % (opts.MVA)
+    opts.showerScales    = "uncertainties_showerScales_MVA_%s.json" % (opts.MVA)
+    opts.highPtRadiation = "uncertainties_highPtRadiation_MVA_%s.json" % (opts.MVA)
+    opts.partonShower    = "uncertainties_partonShower_MVA_%s.json" % (opts.MVA)
+    opts.evtGen          = "uncertainties_evtGen_MVA_%s.json" % (opts.MVA)
+    opts.matching        = "uncertainties_matching_MVA_%s.json" %(opts.MVA)
     
     if opts.mtop == None or opts.showerScales == None or opts.highPtRadiation == None or opts.partonShower == None or opts.evtGen == None or opts.matching == None:
         Print("Not enough arguments passed to script execution. Printing docstring & EXIT.")
