@@ -310,6 +310,13 @@ def GetHistoKwargs(histoName, opts):
         if "dilepton" in h.lower():
             kwargs["opts"]  = {"xmin": -5.0, "xmax": +5.0, "ymin": _yMin, "ymaxfactor": _yMaxF}            
 
+    if "charge" in h.lower():
+        kwargs["rebinX"] = 1
+        kwargs["xlabel"] = "dilepton charge"
+        kwargs["ylabel"] = "Events / %.0f "
+        kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["moveLegend"] = _legRM #_legNE
+
     if "tausrc" in h.lower():
         kwargs["opts"]   = {"xmax": +20, "ymin": _yMin, "ymaxfactor": _yMaxF}
         #kwargs["opts"]   = {"xmax": +65, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -344,6 +351,11 @@ def GetHistoKwargs(histoName, opts):
         kwargs["rebinX"] = systematics.DataMCBinningHToHW["Vertices"]
         kwargs["units"]  = ""
         kwargs["xlabel"] = "vertex multiplicity"
+        kwargs["divideByBinWidth"] = True
+
+    if "Lt" in h:
+        kwargs["rebinX"] = systematics.DataMCBinningHToHW["LT"]
+        kwargs["units"]  = "GeV"
         kwargs["divideByBinWidth"] = True
 
     if "HT" in h:
@@ -456,12 +468,9 @@ def GetHistoKwargs(histoName, opts):
         kwargs["opts"]       = {"ymin": 1e-1, "ymaxfactor": 10}
         if h == "counter":
             kwargs["moveLegend"] = _legSW
-            xMin =  8.0 # start from trigger (8.0)
-            xMax = 27.0 # using 1 before because blinding fails there
-            kwargs["opts"] = {"xmin": xMin, "xmax": xMax, "ymin": _yMin, "ymax": 5e9}
-            #kwargs["opts"] = {"ymin": _yMin, "ymax": 5e9}
+            xMin = 7.0
+            kwargs["opts"] = {"xmin": xMin, "ymin": 1}#, "ymax": 5e9}
             kwargs["moveLegend"] = _legNE
-            #kwargs["blindingRangeString"] = "0 to 100"
         elif "jet selection" in h:
             kwargs["opts"] = {"xmin": 0.0, "xmax": 7.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         elif "tau selection" in h:
@@ -623,7 +632,7 @@ if __name__ == "__main__":
     parser.add_option("-b", "--batchMode", dest="batchMode", action="store_false", default=BATCHMODE, 
                       help="Enables batch mode (canvas creation does NOT generate a window) [default: %s]" % BATCHMODE)
 
-    parser.add_option("--analysisName", dest="analysisName", type="string", default=ANALYSISNAME,
+    parser.add_option("-a", "--analysisName", dest="analysisName", type="string", default=ANALYSISNAME,
                       help="Override default analysisName [default: %s]" % ANALYSISNAME)
 
     parser.add_option("--ratio", dest="ratio", action="store_true", default=RATIO,
@@ -668,7 +677,7 @@ if __name__ == "__main__":
     parser.add_option("--folder", dest="folder", type="string", default = FOLDER,
                       help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOLDER) )
 
-    parser.add_option("-s", "--saveFormats", dest="saveFormats", default = SAVEFORMATS,
+    parser.add_option("-s", "--saveFormats", dest="formats", default = SAVEFORMATS,
                       help="Save formats for all plots [default: %s]" % SAVEFORMATS)
 
     (opts, parseArgs) = parser.parse_args()
@@ -698,11 +707,11 @@ if __name__ == "__main__":
         opts.signal = "ChargedHiggs_HplusTB_HplusToTB_M_%.0f" % opts.signalMass
 
     # Create save formats
-    if "," in opts.saveFormats:
-        opts.saveFormats = opts.saveFormats.split(",")
+    if "," in opts.formats:
+        opts.saveFormats = opts.formats.split(",")
     else:
-        opts.saveFormats = [opts.saveFormats]
-    opts.saveFormats = ["." + s for s in opts.saveFormats]          
+        opts.saveFormats = [opts.formats]
+    opts.saveFormats = ["." + s for s in opts.saveFormats]
 
     # Call the main function
     main(opts)

@@ -46,12 +46,12 @@ private:
   TauSelection fTauSelection;
   TauSelection fLooseTauSelection;
   Count cTauNCounter;
-  Count cTauSFCounter;
-  Count cFakeTauSFCounter;
   JetSelection fJetSelection;
   BJetSelection fBJetSelection;
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
+  Count cTauSFCounter;
+  Count cFakeTauSFCounter;
   Count cPreselected;
   Count cSelected;
     
@@ -197,19 +197,19 @@ TauFakeRate_mm::TauFakeRate_mm(const ParameterSet& config, const TH1* skimCounte
     cVertexSelection(fEventCounter.addCounter("PV")),
     fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    cLeptonOSCounter(fEventCounter.addCounter("dilepton charge")),
-    cLeptonMassCounter(fEventCounter.addCounter("dilepton mass")),
+    cLeptonOSCounter(fEventCounter.addCounter("Q_{ll}")),
+    cLeptonMassCounter(fEventCounter.addCounter("m_{ll}")),
     // /fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fTauSelection(config.getParameter<ParameterSet>("TauSelection")),
     // fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection")),
     cTauNCounter(fEventCounter.addCounter("#geq 1 loose #tau_{h}")),
-    cTauSFCounter(fEventCounter.addCounter("#tau_{h} SF")),
-    cFakeTauSFCounter(fEventCounter.addCounter("Fake #tau SF")),
     fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection")), //fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cBTaggingSFCounter(fEventCounter.addCounter("b-tag SF")),
     fMETSelection(config.getParameter<ParameterSet>("METSelection")),
+    cTauSFCounter(fEventCounter.addCounter("#tau_{h} SF")),
+    cFakeTauSFCounter(fEventCounter.addCounter("Fake #tau_{h} SF")),
     cPreselected(fEventCounter.addCounter("Preselections")),
     cSelected(fEventCounter.addCounter("Selections"))
 { }
@@ -247,6 +247,9 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   const int   metN   = fCommonPlots.getMetBinSettings().bins();
   const float metMin = fCommonPlots.getMetBinSettings().min();
   const float metMax = fCommonPlots.getMetBinSettings().max();
+  const int   htN    = fCommonPlots.getHtBinSettings().bins();
+  const float htMin  = fCommonPlots.getHtBinSettings().min();
+  const float htMax  = fCommonPlots.getHtBinSettings().max();
   const int dRN      = fCommonPlots.getDeltaRBinSettings().bins();
   const double dRMin = fCommonPlots.getDeltaRBinSettings().min();
   const double dRMax = fCommonPlots.getDeltaRBinSettings().max();
@@ -335,7 +338,7 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hNJet_Preselections             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NJet_Preselections"        , ";jet multiplicity"  , nN  , nMin  , nMax  );
   hNBjet_Preselections            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NBjet_Preselections"       , ";b-jet multiplicity", nN  , nMin  , nMax  );
   hMet_Preselections              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Met_Preselections"         , ";E_{T}^{miss} (GeV)", metN, metMin, metMax);
-  hLt_Preselections               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Lt_Preselections"          , ";L_{T} (GeV)" , metN, metMin, metMax);
+  hLt_Preselections               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Lt_Preselections"          , ";L_{T} (GeV)" , htN, htMin, htMax);
   hDileptonPt_Preselections       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonPt_Preselections"  , ";p_{T} (GeV)" , ptN , ptMin , ptMax );
   hDileptonEta_Preselections      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonEta_Preselections" , ";#eta"        , etaN, etaMin, etaMax);
   hDileptonMass_Preselections     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_Preselections", ";m_{ll} (GeV)", mN  , mMin  , mMax  );
@@ -352,7 +355,7 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hNJet_LooseTau           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NJet_LooseTau"          , ";jet multiplicity"  , nN  , nMin  , nMax  );
   hNBjet_LooseTau          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NBjet_LooseTau"         , ";b-jet multiplicity", nN  , nMin  , nMax  );
   hMet_LooseTau            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Met_LooseTau"           , ";E_{T}^{miss} (GeV)", metN, metMin, metMax);
-  hLt_LooseTau             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Lt_LooseTau"            , ";L_{T} (GeV)" , metN, metMin, metMax);
+  hLt_LooseTau             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Lt_LooseTau"            , ";L_{T} (GeV)" , htN, htMin, htMax);
   hDileptonPt_LooseTau     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonPt_LooseTau"    , ";p_{T} (GeV)" , ptN , ptMin , ptMax );
   hDileptonEta_LooseTau    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonEta_LooseTau"   , ";#eta"        , etaN, etaMin, etaMax);
   hDileptonMass_LooseTau   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_LooseTau"  , ";m_{ll} (GeV)", mN  , mMin  , mMax  );
@@ -365,7 +368,7 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hNJet_TightTau           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NJet_TightTau"          , ";jet multiplicity"  , nN  , nMin  , nMax  );
   hNBjet_TightTau          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NBjet_TightTau"         , ";b-jet multiplicity", nN  , nMin  , nMax  );
   hMet_TightTau            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Met_TightTau"           , ";E_{T}^{miss} (GeV)", metN, metMin, metMax);
-  hLt_TightTau             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Lt_TightTau"            , ";L_{T} (GeV)" , metN, metMin, metMax);
+  hLt_TightTau             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Lt_TightTau"            , ";L_{T} (GeV)" , htN, htMin, htMax);
   hDileptonPt_TightTau     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonPt_TightTau"    , ";p_{T} (GeV)" , ptN , ptMin , ptMax );
   hDileptonEta_TightTau    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonEta_TightTau"   , ";#eta"        , etaN, etaMin, etaMax);
   hDileptonMass_TightTau   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_TightTau"  , ";m_{ll} (GeV)", mN  , mMin  , mMax  );
@@ -455,21 +458,15 @@ void TauFakeRate_mm::process(Long64_t entry) {
   bool bOnZMassBelow      = true; // yes, defualt is "true"
   bool bPassDeltaR        = false;
 
-  // Apply muon trigger scale factors
+  // Apply muon trigger and ID scale factor (SF)
   // https://gitlab.cern.ch/HPlus/HiggsAnalysis/blob/master/NtupleAnalysis/python/parameters/scaleFactors.py
   // https://gitlab.cern.ch/HPlus/HiggsAnalysis/blob/master/NtupleAnalysis/data/TriggerEfficiency/muonPAGEff.json
   if (fEvent.isMC()) 
     {
       fEventWeight.multiplyWeight(muData.getMuonTriggerSF());
-    }
-
-  // Apply muon ID scale factors
-  if (fEvent.isMC()) 
-    {
       fEventWeight.multiplyWeight(muData.getMuonIDSF());
     }
   
-
   // Require the muons to have opposite sign (OS)
   bPassAbsCharge = cfg_DileptonAbsCharge.passedCut( abs(dilepton_charge) );
   if (!bPassAbsCharge) return;
@@ -483,7 +480,7 @@ void TauFakeRate_mm::process(Long64_t entry) {
   if (bOnZMass) cLeptonMassCounter.increment();
 
   // Apply dR cut for dilepton system?
-  bPassDeltaR = cfg_DileptonAbsCharge.passedCut(dilepton_dR);
+  bPassDeltaR = cfg_DileptonDeltaR.passedCut(dilepton_dR);
   if(!bPassDeltaR) return;
 
   // Fill histos
@@ -612,13 +609,12 @@ void TauFakeRate_mm::process(Long64_t entry) {
   if (tauData.hasIdentifiedTaus()) 
     {
 
+      // Apply "tight" tau trigger and ID scale factor (SF)
       if (fEvent.isMC()) 
 	{
-	  // Apply "tight" tau ID scale factor (SF)
 	  fEventWeight.multiplyWeight(tauData.getTauIDSF());
 	  cTauSFCounter.increment(); 
 
-	  // Apply "tight" fake tau SF
 	  fEventWeight.multiplyWeight(tauData.getTauMisIDSF());
 	  cFakeTauSFCounter.increment();
 	}
@@ -650,12 +646,10 @@ void TauFakeRate_mm::process(Long64_t entry) {
       hMet_TightTau->Fill(metData.getMET().R());
       hLt_TightTau->Fill(dilepton_pt + tauData.getSelectedTau().pt());
       
+      // Undo "tight" tau trigger and ID scale factor (SF)
       if (fEvent.isMC())
 	{ 
-	  // Undo tau ID SF!
 	  fEventWeight.multiplyWeight(1.0/tauData.getTauIDSF());
-
-	  // Undo tau mis-ID SF!
 	  fEventWeight.multiplyWeight(1.0/tauData.getTauMisIDSF());
 	}
     }
@@ -667,11 +661,10 @@ void TauFakeRate_mm::process(Long64_t entry) {
   if (looseTauData.hasIdentifiedTaus()) 
     {
       
+      // Apply "loose" tau trigger and ID scale factor (SF)
       if (fEvent.isMC())
 	{
-	  // Apply "loose" tau ID SF
 	  fEventWeight.multiplyWeight(looseTauData.getTauIDSF());
-	  // Apply "loose" tau mis-ID SF
 	  fEventWeight.multiplyWeight(looseTauData.getTauMisIDSF());
 	}
 
@@ -682,7 +675,7 @@ void TauFakeRate_mm::process(Long64_t entry) {
       unsigned int looseTau_dm = looseTauData.getSelectedTau().decayMode();
 
       // Fill histograms
-      if (fEvent.isMC() )
+      if (fEvent.isMC())
 	{
 	  hTauSrc_LooseTau->Fill(looseTauSrcBit);
 	  if (looseTau_dm == 0)  hTauSrcDM0_LooseTau->Fill(looseTauSrcBit);
