@@ -301,7 +301,7 @@ def GetHistoKwargs(histoName, opts):
         kwargs["divideByBinWidth"] = True
 
     if "eta_" in h.lower():
-        kwargs["rebinX"] = 2
+        kwargs["rebinX"] = 1 #2
         kwargs["xlabel"] = "#eta"
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}

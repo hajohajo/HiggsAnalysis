@@ -369,7 +369,7 @@ commonPlotsOptions = PSet(
     deltaRBins        = PSet(nBins =  50, axisMin =  0.0, axisMax =   10.0),
     rtauBins          = PSet(nBins =  55, axisMin =  0.0, axisMax =    1.1), # needed?
     njetsBins         = PSet(nBins =  18, axisMin =  0.0, axisMax =   18.0),
-    metBins           = PSet(nBins = 100, axisMin =  0.0, axisMax =  500.0), 
+    metBins           = PSet(nBins = 120, axisMin =  0.0, axisMax =  600.0), 
     htBins            = PSet(nBins = 100, axisMin =  0.0, axisMax = 1000.0), 
     bjetDiscrBins     = PSet(nBins = 120, axisMin =  0.0, axisMax =    1.2),
     angularCuts1DBins = PSet(nBins =  52, axisMin =  0.0, axisMax =  260.0), # needed?
