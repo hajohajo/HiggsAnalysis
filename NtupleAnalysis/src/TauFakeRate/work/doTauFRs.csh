@@ -36,10 +36,18 @@ set GRID    = ""
 #./plotDataMC.py --folder "" -e ${eDSETS} -s {$FORMATS} -m ${MYDIR} --ratio --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE}
 ./plotDataMC.py --folder "" -i ${iDSETS} -s {$FORMATS} -m ${MYDIR} --ratio --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE}
 
+./plotDataMC.py --folder ForDataDrivenCtrlPlots -e ${eDSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}
+#./plotDataMC.py --folder ForDataDrivenCtrlPlotsFakeTau -e ${eDSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}
+#./plotDataMC.py --folder ForDataDrivenCtrlPlotsGenuineTau -e ${eDSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}
+
 
 #================================================================================================
 # Fake Rate plots
 #================================================================================================
+./plotTauFakeRates.py -a ${ANAME} -m ${MYDIR} --numHisto "tauPt_num" --denHisto "tauPt_den" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
+./plotTauFakeRates.py -a ${ANAME} -m ${MYDIR} --numHisto "tauPt_num_barrel" --denHisto "tauPt_den_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
+./plotTauFakeRates.py -a ${ANAME} -m ${MYDIR} --numHisto "tauPt_num_endcap" --denHisto "tauPt_den_endcap" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
+
 ./plotTauFakeRates.py -a ${ANAME} -m ${MYDIR} --numHisto "tauPt_num_dm0_barrel" --denHisto "tauPt_den_dm0_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC 
 ./plotTauFakeRates.py -a ${ANAME} -m ${MYDIR} --numHisto "tauPt_num_dm1_barrel" --denHisto "tauPt_den_dm1_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
 ./plotTauFakeRates.py -a ${ANAME} -m ${MYDIR} --numHisto "tauPt_num_dm10_barrel" --denHisto "tauPt_den_dm10_barrel" -s ${FORMATS} ${GRID} --yMin 0.0 --yMax 0.8 -i ${iDSETS} --analysisName ${ANAME} --dataEra ${DATAERA} --searchMode ${SMODE} #--individualMC
