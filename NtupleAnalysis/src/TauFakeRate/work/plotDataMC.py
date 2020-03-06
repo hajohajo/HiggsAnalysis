@@ -274,7 +274,7 @@ def GetHistoKwargs(histoName, opts):
         "addMCUncertainty" : True, 
         "addLuminosityText": True,
         "addCmText"        : True,
-        "cmsExtraText"     : "Very Preliminary",
+        "cmsExtraText"     : "Preliminary",
         "opts"             : {"ymin": _yMin, "ymaxfactor": _yMaxF},
         #"opts2"            : {"ymin": 0.0, "ymax": 3.0},
         "opts2"            : {"ymin": 0.65, "ymax": 1.35},
@@ -517,6 +517,8 @@ def GetHistoKwargs(histoName, opts):
             kwargs["ylabel"] = "< Events > "
 
     Verbose("Histagram %s will be rebinned by %s" % (h, str(kwargs["rebinX"])), True)
+    if "tauPt_" in h:
+        kwargs["rebinX"] = None
     return kwargs
     
 
