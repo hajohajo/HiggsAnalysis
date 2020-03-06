@@ -197,7 +197,7 @@ def main():
                        ]
         
         Verbose("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
-        Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
+        Verbose("If collision data are present, then vertex reweighting is done according to the chosen data era")
         regex =  "|".join(myBlackList)
         if len(myBlackList)>0:
             process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=regex)

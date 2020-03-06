@@ -155,15 +155,34 @@ def main():
                        "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO",
                        "CRAB_private_ChargedHiggs_HplusTB_HplusToHW_M700_mH200_2ta_NLO",
                        "WWTo4Q",
-                       "SingleMuon_Run2016F_03Feb2017_v1_277932_278800",                                                                                                                             
-                       "SingleMuon_Run2016E_03Feb2017_v1_276831_277420",                                                                                                                             
-                       "SingleMuon_Run2016D_03Feb2017_v1_276315_276811",                                                                                                                             
-                       "SingleMuon_Run2016C_03Feb2017_v1_275656_276283",                                                                                                                             
-                       "SingleMuon_Run2016B_03Feb2017_ver2_v2_273150_275376",                                                                                                                        
-                       "SingleMuon_Run2016G_03Feb2017_v1_278820_280385",                                                                                                                             
-                       "SingleMuon_Run2016F_03Feb2017_v1_278801_278808",                                                                                                                             
-                       "SingleMuon_Run2016H_03Feb2017_ver3_v1_284036_284044",                                                                                                                        
-                       "SingleMuon_Run2016H_03Feb2017_ver2_v1_281613_284035",     
+                       "WJetsToLNu",
+                       "WJetsToLNu_HT_100To200",
+                       "WJetsToLNu_HT_100To200_ext1",
+                       "WJetsToLNu_HT_100To200_ext2",
+                       "WJetsToLNu_HT_1200To2500",
+                       "WJetsToLNu_HT_1200To2500_ext1",
+                       "WJetsToLNu_HT_200To400",
+                       "WJetsToLNu_HT_200To400_ext1",
+                       "WJetsToLNu_HT_200To400_ext2",
+                       "WJetsToLNu_HT_2500ToInf",
+                       "WJetsToLNu_HT_2500ToInf_ext1",
+                       "WJetsToLNu_HT_400To600",
+                       "WJetsToLNu_HT_400To600_ext1",
+                       "WJetsToLNu_HT_600To800",
+                       "WJetsToLNu_HT_600To800_ext1",
+                       "WJetsToLNu_HT_70To100",
+                       "WJetsToLNu_HT_800To1200",
+                       "WJetsToLNu_HT_800To1200_ext1",
+                       "WJetsToLNu_ext2",
+                       "SingleMuon_Run2016F_03Feb2017_v1_277932_278800",
+                       "SingleMuon_Run2016E_03Feb2017_v1_276831_277420",
+                       "SingleMuon_Run2016D_03Feb2017_v1_276315_276811",
+                       "SingleMuon_Run2016C_03Feb2017_v1_275656_276283",
+                       "SingleMuon_Run2016B_03Feb2017_ver2_v2_273150_275376",
+                       "SingleMuon_Run2016G_03Feb2017_v1_278820_280385",
+                       "SingleMuon_Run2016F_03Feb2017_v1_278801_278808",
+                       "SingleMuon_Run2016H_03Feb2017_ver3_v1_284036_284044",
+                       "SingleMuon_Run2016H_03Feb2017_ver2_v1_281613_284035",
                        "DYJetsToLL_M_50_HT_70to100",
                        "DYJetsToLL_M_50_HT_100to200",
                        "DYJetsToLL_M_50_HT_100to200_ext1",
@@ -177,11 +196,8 @@ def main():
                        "DYJetsToLL_M_50_HT_2500toInf",
                        ]
 
-        #if opts.doSystematics:
-        #    myBlackList.append("QCD")
-
         Print("Adding all datasets from multiCRAB directory %s" % (opts.mcrab))
-        Print("If collision data are present, then vertex reweighting is done according to the chosen data era (era=2015C, 2015D, 2015) etc...")
+        Print("If collision data are present, then vertex reweighting is done according to the chosen data era")
         regex =  "|".join(myBlackList)
         if len(myBlackList)>0:
             process.addDatasetsFromMulticrab(opts.mcrab, excludeTasks=regex)
