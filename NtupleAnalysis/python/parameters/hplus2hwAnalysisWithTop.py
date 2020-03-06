@@ -353,7 +353,11 @@ scaleFactors.setupToptagSFInformation(topTagPset                     = topSelect
 # Common plots options
 #================================================================================================
 commonPlotsOptions = PSet(
-    histogramSplitting         = [],    # Splitting of histograms as function of one or more parameters
+    # Splitting of histograms as function of one or more parameters
+    histogramSplitting  = [
+        PSet(label="TauJetPt" , binLowEdges=[20, 25, 30, 35, 40, 50, 60, 120], useAbsoluteValues=False),
+        PSet(label="TauJetEta", binLowEdges=[1.5], useAbsoluteValues=True),
+        ],
     enableGenuineBHistograms   = False,
     enablePUDependencyPlots    = True,  # Enable/Disable some debug-level plots
     nVerticesBins     = PSet(nBins = 100, axisMin =  0.0, axisMax =  100.0),

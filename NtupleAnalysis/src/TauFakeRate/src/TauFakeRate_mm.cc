@@ -139,8 +139,6 @@ private:
   WrappedTH1 *hDileptonCharge_AfterLeptonSelection;
   WrappedTH1 *hDileptonDeltaR_AfterLeptonSelection;
   
-  WrappedTH1 *hDileptonMass_AfterTauSelection;
-
   WrappedTH1 *hNTau_Preselections;
   WrappedTH1 *hTauSrc_Preselections;
   WrappedTH1 *hTauSrcDM0_Preselections;
@@ -263,7 +261,7 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   const double dRMax = fCommonPlots.getDeltaRBinSettings().max();
   
   // Book non-common histograms 
-  double bin[8] = {20,25,30,35,40,50,60,120};
+  double bin[8] = {20,25,30,35,40,50,60,120}; //fixme: read from cfg file!
 
   hTauPt_num        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num"       , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm0    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm0"   , ";p_{T} (GeV)", 7, bin);
@@ -344,8 +342,6 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hDileptonCharge_AfterLeptonSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonCharge_AfterLeptonSelection", ";Q_{ll} (GeV)", 6, -3, +3);
   hDileptonDeltaR_AfterLeptonSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonDeltaR_AfterLeptonSelection", ";#DeltaR_{ll}", dRN, dRMin , dRMax );
 
-  hDileptonMass_AfterTauSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterTauSelection"  , ";m_{ll} (GeV)", mN, mMin, mMax);
-
   hTauSrc_Preselections           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrc_Preselections"      , ";#tau source", 80, 0.0, 80.0);
   hTauSrcDM0_Preselections        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM0_Preselections"   , ";#tau source", 80, 0.0, 80.0);
   hTauSrcDM1_Preselections        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM1_Preselections"   , ";#tau source", 80, 0.0, 80.0);
@@ -367,7 +363,7 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hTauSrcDM0_LooseTau      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM0_LooseTau"     , ";#tau source", 80, 0.0, 80.0);
   hTauSrcDM1_LooseTau      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM1_LooseTau"     , ";#tau source", 80, 0.0, 80.0);
   hTauSrcDM10_LooseTau     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM10_LooseTau"    , ";#tau source", 80, 0.0, 80.0);
-  hNTau_LooseTau           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_LooseTau"          , ";loose #tau-jet multiplicity", nN  , nMin  , nMax  );
+  hNTau_LooseTau           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_LooseTau"          , ";#tau-jet multiplicity", nN, nMin , nMax  );
   hNJet_LooseTau           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NJet_LooseTau"          , ";jet multiplicity"  , nN  , nMin  , nMax  );
   hNBjet_LooseTau          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NBjet_LooseTau"         , ";b-jet multiplicity", nN  , nMin  , nMax  );
   hMet_LooseTau            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Met_LooseTau"           , ";E_{T}^{miss} (GeV)", metN, metMin, metMax);
@@ -380,7 +376,7 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hTauSrcDM0_TightTau      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM0_TightTau"     , ";#tau source", 80, 0.0, 80.0);
   hTauSrcDM1_TightTau      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM1_TightTau"     , ";#tau source", 80, 0.0, 80.0);
   hTauSrcDM10_TightTau     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM10_TightTau"    , ";#tau source", 80, 0.0, 80.0);
-  hNTau_TightTau           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_TightTau"          , ";loose #tau-jet multiplicity", nN  , nMin  , nMax  );
+  hNTau_TightTau           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NTau_TightTau"          , ";#tau-jet multiplicity", nN  , nMin  , nMax  );
   hNJet_TightTau           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NJet_TightTau"          , ";jet multiplicity"  , nN  , nMin  , nMax  );
   hNBjet_TightTau          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "NBjet_TightTau"         , ";b-jet multiplicity", nN  , nMin  , nMax  );
   hMet_TightTau            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "Met_TightTau"           , ";E_{T}^{miss} (GeV)", metN, metMin, metMax);
@@ -403,7 +399,7 @@ void TauFakeRate_mm::process(Long64_t entry) {
 
   //====== Initialize
   fCommonPlots.initialize();
-  fCommonPlots.setFactorisationBinForEvent(std::vector<float> {});
+  // fCommonPlots.setFactorisationBinForEvent(std::vector<float> {});
   cAllEvents.increment();
 
   //================================================================================================   
@@ -510,19 +506,24 @@ void TauFakeRate_mm::process(Long64_t entry) {
   if (0) std::cout << "=== Tau Selection (Loose)" << std::endl;
   const TauSelection::Data looseTauData = fLooseTauSelection.analyzeLoose(fEvent);
 
-  if (!looseTauData.hasIdentifiedTaus() ) return;
-  // if (looseTauData.getSelectedTaus().size() != 1) return; // needed?
+  // if (!looseTauData.hasIdentifiedTaus() ) return; // original implementation
+  if (looseTauData.getSelectedTaus().size() != 1) return; //new implementation
   if (0) std::cout << "=== Tau Selection: Has at least 1 loose tau(s)" << std::endl;
   // cTauNCounter.increment(); 
+
+  // Defining the splitting of phase-space for control-plots
+  std::vector<float> myFactorisationInfo;
+  myFactorisationInfo.push_back( looseTauData.getSelectedTaus()[0].pt() );
+  myFactorisationInfo.push_back( looseTauData.getSelectedTaus()[0].eta() );
+  fCommonPlots.setFactorisationBinForEvent(myFactorisationInfo);
+  
 
   // Tau-related variables
   int looseTauSrcBit = getTauSrcBit(fEvent, looseTauData);
   bool looseTauFake  = getIsFakeTau(fEvent, looseTauData);
   
-  // Fill histos ( also sets value for boolean bIsGenuineTau
+  // Fill histos ( also sets value for boolean bIsGenuineTau)
   fCommonPlots.fillControlPlotsAfterTauSelection(fEvent, looseTauData); // uses: OBbIsGenuineTau = data.getSelectedTaus()[0].isGenuineTau();
-  hDileptonMass_AfterTauSelection->Fill(dilepton_invMass);
-
   // Redefine what the "bGenuineTau" boolean is. N.B: Affects the genuineTau plots filled by control plots!
   fCommonPlots.setGenuineTauStatus(!looseTauFake); // CommonPlots.cc (L1292) bIsGenuineTau = data.getSelectedTaus()[0].isGenuineTau();
 
@@ -595,7 +596,10 @@ void TauFakeRate_mm::process(Long64_t entry) {
   // "Tight" Tau
   //================================================================================================
   const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
-  if (tauData.hasIdentifiedTaus()) 
+
+  // Require at least 1 "tight" tau
+  // if (tauData.hasIdentifiedTaus()) // original implementation
+  if (tauData.getSelectedTaus().size() == 1) //new implementation
     {
 
       // Apply "tight" tau trigger and ID scale factor (SF)
@@ -607,6 +611,7 @@ void TauFakeRate_mm::process(Long64_t entry) {
 	  fEventWeight.multiplyWeight(tauData.getTauMisIDSF());
 	  cFakeTauSFCounter.increment();
 	}
+
 
       // Do rest of event selection
       doTightTaus(fEvent, tauData, bOnZMass);
@@ -647,7 +652,9 @@ void TauFakeRate_mm::process(Long64_t entry) {
   //================================================================================================
   // "Loose" Tau
   //================================================================================================
-  if (looseTauData.hasIdentifiedTaus()) 
+  // Require at least 1 "loose" tau
+  // if (looseTauData.hasIdentifiedTaus()) 
+  if (looseTauData.getSelectedTaus().size() == 1) //new implementation
     {
       
       // Apply "loose" tau trigger and ID scale factor (SF)
@@ -731,6 +738,7 @@ void TauFakeRate_mm::doLooseTaus(const Event& event, const TauSelection::Data& t
 	  if (tau_dm == 0)  
 	    {
 	      hTauPt_den_g_dm0->Fill( tau_pt );
+	      hTauEta_den_g_dm0->Fill( tau_eta ); 
 	      if (tau_inBarrel) hTauPt_den_g_dm0_barrel->Fill( tau_pt );
 	      else hTauPt_den_g_dm0_endcap->Fill( tau_pt );
 	    }
@@ -738,6 +746,7 @@ void TauFakeRate_mm::doLooseTaus(const Event& event, const TauSelection::Data& t
 	  if (tau_dm==1)
 	    {
 	      hTauPt_den_g_dm1->Fill( tau_pt );
+	      hTauEta_den_g_dm1->Fill( tau_eta ); 
 	      if (tau_inBarrel) hTauPt_den_g_dm1_barrel->Fill( tau_pt );
 	      else hTauPt_den_g_dm1_endcap->Fill( tau_pt );
 	    }
@@ -745,6 +754,7 @@ void TauFakeRate_mm::doLooseTaus(const Event& event, const TauSelection::Data& t
 	  if (tau_dm==10) 
 	    {
 	      hTauPt_den_g_dm10->Fill( tau_pt );
+	      hTauEta_den_g_dm10->Fill( tau_eta ); 
 	      if (tau_inBarrel) hTauPt_den_g_dm10_barrel->Fill( tau_pt );
 	      else hTauPt_den_g_dm10_endcap->Fill( tau_pt );
 	    }
@@ -795,6 +805,9 @@ void TauFakeRate_mm::doTightTaus(const Event& event, const TauSelection::Data& t
   
   if (!bOnZMass) return;
 
+  // new-start
+  // new-end
+
   // For-loop: All selected taus
   for(unsigned int i=0; i<tauData.getSelectedTaus().size(); i++)
     {
@@ -832,6 +845,7 @@ void TauFakeRate_mm::doTightTaus(const Event& event, const TauSelection::Data& t
 	  if (tau_dm==0) 
 	    {
 	      hTauPt_num_g_dm0->Fill( tau_pt );
+	      hTauEta_num_g_dm0->Fill( tau_eta ); 
 	      if (tau_inBarrel) hTauPt_num_g_dm0_barrel->Fill( tau_pt );
 	      else hTauPt_num_g_dm0_endcap->Fill( tau_pt );
 	    }
@@ -839,6 +853,7 @@ void TauFakeRate_mm::doTightTaus(const Event& event, const TauSelection::Data& t
 	  if (tau_dm==1)
 	    {
 	      hTauPt_num_g_dm1->Fill( tau_pt );
+	      hTauEta_num_g_dm1->Fill( tau_eta ); 
 	      if (tau_inBarrel) hTauPt_num_g_dm1_barrel->Fill( tau_pt );
 	      else hTauPt_num_g_dm1_endcap->Fill( tau_pt );	   
 	    }
@@ -846,6 +861,7 @@ void TauFakeRate_mm::doTightTaus(const Event& event, const TauSelection::Data& t
 	  if (tau_dm==10) 
 	    {
 	      hTauPt_num_g_dm10->Fill( tau_pt );
+	      hTauEta_num_g_dm10->Fill( tau_eta ); 
 	      if (tau_inBarrel) hTauPt_num_g_dm10_barrel->Fill( tau_pt );
 	      else hTauPt_num_g_dm10_endcap->Fill( tau_pt );
 	    }
