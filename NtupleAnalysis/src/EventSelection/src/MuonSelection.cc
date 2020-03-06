@@ -96,16 +96,16 @@ MuonSelection::MuonSelection(const ParameterSet& config, EventCounter& eventCoun
   fMuonIDSFReader(config.getParameterOptional<ParameterSet>("muonIDSF")),
   fMuonTriggerSFReader(config.getParameterOptional<ParameterSet>("muonTriggerSF")),
   // Event counter for passing selection
-  cPassedMuonSelection(fEventCounter.addCounter("muons " + postfix)),
+  cPassedMuonSelection(fEventCounter.addCounter("muon" + postfix)),
   // Sub counters
   cSubAll(fEventCounter.addSubCounter("mu selection" + postfix, "All")),
-  cSubPassedIsPresent(fEventCounter.addSubCounter("mu selection" + postfix, "Present")),
+  cSubPassedIsPresent(fEventCounter.addSubCounter("mu selection" + postfix, "Pres.")),
   cSubPassedTriggerMatching(fEventCounter.addSubCounter("mu selection" + postfix, "Trg. Match")),
   cSubPassedPt(fEventCounter.addSubCounter("mu selection" + postfix, "p_{T}")),
   cSubPassedEta(fEventCounter.addSubCounter("mu selection" + postfix, "#eta")),
   cSubPassedID(fEventCounter.addSubCounter("mu selection" + postfix, "#mu-ID")),
-  cSubPassedIsolation(fEventCounter.addSubCounter("mu selection" + postfix, "Isolation")),
-  cSubPassedSelection(fEventCounter.addSubCounter("mu selection" + postfix, "Selection")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("mu selection" + postfix, "Isol.")),
+  cSubPassedSelection(fEventCounter.addSubCounter("mu selection" + postfix, "Passed")),
   cSubPassedVeto(fEventCounter.addSubCounter("mu selection" + postfix, "Veto"))
 {
   initialize(config, postfix);

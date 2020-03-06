@@ -16,8 +16,8 @@ METFilterSelection::Data::~Data() { }
 METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
   // Event counter for passing selection
-  cSubAll(fEventCounter.addSubCounter("METFilter selection ("+postfix+")", "All events")),
-  cPassedMETFilterSelection(fEventCounter.addCounter("passed METFilter selection ("+postfix+")"))
+  cSubAll(fEventCounter.addSubCounter("METFilter selection" + postfix, "All events")),
+  cPassedMETFilterSelection(fEventCounter.addCounter("passed METFilter selection" + postfix))
 {
   initialize(config);
 }
@@ -25,8 +25,8 @@ METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter&
 METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_ttm* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
   // Event counter for passing selection
-  cSubAll(fEventCounter.addSubCounter("METFilter selection ("+postfix+")", "All events")),
-  cPassedMETFilterSelection(fEventCounter.addCounter("passed METFilter selection ("+postfix+")"))
+  cSubAll(fEventCounter.addSubCounter("METFilter selection" + postfix, "All events")),
+  cPassedMETFilterSelection(fEventCounter.addCounter("passed METFilter selection" + postfix))
 {
   initialize(config);
 }
@@ -34,8 +34,8 @@ METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter&
 METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots_lt* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
   // Event counter for passing selection
-  cSubAll(fEventCounter.addSubCounter("METFilter selection " + postfix, "All events")),
-  cPassedMETFilterSelection(fEventCounter.addCounter("E_{T}^{miss} Filter " + postfix))
+  cSubAll(fEventCounter.addSubCounter("METFilter selection" + postfix, "All")),
+  cPassedMETFilterSelection(fEventCounter.addCounter("METFilter" + postfix))
 {
   initialize(config);
 }
@@ -43,8 +43,8 @@ METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter&
 METFilterSelection::METFilterSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, std::nullptr_t, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, nullptr, postfix),
   // Event counter for passing selection
-  cSubAll(fEventCounter.addSubCounter("METFilter selection ("+postfix+")", "All events")),
-  cPassedMETFilterSelection(fEventCounter.addCounter("passed METFilter selection ("+postfix+")"))
+  cSubAll(fEventCounter.addSubCounter("METFilter selection" + postfix, "All events")),
+  cPassedMETFilterSelection(fEventCounter.addCounter("passed METFilter selection" + postfix))
 {
   initialize(config);
 }
@@ -66,9 +66,12 @@ void METFilterSelection::initialize(const ParameterSet& config) {
   if(config.exists("runOnlyData")) runOnlyData = config.getParameter<std::vector<std::string>>("runOnlyData");
 
   // Create sub counters
-  for (auto p: config.getParameter<std::vector<std::string>>("discriminators")) {
-    cSubPassedFilter.push_back(fEventCounter.addSubCounter("METFilter selection", "Passed "+p) );
-  }
+  for (auto p: config.getParameter<std::vector<std::string>>("discriminators")) 
+    {
+      // WARNING! potential problem if postfix string is not empty! Will (likely) result in two counter histos instead of one
+      cSubPassedFilter.push_back(fEventCounter.addSubCounter("METFilter selection", p) );
+      // cSubPassedFilter.push_back(fEventCounter.addSubCounter("METFilter selection", "Passed " + p) );
+    }
 }
 
 void METFilterSelection::bookHistograms(TDirectory* dir) {

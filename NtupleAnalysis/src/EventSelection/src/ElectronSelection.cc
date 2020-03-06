@@ -90,16 +90,16 @@ ElectronSelection::ElectronSelection(const ParameterSet& config, EventCounter& e
   fElectronIDSFReader(config.getParameterOptional<ParameterSet>("electronIDSF")),
   fElectronTriggerSFReader(config.getParameterOptional<ParameterSet>("electronTriggerSF")),
   // Event counter for passing selection
-  cPassedElectronSelection(fEventCounter.addCounter("electrons " + postfix) ),
+  cPassedElectronSelection(fEventCounter.addCounter("electron" + postfix) ),
   // Sub counters
-  cSubAll(fEventCounter.addSubCounter("e selection " + postfix, "All")),
-  cSubPassedIsPresent(fEventCounter.addSubCounter("e selection "+  postfix, "Present")),
+  cSubAll(fEventCounter.addSubCounter("e selection" + postfix, "All")),
+  cSubPassedIsPresent(fEventCounter.addSubCounter("e selection" +  postfix, "Pres.")),
   cSubPassedTriggerMatching(fEventCounter.addSubCounter("e selection" + postfix, "Trg. Match")),
   cSubPassedPt(fEventCounter.addSubCounter("e selection" + postfix, "p_{T}")),
   cSubPassedEta(fEventCounter.addSubCounter("e selection" + postfix, "#eta")),
   cSubPassedID(fEventCounter.addSubCounter("e selection" + postfix, "e-ID")),
-  cSubPassedIsolation(fEventCounter.addSubCounter("e selection" + postfix, "Isolation")),
-  cSubPassedSelection(fEventCounter.addSubCounter("e selection" + postfix, "Selection")),
+  cSubPassedIsolation(fEventCounter.addSubCounter("e selection" + postfix, "Isol.")),
+  cSubPassedSelection(fEventCounter.addSubCounter("e selection" + postfix, "Passed")),
   cSubPassedVeto(fEventCounter.addSubCounter("e selection" + postfix, "Veto"))
 {
   initialize(config, postfix);

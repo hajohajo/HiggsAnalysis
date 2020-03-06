@@ -337,7 +337,7 @@ void CommonPlots_lt::book(TDirectory *dir, bool isData)
   
   fHistoSplitter.createShapeHistogramTriplet<TH1F>(true, HistoLevel::kSystematics, myDirs3, 
 						   hTransverseMass_AfterPreselections, "TransverseMass_AfterPreselections", 
-						   ";m_{T} (GeV);Events", fMtBins.bins(), fMtBins.min(), fMtBins.max());
+						   ";m_{T}(#tau_{h}, #ell, j_{1}, j_{2}) (GeV);Events", fMtBins.bins(), fMtBins.min(), fMtBins.max());
 
   //================================================================================================
   // Selections
@@ -456,7 +456,7 @@ void CommonPlots_lt::book(TDirectory *dir, bool isData)
   
   fHistoSplitter.createShapeHistogramTriplet<TH1F>(true, HistoLevel::kSystematics, myDirs3, 
 						   hTransverseMass_AfterSelections, "TransverseMass_AfterSelections", 
-						   ";m_{T} (GeV);Events", fMtBins.bins(), fMtBins.min(), fMtBins.max());
+						   ";m_{T}(#tau_{h}, #ell, j_{1}, j_{2});Events", fMtBins.bins(), fMtBins.min(), fMtBins.max());
 
   if (isData) 
     {
