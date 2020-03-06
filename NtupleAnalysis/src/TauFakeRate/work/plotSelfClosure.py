@@ -6,26 +6,15 @@ Good for sanity checks for key points in the cut-flow
 
 
 USAGE:
-./plotDataMC.py -m <pseudo_mcrab_directory> [opts]
+./plotSelfClosure.py -m <pseudo_mcrab_directory> [opts]
 
 
 EXAMPLES:
-./plotDataMC.py --folder ForDataDrivenCtrlPlots --ratio -s png -m
-./plotDataMC.py --folder PUDependency --ratio -s png -m 
-./plotDataMC.py --folder counters/weighted --ratio -s png -m 
-./plotDataMC.py --folder muSelection_ --ratio -s png -m
-./plotDataMC.py --folder tauSelection_ --ratio -s png -m
-./plotDataMC.py --folder jetSelection_ --ratio -s png -m
+./plotSelfClosure.py -s png --ratio  -m TauFakeRate_NewCommonPlots_Attempt1_2MuonsPt26_05Mar2020
 
 
 LAST USED:
-./plotDataMC.py --folder ForDataDrivenCtrlPlots --ratio -s png -m
-./plotDataMC.py --folder PUDependency --ratio -s png -m 
-./plotDataMC.py --folder counters/weighted --ratio -s png -m 
-./plotDataMC.py --folder muSelection_ --ratio -s png -m
-./plotDataMC.py --folder tauSelection_ --ratio -s png -m
-./plotDataMC.py --folder jetSelection_ --ratio -s png -m
-
+./plotSelfClosure.py -s png --ratio  -m 
 
 '''
 #================================================================================================ 
@@ -61,7 +50,7 @@ import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 #================================================================================================ 
 ss = ShellStyles.SuccessStyle()
 ns = ShellStyles.NormalStyle()
-ts = ShellStyles.NoteStyle()
+ts = ShellStyles.NoplotSelfClosureyle()
 hs = ShellStyles.HighlightAltStyle()
 ls = ShellStyles.HighlightStyle()
 es = ShellStyles.ErrorStyle()
@@ -84,16 +73,6 @@ def Verbose(msg, printHeader=True, verbose=False):
         return
     Print(msg, printHeader)
     return
-
-def GetLumi(datasetsMgr):
-    lumi = 0.0
-    for d in datasetsMgr.getAllDatasets():
-        if d.isMC():
-            continue
-        else:
-            lumi += d.getLuminosity()
-    Verbose("Luminosity = %s (pb)" % (lumi), True)
-    return lumi
 
 def GetDatasetsFromDir(opts):
     Verbose("Getting datasets")
@@ -144,97 +123,29 @@ def main(opts):
         datasetsMgr.loadLuminosities() # from lumi.json
 
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
+        plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
         if 0:
             datasetsMgr.PrintInfo()
-        plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
-        datasetsMgr.PrintInfo()
-
-        # Set signal cross-section
-        newOrder = ["Data", "DYJetsToLL", "TT", "Diboson", "SingleTop", "ttX"]
-
-        # For-loop: All dataset objects
-        for d in datasetsMgr.getAllDatasets():
-            if "ChargedHiggs" in d.getName():
-                datasetsMgr.getDataset(d.getName()).setCrossSection(1.0) # ATLAS 13 TeV H->tb exclusion limits
-                newOrder.remove(d.getName())
-                newOrder.insert(1, d.getName())
 
         if opts.verbose:
             datasetsMgr.PrintCrossSections()
             datasetsMgr.PrintLuminosities()
-        datasetsMgr.PrintInfo()
+            datasetsMgr.PrintInfo()
 
-        # Ensure that signal dataset is plotted last
-        if 1:
-            datasetsMgr.selectAndReorder(newOrder)
+        # Overwrite dataset order
+        newOrder = ["Data", "DYJetsToLL", "TT", "Diboson", "SingleTop", "ttX"]
+        datasetsMgr.selectAndReorder(newOrder)
           
-        # Merge EWK samples
-        if opts.mergeEWK:
-            datasetsMgr.merge("EWK", aux.GetListOfEwkDatasets())
-            plots._plotStyles["EWK"] = styles.getAltEWKStyle()
-            
         # Print dataset information
         datasetsMgr.PrintInfo()
 
         # Do Data-MC histograms
         folder     = opts.folder
-        histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(folder)        
+        histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(folder)
         histoPaths = [os.path.join(folder, h) for h in histoList]
-        myHistos   = []
-        skipList   = [
-            "counters",
-            "Weighting",
-            "SplittedBinInfo",
-            "ForDataDrivenCtrlPlots",
-            "ForDataDrivenCtrlPlotsEWKFakeB",
-            "ForDataDrivenCtrlPlotsEWKGenuineB",
-            "ForDataDrivenCtrlPlotsEWKFakeTaus",
-            "ForDataDrivenCtrlPlotsEWKGenuineTaus",
-            "ForDataDrivenCtrlPlotsFakeTau",
-            "ForDataDrivenCtrlPlotsGenuineTau",
-            "AngularCuts_Collinear",
-            "AngularCuts_BackToBack",
-            "PUDependency",
-            "jetSelection_",
-            "bjetSelection_",
-            "eSelection_Veto",
-            "muSelection_",
-            "tauSelection_",
-            "metSelection_",
-            "topSelectionBDT_",
-            "topSelectionMVA_",
-            "config",
-            "NSelectedVsRunNumber",
-            ]
+        myHistos   = ["DileptonMass_TightTau", "DileptonMass_LooseTau"]
 
-        # For-loop: All histograms
-        for h in histoPaths:
-            if "resolution" in h.lower():
-                continue
-            if "angular" in h.lower():
-                continue
-            if "backtoback" in h.lower():
-                continue
-            if "DeltaPhiMuonMet" in h:
-                continue
-            if "DeltaPhiTauMet" in h:
-                continue
-            myHistos.append(h)
-
-        # For-loop: All histos
-        for i, h in enumerate(myHistos, 1):
-            msg   = "{:<9} {:>3} {:<1} {:<3} {:<50}".format("Histogram", "%i" % i, "/", "%s:" % (len(myHistos)), h)
-            Print(ss + msg + ns, i==1)
-            
-            if "NprongsMatrix" in h or "etaphi" in h:
-                continue
-
-            if opts.folder == "":
-                if h in skipList:
-                    continue
-
-            Verbose(h, i==1)
-            PlotDataMCHistograms(datasetsMgr, h)
+        PlotDataMCHistograms(datasetsMgr, myHistos)
 
     Print("All plots saved under directory %s" % (ts + aux.convertToURL(opts.saveDir, opts.url) + ns), True)    
     return
@@ -244,11 +155,11 @@ def GetHistoKwargs(histoName, opts):
 
     # Common bin settings
     _legRM  = {"dx": -10000.23, "dy": -10000.01, "dh": -0.1}
-    _legNE  = {"dx": -0.08, "dy": -0.01, "dh": 0.1}
-    _legNW  = {"dx": -0.52, "dy": -0.01, "dh": 0.1}
-    _legSE  = {"dx": -0.23, "dy": -0.50, "dh": 0.1}
-    _legSW  = {"dx": -0.52, "dy": -0.48, "dh": 0.1}
-    _legCE  = {"dx": -0.08, "dy": -0.44, "dh": 0.1}
+    _legNE  = {"dx": -0.08, "dy": -0.01, "dh": -0.15}
+    _legNW  = {"dx": -0.52, "dy": -0.01, "dh": -0.15}
+    _legSE  = {"dx": -0.23, "dy": -0.50, "dh": -0.15}
+    _legSW  = {"dx": -0.52, "dy": -0.48, "dh": -0.15}
+    _legCE  = {"dx": -0.08, "dy": -0.44, "dh": -0.15}
     _logY   = True
     _yLabel = "Events / %.0f "
     if "_AfterAllSelections" in h or "_AfterTopSelection" in h or "_AfterMetSelection" in h:
@@ -271,7 +182,7 @@ def GetHistoKwargs(histoName, opts):
         "ratio"            : opts.ratio, 
         "stackMCHistograms": True,
         "ratioInvert"      : False, 
-        "addMCUncertainty" : True, 
+        "addMCUncertainty" : True, # only if genuine tau (from MC) is used
         "addLuminosityText": True,
         "addCmText"        : True,
         "cmsExtraText"     : "Preliminary",
@@ -286,15 +197,8 @@ def GetHistoKwargs(histoName, opts):
 
     kwargs = copy.deepcopy(_kwargs)
     
-    if "phi" in h.lower():
-        kwargs["moveLegend"] = _legNW
-
     if "pt" in h.lower():
         kwargs["units"]      = "GeV"
-        if "eSelection" in histoName:
-            kwargs["rebinX"] = systematics.DataMCBinningHToHW["ElectronPt"]
-        if "tauSelection" in histoName or "taupt" in h.lower():
-            kwargs["rebinX"] = systematics.DataMCBinningHToHW["TauPt"]
         kwargs["xlabel"]     = "p_{T} (%s)" % kwargs["units"]
         kwargs["ylabel"]     = _yLabel + kwargs["units"]
         kwargs["moveLegend"] = _legNE
@@ -316,42 +220,6 @@ def GetHistoKwargs(histoName, opts):
         kwargs["ylabel"] = "Events / %.0f "
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["moveLegend"] = _legRM #_legNE
-
-    if "tausrc" in h.lower():
-        kwargs["opts"]   = {"xmax": +20, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        #kwargs["opts"]   = {"xmax": +65, "ymin": _yMin, "ymaxfactor": _yMaxF}
-
-    if "miniiso" in h.lower():
-        kwargs["units"]  = ""
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["opts"] = {"xmax": +30.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["rebinX"] = systematics.DataMCBinningHToHW["MiniIso"]
-        kwargs["divideByBinWidth"] = True
-        if "after" in h.lower() or "passed" in h.lower():
-            kwargs["opts"]   = {"xmax": +0.8, "ymin": _yMin, "ymaxfactor": _yMaxF}
-            kwargs["rebinX"] = 1
-            kwargs["divideByBinWidth"] = False
-            
-    if "reliso" in h.lower():
-        kwargs["units"]  = ""
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["opts"] = {"xmax": +30.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["rebinX"] = systematics.DataMCBinningHToHW["RelIso"]
-        kwargs["divideByBinWidth"] = True
-
-    if "disc" in h.lower():
-        kwargs["rebinX"] = 2
-        kwargs["xlabel"] = "b-jet discriminant"
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["cutBox"] = {"cutValue": 0.8484, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": 0.6, "xmax": +1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["moveLegend"] = _legSW
-
-    if "Nvtx" in h or "IsolVtx" in h or "verticesn" in h.lower():
-        kwargs["rebinX"] = systematics.DataMCBinningHToHW["Vertices"]
-        kwargs["units"]  = ""
-        kwargs["xlabel"] = "vertex multiplicity"
-        kwargs["divideByBinWidth"] = True
 
     if "Lt" in h:
         kwargs["rebinX"] = systematics.DataMCBinningHToHW["LT"]
@@ -392,41 +260,6 @@ def GetHistoKwargs(histoName, opts):
         kwargs["cutBox"] = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["divideByBinWidth"] = True
 
-    if "counters" in opts.folder:
-        ROOT.gStyle.SetLabelSize(16.0, "X")
-        kwargs["moveLegend"] = {"dx": -0.08, "dy": 0.0, "dh": 0.1}
-        kwargs["moveLegend"] = _legNE
-        
-    regex = re.compile('selectedJets.*JetPt')
-    if(regex.search(h)):
-        ROOT.gStyle.SetNdivisions(8, "X")
-        kwargs["units"]  = "GeV"
-        kwargs["xlabel"] = "p_{T} (%s)" % kwargs["units"]
-        kwargs["ylabel"] = _yLabel + kwargs["units"]
-        kwargs["cutBox"] = {"cutValue": 30.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["rebinX"] = systematics.DataMCBinningHToHW["JetPt"]
-        kwargs["divideByBinWidth"] = True
-        kwargs["opts"] = {"xmin": 30.0, "xmax": +800.0}
-        if "second" in h.lower():
-            kwargs["opts"] = {"xmin": 30.0, "xmax": +500.0}
-        if "third" in h.lower() or "fourth" in h.lower():
-            kwargs["opts"] = {"xmin": 30.0, "xmax": +300.0}
-        if "fifth" in h.lower() or "sixth" in h.lower():
-            kwargs["opts"] = {"xmin": 30.0, "xmax": +150.0}
-        
-  
-    if h == "btagSF":
-        kwargs["xlabel"] = "b-jet SF"
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["opts"]   = {"xmin": 0.5, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["rebinX"] = 5
-
-    if "metphi" in h.lower() or "muonphi" in h.lower() or "tauphi" in h.lower():
-        kwargs["units"]  = "rads"
-        kwargs["rebinX"] = 2
-        kwargs["ylabel"] = "Events / %.2f " + kwargs["units"]
-        kwargs["moveLegend"] = _legRM
-
     if "met_" in h.lower() or h == "Met" or h == "MET":
         kwargs["units"]  = "GeV"
         kwargs["rebinX"] = systematics.DataMCBinningHToHW["Met"]
@@ -440,14 +273,6 @@ def GetHistoKwargs(histoName, opts):
             kwargs["ylabel"] = "Events / %.0f "
             kwargs["opts"]   = {"xmin": 0.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
-    if "deltaphi" in h.lower():
-        kwargs["units"]  = "rads"
-        #kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaPhi"]
-        kwargs["rebinX"] = systematics.DataMCBinningHToHW["DeltaPhiRads"]
-        kwargs["xlabel"] = "#Delta#phi"
-        kwargs["ylabel"] = "Events / %.2f "
-        kwargs["opts"]   = {"xmin": 0.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-
     if "deltar" in h.lower():
         kwargs["units"]  = ""
         kwargs["rebinX"] = 1 #systematics.DataMCBinningHToHW["DeltaR"]
@@ -455,9 +280,6 @@ def GetHistoKwargs(histoName, opts):
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"]   = {"xmax": 7.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         
-    if "DecayMode" in h:
-        kwargs["moveLegend"] = _legRM
-
     if "Nprong" in h:
         kwargs["moveLegend"] = _legNE
         kwargs["xlabel"]     = "charged particle multiplicity" # "N_{prongs}"
@@ -473,26 +295,6 @@ def GetHistoKwargs(histoName, opts):
     if "TauN" in h:
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-
-    if "counters" in opts.folder.lower():
-        kwargs["moveLegend"] = _legRM
-        #kwargs["opts"]       = {"ymin": 1e-1, "ymaxfactor": 15}
-        kwargs["opts"]       = {"ymin": 1, "ymaxfactor": 15}
-        if h == "counter":
-            kwargs["moveLegend"] = _legSW
-            xMin = 8.0
-            kwargs["opts"] = {"xmin": xMin, "ymin": 1,"ymaxfactor": 20}
-            kwargs["moveLegend"] = _legNE
-        elif "jet selection" in h:
-            kwargs["opts"] = {"xmin": 0.0, "xmax": 7.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        elif "tau selection" in h:
-            kwargs["opts"] = {"xmin": 0.0, "xmax": 11.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        elif "metfilter" in h.lower():
-            #kwargs["log"]  = False
-            #kwargs["opts"] = {"ymin": 0.0}#, "ymaxfactor": _yMaxF}
-            pass
-        else:
-            pass
 
     if "mass" in h.lower():
         kwargs["units"] = "GeV" #"GeV/c^{2}"
@@ -517,73 +319,47 @@ def GetHistoKwargs(histoName, opts):
             kwargs["ylabel"] = "< Events > "
 
     Verbose("Histagram %s will be rebinned by %s" % (h, str(kwargs["rebinX"])), True)
-    if "tauPt_" in h:
-        kwargs["rebinX"] = None
+    #if "tauPt_" in h:
+    #    kwargs["rebinX"] = None
     return kwargs
     
-
-def GetBinWidthMinMax(binList):
-    if not isinstance(binList, list):
-        raise Exception("Argument is not a list instance!")
-
-    minWidth = +1e6
-    maxWidth = -1e6
-    # For-loop: All bin values (centre)
-    for i in range(0, len(binList)-1):
-        j = i + 1
-        iBin = binList[i]
-        jBin = binList[j]
-        wBin = jBin-iBin
-        if wBin < minWidth:
-            minWidth = wBin
-
-        if wBin > maxWidth:
-            maxWidth = wBin
-    return minWidth, maxWidth
-
-def getHistos(datasetsMgr, histoName):
-
-    h1 = datasetsMgr.getDataset("Data").getDatasetRootHisto(histoName)
-    h1.setName("Data")
-
-    h2 = datasetsMgr.getDataset("EWK").getDatasetRootHisto(histoName)
-    h2.setName("EWK")
-    return [h1, h2]
-
-def PlotDataMCHistograms(datasetsMgr, histoName):
-    skipStrings = []
-    if "ForDataDrivenCtrlPlots" in opts.folder:
-        skipStrings = ["_Vs_", "JetEtaPhi"]
-
-    # Skip histograms if they contain a given string
-    for keyword in skipStrings:
-        if keyword in histoName:
-            Verbose("Skipping \"%s\" due to keyword \"%s\"" % (histoName, keyword), True)
-            return
-        else:
-            pass
+def PlotDataMCHistograms(datasetsMgr, hList):
 
     # Get Histogram name and its kwargs
-    kwargs_  = GetHistoKwargs(histoName, opts)
-    saveName = histoName.rsplit("/")[-1]
+    histoName = hList[0]
+    saveName  = histoName.rsplit("/")[-1].rsplit("_")[0] + "_closure"
+    kwargs_   = GetHistoKwargs(histoName, opts)
 
     # Create the plotting object
-    p = plots.DataMCPlot(datasetsMgr, histoName, saveFormats=[])
-
-    # Overwite signal style?
-    if 0:
-        if opts.signalMass != 0:
-            p.histoMgr.forHisto(opts.signal, styles.getSignalStyleHToTB_M(opts.signalMass))
-
-    # Apply blinding of signal region
-    if "blindingRangeString" in kwargs_:
-        startBlind = float(kwargs_["blindingRangeString"].split(" to ")[1])
-        endBlind   = float(kwargs_["blindingRangeString"].split(" to ")[0])
-        plots.partiallyBlind(p, maxShownValue=startBlind, minShownValue=endBlind, invert=True, moveBlindedText=kwargs_["moveBlindedText"])
+    p1 = plots.DataMCPlot(datasetsMgr, hList[0], saveFormats=[])
+    p2 = plots.DataMCPlot(datasetsMgr, hList[1], saveFormats=[])
 
     # Draw and save the plot
-    plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
+    plots.drawPlot(p1, saveName + "_1", **kwargs_)
+    plots.drawPlot(p2, saveName + "_2", **kwargs_)
 
+    rhDict = {}
+    rhDict["Data-1"] = p1.histoMgr.getHisto("Data").getRootHisto().Clone("Data-1")
+    rhDict["Data-2"] = p2.histoMgr.getHisto("Data").getRootHisto().Clone("Data-2")
+
+    # Create empty histogram stack list
+    myStackList = []
+
+    h1 = histograms.Histo(rhDict["Data-1"], "Data", "Tight")
+    h1.setIsDataMC(isData=True, isMC=False)
+    #hFakeB.setIsDataMC(isData=False, isMC=True)
+    myStackList.append(h1)
+
+    rhDict["Data-2"].Scale(0.35) #fixme:  divide inclusive histos to get factor
+    styles.getFakeTauStyle().apply(rhDict["Data-2"])
+    h2 = histograms.Histo(rhDict["Data-2"], "j#rightarrow #tau_{h}", "Loose")
+    h2.setIsDataMC(isData=False, isMC=True)
+    myStackList.append(h2)
+
+    p = plots.DataMCPlot2( myStackList, saveFormats=[])
+    p.setLuminosity(opts.intLumi)
+    p.setDefaultStyles()
+    plots.drawPlot(p, saveName, **kwargs_)
     # Save the plots in custom list of saveFormats
     SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), opts.saveFormats)
     return
@@ -627,7 +403,7 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "TauFakeRate" #Hplus2hwAnalysisWithTop"
+    ANALYSISNAME = "TauFakeRate_mm"
     SEARCHMODE   = "350to3000"
     DATAERA      = "Run2016"
     GRIDX        = False
@@ -636,12 +412,11 @@ if __name__ == "__main__":
     BATCHMODE    = True
     INTLUMI      = -1.0
     SIGNALMASS   = 500
-    MERGEEWK     = False
     URL          = False
     SAVEDIR      = None
     VERBOSE      = False
     RATIO        = False
-    FOLDER       = "ForDataDrivenCtrlPlots" # "topSelectionBDT_" #"ForDataDrivenCtrlPlots" #jetSelection_
+    FOLDER       = ""
     SAVEFORMATS  = "pdf,png,C"
     
     # Define the available script options
@@ -670,9 +445,6 @@ if __name__ == "__main__":
 
     parser.add_option("--dataEra", dest="dataEra", type="string", default=DATAERA, 
                       help="Override default dataEra [default: %s]" % DATAERA)
-
-    parser.add_option("--mergeEWK", dest="mergeEWK", action="store_true", default=MERGEEWK, 
-                      help="Merge all EWK samples into a single sample called \"EWK\" [default: %s]" % MERGEEWK)
 
     parser.add_option("--gridX", dest="gridX", action="store_true", default=GRIDX, 
                       help="Enable the x-axis grid lines [default: %s]" % GRIDX)
@@ -741,4 +513,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotDataMC.py: Press any key to quit ROOT ...")
+        raw_input("=== plotSelfClosure.py: Press any key to quit ROOT ...")
