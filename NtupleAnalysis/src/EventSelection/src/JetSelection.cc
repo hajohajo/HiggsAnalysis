@@ -93,18 +93,18 @@ JetSelection::JetSelection(const ParameterSet& config, EventCounter& eventCounte
   fJTCut(config, "JTCut"),
   fMHTCut(config, "MHTCut"),
   // Event counter for passing selection
-  cPassedJetSelection(fEventCounter.addCounter("jets " + postfix)),
+  cPassedJetSelection(fEventCounter.addCounter("jets" + postfix)),
   // Sub counters
-  cSubAll(fEventCounter.addSubCounter("jet selection " + postfix, "All")),
-  cSubPassedJetID(fEventCounter.addSubCounter("jet selection " + postfix, "Jet ID")),
-  cSubPassedJetPUID(fEventCounter.addSubCounter("jet selection " + postfix, "PU ID")),
-  cSubPassedDeltaRMatchWithTau(fEventCounter.addSubCounter("jet selection " + postfix, "#tau_{h} Match")),
-  cSubPassedEta(fEventCounter.addSubCounter("jet selection " + postfix, "#eta")),
-  cSubPassedPt(fEventCounter.addSubCounter("jet selection " + postfix, "p_{T}")),
-  cSubPassedJetCount(fEventCounter.addSubCounter("jet selection " + postfix, "multiplicity")),
-  cSubPassedHT(fEventCounter.addSubCounter("jet selection " + postfix, "H_{T}")),
-  cSubPassedJT(fEventCounter.addSubCounter("jet selection " + postfix, "J_{T}")),
-  cSubPassedMHT(fEventCounter.addSubCounter("jet selection " + postfix, "MHT"))
+  cSubAll(fEventCounter.addSubCounter("jet selection" + postfix, "All")),
+  cSubPassedJetID(fEventCounter.addSubCounter("jet selection" + postfix, "Jet ID")),
+  cSubPassedJetPUID(fEventCounter.addSubCounter("jet selection" + postfix, "PU ID")),
+  cSubPassedDeltaRMatchWithTau(fEventCounter.addSubCounter("jet selection" + postfix, "#tau_{h} Match")),
+  cSubPassedEta(fEventCounter.addSubCounter("jet selection" + postfix, "#eta")),
+  cSubPassedPt(fEventCounter.addSubCounter("jet selection" + postfix, "p_{T}")),
+  cSubPassedJetCount(fEventCounter.addSubCounter("jet selection" + postfix, "multiplicity")),
+  cSubPassedHT(fEventCounter.addSubCounter("jet selection" + postfix, "H_{T}")),
+  cSubPassedJT(fEventCounter.addSubCounter("jet selection" + postfix, "J_{T}")),
+  cSubPassedMHT(fEventCounter.addSubCounter("jet selection" + postfix, "MHT"))
 { 
   initialize(config);
 }

@@ -186,27 +186,27 @@ TauSelection::TauSelection(const ParameterSet& config, EventCounter& eventCounte
     // tau trigger SF
     fTauTriggerSFReader(config.getParameterOptional<ParameterSet>("tauTriggerSF")),
     // Event counter for passing selection
-    cPassedTauSelection(fEventCounter.addCounter("#tau_{h} " + postfix)),
-    cPassedTauSelectionGenuine(fEventCounter.addCounter("Genuine #tau_{h} " + postfix)),
+    cPassedTauSelection(fEventCounter.addCounter("#tau_{h}" + postfix)),
+    cPassedTauSelectionGenuine(fEventCounter.addCounter("Genuine #tau_{h}" + postfix)),
     // Sub counters
-    cSubAll(fEventCounter.addSubCounter("tau selection "+postfix, "All events")),
-    cSubPassedTriggerMatching(fEventCounter.addSubCounter("tau selection " + postfix, "Trg")),
-    cSubPassedDecayMode(fEventCounter.addSubCounter("tau selection " + postfix, "DM")),
-    cSubPassedGenericDiscriminators(fEventCounter.addSubCounter("tau selection " + postfix, "Discr")),
-    cSubPassedElectronDiscr(fEventCounter.addSubCounter("tau selection " + postfix, "e-Discr")),
-    cSubPassedMuonDiscr(fEventCounter.addSubCounter("tau selection " + postfix, "#mu-Discr")),
-    cSubPassedPt(fEventCounter.addSubCounter("tau selection " + postfix, "p_{T}")),
-    cSubPassedEta(fEventCounter.addSubCounter("tau selection " + postfix, "#eta")),
-    cSubPassedLdgTrk(fEventCounter.addSubCounter("tau selection " + postfix, "p_{T}^{ldg.trk}")),
-    cSubPassedNprongs(fEventCounter.addSubCounter("tau selection " + postfix, "N-prong")),
-    cSubPassedIsolation(fEventCounter.addSubCounter("tau selection " + postfix, "Isol.")),
-    cSubPassedRtau(fEventCounter.addSubCounter("tau selection " + postfix, "R_{#tau}")),
-    cSubPassedAntiIsolation(fEventCounter.addSubCounter("tau selection " + postfix, "Anti-isolation")),
-    cSubPassedAntiIsolationRtau(fEventCounter.addSubCounter("tau selection " + postfix, "Anti-isolated R_{#tau}")),
-    cSubPassedTauSelectionGenuine(fEventCounter.addSubCounter("tau selection " + postfix, "Genuine #tau_{h}")),
-    cSubPassedTauSelectionMultipleTaus(fEventCounter.addSubCounter("tau selection " + postfix, "Multiple #tau_{h}")),
-    cSubPassedAntiIsolatedTauSelection(fEventCounter.addSubCounter("tau selection " + postfix, "Anti-isolated #tau_{h}")),
-    cSubPassedAntiIsolatedTauSelectionMultipleTaus(fEventCounter.addSubCounter("tau selection " + postfix, "Multiple anti-isolated #tau_{h}"))
+    cSubAll(fEventCounter.addSubCounter("tau selection" + postfix, "All events")),
+    cSubPassedTriggerMatching(fEventCounter.addSubCounter("tau selection" + postfix, "Trg")),
+    cSubPassedDecayMode(fEventCounter.addSubCounter("tau selection" + postfix, "DM")),
+    cSubPassedGenericDiscriminators(fEventCounter.addSubCounter("tau selection" + postfix, "Discr")),
+    cSubPassedElectronDiscr(fEventCounter.addSubCounter("tau selection" + postfix, "e-Discr")),
+    cSubPassedMuonDiscr(fEventCounter.addSubCounter("tau selection" + postfix, "#mu-Discr")),
+    cSubPassedPt(fEventCounter.addSubCounter("tau selection" + postfix, "p_{T}")),
+    cSubPassedEta(fEventCounter.addSubCounter("tau selection" + postfix, "#eta")),
+    cSubPassedLdgTrk(fEventCounter.addSubCounter("tau selection" + postfix, "p_{T}^{ldg.trk}")),
+    cSubPassedNprongs(fEventCounter.addSubCounter("tau selection" + postfix, "N-prong")),
+    cSubPassedIsolation(fEventCounter.addSubCounter("tau selection" + postfix, "Isol.")),
+    cSubPassedRtau(fEventCounter.addSubCounter("tau selection" + postfix, "R_{#tau}")),
+    cSubPassedAntiIsolation(fEventCounter.addSubCounter("tau selection" + postfix, "Anti-isolation")),
+    cSubPassedAntiIsolationRtau(fEventCounter.addSubCounter("tau selection" + postfix, "Anti-isolated R_{#tau}")),
+    cSubPassedTauSelectionGenuine(fEventCounter.addSubCounter("tau selection" + postfix, "Genuine #tau_{h}")),
+    cSubPassedTauSelectionMultipleTaus(fEventCounter.addSubCounter("tau selection" + postfix, "Multiple #tau_{h}")),
+    cSubPassedAntiIsolatedTauSelection(fEventCounter.addSubCounter("tau selection" + postfix, "Anti-isolated #tau_{h}")),
+    cSubPassedAntiIsolatedTauSelectionMultipleTaus(fEventCounter.addSubCounter("tau selection" + postfix, "Multiple anti-isolated #tau_{h}"))
 {
   
   if(config.exists("tauIdentificationSF"))

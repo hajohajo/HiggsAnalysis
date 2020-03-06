@@ -59,7 +59,7 @@ METSelection::METSelection(const ParameterSet& config, EventCounter& eventCounte
   // MET trigger SF
   fMETTriggerSFReader(config.getParameterOptional<ParameterSet>("metTriggerSF")),
   // Event counter for passing selection
-  cPassedMETSelection(fEventCounter.addCounter("passed MET selection ("+postfix+")"))
+  cPassedMETSelection(fEventCounter.addCounter("passed MET selection" + postfix))
 {
   initialize(config);
 }

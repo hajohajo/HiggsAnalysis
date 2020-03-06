@@ -2,7 +2,6 @@
 #include "Framework/interface/BaseSelector.h"
 #include "Framework/interface/makeTH.h"
 
-//#include "EventSelection/interface/CommonPlots.h"
 #include "EventSelection/interface/CommonPlots_lt.h"
 #include "EventSelection/interface/EventSelections.h"
 #include "EventSelection/interface/TransverseMass.h"
@@ -31,7 +30,6 @@ private:
   const DirectionalCut<int> cfg_DileptonDeltaR;
 
   // Common plots
-  // CommonPlots fCommonPlots;
   CommonPlots_lt fCommonPlots;
 
   // Event selection classes and event counters (in same order like they are applied)
@@ -41,11 +39,12 @@ private:
   Count cVertexSelection;
   ElectronSelection fElectronSelection;
   MuonSelection fMuonSelection;
+  Count cLeptonNCounter;
   Count cLeptonOSCounter;
   Count cLeptonMassCounter;
   TauSelection fTauSelection;
   TauSelection fLooseTauSelection;
-  Count cTauNCounter;
+  // Count cTauNCounter;
   JetSelection fJetSelection;
   BJetSelection fBJetSelection;
   Count cBTaggingSFCounter;
@@ -61,64 +60,75 @@ private:
   void doTightTaus(const Event& event, const TauSelection::Data& looseTauData, const bool bOnZMass);
 
   // Non-common histograms
+  WrappedTH1 *hTauPt_num;
   WrappedTH1 *hTauPt_num_dm0;
   WrappedTH1 *hTauPt_num_dm1;
   WrappedTH1 *hTauPt_num_dm10;
+  WrappedTH1 *hTauPt_den;
   WrappedTH1 *hTauPt_den_dm0;
   WrappedTH1 *hTauPt_den_dm1;
   WrappedTH1 *hTauPt_den_dm10;
+  WrappedTH1 *hTauPt_num_g;
   WrappedTH1 *hTauPt_num_g_dm0;
   WrappedTH1 *hTauPt_num_g_dm1;
   WrappedTH1 *hTauPt_num_g_dm10;
+  WrappedTH1 *hTauPt_den_g;
   WrappedTH1 *hTauPt_den_g_dm0;
   WrappedTH1 *hTauPt_den_g_dm1;
   WrappedTH1 *hTauPt_den_g_dm10;
+  //
+  WrappedTH1 *hTauEta_num;
   WrappedTH1 *hTauEta_num_dm0;
   WrappedTH1 *hTauEta_num_dm1;
   WrappedTH1 *hTauEta_num_dm10;
+  WrappedTH1 *hTauEta_den;
   WrappedTH1 *hTauEta_den_dm0;
   WrappedTH1 *hTauEta_den_dm1;
   WrappedTH1 *hTauEta_den_dm10;
+  WrappedTH1 *hTauEta_num_g;
+  WrappedTH1 *hTauEta_num_g_dm0;
+  WrappedTH1 *hTauEta_num_g_dm1;
+  WrappedTH1 *hTauEta_num_g_dm10;
+  WrappedTH1 *hTauEta_den_g;
+  WrappedTH1 *hTauEta_den_g_dm0;
+  WrappedTH1 *hTauEta_den_g_dm1;
+  WrappedTH1 *hTauEta_den_g_dm10;
 
   // Barrel ( |eta| < 1.5)
+  WrappedTH1 *hTauPt_num_barrel;
   WrappedTH1 *hTauPt_num_dm0_barrel;
   WrappedTH1 *hTauPt_num_dm1_barrel;
   WrappedTH1 *hTauPt_num_dm10_barrel;
+  WrappedTH1 *hTauPt_den_barrel;
   WrappedTH1 *hTauPt_den_dm0_barrel;
   WrappedTH1 *hTauPt_den_dm1_barrel;
   WrappedTH1 *hTauPt_den_dm10_barrel;
+  WrappedTH1 *hTauPt_num_g_barrel;
   WrappedTH1 *hTauPt_num_g_dm0_barrel;
   WrappedTH1 *hTauPt_num_g_dm1_barrel;
   WrappedTH1 *hTauPt_num_g_dm10_barrel;
+  WrappedTH1 *hTauPt_den_g_barrel;
   WrappedTH1 *hTauPt_den_g_dm0_barrel;
   WrappedTH1 *hTauPt_den_g_dm1_barrel;
   WrappedTH1 *hTauPt_den_g_dm10_barrel;
-  WrappedTH1 *hTauEta_num_dm0_barrel;
-  WrappedTH1 *hTauEta_num_dm1_barrel;
-  WrappedTH1 *hTauEta_num_dm10_barrel;
-  WrappedTH1 *hTauEta_den_dm0_barrel;
-  WrappedTH1 *hTauEta_den_dm1_barrel;
-  WrappedTH1 *hTauEta_den_dm10_barrel;
 
   // Endcap ( |eta| >= 1.5)
+  WrappedTH1 *hTauPt_num_endcap;
   WrappedTH1 *hTauPt_num_dm0_endcap;
   WrappedTH1 *hTauPt_num_dm1_endcap;
   WrappedTH1 *hTauPt_num_dm10_endcap;
+  WrappedTH1 *hTauPt_den_endcap;
   WrappedTH1 *hTauPt_den_dm0_endcap;
   WrappedTH1 *hTauPt_den_dm1_endcap;
   WrappedTH1 *hTauPt_den_dm10_endcap;
+  WrappedTH1 *hTauPt_num_g_endcap;
   WrappedTH1 *hTauPt_num_g_dm0_endcap;
   WrappedTH1 *hTauPt_num_g_dm1_endcap;
   WrappedTH1 *hTauPt_num_g_dm10_endcap;
+  WrappedTH1 *hTauPt_den_g_endcap;
   WrappedTH1 *hTauPt_den_g_dm0_endcap;
   WrappedTH1 *hTauPt_den_g_dm1_endcap;
   WrappedTH1 *hTauPt_den_g_dm10_endcap;
-  WrappedTH1 *hTauEta_num_dm0_endcap;
-  WrappedTH1 *hTauEta_num_dm1_endcap;
-  WrappedTH1 *hTauEta_num_dm10_endcap;
-  WrappedTH1 *hTauEta_den_dm0_endcap;
-  WrappedTH1 *hTauEta_den_dm1_endcap;
-  WrappedTH1 *hTauEta_den_dm10_endcap;
 
   WrappedTH1 *hLeptonN_AfterLeptonSelection;
   WrappedTH1 *hLeptonPt_AfterLeptonSelection;
@@ -130,9 +140,6 @@ private:
   WrappedTH1 *hDileptonDeltaR_AfterLeptonSelection;
   
   WrappedTH1 *hDileptonMass_AfterTauSelection;
-  WrappedTH1 *hDileptonMass_AfterJetSelection;
-  WrappedTH1 *hDileptonMass_AfterBJetSelection;
-  WrappedTH1 *hDileptonMass_AfterMetSelection;
 
   WrappedTH1 *hNTau_Preselections;
   WrappedTH1 *hTauSrc_Preselections;
@@ -195,15 +202,16 @@ TauFakeRate_mm::TauFakeRate_mm(const ParameterSet& config, const TH1* skimCounte
     cTrigger(fEventCounter.addCounter("Trg")),
     fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cVertexSelection(fEventCounter.addCounter("PV")),
-    fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
+    fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, " Veto"),
     fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    cLeptonOSCounter(fEventCounter.addCounter("Q_{ll}")),
-    cLeptonMassCounter(fEventCounter.addCounter("m_{ll}")),
+    cLeptonNCounter(fEventCounter.addCounter("#mu#mu")),
+    cLeptonOSCounter(fEventCounter.addCounter("OS #mu")),
+    cLeptonMassCounter(fEventCounter.addCounter("m_{#mu#mu}")),
     // /fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fTauSelection(config.getParameter<ParameterSet>("TauSelection")),
-    // fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection")),
-    cTauNCounter(fEventCounter.addCounter("#geq 1 loose #tau_{h}")),
+    fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    //fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection")),
+    // cTauNCounter(fEventCounter.addCounter("#geq 1 loose #tau_{h}")),
     fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection")), //fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cBTaggingSFCounter(fEventCounter.addCounter("b-tag SF")),
@@ -257,64 +265,75 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   // Book non-common histograms 
   double bin[8] = {20,25,30,35,40,50,60,120};
 
+  hTauPt_num        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num"       , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm0    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm0"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm1    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm1"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm10   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm10"  , ";p_{T} (GeV)", 7, bin);
+  hTauPt_den        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den"       , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm0    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm0"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm1    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm1"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm10   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm10"  , ";p_{T} (GeV)", 7, bin);
+  hTauPt_num_g      =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g"     , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm0  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm0" , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm1  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm1" , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm10 =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm10", ";p_{T} (GeV)", 7, bin);
+  hTauPt_den_g      =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g"     , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm0  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm0" , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm1  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm1" , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm10 =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm10", ";p_{T} (GeV)", 7, bin);
-  hTauEta_num_dm0   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm0"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_num_dm1   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm1"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_num_dm10  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm10" , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm0   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm0"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm1   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm1"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm10  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm10" , ";#eta", etaN, etaMin, etaMax);
+  //
+  hTauEta_num        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num"       ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_num_dm0    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm0"   ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_num_dm1    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm1"   ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_num_dm10   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm10"  ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_den        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den"       ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_den_dm0    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm0"   ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_den_dm1    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm1"   ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_den_dm10   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm10"  ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_num_g      =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_g"     ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_num_g_dm0  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_g_dm0" ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_num_g_dm1  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_g_dm1" ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_num_g_dm10 =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_g_dm10",  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_den_g      =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_g"     ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_den_g_dm0  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_g_dm0" ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_den_g_dm1  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_g_dm1" ,  ";#eta", etaN, etaMin, etaMax);
+  hTauEta_den_g_dm10 =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_g_dm10",  ";#eta", etaN, etaMin, etaMax);
 
   // Barrel ( |eta| < 1.5)
+  hTauPt_num_barrel        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_barrel"       , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm0_barrel    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm0_barrel"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm1_barrel    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm1_barrel"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm10_barrel   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm10_barrel"  , ";p_{T} (GeV)", 7, bin);
+  hTauPt_den_barrel        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_barrel"       , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm0_barrel    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm0_barrel"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm1_barrel    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm1_barrel"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm10_barrel   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm10_barrel"  , ";p_{T} (GeV)", 7, bin);
+  hTauPt_num_g_barrel      =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_barrel"     , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm0_barrel  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm0_barrel" , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm1_barrel  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm1_barrel" , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm10_barrel =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm10_barrel", ";p_{T} (GeV)", 7, bin);
+  hTauPt_den_g_barrel      =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_barrel"     , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm0_barrel  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm0_barrel" , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm1_barrel  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm1_barrel" , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm10_barrel =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm10_barrel", ";p_{T} (GeV)", 7, bin);
-  hTauEta_num_dm0_barrel   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm0_barrel"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_num_dm1_barrel   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm1_barrel"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_num_dm10_barrel  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm10_barrel" , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm0_barrel   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm0_barrel"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm1_barrel   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm1_barrel"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm10_barrel  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm10_barrel" , ";#eta", etaN, etaMin, etaMax);
 
   // Endcap ( |eta| >= 1.5)
+  hTauPt_num_endcap        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_endcap"       , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm0_endcap    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm0_endcap"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm1_endcap    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm1_endcap"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_dm10_endcap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_dm10_endcap"  , ";p_{T} (GeV)", 7, bin);
+  hTauPt_den_endcap        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_endcap"       , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm0_endcap    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm0_endcap"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm1_endcap    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm1_endcap"   , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_dm10_endcap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_dm10_endcap"  , ";p_{T} (GeV)", 7, bin);
+  hTauPt_num_g_endcap      =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_endcap"     , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm0_endcap  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm0_endcap" , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm1_endcap  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm1_endcap" , ";p_{T} (GeV)", 7, bin);
   hTauPt_num_g_dm10_endcap =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_num_g_dm10_endcap", ";p_{T} (GeV)", 7, bin);
+  hTauPt_den_g_endcap      =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_endcap"     , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm0_endcap  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm0_endcap" , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm1_endcap  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm1_endcap" , ";p_{T} (GeV)", 7, bin);
   hTauPt_den_g_dm10_endcap =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauPt_den_g_dm10_endcap", ";p_{T} (GeV)", 7, bin);
-  hTauEta_num_dm0_endcap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm0_endcap"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_num_dm1_endcap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm1_endcap"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_num_dm10_endcap  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_num_dm10_endcap" , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm0_endcap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm0_endcap"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm1_endcap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm1_endcap"  , ";#eta", etaN, etaMin, etaMax);
-  hTauEta_den_dm10_endcap  =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "tauEta_den_dm10_endcap" , ";#eta", etaN, etaMin, etaMax);
 
   hLeptonN_AfterLeptonSelection        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "LeptonN_AfterLeptonSelection"       , ";lepton multiplicity", nN  , nMin  , nMax );
   hLeptonPt_AfterLeptonSelection       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "LeptonPt_AfterLeptonSelection"      , ";p_{T} (GeV)", ptN , ptMin , ptMax );
@@ -326,9 +345,6 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   hDileptonDeltaR_AfterLeptonSelection = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonDeltaR_AfterLeptonSelection", ";#DeltaR_{ll}", dRN, dRMin , dRMax );
 
   hDileptonMass_AfterTauSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterTauSelection"  , ";m_{ll} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterJetSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterJetSelection"  , ";m_{ll} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterBJetSelection   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterBJetSelection" , ";m_{ll} (GeV)", mN, mMin, mMax);
-  hDileptonMass_AfterMetSelection    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "DileptonMass_AfterMetSelection"  , ";m_{ll} (GeV)", mN, mMin, mMax);
 
   hTauSrc_Preselections           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrc_Preselections"      , ";#tau source", 80, 0.0, 80.0);
   hTauSrcDM0_Preselections        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, dir, "TauSrcDM0_Preselections"   , ";#tau source", 80, 0.0, 80.0);
@@ -398,8 +414,6 @@ void TauFakeRate_mm::process(Long64_t entry) {
   cTrigger.increment();
   int nVertices = fEvent.vertexInfo().value();
   fCommonPlots.setNvertices(nVertices);
-
-  // Fill histos
   fCommonPlots.fillControlPlotsAfterTrigger(fEvent);
 
 
@@ -409,8 +423,6 @@ void TauFakeRate_mm::process(Long64_t entry) {
   if (0) std::cout << "=== MET Filter" << std::endl;
   const METFilterSelection::Data metFilterData = fMETFilterSelection.analyze(fEvent);
   if (!metFilterData.passedSelection()) return;
-
-  // Fill histos
   fCommonPlots.fillControlPlotsAfterMETFilter(fEvent);  
 
 
@@ -420,8 +432,6 @@ void TauFakeRate_mm::process(Long64_t entry) {
   if (0) std::cout << "=== Vertices" << std::endl;
   if (nVertices < 1) return;
   cVertexSelection.increment();
-
-  // Fill histos
   fCommonPlots.fillControlPlotsAtVertexSelection(fEvent);
 
   
@@ -432,10 +442,6 @@ void TauFakeRate_mm::process(Long64_t entry) {
   const ElectronSelection::Data eData = fElectronSelection.analyze(fEvent);
   if (eData.hasIdentifiedElectrons()) return;
 
-  // Fill histos
-  fCommonPlots.fillControlPlotsAtElectronSelection(fEvent, eData);
-
-
   //================================================================================================
   // Muon Selection
   //================================================================================================
@@ -445,6 +451,7 @@ void TauFakeRate_mm::process(Long64_t entry) {
 
   // Require exactly 2 muons
   if (muData.getSelectedMuons().size() != 2) return; // note: remember to disable trigger-matching option if using a single muon trigger
+  cLeptonNCounter.increment(); 
 
   // Calculate variables for dilepton system
   double dilepton_pt      = ( muData.getSelectedMuons()[0].p4() + muData.getSelectedMuons()[1].p4() ).pt();
@@ -484,14 +491,12 @@ void TauFakeRate_mm::process(Long64_t entry) {
   if(!bPassDeltaR) return;
 
   // Fill histos
-  fCommonPlots.fillControlPlotsAtMuonSelection(fEvent, muData);
   hDileptonPt_AfterLeptonSelection->Fill(dilepton_pt);
   hDileptonEta_AfterLeptonSelection->Fill(dilepton_eta);
   hDileptonMass_AfterLeptonSelection->Fill(dilepton_invMass);
   hDileptonCharge_AfterLeptonSelection->Fill(dilepton_charge);
   hDileptonDeltaR_AfterLeptonSelection->Fill(dilepton_dR);
   hLeptonN_AfterLeptonSelection ->Fill(muData.getSelectedMuons().size());
-  // For-loop: All Selected leptons
   for(unsigned int i=0; i< muData.getSelectedMuons().size(); i++)
     {
       hLeptonPt_AfterLeptonSelection ->Fill(muData.getSelectedMuons()[i].pt());
@@ -499,7 +504,6 @@ void TauFakeRate_mm::process(Long64_t entry) {
     }
 
   
-
   //================================================================================================   
   // Tau Selection
   //================================================================================================   
@@ -508,9 +512,8 @@ void TauFakeRate_mm::process(Long64_t entry) {
 
   if (!looseTauData.hasIdentifiedTaus() ) return;
   // if (looseTauData.getSelectedTaus().size() != 1) return; // needed?
-
   if (0) std::cout << "=== Tau Selection: Has at least 1 loose tau(s)" << std::endl;
-  cTauNCounter.increment(); 
+  // cTauNCounter.increment(); 
 
   // Tau-related variables
   int looseTauSrcBit = getTauSrcBit(fEvent, looseTauData);
@@ -531,10 +534,6 @@ void TauFakeRate_mm::process(Long64_t entry) {
   const JetSelection::Data jetData = fJetSelection.analyze(fEvent, looseTauData.getSelectedTau());
   if (!jetData.passedSelection()) return;  
     
-  // Fill histos
-  fCommonPlots.fillControlPlotsAtJetSelection(fEvent, jetData);
-  hDileptonMass_AfterJetSelection->Fill(dilepton_invMass);
-
  
   //================================================================================================  
   // BJet selection
@@ -542,20 +541,14 @@ void TauFakeRate_mm::process(Long64_t entry) {
   if (0) std::cout << "=== BJet selection" << std::endl;
   const BJetSelection::Data bjetData = fBJetSelection.analyze(fEvent, jetData);
   if (!bjetData.passedSelection()) return;
-  
-  // Fill histos
-  fCommonPlots.fillControlPlotsAtBtagging(fEvent, bjetData);
-
+  fCommonPlots.fillControlPlotsAfterBjetSelection(fEvent, bjetData);
   if (fEvent.isMC()) 
     {
       fEventWeight.multiplyWeight(bjetData.getBTaggingScaleFactorEventWeight());
     }
-  cBTaggingSFCounter.increment();
-
-  // Fill histos
   fCommonPlots.fillControlPlotsAfterBtagSF(fEvent, jetData, bjetData);
-  hDileptonMass_AfterBJetSelection->Fill(dilepton_invMass);
-
+  cBTaggingSFCounter.increment();
+  
 
   //================================================================================================
   // MET selection
@@ -565,18 +558,15 @@ void TauFakeRate_mm::process(Long64_t entry) {
   const METSelection::Data metData = fMETSelection.analyze(fEvent, nVertices);
   if (!metData.passedSelection()) return;
 
-  // Fill Histos
-  fCommonPlots.fillControlPlotsAtMETSelection(fEvent, metData);
-  hDileptonMass_AfterMetSelection->Fill(dilepton_invMass);
 
   //================================================================================================
   // Preselections
   //================================================================================================
   if (0) std::cout << "=== Preselections" << std::endl;
   cPreselected.increment();
-  
-  // Fill histos
   fCommonPlots.fillControlPlotsAfterPreselections(fEvent, jetData, bjetData, metData);
+  
+  // Get decay mode (DM)
   unsigned int looseTau_dm = looseTauData.getSelectedTau().decayMode();
   if (fEvent.isMC() )
     {
@@ -597,7 +587,6 @@ void TauFakeRate_mm::process(Long64_t entry) {
   else hDileptonMassOffZ_Preselections->Fill(dilepton_invMass);
   hDileptonCharge_Preselections->Fill(dilepton_charge);
   hDileptonDeltaR_Preselections->Fill(dilepton_dR);
-
   hMet_Preselections->Fill(metData.getMET().R());
   hLt_Preselections->Fill(dilepton_pt + looseTauData.getSelectedTau().pt());
 
@@ -733,6 +722,12 @@ void TauFakeRate_mm::doLooseTaus(const Event& event, const TauSelection::Data& t
       // if (event.isMC() && tauData.getSelectedTaus()[i].isGenuineTau()) 
       if (bIsMC && !bFakeTau)
 	{
+	  // inclusive
+	  hTauPt_den_g ->Fill( tau_pt );
+	  hTauEta_den_g->Fill( tau_eta ); 
+	  if (tau_inBarrel) hTauPt_den_g_barrel->Fill( tau_pt );
+	  else hTauPt_den_g_endcap->Fill( tau_pt );
+
 	  if (tau_dm == 0)  
 	    {
 	      hTauPt_den_g_dm0->Fill( tau_pt );
@@ -754,62 +749,43 @@ void TauFakeRate_mm::doLooseTaus(const Event& event, const TauSelection::Data& t
 	      else hTauPt_den_g_dm10_endcap->Fill( tau_pt );
 	    }
 	}// (!bFakeTau)
+
+      
+      // inclusive 
+      // std::cout << "Filling hTauPt_den with pt = " << tau_pt << " GeV. DM = " << tau_dm << std::endl;
+      hTauPt_den ->Fill( tau_pt );
+      hTauEta_den->Fill( tau_eta );
+      if (tau_inBarrel) hTauPt_den_barrel->Fill( tau_pt );
+      else hTauPt_den_endcap->Fill( tau_pt );
     
-      // 1-prong decays; decay mode (DM) = 0
+      // decay mode (DM) = 0
       if (tau_dm==0) 
 	{
 	  hTauPt_den_dm0 ->Fill( tau_pt  );
 	  hTauEta_den_dm0->Fill( tau_eta );
-
-	  if (tau_inBarrel)
-	    {
-	      hTauPt_den_dm0_barrel ->Fill( tau_pt  );
-	      hTauEta_den_dm0_barrel->Fill( tau_eta );
-	    }
-	  else
-	    {
-	      hTauPt_den_dm0_endcap ->Fill( tau_pt  );
-	      hTauEta_den_dm0_endcap->Fill( tau_eta );
-	    }
+	  if (tau_inBarrel) hTauPt_den_dm0_barrel ->Fill( tau_pt  );
+	  else hTauPt_den_dm0_endcap ->Fill( tau_pt  );
 	}
       
-      // 2-prong decays; decay mode (DM) = 1
+      // decay mode (DM) = 1
       if (tau_dm==1) 
 	{
 	  hTauPt_den_dm1 ->Fill( tau_pt  );
 	  hTauEta_den_dm1->Fill( tau_eta );
-	  
-	  if (tau_inBarrel)
-	    {
-	      hTauPt_den_dm1_barrel ->Fill( tau_pt  );
-	      hTauEta_den_dm1_barrel->Fill( tau_eta );
-	    }
-	  else
-	    {
-	      hTauPt_den_dm1_endcap ->Fill( tau_pt  );
-	      hTauEta_den_dm1_endcap->Fill( tau_eta );
-	    }
+	  if (tau_inBarrel) hTauPt_den_dm1_barrel ->Fill( tau_pt  );
+	  else hTauPt_den_dm1_endcap ->Fill( tau_pt  );
 	}
       
-      // 3-prong decays; decay mode (DM) = 10
+      // decay mode (DM) = 10
       if (tau_dm==10) 
 	{
 	  hTauPt_den_dm10 ->Fill( tau_pt  );
 	  hTauEta_den_dm10->Fill( tau_eta );
-	  
-	  if (tau_inBarrel)
-	    {
-	      hTauPt_den_dm10_barrel ->Fill( tau_pt  );
-	      hTauEta_den_dm10_barrel->Fill( tau_eta );
-	    }
-	  else
-	    {
-	      hTauPt_den_dm10_endcap ->Fill( tau_pt  );
-	      hTauEta_den_dm10_endcap->Fill( tau_eta );
-	    }
+	  if (tau_inBarrel) hTauPt_den_dm10_barrel ->Fill( tau_pt  );
+	  else hTauPt_den_dm10_endcap ->Fill( tau_pt  );
 	}
     }
-
+  
   return;
 }
 
@@ -847,6 +823,12 @@ void TauFakeRate_mm::doTightTaus(const Event& event, const TauSelection::Data& t
       //if (event.isMC() && tauData.getSelectedTaus()[i].isGenuineTau()) 
       if (bIsMC && !bFakeTau)
 	{
+	  // inclusive
+	  hTauPt_num_g ->Fill( tau_pt ); 
+	  hTauEta_num_g->Fill( tau_eta ); 
+	  if (tau_inBarrel) hTauPt_num_g_barrel->Fill( tau_pt );
+	  else hTauPt_num_g_endcap->Fill( tau_pt );
+
 	  if (tau_dm==0) 
 	    {
 	      hTauPt_num_g_dm0->Fill( tau_pt );
@@ -867,58 +849,41 @@ void TauFakeRate_mm::doTightTaus(const Event& event, const TauSelection::Data& t
 	      if (tau_inBarrel) hTauPt_num_g_dm10_barrel->Fill( tau_pt );
 	      else hTauPt_num_g_dm10_endcap->Fill( tau_pt );
 	    }
-	}
+	}// (!bFakeTau)
+
+      // inclusive
+      hTauPt_num ->Fill( tau_pt ); 
+      hTauEta_num->Fill( tau_eta );
+      if (tau_inBarrel) hTauPt_num_barrel->Fill( tau_pt );
+      else hTauPt_num_endcap->Fill( tau_pt );
+
       
-      // 1-prong decays; decay mode (DM) = 0
+      // decay mode (DM) = 0
       if (tau_dm==0) 
 	{
 	  hTauPt_num_dm0 ->Fill( tau_pt  );
 	  hTauEta_num_dm0->Fill( tau_eta );
 
-	  if (tau_inBarrel) 
-	    {
-	      hTauPt_num_dm0_barrel ->Fill( tau_pt  );
-	      hTauEta_num_dm0_barrel->Fill( tau_eta );
-	    }
-	  else
-	    {
-	      hTauPt_num_dm0_endcap ->Fill( tau_pt  );
-	      hTauEta_num_dm0_endcap->Fill( tau_eta );
-	    }
+	  if (tau_inBarrel) hTauPt_num_dm0_barrel ->Fill( tau_pt  );
+	  else hTauPt_num_dm0_endcap ->Fill( tau_pt  );
 	}
       
-      // 2-prong decays; decay mode (DM) = 1
+      // decay mode (DM) = 1
       if (tau_dm==1) 
 	{
 	  hTauPt_num_dm1 ->Fill( tau_pt  );
 	  hTauEta_num_dm1->Fill( tau_eta );
-	  if (tau_inBarrel) 
-	    {
-	      hTauPt_num_dm1_barrel ->Fill( tau_pt  );
-	      hTauEta_num_dm1_barrel->Fill( tau_eta );
-	    }
-	  else
-	    {
-	      hTauPt_num_dm1_endcap ->Fill( tau_pt  );
-	      hTauEta_num_dm1_endcap->Fill( tau_eta );
-	    }
+	  if (tau_inBarrel) hTauPt_num_dm1_barrel ->Fill( tau_pt  );
+	  else hTauPt_num_dm1_endcap ->Fill( tau_pt  );
 	}
       
-      // 3-prong decays; decay mode (DM) = 10
+      // decay mode (DM) = 10
       if (tau_dm==10) 
 	{
 	  hTauPt_num_dm10 ->Fill( tau_pt  );
 	  hTauEta_num_dm10->Fill( tau_eta );
-	  if (tau_inBarrel) 
-	    {
-	      hTauPt_num_dm10_barrel ->Fill( tau_pt  );
-	      hTauEta_num_dm10_barrel->Fill( tau_eta );
-	    }
-	  else
-	    {
-	      hTauPt_num_dm10_endcap ->Fill( tau_pt  );
-	      hTauEta_num_dm10_endcap->Fill( tau_eta );
-	    }
+	  if (tau_inBarrel) hTauPt_num_dm10_barrel ->Fill( tau_pt  );
+	  else hTauPt_num_dm10_endcap ->Fill( tau_pt  );
 	}
     }
 
