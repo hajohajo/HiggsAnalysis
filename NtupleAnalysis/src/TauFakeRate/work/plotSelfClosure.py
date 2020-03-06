@@ -10,11 +10,11 @@ USAGE:
 
 
 EXAMPLES:
-./plotSelfClosure.py -s png --ratio  -m TauFakeRate_NewCommonPlots_Attempt1_2MuonsPt26_05Mar2020
+/plotSelfClosure.py -s png --ratio --histos "NTau,NJet,NBjet,Met,Lt,DileptonPt,DileptonEta,DileptonMass" -m TauFakeRate_NewCommonPlots_Attempt1_2MuonsPt26_05Mar2020
 
 
 LAST USED:
-./plotSelfClosure.py -s png --ratio  -m 
+./plotSelfClosure.py -s png --ratio --histos "NTau,NJet,NBjet,Met,Lt,DileptonPt,DileptonEta,DileptonMass" -m TauFakeRate_NewCommonPlots_Attempt1_2MuonsPt26_05Mar2020
 
 '''
 #================================================================================================ 
@@ -50,7 +50,7 @@ import HiggsAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 #================================================================================================ 
 ss = ShellStyles.SuccessStyle()
 ns = ShellStyles.NormalStyle()
-ts = ShellStyles.NoplotSelfClosureyle()
+ts = ShellStyles.NoteStyle()
 hs = ShellStyles.HighlightAltStyle()
 ls = ShellStyles.HighlightStyle()
 es = ShellStyles.ErrorStyle()
@@ -126,6 +126,7 @@ def main(opts):
         plots.mergeRenameReorderForDataMC(datasetsMgr, keepSourcesMC=False, analysisType="HToHW_withTop") 
         if 0:
             datasetsMgr.PrintInfo()
+        opts.intLumi = datasetsMgr.getDataset("Data").getLuminosity()
 
         if opts.verbose:
             datasetsMgr.PrintCrossSections()
@@ -143,9 +144,10 @@ def main(opts):
         folder     = opts.folder
         histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(folder)
         histoPaths = [os.path.join(folder, h) for h in histoList]
-        myHistos   = ["DileptonMass_TightTau", "DileptonMass_LooseTau"]
-
-        PlotDataMCHistograms(datasetsMgr, myHistos)
+        
+        for i in range(0, len(opts.histoDict["tight"]) ):
+            Print("%d/%d: %s" % (i+1, len(opts.histoDict["tight"]), opts.histoDict["tight"][i]), i==0)
+            PlotDataMCHistograms(datasetsMgr, [opts.histoDict["tight"][i], opts.histoDict["loose"][i]] )
 
     Print("All plots saved under directory %s" % (ts + aux.convertToURL(opts.saveDir, opts.url) + ns), True)    
     return
@@ -162,11 +164,7 @@ def GetHistoKwargs(histoName, opts):
     _legCE  = {"dx": -0.08, "dy": -0.44, "dh": -0.15}
     _logY   = True
     _yLabel = "Events / %.0f "
-    if "_AfterAllSelections" in h or "_AfterTopSelection" in h or "_AfterMetSelection" in h:
-        _yMin = 1e-2
-    else:
-        _yMin = 1e-2
-
+    _yMin   = 1e-1
     if _logY:
         _yMaxF = 10
     else:
@@ -178,16 +176,15 @@ def GetHistoKwargs(histoName, opts):
         "rebinY"           : None,
         "ratioType"        : "errorScale",
         "ratioErrorOptions": {"numeratorStatSyst": False},
-        "ratioYlabel"      : "Data/MC ",
+        "ratioYlabel"      : "Data/Bkg  ",
         "ratio"            : opts.ratio, 
         "stackMCHistograms": True,
         "ratioInvert"      : False, 
-        "addMCUncertainty" : True, # only if genuine tau (from MC) is used
+        "addMCUncertainty" : True,
         "addLuminosityText": True,
         "addCmText"        : True,
         "cmsExtraText"     : "Preliminary",
         "opts"             : {"ymin": _yMin, "ymaxfactor": _yMaxF},
-        #"opts2"            : {"ymin": 0.0, "ymax": 3.0},
         "opts2"            : {"ymin": 0.65, "ymax": 1.35},
         "divideByBinWidth" : False,
         "log"              : _logY,
@@ -205,7 +202,7 @@ def GetHistoKwargs(histoName, opts):
         kwargs["divideByBinWidth"] = True
 
     if "eta_" in h.lower():
-        kwargs["rebinX"] = 2
+        kwargs["rebinX"] = 1
         kwargs["xlabel"] = "#eta"
         kwargs["ylabel"] = "Events / %.2f "
         kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -213,13 +210,6 @@ def GetHistoKwargs(histoName, opts):
         kwargs["divideByBinWidth"] = False
         if "dilepton" in h.lower():
             kwargs["opts"]  = {"xmin": -5.0, "xmax": +5.0, "ymin": _yMin, "ymaxfactor": _yMaxF}            
-
-    if "charge" in h.lower():
-        kwargs["rebinX"] = 1
-        kwargs["xlabel"] = "dilepton charge"
-        kwargs["ylabel"] = "Events / %.0f "
-        kwargs["opts"]   = {"xmin": -2.5, "xmax": +2.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        kwargs["moveLegend"] = _legRM #_legNE
 
     if "Lt" in h:
         kwargs["rebinX"] = systematics.DataMCBinningHToHW["LT"]
@@ -239,13 +229,12 @@ def GetHistoKwargs(histoName, opts):
             kwargs["moveLegend"] = _legNE
             kwargs["divideByBinWidth"] = True
 
-
     if "NTau" in h:
         kwargs["opts"]   = {"xmax": 8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-    if "jetn" in h.lower():
+    if "jetn" in h.lower() or "njet" in h.lower():
         kwargs["xlabel"] = "jet multiplicity"
         kwargs["opts"]   = {"xmax": 14.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-    if "bjetn" in h.lower():
+    if "bjetn" in h.lower() or "nbjet" in h.lower():
         kwargs["xlabel"] = "b-jet multiplicity"
         kwargs["opts"]   = {"xmax": 8.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
@@ -415,6 +404,8 @@ if __name__ == "__main__":
     URL          = False
     SAVEDIR      = None
     VERBOSE      = False
+    #HISTOS       = "hNTau,hTauSrc,hTauSrcDM0,hTauSrcDM1,hTauSrcDM10,hNJet,hNBjet,hMet,hLt,hDileptonPt,hDileptonEta,hDileptonMass"
+    HISTOS       = "NTau,NJet,NBjet,MethLt,DileptonPt,DileptonEta,DileptonMass"
     RATIO        = False
     FOLDER       = ""
     SAVEFORMATS  = "pdf,png,C"
@@ -452,9 +443,6 @@ if __name__ == "__main__":
     parser.add_option("--gridY", dest="gridY", action="store_true", default=GRIDY, 
                       help="Enable the y-axis grid lines [default: %s]" % GRIDY)
 
-    parser.add_option("--signalMass", dest="signalMass", type=int, default=SIGNALMASS, 
-                     help="Mass value of signal to use [default: %s]" % SIGNALMASS)
-
     parser.add_option("--saveDir", dest="saveDir", type="string", default=SAVEDIR, 
                       help="Directory where all pltos will be saved [default: %s]" % SAVEDIR)
 
@@ -476,6 +464,9 @@ if __name__ == "__main__":
     parser.add_option("-s", "--saveFormats", dest="formats", default = SAVEFORMATS,
                       help="Save formats for all plots [default: %s]" % SAVEFORMATS)
 
+    parser.add_option("--histos", dest="histos", default = HISTOS,
+                      help="Name of closure histograms (_LooseTau, _TightTau) to be plotted [default: %s]" % HISTOS)
+
     (opts, parseArgs) = parser.parse_args()
 
     # Require at least two arguments (script-name, path to multicrab)
@@ -492,16 +483,6 @@ if __name__ == "__main__":
     if opts.saveDir == None:
         opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="DataMC")
 
-    # Sanity check
-    allowedMass = [180, 200, 220, 250, 300, 350, 400, 500, 650, 800, 1000, 1500, 2000, 3000]
-    if opts.signalMass!=0 and opts.signalMass not in allowedMass:
-        Print("Invalid signal mass point (=%.0f) selected! Please select one of the following:" % (opts.signalMass), True)
-        for m in allowedMass:
-            Print(m, False)
-        sys.exit()
-    else:
-        opts.signal = "ChargedHiggs_HplusTB_HplusToTB_M_%.0f" % opts.signalMass
-
     # Create save formats
     if "," in opts.formats:
         opts.saveFormats = opts.formats.split(",")
@@ -509,7 +490,18 @@ if __name__ == "__main__":
         opts.saveFormats = [opts.formats]
     opts.saveFormats = ["." + s for s in opts.saveFormats]
 
+    # Defien the histograms to be plotted
+    if "," in opts.histos:
+        opts.histoList = opts.histos.split(",")
+    else:
+        opts.histoList = [opts.histos]
+    opts.looseList = ["%s_LooseTau" % s for s in opts.histoList]
+    opts.tightList = ["%s_TightTau" % s for s in opts.histoList]
+
     # Call the main function
+    opts.histoDict = {}
+    opts.histoDict["loose"] = opts.looseList
+    opts.histoDict["tight"] = opts.tightList
     main(opts)
 
     if not opts.batchMode:
