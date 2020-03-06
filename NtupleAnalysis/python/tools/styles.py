@@ -554,6 +554,9 @@ def getEWKFakeStyle():
 def getAltQCDStyle():
     return altQCDStyle
 
+def getFakeTauStyle():
+    return qcdFillStyle
+
 def getQCDStyle():
     return qcdFillStyle
 

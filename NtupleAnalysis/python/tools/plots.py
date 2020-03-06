@@ -665,6 +665,7 @@ _legendLabels = {
     "FakeB"                : "Fake b (data)",
     "GenuineB"             : "Genuine b (MC)",
     "FakeTau"              : "jet #rightarrow #tau_{h} (MC)",
+    "FakeTauData"          : "jet #rightarrow #tau_{h} (data)",
     "GenuineTau"           : "Genuine #tau_{h} (MC)",
     "QCD-b"                : "QCD (b enr.)",
     "QCDdata"              : "Mis-ID. #tau_{h} (data)", #"QCD (data driven)"
@@ -866,6 +867,7 @@ _plotStyles = {
     "QCD"           : styles.qcdStyle,
     "FakeB"         : styles.fakeBStyle,
     "FakeTau"       : styles.fakeTauStyle,
+    "FakeTauData"   : styles.qcdStyle,
     "GenuineTau"    : styles.genuineTauStyle,
     "QCD-b"         : styles.qcdBEnrichedStyle,
     "ttX"           : styles.ttXStyle,
