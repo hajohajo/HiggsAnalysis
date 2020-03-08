@@ -19,14 +19,14 @@ set MYDIR   = ${1}
 set FORMATS = "png"
 set DSETS   = "QCD"
 set SMODE   = "350to3000"
-#set ANAME   = "TauFakeRate_ee"
-set ANAME   = "TauFakeRate_mm"
+set ANAME   = "TauFakeRate_ee"
+#set ANAME   = "TauFakeRate_mm"
 
 #================================================================================================
 # TH1
 #================================================================================================
 ./plotDataMC.py --folder counters/weighted -e ${DSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}
-# ./plotDataMC.py --folder "" -e ${DSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}
+./plotDataMC.py --folder "" -e ${DSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}
 # #./plotDataMC.py --folder PUDependency -e ${DSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}
 # ./plotDataMC.py --folder eSelection_Veto -e ${DSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}
 # ./plotDataMC.py --folder muSelection_ -e ${DSETS} -s ${FORMATS} -m $MYDIR --ratio -a ${ANAME} --searchMode ${SMODE}

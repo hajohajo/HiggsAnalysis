@@ -42,8 +42,8 @@ private:
   Count cLeptonNCounter;
   Count cLeptonOSCounter;
   Count cLeptonMassCounter;
-  TauSelection fTauSelection;
   TauSelection fLooseTauSelection;
+  TauSelection fTauSelection;
   // Count cTauNCounter;
   JetSelection fJetSelection;
   BJetSelection fBJetSelection;
@@ -200,15 +200,15 @@ TauFakeRate_mm::TauFakeRate_mm(const ParameterSet& config, const TH1* skimCounte
     cTrigger(fEventCounter.addCounter("Trg")),
     fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cVertexSelection(fEventCounter.addCounter("PV")),
-    fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, " Veto"),
+    fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cLeptonNCounter(fEventCounter.addCounter("#mu#mu")),
     cLeptonOSCounter(fEventCounter.addCounter("OS #mu")),
     cLeptonMassCounter(fEventCounter.addCounter("m_{#mu#mu}")),
-    // /fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fTauSelection(config.getParameter<ParameterSet>("TauSelection")),
     fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     //fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection")),
+    fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    // fTauSelection(config.getParameter<ParameterSet>("TauSelection")), // for some strange reason it breaks MC histos!
     // cTauNCounter(fEventCounter.addCounter("#geq 1 loose #tau_{h}")),
     fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection")), //fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -231,8 +231,8 @@ void TauFakeRate_mm::book(TDirectory *dir) {
   fMETFilterSelection.bookHistograms(dir);
   fElectronSelection.bookHistograms(dir);
   fMuonSelection.bookHistograms(dir);
-  fTauSelection.bookHistograms(dir);
   fLooseTauSelection.bookHistograms(dir);
+  fTauSelection.bookHistograms(dir); // fixme: problem?
   fJetSelection.bookHistograms(dir);
   fBJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
