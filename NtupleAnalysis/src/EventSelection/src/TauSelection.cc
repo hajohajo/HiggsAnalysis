@@ -189,7 +189,7 @@ TauSelection::TauSelection(const ParameterSet& config, EventCounter& eventCounte
     cPassedTauSelection(fEventCounter.addCounter("#tau_{h}" + postfix)),
     cPassedTauSelectionGenuine(fEventCounter.addCounter("Genuine #tau_{h}" + postfix)),
     // Sub counters
-    cSubAll(fEventCounter.addSubCounter("tau selection" + postfix, "All events")),
+    cSubAll(fEventCounter.addSubCounter("tau selection" + postfix, "All")),
     cSubPassedTriggerMatching(fEventCounter.addSubCounter("tau selection" + postfix, "Trg")),
     cSubPassedDecayMode(fEventCounter.addSubCounter("tau selection" + postfix, "DM")),
     cSubPassedGenericDiscriminators(fEventCounter.addSubCounter("tau selection" + postfix, "Discr")),

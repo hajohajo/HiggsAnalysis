@@ -238,7 +238,7 @@ void ElectronSelection::initialize(const ParameterSet& config, const std::string
 }
 
 void ElectronSelection::bookHistograms(TDirectory* dir) {
-  TDirectory* subdir  = fHistoWrapper.mkdir(HistoLevel::kDebug, dir, "eSelection_"+sPostfix);
+  TDirectory* subdir  = fHistoWrapper.mkdir(HistoLevel::kDebug, dir, "eSelection_" + sPostfix);
 
   // Electrons before any cuts
   hElectronNAll       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kDebug, subdir, "electronNAll", ";e multiplicity;Occur / %.0f", 20, 0, 20.0);
