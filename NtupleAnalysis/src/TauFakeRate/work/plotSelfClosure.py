@@ -15,6 +15,8 @@ EXAMPLES:
 
 LAST USED:
 ./plotSelfClosure.py -s png --ratio --histos "NTau,NJet,NBjet,Met,Lt,DileptonPt,DileptonEta,DileptonMass" -m TauFakeRate_NewCommonPlots_Attempt1_2MuonsPt26_05Mar2020
+./plotSelfClosure.py -s png --ratio --histos "NTau,NJet,NBjet,Met,Lt,DileptonPt,DileptonEta,DileptonMass" --analysisName TauFakeRate_ee -m TauFakeRate_ee_2ElectronsPt28_07Mar2020
+
 
 '''
 #================================================================================================ 
@@ -316,30 +318,39 @@ def PlotDataMCHistograms(datasetsMgr, hList):
 
     # Get Histogram name and its kwargs
     histoName = hList[0]
-    saveName  = histoName.rsplit("/")[-1].rsplit("_")[0] + "_closure"
+    saveName  = histoName.rsplit("/")[-1].rsplit("_")[0] #+ "_closure"
     kwargs_   = GetHistoKwargs(histoName, opts)
 
     # Create the plotting object
     p1 = plots.DataMCPlot(datasetsMgr, hList[0], saveFormats=[])
     p2 = plots.DataMCPlot(datasetsMgr, hList[1], saveFormats=[])
+    p3 = plots.DataMCPlot(datasetsMgr, "tauPt_num", saveFormats=[])
+    p4 = plots.DataMCPlot(datasetsMgr, "tauPt_den", saveFormats=[])
 
     # Draw and save the plot
     plots.drawPlot(p1, saveName + "_1", **kwargs_)
     plots.drawPlot(p2, saveName + "_2", **kwargs_)
+    plots.drawPlot(p3, saveName + "_3")
+    plots.drawPlot(p4, saveName + "_4")
 
     rhDict = {}
     rhDict["Data-1"] = p1.histoMgr.getHisto("Data").getRootHisto().Clone("Data-1")
     rhDict["Data-2"] = p2.histoMgr.getHisto("Data").getRootHisto().Clone("Data-2")
+    rhDict["Data-3"] = p3.histoMgr.getHisto("Data").getRootHisto().Clone("Data-3")
+    rhDict["Data-4"] = p4.histoMgr.getHisto("Data").getRootHisto().Clone("Data-4")
 
     # Create empty histogram stack list
     myStackList = []
-
     h1 = histograms.Histo(rhDict["Data-1"], "Data", "Tight")
     h1.setIsDataMC(isData=True, isMC=False)
-    #hFakeB.setIsDataMC(isData=False, isMC=True)
     myStackList.append(h1)
 
-    rhDict["Data-2"].Scale(0.35) #fixme:  divide inclusive histos to get factor
+    # Get normalisation factor
+    normFactor_LtoM = rhDict["Data-3"].Integral()/rhDict["Data-4"].Integral()
+    #normFactor_LtoM = 0.344
+    Print("Scaling loose-tau dataset by factor of %.3f" % (normFactor_LtoM), True)
+
+    rhDict["Data-2"].Scale(normFactor_LtoM)
     styles.getFakeTauStyle().apply(rhDict["Data-2"])
     h2 = histograms.Histo(rhDict["Data-2"], "j#rightarrow #tau_{h}", "Loose")
     h2.setIsDataMC(isData=False, isMC=True)
@@ -349,7 +360,6 @@ def PlotDataMCHistograms(datasetsMgr, hList):
     p.setLuminosity(opts.intLumi)
     p.setDefaultStyles()
     plots.drawPlot(p, saveName, **kwargs_)
-    # Save the plots in custom list of saveFormats
     SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), opts.saveFormats)
     return
 
@@ -481,7 +491,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="DataMC")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="Closure")
 
     # Create save formats
     if "," in opts.formats:

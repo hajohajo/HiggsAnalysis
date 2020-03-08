@@ -178,7 +178,9 @@ def main(opts):
 
         # Do Data-MC histograms
         folder     = opts.folder
-        histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(folder)        
+        #folder     = os.path.join("ForDataDrivenCtrlPlots", "MET_AfterSelections") # fixme - tmp
+        #Print("FIXME - TMP", True)
+        histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(folder)
         histoPaths = [os.path.join(folder, h) for h in histoList]
         myHistos   = []
         skipList   = [
@@ -186,10 +188,6 @@ def main(opts):
             "Weighting",
             "SplittedBinInfo",
             "ForDataDrivenCtrlPlots",
-            "ForDataDrivenCtrlPlotsEWKFakeB",
-            "ForDataDrivenCtrlPlotsEWKGenuineB",
-            "ForDataDrivenCtrlPlotsEWKFakeTaus",
-            "ForDataDrivenCtrlPlotsEWKGenuineTaus",
             "ForDataDrivenCtrlPlotsFakeTau",
             "ForDataDrivenCtrlPlotsGenuineTau",
             "AngularCuts_Collinear",
@@ -197,8 +195,11 @@ def main(opts):
             "PUDependency",
             "jetSelection_",
             "bjetSelection_",
+            "eSelection_",
             "eSelection_Veto",
+            "eSelection_ Veto",
             "muSelection_",
+            "muSelection_Veto",
             "tauSelection_",
             "metSelection_",
             "topSelectionBDT_",
@@ -232,6 +233,7 @@ def main(opts):
             if opts.folder == "":
                 if h in skipList:
                     continue
+                
 
             Verbose(h, i==1)
             PlotDataMCHistograms(datasetsMgr, h)

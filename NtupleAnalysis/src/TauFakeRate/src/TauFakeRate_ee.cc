@@ -42,8 +42,8 @@ private:
   Count cLeptonNCounter;
   Count cLeptonOSCounter;
   Count cLeptonMassCounter;
-  TauSelection fTauSelection;
   TauSelection fLooseTauSelection;
+  TauSelection fTauSelection;
   // Count cTauNCounter;
   JetSelection fJetSelection;
   BJetSelection fBJetSelection;
@@ -200,15 +200,15 @@ TauFakeRate_ee::TauFakeRate_ee(const ParameterSet& config, const TH1* skimCounte
     cTrigger(fEventCounter.addCounter("Trg")),
     fMETFilterSelection(config.getParameter<ParameterSet>("METFilter"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cVertexSelection(fEventCounter.addCounter("PV")),
-    fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, " Veto"),
+    fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
     fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cLeptonNCounter(fEventCounter.addCounter("ee")),
     cLeptonOSCounter(fEventCounter.addCounter("OS e")),
     cLeptonMassCounter(fEventCounter.addCounter("m_{ee}")),
-    // /fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
-    fTauSelection(config.getParameter<ParameterSet>("TauSelection")),
     fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     //fLooseTauSelection(config.getParameter<ParameterSet>("LooseTauSelection")),
+    fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    // fTauSelection(config.getParameter<ParameterSet>("TauSelection")), // for some strange reason it breaks MC histos!   
     // cTauNCounter(fEventCounter.addCounter("#geq 1 loose #tau_{h}")),
     fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     fBJetSelection(config.getParameter<ParameterSet>("BJetSelection")), //fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -231,8 +231,8 @@ void TauFakeRate_ee::book(TDirectory *dir) {
   fMETFilterSelection.bookHistograms(dir);
   fMuonSelection.bookHistograms(dir);
   fElectronSelection.bookHistograms(dir);
-  fTauSelection.bookHistograms(dir);
   fLooseTauSelection.bookHistograms(dir);
+  fTauSelection.bookHistograms(dir); // fixme: problem?
   fJetSelection.bookHistograms(dir);
   fBJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
@@ -456,7 +456,8 @@ void TauFakeRate_ee::process(Long64_t entry) {
   double dilepton_eta     = ( eData.getSelectedElectrons()[0].p4() + eData.getSelectedElectrons()[1].p4() ).eta();
   double dilepton_invMass = ( eData.getSelectedElectrons()[0].p4() + eData.getSelectedElectrons()[1].p4() ).M();
   double dilepton_dR      = ROOT::Math::VectorUtil::DeltaR(eData.getSelectedElectrons()[0].p4(), eData.getSelectedElectrons()[1].p4());
-  int dilepton_charge     = eData.getSelectedElectrons()[0].charge() + eData.getSelectedElectrons()[1].charge();
+  // int dilepton_charge     = eData.getSelectedElectrons()[0].charge() + eData.getSelectedElectrons()[1].charge(); // fixme: charge not available in ntuples!
+  int dilepton_charge     = 0; 
   bool bPassAbsCharge     = false;
   bool bOnZMass           = false; 
   bool bOnZMassAbove      = true; // yes, defualt is "true"
