@@ -41,7 +41,7 @@ else
 endif
 
 # Link flags
-LDFLAGS := $(ROOTLIBS) -lProof -lGenVector -lTreePlayer -Llib -lTMVA
+LDFLAGS := $(ROOTLIBS) -lProof -lGenVector -lTreePlayer -Llib -lTMVA -ltensorflow
 
 # Debugging
 ifeq "$(DEBUG)" "yes"

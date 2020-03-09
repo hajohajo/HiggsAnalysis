@@ -17,3 +17,4 @@
 #include "EventSelection/interface/HplusSelection.h"
 #include "EventSelection/interface/FatJetSelection.h"
 #include "EventSelection/interface/QuarkGluonLikelihoodRatio.h"
+#include "EventSelection/interface/DnnSelection.h"
