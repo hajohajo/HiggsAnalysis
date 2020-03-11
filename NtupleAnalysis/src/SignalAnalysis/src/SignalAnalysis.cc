@@ -42,7 +42,10 @@ private:
   BJetSelection fBJetSelection;
   Count cBTaggingSFCounter;
   METSelection fMETSelection;
+  // TopSelectionMVA fTopSelection;
+  Count cTopCounter;
   AngularCutsBackToBack fAngularCutsBackToBack;
+  DnnSelection fDnnSelection;
   //  JetCorrelations fJetCorrelations;
   Count cSelected;
     
@@ -84,7 +87,12 @@ SignalAnalysis::SignalAnalysis(const ParameterSet& config, const TH1* skimCounte
   cBTaggingSFCounter(fEventCounter.addCounter("b tag SF")),
   fMETSelection(config.getParameter<ParameterSet>("METSelection"),
                 fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+//  fTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"),
+//                fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+  cTopCounter(fEventCounter.addCounter("Top selection")),
   fAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"),
+                fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+  fDnnSelection(config.getParameter<ParameterSet>("DnnSelection"),
                 fEventCounter, fHistoWrapper, &fCommonPlots, ""),
 // fJetCorrelations(config.getParameter<ParameterSet>("JetCorrelations"),
 //                fEventCounter, fHistoWrapper, &fCommonPlots, ""),
@@ -103,7 +111,9 @@ void SignalAnalysis::book(TDirectory *dir) {
   fAngularCutsCollinear.bookHistograms(dir);
   fBJetSelection.bookHistograms(dir);
   fMETSelection.bookHistograms(dir);
+//  fTopSelection.bookHistograms(dir);
   fAngularCutsBackToBack.bookHistograms(dir);
+  fDnnSelection.bookHistograms(dir);
   //  fJetCorrelations.bookHistograms(dir);
   // Book non-common histograms
   //hExample =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, dir, "example pT", "example pT", 40, 0, 400);
@@ -232,6 +242,19 @@ void SignalAnalysis::process(Long64_t entry) {
   if (!METData.passedSelection())
     return;
 
+//====== Top selection
+//  const TopSelectionMVA::Data topData = fTopSelection.analyze(fEvent,jetData,bjetData);
+  // if(topData.getAllCleanedTopsSize() != 1) return;
+//  if (!topData.passedSelection()) 
+//    return;  
+//  cTopCounter.increment();
+
+  // Apply top-tag SF <--- Fix ME (implement soon)
+  // if (fEvent.isMC()) 
+  //   {
+  //     fEventWeight.multiplyWeight(topData.getTopTaggingScaleFactorEventWeight());
+  //   }
+  // cTopTaggingSFCounter.increment();
 
   double myTransverseMass = TransverseMass::reconstruct(tauData.getSelectedTau(), METData.getMET());
 
@@ -253,6 +276,11 @@ void SignalAnalysis::process(Long64_t entry) {
     hTransverseMass_ttRegion_bbcuts->Fill(myTransverseMass);
     //    hTransverseMass_WRegion_bbcuts->Fill(myTransverseMass);
   }
+
+//===== Dnn selection cut
+  const DnnSelection::Data dnnData = fDnnSelection.analyze(fEvent, tauData.getSelectedTau(), METData, bjetData);
+  if(!dnnData.passedSelection())
+    return;
 
 
 //====== All cuts passed

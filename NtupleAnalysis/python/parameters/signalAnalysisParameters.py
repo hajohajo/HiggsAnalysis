@@ -164,6 +164,65 @@ enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
         cutValueJet4 = 40.0,   # Cut value in degrees (circular cut)
 )
 #====== Experimental
+#================================================================================================
+# Dnn selection MVA
+#================================================================================================
+dnnSelection = PSet(
+    EventDnnCut     = 0.5,
+    WeightFile      = "BDTG_eventSelection.xml"
+)
+
+#================================================================================================
+# Top selection MVA
+#================================================================================================
+topSelectionMVA = PSet(
+        NumberOfTopsCutValue     =    1,       # [default: 3]
+        NumberOfTopsCutDirection = "==",       # [default: "=="] (==, !=, <, <=, >, >=)
+        AnyTopMVACutValue       =   -1.00,    # [default: -1.00]
+        AnyTopMVACutDirection   =  ">",       # [default: ">"]
+        TopMVACutValue          =    0.00,    # [default: -0.60] NOTE: Only use numbers with 2 decimals
+        TopMVACutDirection      =  ">=",      # [default: ">="]
+        TopMassLowCutValue       =    0.00,    # [default: 0.00]
+        TopMassLowCutDirection   =  ">=",      # [default: ">="]
+        TopMassUppCutValue       = 2000.00,    # [default: 1000.0]
+        TopMassUppCutDirection   =  "<=",      # [default: "<"]
+        CSV_bDiscCutValue        =    0.8484,  # [default: 0.8484, 0.5426]
+        CSV_bDiscCutDirection    = ">=",       # [default: ">="]
+        WeightFile               = "BDTG_DeltaR0p3_DeltaPtOverPt0p32_BJetPt40_noTopPtRew_24Oct2018.weights.xml",
+        TopMVAalgo               = "BDTG" # [default: BDTG] (options: "BDTG", "NN")
+)
+
+# top-tagging (json files available for: defaut, fatJet, ldgJet)
+MVAstring = "%.2f" % topSelectionMVA.TopMVACutValue
+# Determine which top JSON files to use depending on the MVA trainigh weightfile used
+if "noDeltaRqq_noTopPtRew" in topSelectionMVA.WeightFile:
+    # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)
+    topMisID     = "topMisID_BDT0p40_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"
+    topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"
+    topTagEffUnc = "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq_noTopPtRew.json"
+elif "noDeltaRqq" in topSelectionMVA.WeightFile:
+    # dR(q,q') > 0.8 removed from training (q,q': partons from top decay)
+    topMisID     = "topMisID_BDT0p40_TopMassCut400_BDTGnoDRqq.json"
+    topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq.json"
+    topTagEffUnc = "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_BDTGnoDRqq.json"
+elif "noTopPtRew" in topSelectionMVA.WeightFile:
+    # Disabled top-pt reweighting
+    topMisID     = "topMisID_BDT0p40_TopMassCut400_noTopPtRew.json"
+    topTagEff    = "toptagEff_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json"
+    topTagEffUnc = "toptagEffUncert_BDT0p40_GenuineTT_TopMassCut400_noTopPtRew.json"
+else:
+    # Defaut
+    topMisID     = "topMisID_BDT%s_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
+    topTagEff    = "toptagEff_BDT%s_GenuineTT_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
+    topTagEffUnc = "toptagEffUncert_BDT%s_GenuineTT_TopMassCut400.json" % MVAstring.replace(".", "p").replace("-", "m")
+scaleFactors.setupToptagSFInformation(topTagPset                     = topSelectionMVA,
+                                      topTagMisidFilename            = topMisID,
+                                      topTagEfficiencyFilename       = topTagEff,
+                                      topTagEffUncertaintiesFilename = topTagEffUnc,
+                                      direction                      = "nominal",
+                                      variationInfo                  = None)
+
+>>>>>>> 0c0e99c... DnnSelection fixed
 jetCorrelations = PSet (
 
 )
@@ -219,6 +278,7 @@ commonPlotsOptions = PSet(
              htBins = PSet(nBins=240, axisMin=0., axisMax=2400.), 
        bjetDiscrBins = PSet(nBins=20, axisMin=-1.0, axisMax=1.0),
    angularCuts1DBins = PSet(nBins=52, axisMin=0., axisMax=260.),
+    dnnSelectionBins = PSet(nBins=20, axisMin=-1.0, axisMax=1.0),
          topMassBins = PSet(nBins=60, axisMin=0., axisMax=600.),
            wMassBins = PSet(nBins=60, axisMin=0., axisMax=300.),
               mtBins = PSet(nBins=2000, axisMin=0., axisMax=10000.), # 5 GeV bin width for tail fitter
@@ -241,6 +301,7 @@ allSelections = PSet(
          BJetSelection = bjetSelection,
           METSelection = metSelection,
  AngularCutsBackToBack = angularCutsBackToBack,
+          DnnSelection = dnnSelection,
        JetCorrelations = jetCorrelations,
            CommonPlots = commonPlotsOptions,
 )

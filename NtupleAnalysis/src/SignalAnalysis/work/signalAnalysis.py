@@ -13,7 +13,7 @@ from HiggsAnalysis.NtupleAnalysis.main import Process, PSet, Analyzer
 from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import obtainAnalysisSuffix 
 maxEvents = {}
 #maxEvents["TT"] = 100
-#maxEvents["All"] = 100
+maxEvents["All"] = 10000
 #maxEvents["^T\S+"] = 200
 #maxEvents["Charged"] = 100
 process = Process("SignalAnalysis"+obtainAnalysisSuffix(sys.argv),maxEvents=maxEvents)
@@ -58,6 +58,9 @@ allSelections.BJetSelection.bjetDiscrWorkingPoint = "Medium"
 applyAnalysisCommandLineOptions(sys.argv, allSelections)
 
 # Build analysis modules
+sysvar = False
+if opts.validate:
+    sysvar = False
 from HiggsAnalysis.NtupleAnalysis.AnalysisBuilder import AnalysisBuilder
 builder = AnalysisBuilder("SignalAnalysis", 
                           dataEras,
