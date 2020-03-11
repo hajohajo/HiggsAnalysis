@@ -165,7 +165,13 @@ enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
         cutValueJet4 = 40.0,   # Cut value in degrees (circular cut)
 )
 #====== Experimental
-
+#================================================================================================
+# Dnn selection MVA
+#================================================================================================
+dnnSelection = PSet(
+    EventDnnCut     = 0.5,
+    WeightFile      = "BDTG_eventSelection.xml"
+)
 
 #================================================================================================
 # Top selection MVA
@@ -272,6 +278,7 @@ commonPlotsOptions = PSet(
              htBins = PSet(nBins=240, axisMin=0., axisMax=2400.), 
        bjetDiscrBins = PSet(nBins=20, axisMin=-1.0, axisMax=1.0),
    angularCuts1DBins = PSet(nBins=52, axisMin=0., axisMax=260.),
+    dnnSelectionBins = PSet(nBins=20, axisMin=-1.0, axisMax=1.0),
          topMassBins = PSet(nBins=60, axisMin=0., axisMax=600.),
            wMassBins = PSet(nBins=60, axisMin=0., axisMax=300.),
               mtBins = PSet(nBins=2000, axisMin=0., axisMax=10000.), # 5 GeV bin width for tail fitter
@@ -295,6 +302,7 @@ allSelections = PSet(
           METSelection = metSelection,
        TopSelectionMVA = topSelectionMVA,
  AngularCutsBackToBack = angularCutsBackToBack,
+          DnnSelection = dnnSelection,
        JetCorrelations = jetCorrelations,
            CommonPlots = commonPlotsOptions,
 )

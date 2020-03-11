@@ -17,6 +17,8 @@ DnnSelection::Data::Data()
     fDnnOutputValue(-99.9)
 {}
 
+DnnSelection::Data::~Data() { }
+
 DnnSelection::DnnSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
     cPassedDnnSelection(fEventCounter.addCounter("passed DNN event selection (" +postfix+")")),
@@ -49,6 +51,8 @@ DnnSelection::~DnnSelection()
     TF_DeleteSession(session, status);
     TF_DeleteSessionOptions(sessionOptions);
     TF_DeleteStatus(status);
+
+
 }
 
 void DnnSelection::initialize(const ParameterSet& config)
@@ -115,6 +119,18 @@ DnnSelection::Data DnnSelection::silentAnalyze(const Event& event, const Tau& ta
 
     return myData;
 }
+
+DnnSelection::Data DnnSelection::analyze(const Event& event, const Tau& tau, const METSelection::Data& metData, const BJetSelection::Data& bjetData) {
+    ensureAnalyzeAllowed(event.eventID());
+    DnnSelection::Data myData = privateAnalyze(event, tau, metData.getMET(), (const Jet&)bjetData.getSelectedBJets().at(0));
+
+    if (fCommonPlotsIsEnabled()){
+//        fCommonPlots->fillControlPlotsAtDnnSelection(event, myData);
+    }
+
+    return myData;
+}
+
 
 DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& selectedTau, const math::XYVectorD& METVector, const Jet& selectedBjet)
 {
