@@ -27,15 +27,22 @@ public:
         Data();
         ~Data();
 
-        bool passedSelection() const {return bPassedDnnSelection;}
-        float getClassifierOutput() const {return fDnnOutputValue;}
+        const bool passedSelection() const {return bPassedDnnSelection;}
+        const float getDnnOutput() const {return fDnnOutputValue;}
+        const float getMt() const {return fMt;}
+        const bool passedLooseSelection() const {return bPassedLooseCut;}
+        const bool passedMediumSelection() const {return bPassedMediumCut;}
+        const bool passedTightSelection() const {return bPassedTightCut;}
 
         friend class DnnSelection;
 
     private:
-        bool bPassedDnnSelection;
-        float fDnnOutputValue;
         float fMt;
+        float fDnnOutputValue;
+        bool bPassedDnnSelection;
+        bool bPassedLooseCut;
+        bool bPassedMediumCut;
+        bool bPassedTightCut;
     };
 
     explicit DnnSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix = "");
@@ -75,23 +82,24 @@ public:
     float deltaPhiBjetMet;
     float TransverseMass;
 
-    float looseCut = 0.3;
-    float mediumCut = 0.5;
-    float tightCut = 0.7;
-
 private:
     void initialize(const ParameterSet& config);
     Data privateAnalyze(const Event& event, const Tau& selectedTau, const math::XYVectorD& METVector, const Jet& bjet);
 
+    float fLooseCut;
+    float fMediumCut;
+    float fTightCut;
+
+    Count cPassedDnnSelection;
     Count cSubAll;
     Count cSubPassedDnnSelection;
-    Count cPassedDnnSelection;
 
     WrappedTH1 *hDnnOutput;
     WrappedTH1 *hDnnTransverseMass;
     WrappedTH1 *hDnnTransverseMassLoose;
     WrappedTH1 *hDnnTransverseMassMedium;
     WrappedTH1 *hDnnTransverseMassTight;
+
 };
 
 #endif

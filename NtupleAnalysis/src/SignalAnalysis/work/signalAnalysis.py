@@ -25,7 +25,7 @@ maxEvents["All"] = 10000
 process = Process("SignalAnalysis"+obtainAnalysisSuffix(sys.argv),maxEvents=maxEvents)
 blacklist = []
 #blacklist = ["ChargedHiggs_HplusTB_HplusToTauNu_M_","ChargedHiggs_HplusToTauNu_M_200_","ChargedHiggs_HplusTB_HplusToTauNu_HeavyMass_M_"]
-whitelist = []
+whitelist = ["Tau_", "Charged_", "TT"]
 #whitelist = ["Tau_Run2016C_","DY","ChargedHiggs_HplusTB_HplusToTauNu_IntermediateMassNoNeutral_M_175"]
 
 if opts.validate == True:

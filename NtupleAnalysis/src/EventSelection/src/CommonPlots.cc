@@ -26,6 +26,7 @@ CommonPlots::CommonPlots(const ParameterSet& config, const AnalysisType type, Hi
     fHtBinSettings(config.getParameter<ParameterSet>("htBins")),
     fBJetDiscriminatorBinSettings(config.getParameter<ParameterSet>("bjetDiscrBins")),
     fAngularCuts1DSettings(config.getParameter<ParameterSet>("angularCuts1DBins")),
+    fDnnSelectionBinSettings(config.getParameter<ParameterSet>("dnnSelectionBins")),
     fWMassBinSettings(config.getParameter<ParameterSet>("wMassBins")),
     fTopMassBinSettings(config.getParameter<ParameterSet>("topMassBins")),
     fInvmassBinSettings(config.getParameter<ParameterSet>("invMassBins")),
@@ -60,6 +61,7 @@ CommonPlots::CommonPlots(const ParameterSet& config, const AnalysisType type, Hi
     fHtBinSettings(config.getParameter<ParameterSet>("htBins")),
     fBJetDiscriminatorBinSettings(config.getParameter<ParameterSet>("bjetDiscrBins")),
     fAngularCuts1DSettings(config.getParameter<ParameterSet>("angularCuts1DBins")),
+    fDnnSelectionBinSettings(config.getParameter<ParameterSet>("dnnSelectionBins")),
     fWMassBinSettings(config.getParameter<ParameterSet>("wMassBins")),
     fTopMassBinSettings(config.getParameter<ParameterSet>("topMassBins")),
     fInvmassBinSettings(config.getParameter<ParameterSet>("invMassBins")),
@@ -154,6 +156,10 @@ CommonPlots::~CommonPlots() {
   fHistoSplitter.deleteHistograms(hCtrlBackToBackAngularCutsJet2);
   fHistoSplitter.deleteHistograms(hCtrlBackToBackAngularCutsJet3);
   fHistoSplitter.deleteHistograms(hCtrlBackToBackAngularCutsJet4);
+  fHistoSplitter.deleteHistograms(hCtrlDnnSelection);
+  fHistoSplitter.deleteHistograms(hCtrlDnnSelectionLoose);
+  fHistoSplitter.deleteHistograms(hCtrlDnnSelectionMedium);
+  fHistoSplitter.deleteHistograms(hCtrlDnnSelectionTight);
   fHistoSplitter.deleteHistograms(hCtrlNVerticesAfterAllSelections);
   fHistoSplitter.deleteHistograms(hCtrlSelectedTausPtAfterAllSelections);
   fHistoSplitter.deleteHistograms(hCtrlSelectedTausEtaAfterAllSelections);
@@ -222,6 +228,7 @@ CommonPlots::~CommonPlots() {
   fHistoSplitter.deleteHistograms(hCtrlBJet4EtaAfterAllSelections);
   fHistoSplitter.deleteHistograms(hCtrlBDiscriminatorAfterAllSelections);
   fHistoSplitter.deleteHistograms(hCtrlBackToBackAngularCutsMinimumAfterAllSelections);
+  fHistoSplitter.deleteHistograms(hCtrlDnnSelectionAfterAllSelections);
   fHistoSplitter.deleteHistograms(hCtrlDeltaPhiTauMetAfterAllSelections);
   fHistoSplitter.deleteHistograms(hCtrlDeltaPhiMuonMetAfterAllSelections);
   fHistoSplitter.deleteHistograms(hCtrlNTopsAfterAllSelections);
@@ -734,6 +741,24 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
     }// if (!hplus2tb)
 
   //==========================================
+  // Dnn selection cuts
+  //==========================================
+
+  if (!hplus2tb)
+    {
+      fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelection,
+                               "DnnSelection", ";Dnn output value", fDnnSelectionBinSettings.bins(), fDnnSelectionBinSettings.min(), fDnnSelectionBinSettings.max());
+      fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelectionLoose,
+                               "DnnSelection_MtAfterLoose", "m_{T};Events", fMtBinSettings.bins(), fMtBinSettings.min(), fMtBinSettings.max());
+      fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelectionMedium,
+                               "DnnSelection_MtAfterMedium", "m_{T};Events", fMtBinSettings.bins(), fMtBinSettings.min(), fMtBinSettings.max());
+      fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelectionTight,
+                               "DnnSelection_MtAfterTight", "m_{T};Events", fMtBinSettings.bins(), fMtBinSettings.min(), fMtBinSettings.max());
+
+    }
+
+
+  //==========================================
   // all selections: control plots
   //==========================================
   fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlNVerticesAfterAllSelections, 
@@ -1065,6 +1090,15 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
 
     }// if (!hplus2tb)
     
+  //========================================== 
+  // Dnn selection cuts
+  //==========================================
+  if (!hplus2tb)
+    {
+      fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelectionAfterAllSelections,
+                               "DnnSelection_AfterAllSelections", ";Dnn output value", fDnnSelectionBinSettings.bins(), fDnnSelectionBinSettings.min(), fDnnSelectionBinSettings.max());
+    }
+
   //==========================================  
   // all selections: shape plots
   //==========================================
@@ -1104,6 +1138,7 @@ void CommonPlots::initialize() {
   // fQGLRData = QuarkGluonLikelihoodRatio::Data();
   fTopData  = TopSelectionMVA::Data();
   fBackToBackAngularCutsData = AngularCutsCollinear::Data();
+  fDnnSelectionData = DnnSelection::Data();
   // fFatJetData = FatJetSelection::Data();
   // fFatJetSoftDropData = FatJetSoftDropSelection::Data();
   fHistoSplitter.initialize();
@@ -1251,6 +1286,22 @@ void CommonPlots::fillControlPlotsAtAngularCutsBackToBack(const Event& event, co
   }
   
   return;
+}
+
+void CommonPlots::fillControlPlotsAtDnnSelection(const Event& event, const DnnSelection::Data& data){
+  fDnnSelectionData = data;
+  float myTransverseMass = data.getMt();
+
+  fHistoSplitter.fillShapeHistogramTriplet(hCtrlDnnSelection, bIsGenuineTau, data.getDnnOutput());
+  if(data.passedLooseSelection()){
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlDnnSelectionLoose, bIsGenuineTau, myTransverseMass);
+  }
+  if(data.passedMediumSelection()){
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlDnnSelectionMedium, bIsGenuineTau, myTransverseMass);
+  }
+  if(data.passedTightSelection()){
+    fHistoSplitter.fillShapeHistogramTriplet(hCtrlDnnSelectionTight, bIsGenuineTau, myTransverseMass);
+  } 
 }
 
 //===== unique filling methods (to be called AFTER return statement from analysis routine)
@@ -1787,6 +1838,8 @@ void CommonPlots::fillControlPlotsAfterAllSelections(const Event& event, bool wi
   }
   
   fHistoSplitter.fillShapeHistogramTriplet(hCtrlBackToBackAngularCutsMinimumAfterAllSelections, bIsGenuineTau, fBackToBackAngularCutsData.getMinimumCutValue());
+
+  fHistoSplitter.fillShapeHistogramTriplet(hCtrlDnnSelectionAfterAllSelections, bIsGenuineTau, fDnnSelectionData.getDnnOutput());
   
   fHistoSplitter.fillShapeHistogramTriplet(hCtrlDeltaPhiTauMetAfterAllSelections, bIsGenuineTau, fBackToBackAngularCutsData.getDeltaPhiTauMET());
   fHistoSplitter.fillShapeHistogramTriplet(hCtrlDeltaPhiMuonMetAfterAllSelections , bIsGenuineTau, fBackToBackAngularCutsData.getDeltaPhiMuonMET());

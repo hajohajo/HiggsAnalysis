@@ -108,6 +108,7 @@ public:
   void fillControlPlotsAtMETSelection(const Event& event, const METSelection::Data& data);
   void fillControlPlotsAtBtagging(const Event& event, const BJetSelection::Data& data);
   void fillControlPlotsAtAngularCutsBackToBack(const Event& event, const AngularCutsBackToBack::Data& data);
+  void fillControlPlotsAtDnnSelection(const Event& event, const DnnSelection::Data& data);
   //void fillControlPlotsAtTopSelection(const Event& event, const TopSelectionManager::Data& data);
   //void fillControlPlotsAtEvtTopology(const Event& event, const EvtTopology::Data& data);
   
@@ -173,6 +174,7 @@ private:
   const HistogramSettings fHtBinSettings;
   const HistogramSettings fBJetDiscriminatorBinSettings;
   const HistogramSettings fAngularCuts1DSettings;
+  const HistogramSettings fDnnSelectionBinSettings;
   const HistogramSettings fWMassBinSettings;
   const HistogramSettings fTopMassBinSettings;
   const HistogramSettings fInvmassBinSettings;
@@ -281,6 +283,12 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlBackToBackAngularCutsJet3;
   HistoSplitter::SplittedTripletTH1s hCtrlBackToBackAngularCutsJet4;
 
+  // DnnSelection
+  HistoSplitter::SplittedTripletTH1s hCtrlDnnSelection;
+  HistoSplitter::SplittedTripletTH1s hCtrlDnnSelectionLoose;
+  HistoSplitter::SplittedTripletTH1s hCtrlDnnSelectionMedium;
+  HistoSplitter::SplittedTripletTH1s hCtrlDnnSelectionTight;
+
   // control plots after all selections
   HistoSplitter::SplittedTripletTH1s hCtrlNVerticesAfterAllSelections;  
   HistoSplitter::SplittedTripletTH1s hCtrlSelectedTausPtAfterAllSelections;
@@ -350,6 +358,7 @@ private:
   HistoSplitter::SplittedTripletTH1s hCtrlBJet4EtaAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlBDiscriminatorAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlBackToBackAngularCutsMinimumAfterAllSelections;
+  HistoSplitter::SplittedTripletTH1s hCtrlDnnSelectionAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiTauMetAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlDeltaPhiMuonMetAfterAllSelections;
   HistoSplitter::SplittedTripletTH1s hCtrlNTopsAfterAllSelections;
@@ -392,6 +401,7 @@ private:
   // QuarkGluonLikelihoodRatio::Data fQGLRData;
   TopSelectionMVA::Data fTopData;
   AngularCutsCollinear::Data fBackToBackAngularCutsData;
+  DnnSelection::Data fDnnSelectionData;
   // FatJetSelection::Data fFatJetData;
   // FatJetSoftDropSelection::Data fFatJetSoftDropData;
 

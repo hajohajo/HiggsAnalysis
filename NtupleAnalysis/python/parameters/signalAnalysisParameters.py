@@ -169,8 +169,9 @@ enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
 # Dnn selection MVA
 #================================================================================================
 dnnSelection = PSet(
-    EventDnnCut     = 0.5,
-    WeightFile      = "BDTG_eventSelection.xml"
+    looseCut    = 0.25,
+    mediumCut   = 0.45,
+    tightCut    = 0.65
 )
 
 #================================================================================================
