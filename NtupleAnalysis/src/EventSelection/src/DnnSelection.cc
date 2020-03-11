@@ -13,14 +13,21 @@ void Deallocator(void* data, size_t length, void* arg)
 
 DnnSelection::Data::Data()
 :
+    fMt(-99.9),
+    fDnnOutputValue(-99.9),
     bPassedDnnSelection(false),
-    fDnnOutputValue(-99.9)
+    bPassedLooseCut(false),
+    bPassedMediumCut(false),
+    bPassedTightCut(false)
 {}
 
 DnnSelection::Data::~Data() { }
 
 DnnSelection::DnnSelection(const ParameterSet& config, EventCounter& eventCounter, HistoWrapper& histoWrapper, CommonPlots* commonPlots, const std::string& postfix)
 : BaseSelection(eventCounter, histoWrapper, commonPlots, postfix),
+    fLooseCut(config.getParameter<float>("looseCut")),
+    fMediumCut(config.getParameter<float>("mediumCut")),
+    fTightCut(config.getParameter<float>("tightCut")),
     cPassedDnnSelection(fEventCounter.addCounter("passed DNN event selection (" +postfix+")")),
     cSubAll(fEventCounter.addSubCounter("DNN event selection ("+postfix+")", "All")),
     cSubPassedDnnSelection(fEventCounter.addSubCounter("DNN event selection ("+postfix+")", "#geq DNN cut value"))
@@ -125,7 +132,7 @@ DnnSelection::Data DnnSelection::analyze(const Event& event, const Tau& tau, con
     DnnSelection::Data myData = privateAnalyze(event, tau, metData.getMET(), (const Jet&)bjetData.getSelectedBJets().at(0));
 
     if (fCommonPlotsIsEnabled()){
-//        fCommonPlots->fillControlPlotsAtDnnSelection(event, myData);
+        fCommonPlots->fillControlPlotsAtDnnSelection(event, myData);
     }
 
     return myData;
@@ -173,22 +180,24 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     hDnnOutput->Fill(DnnOutput);
 
     hDnnTransverseMass->Fill(TransverseMass);
-    if(DnnOutput >= looseCut) {
+    if(DnnOutput >= fLooseCut) {
         hDnnTransverseMassLoose->Fill(TransverseMass);
+        output.bPassedLooseCut = true;
     }
 
-    if(DnnOutput >= mediumCut) {
+    if(DnnOutput >= fMediumCut) {
         hDnnTransverseMassMedium->Fill(TransverseMass);
+        output.bPassedMediumCut = true;
     }
 
-    if(DnnOutput >= tightCut) {
+    if(DnnOutput >= fTightCut) {
         hDnnTransverseMassTight->Fill(TransverseMass);
+        output.bPassedTightCut = true;
     }
 
-    if(DnnOutput >= mediumCut) {
+    if(DnnOutput >= 0.5) {
         output.bPassedDnnSelection = true;
     }
-
     output.fDnnOutputValue = DnnOutput;
     return output;
 
