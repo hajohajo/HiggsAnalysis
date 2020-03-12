@@ -54,19 +54,26 @@ public:
     Data silentAnalyze(const Event& event, const Tau& tau, const METSelection::Data& metData, const BJetSelection::Data& bjetData);
     Data analyze(const Event& event, const Tau& tau, const METSelection::Data& metData, const BJetSelection::Data& bjetData);
 
-    TF_Graph* graph;
+    TF_Graph* graphEven;
+    TF_Graph* graphOdd;
     TF_Status* status;
     TF_SessionOptions* sessionOptions;
-    TF_Session* session;
+    TF_Session* sessionEven;
+    TF_Session* sessionOdd;
     TF_Buffer* runOptions;
     TF_Tensor* inputTensor;
     TF_Tensor* outputTensor;
     TF_Tensor** inputValues;
     TF_Tensor** outputValues;
-    TF_Operation* inputOperation;
-    TF_Operation* outputOperation;
-    TF_Output* runInputs;
-    TF_Output* runOutputs;
+    TF_Operation* inputOperationEven;
+    TF_Operation* outputOperationEven;
+    TF_Output* runInputsEven;
+    TF_Output* runOutputsEven;
+    TF_Operation* inputOperationOdd;
+    TF_Operation* outputOperationOdd;
+    TF_Output* runInputsOdd;
+    TF_Output* runOutputsOdd;
+
 
     int ntags;
     std::vector<std::int64_t> dims;

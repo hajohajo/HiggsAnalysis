@@ -54,8 +54,10 @@ DnnSelection::~DnnSelection()
     delete hDnnTransverseMassMedium;
     delete hDnnTransverseMassTight;
 
-    TF_DeleteGraph(graph);
-    TF_DeleteSession(session, status);
+    TF_DeleteGraph(graphEven);
+    TF_DeleteSession(sessionEven, status);
+    TF_DeleteGraph(graphOdd);
+    TF_DeleteSession(sessionOdd, status);
     TF_DeleteSessionOptions(sessionOptions);
     TF_DeleteStatus(status);
 
@@ -64,28 +66,45 @@ DnnSelection::~DnnSelection()
 
 void DnnSelection::initialize(const ParameterSet& config)
 {
-    graph = TF_NewGraph();
+    graphEven = TF_NewGraph();
+    graphOdd = TF_NewGraph();
     status = TF_NewStatus();
     sessionOptions = TF_NewSessionOptions();
     runOptions = nullptr;
 
-    const char* savedModelDir = "/work/hajohajo/MVAtoChargedHiggs/HiggsAnalysis/NtupleAnalysis/src/EventSelection/src/savedModel";
+    const char* savedModelDirEven = "/work/hajohajo/HiggsAnalysis_forThesis/HiggsAnalysis/NtupleAnalysis/data/DnnClassifierModels/evenModel";
+    const char* savedModelDirOdd = "/work/hajohajo/HiggsAnalysis_forThesis/HiggsAnalysis/NtupleAnalysis/data/DnnClassifierModels/oddModel";
     const char* tags = "serve";
     ntags = 1;
 
-    session = TF_LoadSessionFromSavedModel(sessionOptions, runOptions, savedModelDir, &tags, ntags, graph, nullptr, status);
+    sessionEven = TF_LoadSessionFromSavedModel(sessionOptions, runOptions, savedModelDirEven, &tags, ntags, graphEven, nullptr, status);
+    sessionOdd = TF_LoadSessionFromSavedModel(sessionOptions, runOptions, savedModelDirOdd, &tags, ntags, graphOdd, nullptr, status);
 
-    inputOperation = TF_GraphOperationByName(graph, "serving_default_inputClassifier");
-    outputOperation = TF_GraphOperationByName(graph, "StatefulPartitionedCall");
+    inputOperationEven = TF_GraphOperationByName(graphEven, "serving_default_input_1");
+    outputOperationEven = TF_GraphOperationByName(graphEven, "StatefulPartitionedCall");
+    inputOperationOdd = TF_GraphOperationByName(graphOdd, "serving_default_input_1");
+    outputOperationOdd = TF_GraphOperationByName(graphOdd, "StatefulPartitionedCall");
 
-    runInputs = (TF_Output*)malloc(1 * sizeof(TF_Output));
-    runOutputs = (TF_Output*)malloc(1 * sizeof(TF_Output));
 
-    runInputs[0].oper = inputOperation;
-    runInputs[0].index = 0;
+    runInputsEven = (TF_Output*)malloc(1 * sizeof(TF_Output));
+    runOutputsEven = (TF_Output*)malloc(1 * sizeof(TF_Output));
 
-    runOutputs[0].oper = outputOperation;
-    runOutputs[0].index = 0;
+    runInputsEven[0].oper = inputOperationEven;
+    runInputsEven[0].index = 0;
+
+    runOutputsEven[0].oper = outputOperationEven;
+    runOutputsEven[0].index = 0;
+
+    runInputsOdd = (TF_Output*)malloc(1 * sizeof(TF_Output));
+    runOutputsOdd = (TF_Output*)malloc(1 * sizeof(TF_Output));
+
+    runInputsOdd[0].oper = inputOperationOdd;
+    runInputsOdd[0].index = 0;
+
+    runOutputsOdd[0].oper = outputOperationOdd;
+    runOutputsOdd[0].index = 0;
+
+
 
     inputValues = (TF_Tensor**)malloc(sizeof(TF_Tensor*)*1);
     outputValues = (TF_Tensor**)malloc(sizeof(TF_Tensor*)*1);
@@ -168,11 +187,20 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     inputTensor = TF_NewTensor(TF_FLOAT, dims.data(), static_cast<int>(dims.size()), data, dataSize, &Deallocator, nullptr);
     inputValues[0] = inputTensor;
 
-    TF_SessionRun(session, nullptr,
-                runInputs, inputValues, 1,
-                runOutputs, outputValues, 1,
-                nullptr, 0, nullptr,
-                status);
+
+    if(event.eventID().event()%2==0) {
+        TF_SessionRun(sessionEven, nullptr,
+                    runInputsEven, inputValues, 1,
+                    runOutputsEven, outputValues, 1,
+                    nullptr, 0, nullptr,
+                    status);
+    }else{
+        TF_SessionRun(sessionOdd, nullptr,
+                    runInputsOdd, inputValues, 1,
+                    runOutputsOdd, outputValues, 1,
+                    nullptr, 0, nullptr,
+                    status);
+    }
 
     float* outputData = (float*)TF_TensorData(outputValues[0]);
     float DnnOutput = outputData[0];
