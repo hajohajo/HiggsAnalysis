@@ -49,18 +49,15 @@ DnnSelection::DnnSelection(const ParameterSet& config)
 DnnSelection::~DnnSelection()
 {
     delete hDnnOutput;
-    delete hDnnTransverseMass;
-    delete hDnnTransverseMassLoose;
-    delete hDnnTransverseMassMedium;
-    delete hDnnTransverseMassTight;
 
+//    TF_CloseSession(sessionEven, status);
+//    TF_CloseSession(sessionOdd, status);
     TF_DeleteGraph(graphEven);
     TF_DeleteSession(sessionEven, status);
     TF_DeleteGraph(graphOdd);
     TF_DeleteSession(sessionOdd, status);
     TF_DeleteSessionOptions(sessionOptions);
     TF_DeleteStatus(status);
-
 
 }
 
@@ -109,14 +106,14 @@ void DnnSelection::initialize(const ParameterSet& config)
     inputValues = (TF_Tensor**)malloc(sizeof(TF_Tensor*)*1);
     outputValues = (TF_Tensor**)malloc(sizeof(TF_Tensor*)*1);
 
+//    dims = {1, 8};
+//    dataSize = std::accumulate(dims.begin(), dims.end(), sizeof(float), std::multiplies<std::int64_t>{});
+//    float* data = static_cast<float*>(std::malloc(dataSize));
+
 }
 
 void DnnSelection::bookHistograms(TDirectory *dir)
 {
-    const int nMtBin = 50;
-    const float fMtMin = 0.0;
-    const float fMtMax = 500.0;
-
     const int nFracBin = 20;
     const float fFracMin = 0.0;
     const float fFracMax = 1.0;
@@ -124,11 +121,6 @@ void DnnSelection::bookHistograms(TDirectory *dir)
     TDirectory* subdir = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "DnnEventSelection_" + sPostfix);
 
     hDnnOutput = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "Dnn_Output", ";Dnn output value", nFracBin, fFracMin, fFracMax);
-    hDnnTransverseMass = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "Dnn_TransverseMass", ";m_{T}", nMtBin, fMtMin, fMtMax);
-    hDnnTransverseMassLoose = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "Dnn_TransverseMassLoose", ";m_{T}", nMtBin, fMtMin, fMtMax);
-    hDnnTransverseMassMedium = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "Dnn_TransverseMassMedium", ";m_{T}", nMtBin, fMtMin, fMtMax);
-    hDnnTransverseMassTight = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, subdir, "Dnn_TransverseMassTight", ";m_{T}", nMtBin, fMtMin, fMtMax);
-
 }
 
 DnnSelection::Data DnnSelection::silentAnalyze(const Event& event, const Tau& tau, const METSelection::Data& metData, const BJetSelection::Data& bjetData)
@@ -187,8 +179,8 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     inputTensor = TF_NewTensor(TF_FLOAT, dims.data(), static_cast<int>(dims.size()), data, dataSize, &Deallocator, nullptr);
     inputValues[0] = inputTensor;
 
-
-    if(event.eventID().event()%2==0) {
+    //NOTE: "even" means the network is _trained_ on even events and should be used on _odd_ events when evaluating...!
+    if(event.eventID().event()%2!=0) {
         TF_SessionRun(sessionEven, nullptr,
                     runInputsEven, inputValues, 1,
                     runOutputsEven, outputValues, 1,
@@ -203,30 +195,29 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     }
 
     float* outputData = (float*)TF_TensorData(outputValues[0]);
-    float DnnOutput = outputData[0];
+    output.fDnnOutputValue = outputData[0];
+    TF_DeleteTensor(*inputValues);
+    TF_DeleteTensor(*outputValues);
+//    std::free(data);
 
-    hDnnOutput->Fill(DnnOutput);
+    hDnnOutput->Fill(output.getDnnOutput());
 
-    hDnnTransverseMass->Fill(TransverseMass);
-    if(DnnOutput >= fLooseCut) {
-        hDnnTransverseMassLoose->Fill(TransverseMass);
+    if(output.getDnnOutput() >= fLooseCut) {
         output.bPassedLooseCut = true;
     }
 
-    if(DnnOutput >= fMediumCut) {
-        hDnnTransverseMassMedium->Fill(TransverseMass);
+    if(output.getDnnOutput() >= fMediumCut) {
         output.bPassedMediumCut = true;
     }
 
-    if(DnnOutput >= fTightCut) {
-        hDnnTransverseMassTight->Fill(TransverseMass);
+    if(output.getDnnOutput() >= fTightCut) {
         output.bPassedTightCut = true;
     }
 
-    if(DnnOutput >= 0.5) {
+    if(output.bPassedMediumCut) {
         output.bPassedDnnSelection = true;
     }
-    output.fDnnOutputValue = DnnOutput;
+
     return output;
 
 }

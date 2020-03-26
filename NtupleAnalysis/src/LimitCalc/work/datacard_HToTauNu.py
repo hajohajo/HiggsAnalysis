@@ -95,7 +95,7 @@ def PrintNuisancesTable(Nuisances, DataGroups):
 #================================================================================================  
 # Options
 #================================================================================================  
-OptionTest                             = True # [default: False]
+OptionTest                             = False # [default: False]
 OptionPaper                            = True  # [default: True]   (Changes figure style to paper style)
 OptionIncludeSystematics               = True  # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
 OptionShapeSystematics                 = False # [default: True]   (Shape systematics; Requires pseudo-multicrab produced with doSystematics=True) 
@@ -119,7 +119,8 @@ OptionPlotNamePrefix                   = None  #"Results" #[default: None] (Pref
 # Definitions
 #================================================================================================  
 OptionPrintNuisances                   = False            # [default: True]
-MassPoints                             = [80, 90, 100, 120, 140, 150, 155, 160, 180, 200, 220, 250, 300, 400, 500, 750, 800, 1000, 1500, 2000, 2500, 3000]
+MassPoints                             = [180, 200, 220]
+#MassPoints                             = [80, 90, 100, 120, 140, 150, 155, 160, 180, 200, 220, 250, 300, 400, 500, 750, 800, 1000, 1500, 2000, 2500, 3000]
 PlotLegendHeader                       = "H^{#pm}#rightarrow#tau^{#pm}_{h} #nu_{#tau}"
 #SignalName                             = "ChargedHiggs_HplusTB_HplusToTauNu_M_%s"
 SignalName                             = "HplusTB_M%s"
@@ -262,7 +263,7 @@ DYJets = DataGroup(label             = labelPrefix + "DYJets" + labelPostfix,
                    shapeHistoName    = OptionMassShape,
                    histoPath         = histoPathInclusive,
                    datasetType       = dsetTypeEWK,
-                   datasetDefinition = "DYJetsToLLHT", # You must use the exact name given in plots.py
+                   datasetDefinition = "DYJetsToLL", # You must use the exact name given in plots.py
                    validMassPoints   = MassPoints,
                    nuisances         = mySystematics["MC"]
                    )

@@ -5,12 +5,6 @@ dataEras = ["2016"]
 #dataEras = ["2015B","2015C"]
 searchModes = ["80to1000"]
 
-from optparse import OptionParser
-parser = OptionParser(usage="Usage: %prog [options]")
-parser.add_option("--validate", dest="validate", default=False, action="store_true",
-                      help="Flag to run only selected datasets for validation [default: False")
-(opts, args) = parser.parse_args()
-
 if len(sys.argv) < 2:
     print "Usage: ./exampleAnalysis.py <path-to-multicrab-directory> <1pr> <2pr> <3pr>"
     sys.exit(0)
@@ -21,19 +15,13 @@ maxEvents = {}
 #maxEvents["TT"] = 100
 #maxEvents["All"] = 10000
 #maxEvents["^T\S+"] = 200
-#maxEvents["Charged"] = 100
+#maxEvents["Charged"] = 1000000
 process = Process("SignalAnalysis"+obtainAnalysisSuffix(sys.argv),maxEvents=maxEvents)
 blacklist = []
 #blacklist = ["ChargedHiggs_HplusTB_HplusToTauNu_M_","ChargedHiggs_HplusToTauNu_M_200_","ChargedHiggs_HplusTB_HplusToTauNu_HeavyMass_M_"]
 whitelist = []
 #whitelist = ["Tau_Run2016C_","DY","ChargedHiggs_HplusTB_HplusToTauNu_IntermediateMassNoNeutral_M_175"]
-
-if opts.validate == True:
-    whitelist = ["Tau_Run201\dC_","TTJets"]
-print "whitelist",whitelist
 process.addDatasetsFromMulticrab(sys.argv[1],blacklist=blacklist,whitelist=whitelist)
-process.ordering(["^Tau_Run","^TT","^ST","^WJ","^DY"])
-
 
 # Add config
 from HiggsAnalysis.NtupleAnalysis.parameters.signalAnalysisParameters import allSelections,applyAnalysisCommandLineOptions,setAngularCutsWorkingPoint
@@ -70,9 +58,6 @@ allSelections.BJetSelection.bjetDiscrWorkingPoint = "Medium"
 applyAnalysisCommandLineOptions(sys.argv, allSelections)
 
 # Build analysis modules
-sysvar = False
-if opts.validate:
-    sysvar = False
 from HiggsAnalysis.NtupleAnalysis.AnalysisBuilder import AnalysisBuilder
 builder = AnalysisBuilder("SignalAnalysis", 
                           dataEras,
@@ -83,7 +68,7 @@ builder = AnalysisBuilder("SignalAnalysis",
 #                          intermediateSignalSF=0.408683 # for M145-M170
 #                          intermediateSignalSF=0.654405 #for M175-M200
 #                          intermediateSignalSF=1.0 #default                    
-                          doSystematicVariations=sysvar
+                          doSystematicVariations=True
                           )
 #builder.addVariation("METSelection.METCutValue", [100,120,140])
 #builder.addVariation("AngularCutsBackToBack.workingPoint", ["Loose","Medium","Tight"])

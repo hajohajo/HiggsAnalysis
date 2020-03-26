@@ -220,7 +220,7 @@ class ControlPlotMaker:
                             hQCDdata = h.Clone()
                         else:
                             hQCDdata.Add(h)
-                    elif c.typeIsEWKMC() or c.typeIsGenuineB():
+                    elif c.typeIsEWKMC() or c.typeIsGenuineB() or c.typeIsGenuineTau(): ##Added singleTop
                         msg += ". EWKMC"
                         self.Verbose(msg, False)
                         myHisto = histograms.Histo(h, c._datasetMgrColumn)
@@ -229,7 +229,6 @@ class ControlPlotMaker:
                     else:
                         msg = "Histogram %s has unexpected type" % (c.getLabel())
                         raise Exception(sh_e + msg + sh_n)
-                    
                 # If stackList is empty skip the next steps
                 if len(stackList) < 1:
                     continue
@@ -279,6 +278,7 @@ class ControlPlotMaker:
                     stackList.insert(1, myHisto)
             
                 self.Verbose("Add data to selection flow plot", True)
+                print("FlowPlotCaption: {}".format(myCtrlPlot.flowPlotCaption))
                 selectionFlow.addColumn(myCtrlPlot.flowPlotCaption, hDataUnblinded, stackList[1:])
 
                 # Make plot
@@ -635,6 +635,7 @@ class SelectionFlowPlotMaker:
             else:
                 self.Verbose("Appending selection flow bin #%d (%s)" % (i, c.title), i==1)
                 myBinList.append(c.flowPlotCaption)
+                print("myBinList: {}".format(c.flowPlotCaption))
 
         # Make an empty frame
         nBins = len(myBinList)
@@ -644,6 +645,8 @@ class SelectionFlowPlotMaker:
         # For-loop: All (selection flow) bins
         for i, b in enumerate(myBinList, 1):
             self.Verbose("Setting label for bin #%d to \"%s\"" % (i, b), i==1)
+            print("FlowPlotMaker, binLabel:{}".format(b))
+            print("i: {}, b: {}".format(i, b))
             self._hFrame.GetXaxis().SetBinLabel(i, b)
         return
 
@@ -666,6 +669,8 @@ class SelectionFlowPlotMaker:
         '''
         if label == "":
             return
+
+        print("ControlPlotMakerHToTauNu, SelectionFlow, addColumn: {}".format(label))
 
         # Create histograms if necessary
         if self._data == None:

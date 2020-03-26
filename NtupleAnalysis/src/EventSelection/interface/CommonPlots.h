@@ -285,6 +285,7 @@ private:
 
   // DnnSelection
   HistoSplitter::SplittedTripletTH1s hCtrlDnnSelection;
+  HistoSplitter::SplittedTripletTH1s hCtrlDnnSelectionBefore;
   HistoSplitter::SplittedTripletTH1s hCtrlDnnSelectionLoose;
   HistoSplitter::SplittedTripletTH1s hCtrlDnnSelectionMedium;
   HistoSplitter::SplittedTripletTH1s hCtrlDnnSelectionTight;

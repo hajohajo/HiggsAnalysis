@@ -207,7 +207,8 @@ def getBkgDsetCreator(multicrabPaths, bkgLabel, fakesFromData, mcrabInfoOutput):
 
     # Sanity check
     if multicrabPath == "":
-        raise Exception(sh_e + "Could not find the path for the background dataset with label %s" + sh_n % (sh_n + bkgLabel + sh_n) )
+#        raise Exception(sh_e + "Could not find the path for the background dataset with label %s" + sh_n % (sh_n + bkgLabel + sh_n) )
+        raise Exception("Could not find the path for the background dataset with label %s" % (bkgLabel) )
 
     # Get the dataset creator
     msg = "The background with label %s will be estimated from multicrab directory %s" % (sh_t + bkgLabel + sh_n, sh_a + multicrabPath + sh_n)

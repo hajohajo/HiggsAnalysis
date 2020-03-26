@@ -261,6 +261,7 @@ class DatacardColumn():
         elif datasetType == "None":
             dsetType = MulticrabDirectoryDataType.DUMMY
         else:
+            print("Unknown type: {}!!!, from DatacardColumnm getDatasetType".format(datasetType))
             #print "dsetType = ", dsetType
             dsetType = MulticrabDirectoryDataType.UNKNOWN
         return dsetType
