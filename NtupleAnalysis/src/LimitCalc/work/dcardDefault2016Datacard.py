@@ -57,6 +57,7 @@ else:
 
 # Set mass points for control plots (overriding the previous settings):
 #MassPoints = [200]
+MassPoints = HeavyMassPoints
 
 #================================================================================================  
 # Options
@@ -69,16 +70,16 @@ OptionMassShape="TransverseMass" # Use "FullMass" in order to use invariant mass
 ToleranceForLuminosityDifference=0.05 # Tolerance for throwing error on luminosity difference (0.01=1 percent agreement is required)
 
 # Control plots and blinding policy
-OptionDoControlPlots= False #FIXME: If you want control plots, switch this to true!
-OptionCtrlPlotsAfterAllSelections=True # Produce control plots after all selections (all selections for transverse mass)
-OptionBlindThreshold=None # If signal exceeds this fraction of expected events, data is blinded; set to None to disable
+OptionDoControlPlots=False #FIXME: If you want control plots, switch this to true!
+OptionCtrlPlotsAfterAllSelections=False # Produce control plots after all selections (all selections for transverse mass)
+OptionBlindThreshold=0.1 # If signal exceeds this fraction of expected events, data is blinded; set to None to disable
 
 # Systematic uncertainties
 OptionIncludeSystematics=True # Include shape systematics (multicrabs must beproduced with doSystematics=True)
 OptionCombineSingleColumnUncertainties = False # (approxmation that makes limit running faster)
 # Datasets
 OptionUseWJetsHT = True # Use HT binned WJets samples instead of inclusive for WJets background
-OptionUseDYHT = True # Use HT binned DY samples instead of inclusive for DY background
+OptionUseDYHT = False # Use HT binned DY samples instead of inclusive for DY background
 OptionGenuineTauBackgroundSource="MC_FakeAndGenuineTauNotSeparated" # Use "DataDriven" to get EWK+tt genuine taus from embedded samples
 IntSFuncertainty = 0.297037 # for SF 0.41 (light region)
 #IntSFuncertainty = 0.201565 # for SF 0.65 (heavy region)
@@ -318,7 +319,7 @@ else:
     DataGroups.append(DataGroup(label="ttbar"+labelPostfix, landsProcess=3,
                                 shapeHistoName=shapeHistoName, histoPath=histoPathGenuineTaus,
                                 datasetType="Embedding",
-                                datasetDefinition="TT_Mtt",
+                                datasetDefinition="TT", #"TT_Mtt",
                                 validMassPoints=MassPoints,
                                 nuisances=myTrgSystematics[:]+myTauIDSystematics[:]+myTauMisIDSystematics[:]
                                   +myESSystematics[:]+myBtagSystematics[:]+myPileupSystematics[:]+myLeptonVetoSystematics[:]
