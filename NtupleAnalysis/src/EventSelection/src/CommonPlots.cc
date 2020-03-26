@@ -155,6 +155,7 @@ CommonPlots::~CommonPlots() {
   fHistoSplitter.deleteHistograms(hCtrlBackToBackAngularCutsJet3);
   fHistoSplitter.deleteHistograms(hCtrlBackToBackAngularCutsJet4);
   fHistoSplitter.deleteHistograms(hCtrlDnnSelection);
+  fHistoSplitter.deleteHistograms(hCtrlDnnSelectionBefore);
   fHistoSplitter.deleteHistograms(hCtrlDnnSelectionLoose);
   fHistoSplitter.deleteHistograms(hCtrlDnnSelectionMedium);
   fHistoSplitter.deleteHistograms(hCtrlDnnSelectionTight);
@@ -810,6 +811,8 @@ void CommonPlots::book(TDirectory *dir, bool isData) {
     {
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelection,
                                "DnnSelection", ";Dnn output value", fDnnSelectionBinSettings.bins(), fDnnSelectionBinSettings.min(), fDnnSelectionBinSettings.max());
+      fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelectionBefore,
+                               "DnnSelection_MtBefore", "m_{T};Events", fMtBinSettings.bins(), fMtBinSettings.min(), fMtBinSettings.max());
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelectionLoose,
                                "DnnSelection_MtAfterLoose", "m_{T};Events", fMtBinSettings.bins(), fMtBinSettings.min(), fMtBinSettings.max());
       fHistoSplitter.createShapeHistogramTriplet<TH1F>(fEnableGenuineTauHistograms, HistoLevel::kSystematics, myDirs, hCtrlDnnSelectionMedium,
@@ -1215,6 +1218,7 @@ void CommonPlots::fillControlPlotsAtDnnSelection(const Event& event, const DnnSe
   float myTransverseMass = data.getMt();
 
   fHistoSplitter.fillShapeHistogramTriplet(hCtrlDnnSelection, bIsGenuineTau, data.getDnnOutput());
+  fHistoSplitter.fillShapeHistogramTriplet(hCtrlDnnSelectionBefore, bIsGenuineTau, myTransverseMass);
   if(data.passedLooseSelection()){
     fHistoSplitter.fillShapeHistogramTriplet(hCtrlDnnSelectionLoose, bIsGenuineTau, myTransverseMass);
   }

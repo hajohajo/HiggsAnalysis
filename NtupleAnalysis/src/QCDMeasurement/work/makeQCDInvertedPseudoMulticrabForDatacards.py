@@ -21,7 +21,7 @@ _generalOptions = {
     "analysisName": "QCDMeasurement",
     "ewkDatasetsForMerging": ["TT","WJetsHT","DYJetsToLL","SingleTop","Diboson"], # using TT instead of TTJets
     "normalizationFactorSource": "QCDNormalizationFactors_AfterStdSelections%s.py",
-    "normalizationPoint": "AfterStdSelections",
+    "normalizationPoint": "AfterStdSelections", #"AfterAllSelections"
     "normalizationSourcePrefix": "ForQCDNormalization/Normalization",
     "ewkSourceForQCDPlusFakeTaus": "ForDataDrivenCtrlPlotsEWKGenuineTaus",
     "ewkSourceForQCDOnly": "ForDataDrivenCtrlPlots",

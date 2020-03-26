@@ -6,6 +6,8 @@
 # In HiggsAnalysis do
 # source setup.sh
 
+#MUTE THE DAMN TensorFlow spam
+export TF_CPP_MIN_LOG_LEVEL=2
 
 if [ "x$HIGGSANALYSIS_BASE" != "x" ]; then
     echo "Standalone environment already loaded"

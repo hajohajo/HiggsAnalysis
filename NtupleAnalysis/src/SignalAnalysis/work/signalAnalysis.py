@@ -15,7 +15,7 @@ maxEvents = {}
 #maxEvents["TT"] = 100
 #maxEvents["All"] = 10000
 #maxEvents["^T\S+"] = 200
-#maxEvents["Charged"] = 100
+#maxEvents["Charged"] = 1000000
 process = Process("SignalAnalysis"+obtainAnalysisSuffix(sys.argv),maxEvents=maxEvents)
 blacklist = []
 #blacklist = ["ChargedHiggs_HplusTB_HplusToTauNu_M_","ChargedHiggs_HplusToTauNu_M_200_","ChargedHiggs_HplusTB_HplusToTauNu_HeavyMass_M_"]
@@ -58,9 +58,6 @@ allSelections.BJetSelection.bjetDiscrWorkingPoint = "Medium"
 applyAnalysisCommandLineOptions(sys.argv, allSelections)
 
 # Build analysis modules
-sysvar = False
-if opts.validate:
-    sysvar = False
 from HiggsAnalysis.NtupleAnalysis.AnalysisBuilder import AnalysisBuilder
 builder = AnalysisBuilder("SignalAnalysis", 
                           dataEras,

@@ -48,7 +48,11 @@ private:
   BJetSelection fBaselineTauBJetSelection;
   Count cBaselineTauBTaggingSFCounter;
   METSelection fBaselineTauMETSelection;
+  //TopSelectionMVA fBaselineTauTopSelection;
+  Count cBaselineTauTopCounter;
   AngularCutsBackToBack fBaselineTauAngularCutsBackToBack;
+  DnnSelection fBaselineTauDnnSelection;
+
   Count cBaselineTauSelectedEvents;
   // Counters for inverted tau leg (note that the event selection objects contain also some main counters)
   Count cInvertedTauTauIDSFCounter;
@@ -63,7 +67,10 @@ private:
   BJetSelection fInvertedTauBJetSelection;
   Count cInvertedTauBTaggingSFCounter;
   METSelection fInvertedTauMETSelection;
+  //TopSelectionMVA fInvertedTauTopSelection;
+  Count cInvertedTauTopCounter;
   AngularCutsBackToBack fInvertedTauAngularCutsBackToBack;
+  DnnSelection fInvertedTauDnnSelection;
   Count cInvertedTauSelectedEvents;
   
   void doInvertedAnalysis(const Event& event, const Tau& tau, const int nVertices, const bool isGenuineTau);
@@ -166,7 +173,12 @@ QCDMeasurement::QCDMeasurement(const ParameterSet& config, const TH1* skimCounte
   cBaselineTauBTaggingSFCounter(fEventCounter.addCounter("BaselineTau: b tag SF")),
   fBaselineTauMETSelection(config.getParameter<ParameterSet>("METSelection"),
                 fEventCounter, fHistoWrapper, nullptr, "BaselineTau"),
+  //fBaselineTauTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"),
+  //              fEventCounter, fHistoWrapper, nullptr, "BaselineTau"),
+  cBaselineTauTopCounter(fEventCounter.addCounter("BaselineTau: top tagging")),
   fBaselineTauAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"),
+                fEventCounter, fHistoWrapper, nullptr, "BaselineTau"),
+  fBaselineTauDnnSelection(config.getParameter<ParameterSet>("DnnSelection"),
                 fEventCounter, fHistoWrapper, nullptr, "BaselineTau"),
   cBaselineTauSelectedEvents(fEventCounter.addCounter("BaselineTau: selected events")),
   // Inverted tau counters and selection objects (common plots produced)
@@ -188,7 +200,12 @@ QCDMeasurement::QCDMeasurement(const ParameterSet& config, const TH1* skimCounte
   cInvertedTauBTaggingSFCounter(fEventCounter.addCounter("InvertedTau: b tag SF")),
   fInvertedTauMETSelection(config.getParameter<ParameterSet>("METSelection"),
                 fEventCounter, fHistoWrapper, &fCommonPlots, "InvertedTau"),
+  //fInvertedTauTopSelection(config.getParameter<ParameterSet>("TopSelectionMVA"),
+  //              fEventCounter, fHistoWrapper, &fCommonPlots, "InvertedTau"),
+  cInvertedTauTopCounter(fEventCounter.addCounter("InvertedTau: top tagging")),
   fInvertedTauAngularCutsBackToBack(config.getParameter<ParameterSet>("AngularCutsBackToBack"),
+                fEventCounter, fHistoWrapper, &fCommonPlots, "InvertedTau"),
+  fInvertedTauDnnSelection(config.getParameter<ParameterSet>("DnnSelection"),
                 fEventCounter, fHistoWrapper, &fCommonPlots, "InvertedTau"),
   cInvertedTauSelectedEvents(fEventCounter.addCounter("InvertedTau: selected events"))
 { }
@@ -220,7 +237,9 @@ void QCDMeasurement::book(TDirectory *dir) {
   fBaselineTauAngularCutsCollinear.bookHistograms(dir);
   fBaselineTauBJetSelection.bookHistograms(dir);
   fBaselineTauMETSelection.bookHistograms(dir);
+  //fBaselineTauTopSelection.bookHistograms(dir);
   fBaselineTauAngularCutsBackToBack.bookHistograms(dir);
+  fBaselineTauDnnSelection.bookHistograms(dir);
 
   fInvertedTauElectronSelection.bookHistograms(dir);
   fInvertedTauMuonSelection.bookHistograms(dir);
@@ -228,7 +247,9 @@ void QCDMeasurement::book(TDirectory *dir) {
   fInvertedTauAngularCutsCollinear.bookHistograms(dir);
   fInvertedTauBJetSelection.bookHistograms(dir);
   fInvertedTauMETSelection.bookHistograms(dir);
+  //fInvertedTauTopSelection.bookHistograms(dir);
   fInvertedTauAngularCutsBackToBack.bookHistograms(dir);
+  fInvertedTauDnnSelection.bookHistograms(dir);
 
   // ====== Normalization histograms
   HistoSplitter histoSplitter = fCommonPlots.getHistoSplitter();
@@ -564,6 +585,11 @@ void QCDMeasurement::doBaselineAnalysis(const Event& event, const Tau& tau, cons
   const METSelection::Data METData = fBaselineTauMETSelection.analyze(fEvent, nVertices);
   if (!METData.passedSelection())
     return;
+
+//====== Top selection
+  //const TopSelectionMVA::Data topData = fBaselineTauTopSelection.analyze(fEvent,jetData,bjetData);
+  ////  if(topData.getAllCleanedTopsSize() != 1) return;
+  cBaselineTauTopCounter.increment();
   
 //====== Back-to-back angular cuts
   const AngularCutsBackToBack::Data backToBackData = fBaselineTauAngularCutsBackToBack.analyze(fEvent, tau, jetData, METData);
@@ -577,6 +603,10 @@ void QCDMeasurement::doBaselineAnalysis(const Event& event, const Tau& tau, cons
     return;
   }
 
+//====== Dnn selection cut
+  const DnnSelection::Data dnnSelectionData = fBaselineTauDnnSelection.analyze(fEvent, tau, METData, bjetData);
+  if (!dnnSelectionData.passedSelection())
+    return;
 
 //====== All cuts passed
   cBaselineTauSelectedEvents.increment();
@@ -722,6 +752,11 @@ void QCDMeasurement::doInvertedAnalysis(const Event& event, const Tau& tau, cons
   const METSelection::Data METData = fInvertedTauMETSelection.analyze(fEvent, nVertices);
   if (!METData.passedSelection())
     return;
+
+//====== Top selection
+  //const TopSelectionMVA::Data topData = fInvertedTauTopSelection.analyze(fEvent,jetData,bjetData);
+  ////  if(topData.getAllCleanedTopsSize() != 1) return;
+  cInvertedTauTopCounter.increment();
   
 //====== Back-to-back angular cuts
   const AngularCutsBackToBack::Data backToBackData = fInvertedTauAngularCutsBackToBack.analyze(fEvent, tau, jetData, METData);
@@ -732,6 +767,11 @@ void QCDMeasurement::doInvertedAnalysis(const Event& event, const Tau& tau, cons
     }
     return;
   }
+
+//====== Dnn selection cut
+  const DnnSelection::Data dnnSelectionData = fInvertedTauDnnSelection.analyze(fEvent, tau, METData, bjetData);
+  if (!dnnSelectionData.passedSelection())
+    return;
 
 //====== All cuts passed
   cInvertedTauSelectedEvents.increment();

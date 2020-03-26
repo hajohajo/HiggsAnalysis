@@ -74,7 +74,7 @@ public:
     TF_Output* runInputsOdd;
     TF_Output* runOutputsOdd;
 
-
+//    float* data;
     int ntags;
     std::vector<std::int64_t> dims;
     std::int64_t dataSize;
@@ -102,10 +102,10 @@ private:
     Count cSubPassedDnnSelection;
 
     WrappedTH1 *hDnnOutput;
-    WrappedTH1 *hDnnTransverseMass;
-    WrappedTH1 *hDnnTransverseMassLoose;
-    WrappedTH1 *hDnnTransverseMassMedium;
-    WrappedTH1 *hDnnTransverseMassTight;
+//    WrappedTH1 *hDnnTransverseMass;
+//    WrappedTH1 *hDnnTransverseMassLoose;
+//    WrappedTH1 *hDnnTransverseMassMedium;
+//    WrappedTH1 *hDnnTransverseMassTight;
 
 };
 

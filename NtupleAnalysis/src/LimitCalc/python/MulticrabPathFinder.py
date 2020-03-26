@@ -184,7 +184,8 @@ class MulticrabPathFinder:
             myWord = "Hplus2tbAnalysis"
             myFile = "multicrab.cfg"
         else:
-            myWord = "mbedded"
+            #myWord = "mbedded"
+            myWord = "SignalAnalysis"
             myFile = "multicrab.cfg"
         return self.selectLatest( self.grep(dirs, myWord, myFile) )
 

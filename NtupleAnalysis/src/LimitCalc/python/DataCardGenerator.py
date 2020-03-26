@@ -750,6 +750,7 @@ class DataCardGenerator:
         return
 
     def separateMCEWKTausAndFakes(self, targetColumn, targetColumnNewName, addColumnList, subtractColumnList):
+        print("IN SEPARATEMCEWKTAUSANDFAKES")
         # Obtain column for embedding
         myEmbColumn = None
         for c in self._columns:
