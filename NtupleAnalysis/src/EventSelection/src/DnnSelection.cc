@@ -48,10 +48,9 @@ DnnSelection::DnnSelection(const ParameterSet& config)
 
 DnnSelection::~DnnSelection()
 {
+
     delete hDnnOutput;
 
-//    TF_CloseSession(sessionEven, status);
-//    TF_CloseSession(sessionOdd, status);
     TF_DeleteGraph(graphEven);
     TF_DeleteSession(sessionEven, status);
     TF_DeleteGraph(graphOdd);
@@ -63,11 +62,15 @@ DnnSelection::~DnnSelection()
 
 void DnnSelection::initialize(const ParameterSet& config)
 {
+    std::cout<<"INITIALIZE"<<std::endl;
     graphEven = TF_NewGraph();
     graphOdd = TF_NewGraph();
     status = TF_NewStatus();
     sessionOptions = TF_NewSessionOptions();
     runOptions = nullptr;
+
+    auto tf_config = new uint8_t[17]{0xa, 0x7, 0xa, 0x3, 0x47, 0x50, 0x55, 0x10, 0x0, 0x10, 0x4, 0x28, 0x4, 0x38, 0x1, 0x48, 0x1};
+    TF_SetConfig(sessionOptions, tf_config, 17, status);
 
     const char* savedModelDirEven = "/work/hajohajo/HiggsAnalysis_forThesis/HiggsAnalysis/NtupleAnalysis/data/DnnClassifierModels/evenModel";
     const char* savedModelDirOdd = "/work/hajohajo/HiggsAnalysis_forThesis/HiggsAnalysis/NtupleAnalysis/data/DnnClassifierModels/oddModel";
@@ -106,9 +109,9 @@ void DnnSelection::initialize(const ParameterSet& config)
     inputValues = (TF_Tensor**)malloc(sizeof(TF_Tensor*)*1);
     outputValues = (TF_Tensor**)malloc(sizeof(TF_Tensor*)*1);
 
-//    dims = {1, 8};
-//    dataSize = std::accumulate(dims.begin(), dims.end(), sizeof(float), std::multiplies<std::int64_t>{});
-//    float* data = static_cast<float*>(std::malloc(dataSize));
+    dims = {1, 8};
+    dataSize = std::accumulate(dims.begin(), dims.end(), sizeof(float), std::multiplies<std::int64_t>{});
+    data = static_cast<float*>(std::malloc(dataSize));
 
 }
 
@@ -165,22 +168,20 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     TransverseMass = (float)TransverseMass::reconstruct(selectedTau, METVector);
     output.fMt = TransverseMass;
 
-    //Ensuring the inputs are given in the exact order the network expects
-    std::vector<float> inputVector = {MET, tauPt, ldgTrkPtFrac, deltaPhiTauMet, deltaPhiTauBjet, bjetPt, deltaPhiBjetMet, TransverseMass};
-
-    dims = {1, 8};
-    dataSize = std::accumulate(dims.begin(), dims.end(), sizeof(float), std::multiplies<std::int64_t>{});
-    float* data = static_cast<float*>(std::malloc(dataSize));
-    std::copy(inputVector.begin(), inputVector.end(), data);
-
-    inputValues = (TF_Tensor**)malloc(1 * sizeof(TF_Tensor*));
-    outputValues = (TF_Tensor**)malloc(1 * sizeof(TF_Tensor*));
+    data[0] = MET;
+    data[1] = tauPt;
+    data[2] = ldgTrkPtFrac;
+    data[3] = deltaPhiTauMet;
+    data[4] = deltaPhiTauBjet;
+    data[5] = bjetPt;
+    data[6] = deltaPhiBjetMet;
+    data[7] = TransverseMass;
 
     inputTensor = TF_NewTensor(TF_FLOAT, dims.data(), static_cast<int>(dims.size()), data, dataSize, &Deallocator, nullptr);
     inputValues[0] = inputTensor;
 
-    //NOTE: "even" means the network is _trained_ on even events and should be used on _odd_ events when evaluating...!
-    if(event.eventID().event()%2!=0) {
+    //NOTE: "even" means the network is _trained_ on odd events and should be used on _even_ events when evaluating...!
+    if(event.eventID().event()%2==0) {
         TF_SessionRun(sessionEven, nullptr,
                     runInputsEven, inputValues, 1,
                     runOutputsEven, outputValues, 1,
@@ -196,9 +197,6 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
 
     float* outputData = (float*)TF_TensorData(outputValues[0]);
     output.fDnnOutputValue = outputData[0];
-    TF_DeleteTensor(*inputValues);
-    TF_DeleteTensor(*outputValues);
-//    std::free(data);
 
     hDnnOutput->Fill(output.getDnnOutput());
 
@@ -214,6 +212,9 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
         output.bPassedTightCut = true;
     }
 
+    if(TransverseMass > 900) {
+        output.bPassedDnnSelection = true;
+    }
     if(output.bPassedMediumCut) {
         output.bPassedDnnSelection = true;
     }

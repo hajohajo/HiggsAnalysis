@@ -259,7 +259,12 @@ void SignalAnalysis::process(Long64_t entry) {
   }
 
 //===== Dnn selection cut
+//  auto start = std::chrono::high_resolution_clock::now();
   const DnnSelection::Data dnnData = fDnnSelection.analyze(fEvent, tauData.getSelectedTau(), METData, bjetData);
+//  auto finish = std::chrono::high_resolution_clock::now();
+//  std::chrono::duration<double> elapsed = finish - start;
+
+//  std::cout<<fEvent.eventID().event()<<", "<<elapsed.count()<<std::endl;
   if(!dnnData.passedSelection())
     return;
 

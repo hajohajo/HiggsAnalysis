@@ -74,7 +74,7 @@ public:
     TF_Output* runInputsOdd;
     TF_Output* runOutputsOdd;
 
-//    float* data;
+    float* data;
     int ntags;
     std::vector<std::int64_t> dims;
     std::int64_t dataSize;

@@ -54,7 +54,7 @@ builder = AnalysisBuilder("QCDMeasurement",
                           #### Options ####
                           usePUreweighting=True,
                           useTopPtReweighting=True,
-                          doSystematicVariations=True,
+                          doSystematicVariations=False,
                           )
 #builder.addVariation("METSelection.METCutValue", [100,120,140])
 #builder.addVariation("AngularCutsBackToBack.workingPoint", ["Loose","Medium","Tight"])
