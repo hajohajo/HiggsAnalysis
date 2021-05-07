@@ -63,25 +63,26 @@ DnnSelection::~DnnSelection()
 
 void DnnSelection::initialize(const ParameterSet& config)
 {
+    std::srand(std::time(0)); 
     graphEven = TF_NewGraph();
     graphOdd = TF_NewGraph();
     status = TF_NewStatus();
     sessionOptions = TF_NewSessionOptions();
     runOptions = nullptr;
 
-    const char* savedModelDirEven = "/work/hajohajo/HiggsAnalysis_forThesis/HiggsAnalysis/NtupleAnalysis/data/DnnClassifierModels/evenModel";
-    const char* savedModelDirOdd = "/work/hajohajo/HiggsAnalysis_forThesis/HiggsAnalysis/NtupleAnalysis/data/DnnClassifierModels/oddModel";
+    const char* savedModelDirEven = "/home/joona/Documents/CodeRepos/HiggsAnalysis/NtupleAnalysis/data/DnnClassifierModels/evenModel";
+    const char* savedModelDirOdd = "/home/joona/Documents/CodeRepos/HiggsAnalysis/NtupleAnalysis/data/DnnClassifierModels/oddModel";
     const char* tags = "serve";
     ntags = 1;
 
     sessionEven = TF_LoadSessionFromSavedModel(sessionOptions, runOptions, savedModelDirEven, &tags, ntags, graphEven, nullptr, status);
     sessionOdd = TF_LoadSessionFromSavedModel(sessionOptions, runOptions, savedModelDirOdd, &tags, ntags, graphOdd, nullptr, status);
 
-    inputOperationEven = TF_GraphOperationByName(graphEven, "serving_default_input_1");
-    outputOperationEven = TF_GraphOperationByName(graphEven, "StatefulPartitionedCall");
-    inputOperationOdd = TF_GraphOperationByName(graphOdd, "serving_default_input_1");
-    outputOperationOdd = TF_GraphOperationByName(graphOdd, "StatefulPartitionedCall");
 
+    inputOperationEven = TF_GraphOperationByName(graphEven, "serving_default_input_layer");
+    outputOperationEven = TF_GraphOperationByName(graphEven, "StatefulPartitionedCall");
+    inputOperationOdd = TF_GraphOperationByName(graphOdd, "serving_default_input_layer");
+    outputOperationOdd = TF_GraphOperationByName(graphOdd, "StatefulPartitionedCall");
 
     runInputsEven = (TF_Output*)malloc(1 * sizeof(TF_Output));
     runOutputsEven = (TF_Output*)malloc(1 * sizeof(TF_Output));
@@ -106,10 +107,19 @@ void DnnSelection::initialize(const ParameterSet& config)
     inputValues = (TF_Tensor**)malloc(sizeof(TF_Tensor*)*1);
     outputValues = (TF_Tensor**)malloc(sizeof(TF_Tensor*)*1);
 
-//    dims = {1, 8};
-//    dataSize = std::accumulate(dims.begin(), dims.end(), sizeof(float), std::multiplies<std::int64_t>{});
-//    float* data = static_cast<float*>(std::malloc(dataSize));
-
+    lookup[190.0] = 180.0;
+    lookup[210.0] = 200.0;
+    lookup[235.0] = 220.0;
+    lookup[275.0] = 250.0;
+    lookup[350.0] = 300.0;
+    lookup[450.0] = 400.0;
+    lookup[625.0] = 500.0;
+    lookup[775.0] = 750.0;
+    lookup[900.0] = 800.0;
+    lookup[1250.0] = 1000.0;
+    lookup[1750.0] = 1500.0;
+    lookup[2500.0] = 2000.0;
+    lookup[3500.0] = 3000.0;
 }
 
 void DnnSelection::bookHistograms(TDirectory *dir)
@@ -164,11 +174,19 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     deltaPhiBjetMet = (float)ROOT::Math::VectorUtil::DeltaPhi(selectedBjet.p4(), METVector);
     TransverseMass = (float)TransverseMass::reconstruct(selectedTau, METVector);
     output.fMt = TransverseMass;
+    
+    int ind = std::rand() % true_masses.size(); 
+    TrueMass = lookup.lower_bound(boost::algorithm::clamp(TransverseMass, 0.0, 3200.0))->second;
+//    std::cout<<"MT: "<<TransverseMass<<std::endl;
+//    std::cout<<"True: "<<TrueMass<<std::endl;
+//    TrueMass =  true_masses[ind];
 
     //Ensuring the inputs are given in the exact order the network expects
-    std::vector<float> inputVector = {MET, tauPt, ldgTrkPtFrac, deltaPhiTauMet, deltaPhiTauBjet, bjetPt, deltaPhiBjetMet, TransverseMass};
+    std::vector<float> inputVector = {ldgTrkPtFrac, deltaPhiBjetMet, deltaPhiTauMet, deltaPhiTauBjet, MET, tauPt, bjetPt,  TransverseMass, TrueMass};
+  dims = {1, 9};
 
-    dims = {1, 8};
+//    std::vector<float> inputVector = {ldgTrkPtFrac, deltaPhiBjetMet, deltaPhiTauMet, deltaPhiTauBjet, MET, tauPt, bjetPt,  TransverseMass};
+//    dims = {1, 8};
     dataSize = std::accumulate(dims.begin(), dims.end(), sizeof(float), std::multiplies<std::int64_t>{});
     float* data = static_cast<float*>(std::malloc(dataSize));
     std::copy(inputVector.begin(), inputVector.end(), data);
@@ -179,8 +197,8 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     inputTensor = TF_NewTensor(TF_FLOAT, dims.data(), static_cast<int>(dims.size()), data, dataSize, &Deallocator, nullptr);
     inputValues[0] = inputTensor;
 
-    //NOTE: "even" means the network is _trained_ on even events and should be used on _odd_ events when evaluating...!
-    if(event.eventID().event()%2!=0) {
+    //NOTE: "even" means the network should be used on even events when evaluating...!
+    if(event.eventID().event()%2==0) {
         TF_SessionRun(sessionEven, nullptr,
                     runInputsEven, inputValues, 1,
                     runOutputsEven, outputValues, 1,
@@ -198,9 +216,9 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     output.fDnnOutputValue = outputData[0];
     TF_DeleteTensor(*inputValues);
     TF_DeleteTensor(*outputValues);
-//    std::free(data);
 
     hDnnOutput->Fill(output.getDnnOutput());
+    //std::cout<<"Output: "<<output.getDnnOutput()<<std::endl;
 
     if(output.getDnnOutput() >= fLooseCut) {
         output.bPassedLooseCut = true;
@@ -217,6 +235,11 @@ DnnSelection::Data DnnSelection::privateAnalyze(const Event& event, const Tau& s
     if(output.bPassedMediumCut) {
         output.bPassedDnnSelection = true;
     }
+//    else{
+//	for (auto i = inputVector.begin(); i != inputVector.end(); ++i){
+//    		std::cout << *i << ' ';
+//	}
+//    }
 
     return output;
 

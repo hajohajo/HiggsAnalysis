@@ -603,10 +603,10 @@ void QCDMeasurement::doBaselineAnalysis(const Event& event, const Tau& tau, cons
     return;
   }
 
-//====== Dnn selection cut
-  const DnnSelection::Data dnnSelectionData = fBaselineTauDnnSelection.analyze(fEvent, tau, METData, bjetData);
-  if (!dnnSelectionData.passedSelection())
-    return;
+////====== Dnn selection cut
+//  const DnnSelection::Data dnnSelectionData = fBaselineTauDnnSelection.analyze(fEvent, tau, METData, bjetData);
+//  if (!dnnSelectionData.passedSelection())
+//    return;
 
 //====== All cuts passed
   cBaselineTauSelectedEvents.increment();
@@ -768,11 +768,11 @@ void QCDMeasurement::doInvertedAnalysis(const Event& event, const Tau& tau, cons
     return;
   }
 
-//====== Dnn selection cut
-  const DnnSelection::Data dnnSelectionData = fInvertedTauDnnSelection.analyze(fEvent, tau, METData, bjetData);
-  if (!dnnSelectionData.passedSelection())
-    return;
-
+////====== Dnn selection cut
+//  const DnnSelection::Data dnnSelectionData = fInvertedTauDnnSelection.analyze(fEvent, tau, METData, bjetData);
+//  if (!dnnSelectionData.passedSelection())
+//    return;
+//
 //====== All cuts passed
   cInvertedTauSelectedEvents.increment();
   // Fill final plots

@@ -1,12 +1,14 @@
 #ifndef EventSelection_DnnSelection_h
 #define EventSelection_DnnSelection_h
 
+//#include <cstdlib>
+//#include <ctime>
 #include "EventSelection/interface/BaseSelection.h"
 #include "EventSelection/interface/TauSelection.h"
 #include "EventSelection/interface/METSelection.h"
 #include "EventSelection/interface/BJetSelection.h"
 #include "EventSelection/interface/TransverseMass.h"
-
+#include <boost/algorithm/clamp.hpp>
 #include <Math/Vector2D.h>
 #include <Math/VectorUtil.h>
 
@@ -78,7 +80,7 @@ public:
     int ntags;
     std::vector<std::int64_t> dims;
     std::int64_t dataSize;
-
+    std::map<float, float> lookup;
 
     float MET;
     float tauPt;
@@ -87,8 +89,11 @@ public:
     float deltaPhiTauBjet;
     float bjetPt;
     float deltaPhiBjetMet;
+    float TrueMass;
     float TransverseMass;
+    //std::vector<float> true_masses {80., 90., 100., 120., 140., 145., 150., 155., 160., 165., 170., 175., 180., 190., 200., 220., 250., 300., 400., 500., 750., 800., 1000., 1500., 2000., 2500., 3000., 5000., 7000., 10000.};
 
+    std::vector<float> true_masses {180., 190., 200., 220., 250., 300., 400., 500., 750., 800., 1000., 1500., 2000., 2500., 3000.};
 private:
     void initialize(const ParameterSet& config);
     Data privateAnalyze(const Event& event, const Tau& selectedTau, const math::XYVectorD& METVector, const Jet& bjet);

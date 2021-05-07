@@ -38,7 +38,7 @@ allSelections.AngularCutsBackToBack.cutValueJet1 = 40.0
 allSelections.AngularCutsBackToBack.cutValueJet2 = 40.0
 allSelections.AngularCutsBackToBack.cutValueJet3 = 40.0
 allSelections.AngularCutsBackToBack.cutValueJet4 = 40.0
-allSelections.TauSelection.rtau = 0.75
+allSelections.TauSelection.rtau = 0.0 #0.75
 #allSelections.TauSelection.rtauSmallerThan = 0.75
 allSelections.BJetSelection.bjetDiscrWorkingPoint = "Medium"
 
@@ -68,7 +68,7 @@ builder = AnalysisBuilder("SignalAnalysis",
 #                          intermediateSignalSF=0.408683 # for M145-M170
 #                          intermediateSignalSF=0.654405 #for M175-M200
 #                          intermediateSignalSF=1.0 #default                    
-                          doSystematicVariations=True
+                          doSystematicVariations=False
                           )
 #builder.addVariation("METSelection.METCutValue", [100,120,140])
 #builder.addVariation("AngularCutsBackToBack.workingPoint", ["Loose","Medium","Tight"])

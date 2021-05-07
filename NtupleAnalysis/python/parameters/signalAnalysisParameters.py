@@ -167,9 +167,9 @@ enableOptimizationPlots = True, # 2D histograms for optimizing angular cuts
 # Dnn selection MVA
 #================================================================================================
 dnnSelection = PSet(
-    looseCut    = 0.35,
-    mediumCut   = 0.55,
-    tightCut    = 0.65
+    looseCut    = 0.15,
+    mediumCut   = 0.45,
+    tightCut    = 0.8
 )
 
 #====== Experimental

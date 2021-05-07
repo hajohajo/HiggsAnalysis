@@ -32,7 +32,7 @@ allSelections.AngularCutsBackToBack.cutValueJet1 = 40.0
 allSelections.AngularCutsBackToBack.cutValueJet2 = 40.0
 allSelections.AngularCutsBackToBack.cutValueJet3 = 40.0
 allSelections.AngularCutsBackToBack.cutValueJet4 = 40.0
-allSelections.TauSelection.rtau = 0.75
+allSelections.TauSelection.rtau = 0.0 #0.75
 #allSelections.TauSelection.rtauSmallerThan = 0.75
 allSelections.BJetSelection.bjetDiscrWorkingPoint = "Medium"
 
@@ -55,7 +55,7 @@ builder = AnalysisBuilder("QCDMeasurement",
                           #### Options ####
                           usePUreweighting=True,
                           useTopPtReweighting=True,
-                          doSystematicVariations=True,
+                          doSystematicVariations=False,
                           )
 #builder.addVariation("METSelection.METCutValue", [100,120,140])
 #builder.addVariation("AngularCutsBackToBack.workingPoint", ["Loose","Medium","Tight"])
@@ -67,7 +67,7 @@ builder.build(process, allSelections)
 # Run the analysis
 if "proof" in sys.argv:
     #raise Exception("Proof messes up the event weights, do not use for the moment!")
-    #process.run(proof=True, proofWorkers=4)
+   # process.run(proof=True, proofWorkers=4)
     process.run(proof=True)
 else:
     process.run()

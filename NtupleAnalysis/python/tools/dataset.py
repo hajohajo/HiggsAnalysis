@@ -4526,8 +4526,8 @@ class DatasetPrecursor:
                 if pileup == None:
                     Print("Unable to find 'configInfo/pileup' from ROOT file '%s'" % name, True)
                     sys.exit()
-                if (pileup.Integral() == 0):
-                    raise Exception("Empty pileup histogram \"%s\" in ROOT file \"%s\". Entries = \"%s\"." % (puName, rf.GetName(), pileup.GetEntries()) )
+#                if (pileup.Integral() == 0):
+#                    raise Exception("Empty pileup histogram \"%s\" in ROOT file \"%s\". Entries = \"%s\"." % (puName, rf.GetName(), pileup.GetEntries()) )
 
                 if self._pileup is None:
                     if pileup != None:
